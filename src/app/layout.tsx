@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="flex flex-col">{children}</body>
+      <body>{children}</body>
     </html>
   )
 }
