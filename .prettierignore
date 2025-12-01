@@ -3,6 +3,5 @@ node_modules
 out
 dist
 coverage
-build
 public/*
 !.prettier.config.mjs
