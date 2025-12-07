@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 
+import Footer from '@/components/layout/Footer'
+import Header from '@/components/layout/Header'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -24,9 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>
+      <body className="flex min-h-screen flex-col">
         <QueryClientProviderWrapper>
-          {children}
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
           <Toaster richColors closeButton />
         </QueryClientProviderWrapper>
       </body>

@@ -86,4 +86,16 @@
   :where(a, button, [role='button'], input[type='checkbox'], input[type='radio']) {
     @apply cursor-pointer;
   }
+
+  /* 모바일/데스크탑 두 가지 경우로만 반응형 설정 */
+  .container {
+    @apply mx-auto w-full px-4;
+    container-type: inline-size;
+  }
+}
+
+@container (min-width: 768px) {
+  .container {
+    @apply max-w-7xl px-10;
+  }
 }
