@@ -26,10 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="flex min-h-screen flex-col">
+      <body className="relative flex min-h-screen flex-col bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat">
+        <div className="pointer-events-none absolute inset-0 bg-black/20" />
         <QueryClientProviderWrapper>
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="relative flex flex-1 flex-col px-4">{children}</main>
           <Footer />
           <Toaster richColors closeButton />
         </QueryClientProviderWrapper>
