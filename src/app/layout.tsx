@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
+import { Toaster } from '@/components/ui/sonner'
 
 import './globals.css'
 
@@ -24,7 +25,10 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <QueryClientProviderWrapper>{children}</QueryClientProviderWrapper>
+        <QueryClientProviderWrapper>
+          {children}
+          <Toaster richColors closeButton />
+        </QueryClientProviderWrapper>
       </body>
     </html>
   )
