@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 
+import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
+
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -21,7 +23,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <QueryClientProviderWrapper>{children}</QueryClientProviderWrapper>
+      </body>
     </html>
   )
 }
