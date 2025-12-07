@@ -4,6 +4,7 @@ import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
+import FloatingCart from '@/features/cart/FloatingCart'
 
 import './globals.css'
 
@@ -32,6 +33,7 @@ export default function RootLayout({
           <Header />
           <main className="relative flex flex-1 flex-col px-4">{children}</main>
           <Footer />
+          <FloatingCart />
           <Toaster richColors closeButton />
         </QueryClientProviderWrapper>
       </body>
