@@ -8,7 +8,6 @@ import { FiArrowRight } from 'react-icons/fi'
 import { mockCourses } from '@/features/course/api/mockCourses'
 import { CourseFilterTabs } from '@/features/course/components/CourseFilterTabs'
 import { CourseList } from '@/features/course/components/CourseList'
-import { useCartStore } from '@/store/cart.store'
 
 const CATEGORIES = [
   '웹개발',
@@ -24,15 +23,6 @@ const CATEGORIES = [
 export function CourseSection() {
   const router = useRouter()
   const [category, setCategory] = useState(CATEGORIES[0]) // 기본값은 첫 번째 카테고리
-  const add = useCartStore(s => s.add)
-
-  const onAdd = (course: any) => {
-    add({
-      id: course.id,
-      title: course.title,
-      image: course.imageUrl ?? '',
-    })
-  }
 
   return (
     <section>

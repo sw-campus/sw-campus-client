@@ -6,6 +6,7 @@ import 'swiper/css/pagination'
 import { Pagination, Autoplay } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
+// TODO: 클릭하면 상세페이지로 이동
 const banners = [
   { src: '/images/banners/banner-1.png', bg: '#B7DFFF' },
   { src: '/images/banners/banner-2.png', bg: '#000000' },
@@ -13,7 +14,7 @@ const banners = [
   { src: '/images/banners/banner-4.jpg', bg: '#EB6E44' },
 ]
 
-export function BannerSection() {
+export function LargeBanner() {
   return (
     <div className="mx-auto mt-6 w-full max-w-7xl overflow-hidden rounded-3xl">
       <Swiper

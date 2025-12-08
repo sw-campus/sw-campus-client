@@ -4,7 +4,8 @@ import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
-import { BannerSection } from '@/features/banner/components/BannerSection'
+import BannerCardList from '@/features/banner/components/BannerCardList'
+import { LargeBanner } from '@/features/banner/components/LargeBanner'
 import FloatingCart from '@/features/cart/components/FloatingCart'
 
 import './globals.css'
@@ -33,7 +34,8 @@ export default function RootLayout({
         <div className="pointer-events-none absolute inset-0 bg-black/40" />
         <QueryClientProviderWrapper>
           <Header />
-          <BannerSection />
+          <LargeBanner />
+          <BannerCardList />
           <main className="relative flex flex-1 flex-col py-8">
             <div className="mx-auto w-full max-w-7xl rounded-3xl border border-white/10 bg-white/40 p-8 px-4 shadow-xl backdrop-blur-xl">
               {children}
