@@ -4,7 +4,7 @@ import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
-import FloatingCart from '@/features/cart/FloatingCart'
+import FloatingCart from '@/features/cart/components/FloatingCart'
 
 import './globals.css'
 
@@ -33,7 +33,7 @@ export default function RootLayout({
         <QueryClientProviderWrapper>
           <Header />
           <main className="relative flex flex-1 flex-col py-8">
-            <div className="mx-auto w-full max-w-7xl rounded-3xl border border-white/10 bg-white/30 p-8 px-4 shadow-xl backdrop-blur-xl">
+            <div className="mx-auto w-full max-w-7xl rounded-3xl border border-white/10 bg-white/40 p-8 px-4 shadow-xl backdrop-blur-xl">
               {children}
             </div>
           </main>

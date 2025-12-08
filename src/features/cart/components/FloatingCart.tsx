@@ -2,7 +2,6 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowUpRight, X } from 'lucide-react'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 import { useCartStore } from '@/store/cart.store'
@@ -28,7 +27,7 @@ export default function FloatingCart() {
               <div key={item.id} className="relative shrink-0">
                 {/* 이미지 */}
                 <div className="relative h-14 w-14 overflow-hidden rounded-full border border-white/60 shadow-sm">
-                  <Image src={item.image} alt="" fill sizes="56px" className="object-cover" />
+                  {/* <Image src={item.image} alt="" fill sizes="56px" className="object-cover" /> */}
                 </div>
 
                 {/* 삭제 버튼 */}
