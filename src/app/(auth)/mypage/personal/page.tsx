@@ -19,7 +19,7 @@ export default function MyPage() {
           </aside>
 
           {/* 오른쪽 본문 영역 (추후 내용 넣을 자리) */}
-          <div className="flex-[4] rounded-3xl bg-neutral-600/80">
+          <div className="flex-4 rounded-3xl bg-neutral-600/80">
             {/* TODO: 회원정보 / 찜한 강의 / 리뷰 내용 들어갈 자리 */}
           </div>
         </div>

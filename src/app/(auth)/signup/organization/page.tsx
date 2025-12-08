@@ -10,13 +10,13 @@ export default function SignupOrganizationPage() {
 
   return (
     <div className="flex flex-col gap-4 text-sm">
-      {/* 전체 영역 : 검은 박스 + 안쪽 회색 */}
+      {/* 전체 영역 */}
       <section className="relative flex min-h-[540px] w-full items-center justify-center rounded-3xl px-8 py-10">
         {/* 가운데 회원가입 카드 */}
         <div className="relative z-10 flex w-full items-center justify-center">
           <form
             onSubmit={handleSubmit}
-            className="w-full max-w-xl rounded-xl bg-neutral-200/95 p-8 text-xs shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
+            className="w-full max-w-xl rounded-xl bg-white/90 p-8 text-xs shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
           >
             {/* 이메일 + 인증 */}
             <div className="mb-4">
