@@ -87,3 +87,10 @@
     @apply cursor-pointer;
   }
 }
+
+@layer components {
+  .swiper-pagination-bullet-active {
+    background-color: var(--color-orange-400) !important;
+    opacity: 1;
+  }
+}
