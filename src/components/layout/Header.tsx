@@ -19,10 +19,10 @@ export default function Header() {
 
       {/* 아이콘 */}
       <div className="flex items-center gap-6 text-xl text-white">
-        <Link href="/">
+        <Link href="/login">
           <FiLogIn />
         </Link>
-        <Link href="/">
+        <Link href="/mypage/organization">
           <FiUser />
         </Link>
         <Link href="/">
