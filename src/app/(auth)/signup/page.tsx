@@ -24,14 +24,9 @@ export default function SignupSelectPage() {
               className="flex-[1.2] rounded-3xl bg-white/90 p-10 text-center shadow-[0_16px_40px_rgba(0,0,0,0.45)] transition-transform hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
             >
               {/* 그림 자리 */}
-              <div className="mb-6 flex h-72 items-center justify-center overflow-hidden rounded-2xl bg-white/90">
-                <Image
-                  src="/images/signup_personal.png"
-                  alt="개인회원 가입 이미지"
-                  width={300}
-                  height={200}
-                  className="object-contain"
-                />
+              <div className="mb-6 flex h-56 items-center justify-center rounded-2xl bg-neutral-300">
+                {/* 실제로는 <Image /> 넣어서 일러스트 교체하면 됨 */}
+                <span className="text-xs text-neutral-500">개인회원 이미지 영역</span>
               </div>
 
               {/* 버튼 모양 텍스트 */}
@@ -54,14 +49,9 @@ export default function SignupSelectPage() {
               className="flex-[1.2] rounded-3xl bg-white/90 p-10 text-center shadow-[0_16px_40px_rgba(0,0,0,0.45)] transition-transform hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
             >
               {/* 그림 자리 */}
-              <div className="mb-6 flex h-72 items-center justify-center overflow-hidden rounded-2xl bg-white/90">
-                <Image
-                  src="/images/signup_org.png"
-                  alt="개인회원 가입 이미지"
-                  width={300}
-                  height={200}
-                  className="object-contain"
-                />
+              <div className="mb-6 flex h-56 items-center justify-center rounded-2xl bg-neutral-300">
+                {/* 실제로는 <Image /> 넣어서 일러스트 교체하면 됨 */}
+                <span className="text-xs text-neutral-500">개인회원 이미지 영역</span>
               </div>
 
               {/* 버튼 모양 텍스트 */}
