@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer className="mx-auto mt-20 mb-10 w-full max-w-7xl rounded-3xl border border-white/15 bg-white/10 p-10 pb-10 text-white shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+    <footer className="mx-auto mb-10 w-full max-w-7xl rounded-3xl border border-white/15 bg-white/10 p-10 pb-10 text-white shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-xl">
       {/* 상단 영역 */}
       <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div className="text-2xl font-extrabold tracking-tight text-white">SOFTWARE CAMPUS</div>
