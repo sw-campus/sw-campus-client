@@ -7,13 +7,13 @@ export default function SignupSelectPage() {
   const router = useRouter()
 
   return (
-    <div className="flex flex-col gap-4 text-sm">
+    <div className="flex flex-col gap-4">
       {/* 전체 영역 */}
       <section className="relative flex min-h-[540px] w-full items-center justify-center rounded-3xl px-8 py-10">
         {/* 실제 내용 */}
         <div className="relative z-10 flex flex-col items-center gap-12">
           {/* 상단 안내 문구 */}
-          <p className="text-lg font-semibold text-neutral-200">소프트웨어 캠퍼스 회원가입을 환영합니다.</p>
+          <p className="font-semibold text-neutral-200">소프트웨어 캠퍼스 회원가입을 환영합니다.</p>
 
           {/* 두 개의 카드 영역 */}
           <div className="flex w-full max-w-5xl gap-8">
@@ -26,11 +26,11 @@ export default function SignupSelectPage() {
               {/* 그림 자리 */}
               <div className="mb-6 flex h-56 items-center justify-center rounded-2xl bg-neutral-300">
                 {/* 실제로는 <Image /> 넣어서 일러스트 교체하면 됨 */}
-                <span className="text-xs text-neutral-500">개인회원 이미지 영역</span>
+                <span className="text-neutral-500">개인회원 이미지 영역</span>
               </div>
 
               {/* 버튼 모양 텍스트 */}
-              <div className="inline-flex items-center rounded-full bg-neutral-700 px-6 py-1 text-[11px] font-semibold text-white">
+              <div className="inline-flex items-center rounded-full bg-neutral-700 px-6 py-1 font-semibold text-white">
                 개인회원 가입
               </div>
 
@@ -51,16 +51,16 @@ export default function SignupSelectPage() {
               {/* 그림 자리 */}
               <div className="mb-6 flex h-56 items-center justify-center rounded-2xl bg-neutral-300">
                 {/* 실제로는 <Image /> 넣어서 일러스트 교체하면 됨 */}
-                <span className="text-xs text-neutral-500">개인회원 이미지 영역</span>
+                <span className="text-neutral-500">개인회원 이미지 영역</span>
               </div>
 
               {/* 버튼 모양 텍스트 */}
-              <div className="inline-flex items-center rounded-full bg-neutral-700 px-6 py-1 text-[11px] font-semibold text-white">
+              <div className="inline-flex items-center rounded-full bg-neutral-700 px-6 py-1 font-semibold text-white">
                 기업회원 가입
               </div>
 
               {/* 설명 텍스트 */}
-              <p className="mt-4 text-[15px] text-neutral-600">• 부트캠프를 홍보하려는 사업체 직원</p>
+              <p className="mt-4 text-neutral-600">• 부트캠프를 홍보하려는 사업체 직원</p>
             </button>
           </div>
         </div>

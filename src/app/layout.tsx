@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 
 import Footer from '@/components/layout/Footer'
+import FooterController from '@/components/layout/FooterController'
 import Header from '@/components/layout/Header'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
@@ -34,6 +35,7 @@ export default function RootLayout({
           <Header />
           {children}
           <Footer />
+          <FooterController />
 
           {/* 장바구니 */}
           <FloatingCart />
