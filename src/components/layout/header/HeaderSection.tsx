@@ -13,9 +13,9 @@ export default function HeaderSection() {
   if (!mounted) return null // SSR 단계에서는 아무것도 렌더하지 않음
 
   return (
-    <>
+    <div className="relative">
       <Header onOpenNav={() => setOpen(true)} />
       <Navigation open={open} onClose={() => setOpen(false)} />
-    </>
+    </div>
   )
 }

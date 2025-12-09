@@ -1,8 +1,8 @@
 export default function MyPage() {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-7xl flex-col gap-4">
       {/* 전체 마이페이지 영역 */}
-      <section className="flex min-h-[500px] w-full items-center justify-center px-6 py-10">
+      <section className="flex w-full items-center justify-center px-6 py-10">
         {/* 실제 내용 영역 */}
         <div className="relative z-10 flex w-full gap-6">
           {/* 왼쪽 사이드바 */}

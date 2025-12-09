@@ -1,10 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 
-import Footer from '@/components/layout/Footer'
-import HeaderSection from '@/components/layout/header/HeaderSection'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
-import FloatingCart from '@/features/cart/components/FloatingCart'
 
 import './globals.css'
 
@@ -30,15 +27,7 @@ export default function RootLayout({
       <body className="relative flex min-h-screen flex-col bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat">
         <div className="pointer-events-none absolute inset-0 bg-black/40" />
         <QueryClientProviderWrapper>
-          {/* 본문 */}
-          <HeaderSection />
           {children}
-          <Footer />
-
-          {/* 장바구니 */}
-          <FloatingCart />
-
-          {/* 알림창 커스텀 */}
           <Toaster richColors closeButton />
         </QueryClientProviderWrapper>
       </body>

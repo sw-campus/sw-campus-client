@@ -1,18 +1,10 @@
-'use client'
+import HeaderSection from '@/components/layout/header/HeaderSection'
 
-type AuthLayoutProps = {
-  children: React.ReactNode
-}
-
-export default function AuthLayout({ children }: AuthLayoutProps) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <main className="relative mx-auto flex min-h-[calc(100vh-120px)] w-full max-w-6xl flex-col px-6 pt-6 pb-12">
-      <style jsx global>{`
-        footer {
-          display: none !important;
-        }
-      `}</style>
+    <>
+      <HeaderSection />
       {children}
-    </main>
+    </>
   )
 }
