@@ -27,7 +27,7 @@ export default function SignupSelectPage() {
               {/* 그림 자리 */}
               <div className="mb-6 flex h-56 items-center justify-center overflow-hidden rounded-2xl">
                 <Image
-                  src="/images/signup_person.png"
+                  src="/images/signup/signup_person.png"
                   alt="개인회원 가입 이미지"
                   width={200}
                   height={200}
@@ -61,7 +61,7 @@ export default function SignupSelectPage() {
               {/* 그림 자리 */}
               <div className="mb-6 flex h-56 items-center justify-center overflow-hidden rounded-2xl">
                 <Image
-                  src="/images/signup_org.png"
+                  src="/images/signup/signup_org.png"
                   alt="개인회원 가입 이미지"
                   width={200}
                   height={200}
