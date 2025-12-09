@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 
+import Link from 'next/link'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
@@ -15,6 +16,7 @@ const bootcamps = [
     badge: 'D-27',
     date: '1/27',
     tag: '무료(내배카)',
+    href: '/',
   },
   {
     academy: '한화시스템',
@@ -23,6 +25,7 @@ const bootcamps = [
     badge: 'D-1',
     date: '12/9',
     tag: '무료(내배카)',
+    href: '/',
   },
   {
     academy: 'kakao enterprise',
@@ -31,6 +34,7 @@ const bootcamps = [
     badge: 'EVENT',
     date: '12/22',
     tag: '무료(내배카)',
+    href: '/',
   },
   {
     academy: '중앙정보기술',
@@ -39,6 +43,7 @@ const bootcamps = [
     badge: 'EVENT',
     date: '12/22',
     tag: '무료(내배카)',
+    href: '/',
   },
 ]
 
@@ -62,24 +67,26 @@ export default function SmallBanner() {
       >
         {bootcamps.map((item, idx) => (
           <SwiperSlide key={idx}>
-            <div className="flex h-[190px] flex-col justify-between rounded-2xl border border-gray-200 bg-white/60 p-5 shadow">
-              {/* 상단 로고 + 배지 */}
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">{item.academy}</span>
-                <span className="bg-accent rounded-md px-2 py-0.5 text-xs font-semibold">{item.badge}</span>
+            <Link href={item.href} className="block">
+              <div className="flex h-[190px] flex-col justify-between rounded-2xl border border-gray-200 bg-white/60 p-5 shadow">
+                {/* 상단 로고 + 배지 */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-gray-700">{item.academy}</span>
+                  <span className="bg-accent rounded-md px-2 py-0.5 text-xs font-semibold">{item.badge}</span>
+                </div>
+
+                {/* 제목 */}
+                <div className="mt-1 line-clamp-2 text-base font-bold">{item.title}</div>
+
+                {/* 설명 */}
+                <div className="mt-2 line-clamp-1 rounded-xl bg-gray-100/70 px-3 py-2 text-sm">{item.desc}</div>
+
+                {/* 날짜 */}
+                <div className="mt-3 text-sm text-gray-600">
+                  {item.date} 개강 · {item.tag}
+                </div>
               </div>
-
-              {/* 제목 */}
-              <div className="mt-1 line-clamp-2 text-base font-bold">{item.title}</div>
-
-              {/* 설명 */}
-              <div className="mt-2 line-clamp-1 rounded-xl bg-gray-100/70 px-3 py-2 text-sm">{item.desc}</div>
-
-              {/* 날짜 */}
-              <div className="mt-3 text-sm text-gray-600">
-                {item.date} 개강 · {item.tag}
-              </div>
-            </div>
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>
