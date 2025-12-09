@@ -11,11 +11,18 @@ interface AddToCartButtonProps {
   [key: string]: any // 다른 모든 props 허용 (className 등)
 }
 
-export function AddToCartButton({ item, children, ...props }: AddToCartButtonProps) {
+export function AddToCartButton({ item, children, onClick, ...props }: AddToCartButtonProps) {
   const { addToCart } = useAddToCart()
 
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addToCart(item)
+    onClick?.(e)
+  }
+
   return (
-    <Button {...props} onClick={() => addToCart(item)}>
+    <Button {...props} onClick={handleClick}>
       {children ?? 'Add to cart'}
     </Button>
   )
