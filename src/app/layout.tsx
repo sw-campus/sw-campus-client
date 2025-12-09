@@ -34,10 +34,10 @@ export default function RootLayout({
         <QueryClientProviderWrapper>
           {/* 본문 */}
           <Header />
-          <main className="relative flex flex-1 flex-col py-8">
-            <PageContainer>{children}</PageContainer>
-          </main>
-          <FooterController />
+          {children}
+          <Footer />
+
+          {/* 장바구니 */}
           <FloatingCart />
 
           {/* 알림창 커스텀 */}
