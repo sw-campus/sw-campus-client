@@ -12,12 +12,12 @@ import { CourseList } from '@/features/course/components/CourseList'
 const CATEGORIES = [
   '웹개발',
   '모바일',
-  '게임·블록체인',
-  'IoT·임베디드·반도체',
-  '클라우드·보안',
   '데이터·AI',
-  '기획·마케팅·기타',
-  '디자인·3D',
+  '클라우드',
+  '보안',
+  '임베디드(IoT)',
+  '게임·블록체인',
+  '기획·마케팅·디자인',
 ]
 
 export default function CourseSection() {

@@ -9,6 +9,8 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
+  --color-background-20: var(--background-20);
+  --color-background-50: var(--background-50);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -44,6 +46,8 @@
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
+  --background-20: oklch(1 0 0 / 0.2);
+  --background-50: oklch(1 0 0 / 0.5);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);

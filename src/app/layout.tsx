@@ -6,6 +6,7 @@ import PageContainer from '@/components/layout/PageContainer'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
 import FloatingCart from '@/features/cart/components/FloatingCart'
+import Navigation from '@/features/navi/components/NavigationMenu'
 
 import './globals.css'
 
@@ -33,6 +34,7 @@ export default function RootLayout({
         <QueryClientProviderWrapper>
           {/* 본문 */}
           <Header />
+          <Navigation />
           {children}
           <Footer />
           <FooterController />
