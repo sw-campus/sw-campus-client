@@ -14,7 +14,7 @@ const banners = [
   { src: '/images/banners/banner-4.jpg', bg: '#EB6E44' },
 ]
 
-export function LargeBanner() {
+export default function LargeBanner() {
   return (
     <div className="mx-auto mt-6 w-full max-w-7xl overflow-hidden rounded-3xl">
       <Swiper

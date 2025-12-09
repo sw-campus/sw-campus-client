@@ -4,8 +4,6 @@ import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
-import BannerCardList from '@/features/banner/components/BannerCardList'
-import { LargeBanner } from '@/features/banner/components/LargeBanner'
 import FloatingCart from '@/features/cart/components/FloatingCart'
 
 import './globals.css'
@@ -30,19 +28,17 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="relative flex min-h-screen flex-col bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat">
-        {/* 화면 약간 어둡게 오버레이 */}
         <div className="pointer-events-none absolute inset-0 bg-black/40" />
         <QueryClientProviderWrapper>
+          {/* 본문 */}
           <Header />
-          <LargeBanner />
-          <BannerCardList />
-          <main className="relative flex flex-1 flex-col py-8">
-            <div className="mx-auto w-full max-w-7xl rounded-3xl border border-white/10 bg-white/40 p-8 px-4 shadow-xl backdrop-blur-xl">
-              {children}
-            </div>
-          </main>
+          {children}
           <Footer />
+
+          {/* 장바구니 */}
           <FloatingCart />
+
+          {/* 알림창 커스텀 */}
           <Toaster richColors closeButton />
         </QueryClientProviderWrapper>
       </body>

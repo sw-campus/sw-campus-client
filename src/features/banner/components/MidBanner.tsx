@@ -17,7 +17,7 @@ const data = [
   },
 ]
 
-export default function BootcampCardList() {
+export default function MidBanner() {
   return (
     <div className="mx-auto mt-6 w-full max-w-7xl rounded-3xl border border-white/10 bg-white/40 p-6 shadow-xl backdrop-blur-xl">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
