@@ -1,15 +1,37 @@
 'use client'
 
-import { FormEvent } from 'react'
+import { FormEvent, useState } from 'react'
+
+import Script from 'next/script'
 
 export default function SignupPersonalPage() {
+  const [address, setAddress] = useState('')
+  const [detailAddress, setDetailAddress] = useState('')
+
+  const handleSearchAddress = () => {
+    if (typeof window === 'undefined') return
+
+    const { daum } = window as any
+    if (!daum || !daum.Postcode) {
+      alert('주소 검색 스크립트가 아직 로드되지 않았어요. 잠시 후 다시 시도해 주세요.')
+      return
+    }
+
+    new daum.Postcode({
+      oncomplete: (data: any) => {
+        const fullAddress = data.roadAddress || data.jibunAddress
+        setAddress(fullAddress)
+      },
+    }).open()
+  }
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // TODO: 실제 회원가입 로직 (API 연동)
   }
 
   return (
     <div className="flex flex-col gap-4">
+      <Script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" strategy="lazyOnload" />
       {/* 전체 영역 */}
       <section className="relative flex min-h-[540px] w-full items-center justify-center rounded-3xl px-8 py-10">
         {/* 가운데 회원가입 카드 */}
@@ -101,8 +123,14 @@ export default function SignupPersonalPage() {
                   type="text"
                   placeholder="address"
                   className="h-9 w-full flex-1 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
+                  value={address}
+                  readOnly
                 />
-                <button type="button" className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white">
+                <button
+                  type="button"
+                  onClick={handleSearchAddress}
+                  className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white"
+                >
                   검색
                 </button>
               </div>
@@ -110,6 +138,8 @@ export default function SignupPersonalPage() {
                 type="text"
                 placeholder="상세 주소"
                 className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
+                value={detailAddress}
+                onChange={e => setDetailAddress(e.target.value)}
               />
             </div>
 

@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { FaGoogle, FaGithub } from 'react-icons/fa'
 
 export default function SignupSelectPage() {
   const router = useRouter()
@@ -24,9 +25,14 @@ export default function SignupSelectPage() {
               className="flex-[1.2] rounded-3xl bg-white/90 p-10 text-center shadow-[0_16px_40px_rgba(0,0,0,0.45)] transition-transform hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
             >
               {/* 그림 자리 */}
-              <div className="mb-6 flex h-56 items-center justify-center rounded-2xl bg-neutral-300">
-                {/* 실제로는 <Image /> 넣어서 일러스트 교체하면 됨 */}
-                <span className="text-neutral-500">개인회원 이미지 영역</span>
+              <div className="mb-6 flex h-56 items-center justify-center overflow-hidden rounded-2xl bg-neutral-300">
+                <Image
+                  src="/images/signup_person.png"
+                  alt="개인회원 가입 이미지"
+                  width={200}
+                  height={200}
+                  className="object-contain"
+                />
               </div>
 
               {/* 버튼 모양 텍스트 */}
@@ -34,11 +40,15 @@ export default function SignupSelectPage() {
                 개인회원 가입
               </div>
 
-              {/* 하단 동그라미 3개 */}
-              <div className="mt-4 flex justify-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-[#4CD137]" />
-                <span className="h-3 w-3 rounded-full bg-neutral-400" />
-                <span className="h-3 w-3 rounded-full bg-neutral-600" />
+              {/* 하단 구글 / 깃허브 로고 */}
+              <div className="mt-4 flex justify-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white transition hover:scale-105 hover:bg-neutral-100">
+                  <FaGoogle className="text-red-500" size={18} />
+                </div>
+
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white transition hover:scale-105 hover:bg-neutral-100">
+                  <FaGithub className="text-black" size={18} />
+                </div>
               </div>
             </button>
 
@@ -49,9 +59,14 @@ export default function SignupSelectPage() {
               className="flex-[1.2] rounded-3xl bg-white/90 p-10 text-center shadow-[0_16px_40px_rgba(0,0,0,0.45)] transition-transform hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
             >
               {/* 그림 자리 */}
-              <div className="mb-6 flex h-56 items-center justify-center rounded-2xl bg-neutral-300">
-                {/* 실제로는 <Image /> 넣어서 일러스트 교체하면 됨 */}
-                <span className="text-neutral-500">개인회원 이미지 영역</span>
+              <div className="mb-6 flex h-56 items-center justify-center overflow-hidden rounded-2xl bg-neutral-300">
+                <Image
+                  src="/images/signup_org.png"
+                  alt="개인회원 가입 이미지"
+                  width={200}
+                  height={200}
+                  className="object-contain"
+                />
               </div>
 
               {/* 버튼 모양 텍스트 */}
