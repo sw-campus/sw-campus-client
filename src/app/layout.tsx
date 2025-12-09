@@ -34,7 +34,6 @@ export default function RootLayout({
           <HeaderSection />
           {children}
           <Footer />
-          <FooterController />
 
           {/* 장바구니 */}
           <FloatingCart />
