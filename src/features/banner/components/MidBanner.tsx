@@ -1,5 +1,7 @@
 import Image from 'next/image'
 
+import SmallBanner from '@/features/banner/components/SmallBanner'
+
 const data = [
   {
     academy: '멋쟁이사자처럼',
@@ -24,18 +26,31 @@ export default function MidBanner() {
         {data.map((item, idx) => (
           <div
             key={idx}
-            className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+            className="flex h-[190px] items-center justify-between rounded-2xl border border-gray-200 bg-white p-8 shadow-lg"
           >
-            <div className="flex flex-col gap-2">
+            <div className="flex h-full flex-col justify-between">
               <div className="font-semibold text-orange-600">{item.academy}</div>
-              <div className="text-lg font-bold">{item.title}</div>
-              <div className="rounded-xl bg-gray-100 px-3 py-1 text-sm">{item.desc}</div>
+              <div>
+                <div className="mt-1 text-lg font-bold">{item.title}</div>
+                <div className="mt-1 rounded-xl bg-gray-100 px-3 py-2 pr-4 text-sm">{item.desc}</div>
+              </div>
+              <div className="mt-1 text-sm text-gray-600">{item.date}</div>
             </div>
 
-            <Image src={item.thumbnail} width={80} height={80} alt="" className="rounded-xl" />
+            {/* 오른쪽 이미지 */}
+            <Image
+              src={item.thumbnail}
+              width={95}
+              height={95}
+              alt=""
+              className="h-[95px] w-[95px] shrink-0 rounded-xl object-cover"
+            />
           </div>
         ))}
       </div>
+
+      {/* 작은 배너 */}
+      <SmallBanner />
     </div>
   )
 }
