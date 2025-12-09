@@ -25,7 +25,7 @@ export default function SignupSelectPage() {
               className="flex-[1.2] rounded-3xl bg-white/90 p-10 text-center shadow-[0_16px_40px_rgba(0,0,0,0.45)] transition-transform hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
             >
               {/* 그림 자리 */}
-              <div className="mb-6 flex h-56 items-center justify-center overflow-hidden rounded-2xl bg-neutral-300">
+              <div className="mb-6 flex h-56 items-center justify-center overflow-hidden rounded-2xl">
                 <Image
                   src="/images/signup_person.png"
                   alt="개인회원 가입 이미지"
@@ -59,7 +59,7 @@ export default function SignupSelectPage() {
               className="flex-[1.2] rounded-3xl bg-white/90 p-10 text-center shadow-[0_16px_40px_rgba(0,0,0,0.45)] transition-transform hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
             >
               {/* 그림 자리 */}
-              <div className="mb-6 flex h-56 items-center justify-center overflow-hidden rounded-2xl bg-neutral-300">
+              <div className="mb-6 flex h-56 items-center justify-center overflow-hidden rounded-2xl">
                 <Image
                   src="/images/signup_org.png"
                   alt="개인회원 가입 이미지"
