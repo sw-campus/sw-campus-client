@@ -29,7 +29,6 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="relative flex min-h-screen flex-col bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat">
-        {/* 화면 약간 어둡게 오버레이 */}
         <div className="pointer-events-none absolute inset-0 bg-black/40" />
         <QueryClientProviderWrapper>
           <Header />
