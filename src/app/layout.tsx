@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 
 import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
+import PageContainer from '@/components/layout/PageContainer'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
 import FloatingCart from '@/features/cart/components/FloatingCart'
