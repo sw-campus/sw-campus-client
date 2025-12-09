@@ -1,12 +1,10 @@
 import type { Metadata, Viewport } from 'next'
 
 import Footer from '@/components/layout/Footer'
-import Header from '@/components/layout/Header'
-import PageContainer from '@/components/layout/PageContainer'
+import HeaderSection from '@/components/layout/header/HeaderSection'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
 import FloatingCart from '@/features/cart/components/FloatingCart'
-import Navigation from '@/features/navi/components/NavigationMenu'
 
 import './globals.css'
 
@@ -33,8 +31,7 @@ export default function RootLayout({
         <div className="pointer-events-none absolute inset-0 bg-black/40" />
         <QueryClientProviderWrapper>
           {/* 본문 */}
-          <Header />
-          <Navigation />
+          <HeaderSection />
           {children}
           <Footer />
           <FooterController />
