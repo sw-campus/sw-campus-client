@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import Footer from '@/components/layout/Footer'
 import FooterController from '@/components/layout/FooterController'
 import Header from '@/components/layout/Header'
+import PageContainer from '@/components/layout/PageContainer'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
 import FloatingCart from '@/features/cart/FloatingCart'
@@ -33,9 +34,7 @@ export default function RootLayout({
         <QueryClientProviderWrapper>
           <Header />
           <main className="relative flex flex-1 flex-col py-8">
-            <div className="mx-auto w-full max-w-7xl rounded-3xl border border-white/10 bg-white/30 p-8 px-4 shadow-xl backdrop-blur-xl">
-              {children}
-            </div>
+            <PageContainer>{children}</PageContainer>
           </main>
           <FooterController />
           <FloatingCart />
