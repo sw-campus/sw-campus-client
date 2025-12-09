@@ -6,7 +6,7 @@ import Header from '@/components/layout/Header'
 import PageContainer from '@/components/layout/PageContainer'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
-import FloatingCart from '@/features/cart/FloatingCart'
+import FloatingCart from '@/features/cart/components/FloatingCart'
 
 import './globals.css'
 
@@ -32,12 +32,15 @@ export default function RootLayout({
       <body className="relative flex min-h-screen flex-col bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat">
         <div className="pointer-events-none absolute inset-0 bg-black/40" />
         <QueryClientProviderWrapper>
+          {/* 본문 */}
           <Header />
           <main className="relative flex flex-1 flex-col py-8">
             <PageContainer>{children}</PageContainer>
           </main>
           <FooterController />
           <FloatingCart />
+
+          {/* 알림창 커스텀 */}
           <Toaster richColors closeButton />
         </QueryClientProviderWrapper>
       </body>
