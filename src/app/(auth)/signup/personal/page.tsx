@@ -25,7 +25,7 @@ type SignupState = {
 
   // 사용자 정보
   name: string
-  nickname: string | null
+  nickname: string
   phone: string | null
 
   // actions
@@ -39,8 +39,9 @@ type SignupState = {
   setIsPasswordMatched: (value: boolean | null) => void
   setIsPasswordConfirmed: (value: boolean) => void
   setName: (value: string) => void
-  setNickname: (value: string | null) => void
+  setNickname: (value: string) => void
   setPhone: (value: string | null) => void
+  reset: () => void
 }
 
 const useSignupStore = create<SignupState>(set => ({
@@ -55,7 +56,7 @@ const useSignupStore = create<SignupState>(set => ({
   isPasswordMatched: null,
   isPasswordConfirmed: false,
   name: '',
-  nickname: null,
+  nickname: '',
   phone: null,
 
   // actions
@@ -71,6 +72,21 @@ const useSignupStore = create<SignupState>(set => ({
   setName: value => set({ name: value }),
   setNickname: value => set({ nickname: value }),
   setPhone: value => set({ phone: value }),
+  reset: () =>
+    set({
+      address: null,
+      detailAddress: null,
+      email: '',
+      isSendingEmail: false,
+      isEmailVerified: false,
+      password: '',
+      passwordConfirm: '',
+      isPasswordMatched: null,
+      isPasswordConfirmed: false,
+      name: '',
+      nickname: '',
+      phone: null,
+    }),
 }))
 
 export default function SignupPersonalPage() {
@@ -100,20 +116,23 @@ export default function SignupPersonalPage() {
     setName,
     setNickname,
     setPhone,
+    reset,
   } = useSignupStore()
 
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  // ✅ 페이지 진입/새로고침 시 이메일/인증 관련 상태와 localStorage 초기화
+  // ✅ 페이지 진입/새로고침 시 이메일/인증 관련 상태 초기화 + localStorage 에 저장된 이메일 복원
   useEffect(() => {
     setIsEmailVerified(false)
     setIsPasswordMatched(null)
     setIsPasswordConfirmed(false)
-    setEmail('')
 
     if (typeof window !== 'undefined') {
-      window.localStorage.removeItem('signupEmail')
+      const savedEmail = window.localStorage.getItem('signupEmail')
+      if (savedEmail) {
+        setEmail(savedEmail)
+      }
     }
   }, [setIsEmailVerified, setIsPasswordMatched, setIsPasswordConfirmed, setEmail])
 
@@ -275,12 +294,17 @@ export default function SignupPersonalPage() {
   }
 
   // 회원가입
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    // ✅ 어떤 경우에도 브라우저 기본 submit(새로고침) 먼저 차단
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    // 어떤 경우에도 브라우저 기본 submit(새로고침) 먼저 차단
     e.preventDefault()
 
     if (!name.trim()) {
       alert('이름은 필수 입력값입니다.')
+      return
+    }
+
+    if (!nickname || !nickname.trim()) {
+      alert('닉네임은 필수 입력값입니다.')
       return
     }
 
@@ -294,16 +318,54 @@ export default function SignupPersonalPage() {
       return
     }
 
-    // nickname, phone, address 는 null 허용
-    console.log('회원가입 요청 데이터:', {
+    // address + detailAddress → API 스펙의 location 으로 변환
+    const location = address && detailAddress ? `${address} ${detailAddress}` : (address ?? detailAddress ?? null)
+
+    const payload = {
       email,
       password,
       name,
       nickname,
       phone,
-      address,
-      detailAddress,
-    })
+      location,
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        let message = '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+
+        try {
+          const data = await response.json()
+          if (data && typeof data.message === 'string') {
+            message = data.message
+          }
+        } catch (error) {
+          // JSON 파싱 실패 시 기본 메시지 사용
+        }
+
+        alert(message)
+        return
+      }
+
+      // ✅ 회원가입 성공 시: signup 상태 및 localStorage 초기화
+      reset()
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('signupEmail')
+      }
+
+      alert('회원가입이 완료되었습니다.')
+      router.push('/')
+    } catch (error) {
+      alert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.')
+    }
   }
 
   return (
@@ -404,15 +466,16 @@ export default function SignupPersonalPage() {
               />
             </div>
 
-            {/* 닉네임 */}
+            {/* 닉네임 (필수) */}
             <div className="mb-4">
               <label className="mb-1 block text-neutral-700">닉네임</label>
               <input
                 type="text"
                 placeholder="nickname"
                 className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
-                value={nickname ?? ''}
-                onChange={e => setNickname(e.target.value || null)}
+                value={nickname}
+                required
+                onChange={e => setNickname(e.target.value)}
               />
             </div>
 
