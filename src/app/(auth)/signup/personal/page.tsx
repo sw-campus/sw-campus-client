@@ -5,8 +5,54 @@ import { FormEvent, useState } from 'react'
 import Script from 'next/script'
 
 export default function SignupPersonalPage() {
+  // 주소
   const [address, setAddress] = useState('')
   const [detailAddress, setDetailAddress] = useState('')
+
+  // 이메일
+  const [email, setEmail] = useState('')
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
+
+  const handleSendEmailAuth = async () => {
+    if (!email) {
+      alert('이메일을 입력해 주세요.')
+      return
+    }
+
+    try {
+      setIsSendingEmail(true)
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/email/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      if (!response.ok) {
+        let message = '인증 메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+
+        try {
+          const data = await response.json()
+          if (data && typeof data.message === 'string') {
+            message = data.message
+          }
+        } catch (error) {
+          // ignore JSON parse error and use default message
+        }
+
+        alert(message)
+        return
+      }
+
+      alert('인증 메일을 발송했습니다. 메일함을 확인해 주세요.')
+    } catch (error) {
+      alert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.')
+    } finally {
+      setIsSendingEmail(false)
+    }
+  }
 
   const handleSearchAddress = () => {
     if (typeof window === 'undefined') return
@@ -48,9 +94,16 @@ export default function SignupPersonalPage() {
                   type="email"
                   placeholder="email"
                   className="h-9 w-full flex-1 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                 />
-                <button type="button" className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white">
-                  인증
+                <button
+                  type="button"
+                  onClick={handleSendEmailAuth}
+                  disabled={isSendingEmail}
+                  className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isSendingEmail ? '전송 중...' : '인증'}
                 </button>
               </div>
             </div>
