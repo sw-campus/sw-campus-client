@@ -1,8 +1,7 @@
 export default function MyPage() {
   return (
-    <div className="flex flex-col gap-4">
-      {/* 전체 마이페이지 영역 */}
-      <section className="flex min-h-[500px] w-full items-center justify-center px-6 py-10">
+    <div className="custom-container">
+      <div className="custom-card">
         {/* 실제 내용 영역 */}
         <div className="relative z-10 flex w-full gap-6">
           {/* 왼쪽 사이드바 */}
@@ -22,7 +21,7 @@ export default function MyPage() {
             {/* TODO: 회원정보 / 찜한 강의 / 리뷰 내용 들어갈 자리 */}
           </div>
         </div>
-      </section>
+      </div>
     </div>
   )
 }

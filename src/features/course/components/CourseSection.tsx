@@ -12,12 +12,12 @@ import { CourseList } from '@/features/course/components/CourseList'
 const CATEGORIES = [
   '웹개발',
   '모바일',
-  '게임·블록체인',
-  'IoT·임베디드·반도체',
-  '클라우드·보안',
   '데이터·AI',
-  '기획·마케팅·기타',
-  '디자인·3D',
+  '클라우드',
+  '보안',
+  '임베디드(IoT)',
+  '게임·블록체인',
+  '기획·마케팅·디자인',
 ]
 
 export default function CourseSection() {
@@ -25,8 +25,8 @@ export default function CourseSection() {
   const [category, setCategory] = useState(CATEGORIES[0]) // 기본값은 첫 번째 카테고리
 
   return (
-    <div className="relative flex flex-1 flex-col py-8">
-      <div className="mx-auto w-full max-w-7xl rounded-3xl border border-white/10 bg-white/40 p-8 shadow-xl backdrop-blur-xl">
+    <div className="custom-container">
+      <div className="custom-card">
         {/* 제목 */}
         <h2 className="mb-6 text-2xl font-bold text-white">분야별 부트캠프</h2>
 

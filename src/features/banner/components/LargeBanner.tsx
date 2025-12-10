@@ -1,17 +1,17 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import { Pagination, Autoplay } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-// TODO: 클릭하면 상세페이지로 이동
 const banners = [
-  { src: '/images/banners/banner-1.png', bg: '#B7DFFF' },
-  { src: '/images/banners/banner-2.png', bg: '#000000' },
-  { src: '/images/banners/banner-3.png', bg: '#FFFFFF' },
-  { src: '/images/banners/banner-4.jpg', bg: '#EB6E44' },
+  { src: '/images/large-banner/banner-1.png', bg: '#B7DFFF', href: '/' },
+  { src: '/images/large-banner/banner-2.png', bg: '#000000', href: '/' },
+  { src: '/images/large-banner/banner-3.png', bg: '#FFFFFF', href: '/' },
+  { src: '/images/large-banner/banner-4.jpg', bg: '#EB6E44', href: '/' },
 ]
 
 export default function LargeBanner() {
@@ -29,16 +29,22 @@ export default function LargeBanner() {
       >
         {banners.map((banner, index) => (
           <SwiperSlide key={index}>
-            <div className="flex h-[200px] w-full items-center justify-center" style={{ backgroundColor: banner.bg }}>
-              <Image
-                src={banner.src}
-                alt={`banner-${index}`}
-                width={1920}
-                height={400}
-                className="h-auto max-h-[200px] w-auto object-contain"
-                priority={index === 0}
-              />
-            </div>
+            <Link href={banner.href}>
+              <div
+                className="relative flex w-full items-center justify-center sm:p-10"
+                style={{ backgroundColor: banner.bg }}
+              >
+                <div className="relative mx-auto h-[130px] w-full">
+                  <Image
+                    src={banner.src}
+                    alt={`banner-${index}`}
+                    fill
+                    className="object-contain"
+                    priority={index === 0}
+                  />
+                </div>
+              </div>
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>
