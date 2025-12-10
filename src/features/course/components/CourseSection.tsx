@@ -25,8 +25,8 @@ export default function CourseSection() {
   const [category, setCategory] = useState(CATEGORIES[0]) // 기본값은 첫 번째 카테고리
 
   return (
-    <div className="relative flex flex-1 flex-col py-8">
-      <div className="mx-auto w-full max-w-7xl rounded-3xl border border-white/10 bg-white/40 p-8 shadow-xl backdrop-blur-xl">
+    <div className="custom-container">
+      <div className="custom-card">
         {/* 제목 */}
         <h2 className="mb-6 text-2xl font-bold text-white">분야별 부트캠프</h2>
 

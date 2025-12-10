@@ -24,35 +24,37 @@ const data = [
 
 export default function MidBanner() {
   return (
-    <div className="mx-auto mt-6 w-full max-w-7xl rounded-3xl border border-white/10 bg-white/40 p-6 shadow-xl backdrop-blur-xl">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {data.map((item, idx) => (
-          <Link href={item.href} key={idx} className="block">
-            <div className="flex h-[190px] items-center justify-between rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
-              <div className="flex min-w-0 flex-col">
-                <div className="font-semibold text-orange-600">{item.academy}</div>
-                <div>
-                  <div className="mt-1 truncate text-lg font-bold">{item.title}</div>
-                  <div className="mt-1 truncate rounded-xl bg-gray-100 px-3 py-2 pr-4 text-sm">{item.desc}</div>
+    <div className="custom-container">
+      <div className="custom-card">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {data.map((item, idx) => (
+            <Link href={item.href} key={idx} className="block">
+              <div className="flex h-[190px] items-center justify-between rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
+                <div className="flex min-w-0 flex-col">
+                  <div className="font-semibold text-orange-600">{item.academy}</div>
+                  <div>
+                    <div className="mt-1 truncate text-lg font-bold">{item.title}</div>
+                    <div className="mt-1 truncate rounded-xl bg-gray-100 px-3 py-2 pr-4 text-sm">{item.desc}</div>
+                  </div>
+                  <div className="mt-1 text-sm text-gray-600">{item.date} 개강 · 무료</div>
                 </div>
-                <div className="mt-1 text-sm text-gray-600">{item.date} 개강 · 무료</div>
+
+                {/* 오른쪽 이미지 */}
+                <Image
+                  src={item.thumbnail}
+                  width={95}
+                  height={95}
+                  alt=""
+                  className="h-[95px] w-[95px] shrink-0 rounded-xl object-cover"
+                />
               </div>
+            </Link>
+          ))}
+        </div>
 
-              {/* 오른쪽 이미지 */}
-              <Image
-                src={item.thumbnail}
-                width={95}
-                height={95}
-                alt=""
-                className="h-[95px] w-[95px] shrink-0 rounded-xl object-cover"
-              />
-            </div>
-          </Link>
-        ))}
+        {/* 작은 배너 */}
+        <SmallBanner />
       </div>
-
-      {/* 작은 배너 */}
-      <SmallBanner />
     </div>
   )
 }
