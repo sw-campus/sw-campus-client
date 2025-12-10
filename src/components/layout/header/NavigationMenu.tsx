@@ -49,7 +49,7 @@ export default function Navigation({ open, onClose }: { open: boolean; onClose: 
       {/* 데스크탑인 경우 */}
       <NavigationMenu
         viewport={false}
-        className="relative mx-auto mt-4 hidden w-full max-w-7xl items-center justify-center px-8 lg:flex"
+        className="relative mx-auto mt-4 hidden w-full max-w-7xl items-center justify-center px-8 md:flex"
       >
         <NavigationMenuList className="justify-start">
           {BOOT_NAV_DATA.map((item, key) => (

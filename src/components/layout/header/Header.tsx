@@ -18,7 +18,7 @@ export default function Header({ onOpenNav }: { onOpenNav: () => void }) {
       </div>
 
       {/* 네비게이션 */}
-      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 text-sm text-white lg:flex">
+      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 text-sm text-white md:flex">
         <Link href="/">부트캠프</Link>
         <Link href="/">훈련 기관</Link>
         <Link href="/">커뮤니케이션</Link>
