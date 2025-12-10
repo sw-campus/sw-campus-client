@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 import Link from 'next/link'
 import { FiX } from 'react-icons/fi'
 
@@ -14,7 +12,19 @@ import {
 } from '@/components/ui/navigation-menu'
 import { BOOT_NAV_DATA } from '@/features/navi/types/navigation.type'
 
-export default function Navigation({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function Navigation({
+  open,
+  showDesktop,
+  onClose,
+  onDesktopEnter,
+  onDesktopLeave,
+}: {
+  open: boolean
+  showDesktop: boolean
+  onClose: () => void
+  onDesktopEnter?: () => void
+  onDesktopLeave?: () => void
+}) {
   return (
     <>
       {/* 모바일인 경우 */}
@@ -47,32 +57,36 @@ export default function Navigation({ open, onClose }: { open: boolean; onClose: 
       )}
 
       {/* 데스크탑인 경우 */}
-      <NavigationMenu
-        viewport={false}
-        className="relative mx-auto mt-4 hidden w-full max-w-7xl items-center justify-center px-8 md:flex"
-      >
-        <NavigationMenuList className="justify-start">
-          {BOOT_NAV_DATA.map((item, key) => (
-            <NavigationMenuItem key={key} className="relative">
-              {/* 중분류 */}
-              <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
+      {showDesktop && (
+        <NavigationMenu
+          viewport={false}
+          className="relative mx-auto mt-4 hidden w-full max-w-7xl items-center justify-center px-8 md:flex"
+          onMouseEnter={onDesktopEnter}
+          onMouseLeave={onDesktopLeave}
+        >
+          <NavigationMenuList className="justify-start">
+            {BOOT_NAV_DATA.map((item, key) => (
+              <NavigationMenuItem key={key} className="relative">
+                {/* 중분류 */}
+                <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
 
-              {/* 소분류 */}
-              {item.items && (
-                <NavigationMenuContent className="absolute top-full left-0 w-[200px] md:w-[200px]">
-                  <div className="flex flex-col gap-2 p-4">
-                    {item.items.map(child => (
-                      <Link href={child.href} key={child.title} className="hover:text-accent-foreground">
-                        {child.title}
-                      </Link>
-                    ))}
-                  </div>
-                </NavigationMenuContent>
-              )}
-            </NavigationMenuItem>
-          ))}
-        </NavigationMenuList>
-      </NavigationMenu>
+                {/* 소분류 */}
+                {item.items && (
+                  <NavigationMenuContent className="absolute top-full left-0 w-[200px] md:w-[200px]">
+                    <div className="flex flex-col gap-2 p-4">
+                      {item.items.map(child => (
+                        <Link href={child.href} key={child.title} className="hover:text-accent-foreground">
+                          {child.title}
+                        </Link>
+                      ))}
+                    </div>
+                  </NavigationMenuContent>
+                )}
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+      )}
     </>
   )
 }

@@ -7,6 +7,7 @@ import Navigation from '@/components/layout/header/NavigationMenu'
 
 export default function HeaderSection() {
   const [open, setOpen] = useState(false)
+  const [showDesktopNav, setShowDesktopNav] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
@@ -14,8 +15,17 @@ export default function HeaderSection() {
 
   return (
     <div className="relative">
-      <Header onOpenNav={() => setOpen(true)} />
-      <Navigation open={open} onClose={() => setOpen(false)} />
+      <Header
+        onOpenNav={() => setOpen(true)}
+        onBootcampEnter={() => setShowDesktopNav(true)}
+      />
+      <Navigation
+        open={open}
+        showDesktop={showDesktopNav}
+        onClose={() => setOpen(false)}
+        onDesktopEnter={() => setShowDesktopNav(true)}
+        onDesktopLeave={() => setShowDesktopNav(false)}
+      />
     </div>
   )
 }
