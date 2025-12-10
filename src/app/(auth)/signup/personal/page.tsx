@@ -1,40 +1,216 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect } from 'react'
 
+import { useRouter, useSearchParams } from 'next/navigation'
 import Script from 'next/script'
+import { create } from 'zustand'
 
-export default function SignupPersonalPage() {
+// Zustand 스토어
+type SignupState = {
   // 주소
-  const [address, setAddress] = useState('')
-  const [detailAddress, setDetailAddress] = useState('')
+  address: string | null
+  detailAddress: string | null
 
   // 이메일
-  const [email, setEmail] = useState('')
-  const [isSendingEmail, setIsSendingEmail] = useState(false)
+  email: string
+  isSendingEmail: boolean
+  isEmailVerified: boolean
 
   // 비밀번호
-  const [password, setPassword] = useState('')
-  const [passwordConfirm, setPasswordConfirm] = useState('')
-  const [isPasswordMatched, setIsPasswordMatched] = useState<boolean | null>(null)
+  password: string
+  passwordConfirm: string
+  isPasswordMatched: boolean | null
+  isPasswordConfirmed: boolean
 
+  // 사용자 정보
+  name: string
+  nickname: string | null
+  phone: string | null
+
+  // actions
+  setAddress: (value: string) => void
+  setDetailAddress: (value: string) => void
+  setEmail: (value: string) => void
+  setIsSendingEmail: (value: boolean) => void
+  setIsEmailVerified: (value: boolean) => void
+  setPassword: (value: string) => void
+  setPasswordConfirm: (value: string) => void
+  setIsPasswordMatched: (value: boolean | null) => void
+  setIsPasswordConfirmed: (value: boolean) => void
+  setName: (value: string) => void
+  setNickname: (value: string | null) => void
+  setPhone: (value: string | null) => void
+}
+
+const useSignupStore = create<SignupState>(set => ({
+  // 상태 초기값
+  address: null,
+  detailAddress: null,
+  email: '',
+  isSendingEmail: false,
+  isEmailVerified: false,
+  password: '',
+  passwordConfirm: '',
+  isPasswordMatched: null,
+  isPasswordConfirmed: false,
+  name: '',
+  nickname: null,
+  phone: null,
+
+  // actions
+  setAddress: value => set({ address: value || null }),
+  setDetailAddress: value => set({ detailAddress: value || null }),
+  setEmail: value => set({ email: value }),
+  setIsSendingEmail: value => set({ isSendingEmail: value }),
+  setIsEmailVerified: value => set({ isEmailVerified: value }),
+  setPassword: value => set({ password: value }),
+  setPasswordConfirm: value => set({ passwordConfirm: value }),
+  setIsPasswordMatched: value => set({ isPasswordMatched: value }),
+  setIsPasswordConfirmed: value => set({ isPasswordConfirmed: value }),
+  setName: value => set({ name: value }),
+  setNickname: value => set({ nickname: value }),
+  setPhone: value => set({ phone: value }),
+}))
+
+export default function SignupPersonalPage() {
+  const {
+    address,
+    detailAddress,
+    email,
+    isSendingEmail,
+    isEmailVerified,
+    password,
+    passwordConfirm,
+    isPasswordMatched,
+    isPasswordConfirmed,
+    name,
+    nickname,
+    phone,
+
+    setAddress,
+    setDetailAddress,
+    setEmail,
+    setIsSendingEmail,
+    setIsEmailVerified,
+    setPassword,
+    setPasswordConfirm,
+    setIsPasswordMatched,
+    setIsPasswordConfirmed,
+    setName,
+    setNickname,
+    setPhone,
+  } = useSignupStore()
+
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // ✅ 페이지 진입/새로고침 시 이메일/인증 관련 상태와 localStorage 초기화
+  useEffect(() => {
+    setIsEmailVerified(false)
+    setIsPasswordMatched(null)
+    setIsPasswordConfirmed(false)
+    setEmail('')
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('signupEmail')
+    }
+  }, [setIsEmailVerified, setIsPasswordMatched, setIsPasswordConfirmed, setEmail])
+
+  useEffect(() => {
+    const verified = searchParams.get('verified')
+    const verifiedEmail = searchParams.get('email')
+
+    // ✅ 이메일 쿼리가 함께 온 경우, 바로 input 에 세팅
+    if (verifiedEmail) {
+      setEmail(verifiedEmail)
+    }
+
+    // ✅ verified=true 로 들어왔으면
+    // → 인증 완료 상태로 표시하고
+    // → 같은 페이지지만 쿼리 제거해서 깔끔한 URL로 다시 replace
+    if (verified === 'true') {
+      setIsEmailVerified(true)
+      router.replace('/signup/personal')
+    }
+  }, [searchParams, router, setIsEmailVerified, setEmail])
+
+  // ✅ 이메일 인증 상태 polling
+  // 이메일이 입력되어 있고 아직 인증이 안 된 경우, 일정 간격으로 status API를 호출해서
+  // 백엔드에서 verified=true 로 바뀌면 자동으로 UI를 갱신한다.
+  useEffect(() => {
+    if (!email || isEmailVerified) return
+
+    const intervalId = setInterval(async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/email/status?email=${encodeURIComponent(email)}`,
+        )
+
+        if (!res.ok) {
+          // 상태 조회 실패 시에는 조용히 무시 (사용자에게 계속 에러를 띄우지 않기 위함)
+          return
+        }
+
+        const data = await res.json()
+
+        // 백엔드에서 인증 여부를 나타내는 필드명이 verified 라고 가정
+        if (data && data.verified) {
+          setIsEmailVerified(true)
+          clearInterval(intervalId)
+        }
+      } catch (error) {
+        // 네트워크 오류도 조용히 무시하고 다음 interval 에 다시 시도
+      }
+    }, 3000) // 3초마다 한 번씩 상태 확인
+
+    return () => clearInterval(intervalId)
+  }, [email, isEmailVerified, setIsEmailVerified])
+
+  // 비밀번호 일치 확인
   const handleCheckPasswordMatch = () => {
+    const MIN_LENGTH = 8
+    const SPECIAL_CHAR_REGEX = /[!@#$%^&*(),.?":{}|<>]/
+
+    // 1) 비밀번호 / 비밀번호 확인 공백 체크
     if (!password || !passwordConfirm) {
       alert('비밀번호와 비밀번호 확인을 모두 입력해 주세요.')
       setIsPasswordMatched(null)
+      setIsPasswordConfirmed(false)
       return
     }
 
+    // 2) 길이 체크 (백엔드 PasswordValidator 와 동일)
+    if (password.length < MIN_LENGTH) {
+      alert(`비밀번호는 ${MIN_LENGTH}자 이상이어야 합니다`)
+      setIsPasswordMatched(null)
+      setIsPasswordConfirmed(false)
+      return
+    }
+
+    // 3) 특수문자 포함 여부 체크 (백엔드 SPECIAL_CHAR_PATTERN 과 동일)
+    if (!SPECIAL_CHAR_REGEX.test(password)) {
+      alert('비밀번호에 특수문자가 1개 이상 포함되어야 합니다')
+      setIsPasswordMatched(null)
+      setIsPasswordConfirmed(false)
+      return
+    }
+
+    // 4) 위 조건을 모두 통과한 후, 두 비밀번호가 같은지 확인
     if (password === passwordConfirm) {
       setIsPasswordMatched(true)
+      setIsPasswordConfirmed(true) // ✅ 비밀번호가 같으면 “저장” (확인 완료 상태)
     } else {
       setIsPasswordMatched(false)
+      setIsPasswordConfirmed(false)
+      alert('비밀번호와 비밀번호 확인이 일치하지 않습니다')
     }
   }
 
+  // 이메일 인증 메일 보내기
   const handleSendEmailAuth = async () => {
-    if (!email) {
-      alert('이메일을 입력해 주세요.')
+    // 이미 이메일 인증이 완료된 경우, 더 이상 동작하지 않도록 막기
+    if (isEmailVerified) {
       return
     }
 
@@ -66,6 +242,13 @@ export default function SignupPersonalPage() {
       }
 
       alert('인증 메일을 발송했습니다. 메일함을 확인해 주세요.')
+      // 새로 발송했으므로, 다시 인증 대기 상태로 초기화
+      setIsEmailVerified(false)
+
+      // ✅ 새 탭에서도 같은 이메일을 사용할 수 있도록 localStorage에 저장
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('signupEmail', email)
+      }
     } catch (error) {
       alert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.')
     } finally {
@@ -73,6 +256,7 @@ export default function SignupPersonalPage() {
     }
   }
 
+  // 주소 찾기
   const handleSearchAddress = () => {
     if (typeof window === 'undefined') return
 
@@ -90,8 +274,36 @@ export default function SignupPersonalPage() {
     }).open()
   }
 
+  // 회원가입
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    // ✅ 어떤 경우에도 브라우저 기본 submit(새로고침) 먼저 차단
     e.preventDefault()
+
+    if (!name.trim()) {
+      alert('이름은 필수 입력값입니다.')
+      return
+    }
+
+    if (!isEmailVerified) {
+      alert('이메일 인증을 완료해 주세요.')
+      return
+    }
+
+    if (!isPasswordConfirmed) {
+      alert('비밀번호 확인을 완료해 주세요.')
+      return
+    }
+
+    // nickname, phone, address 는 null 허용
+    console.log('회원가입 요청 데이터:', {
+      email,
+      password,
+      name,
+      nickname,
+      phone,
+      address,
+      detailAddress,
+    })
   }
 
   return (
@@ -119,12 +331,19 @@ export default function SignupPersonalPage() {
                 <button
                   type="button"
                   onClick={handleSendEmailAuth}
-                  disabled={isSendingEmail}
+                  disabled={isSendingEmail || isEmailVerified}
                   className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {isSendingEmail ? '전송 중...' : '인증'}
+                  {isEmailVerified ? '인증 완료' : isSendingEmail ? '전송 중...' : '인증'}
                 </button>
               </div>
+              {isEmailVerified ? (
+                <p className="mt-1 text-xs text-green-600">이메일 인증이 완료되었습니다.</p>
+              ) : (
+                <p className="mt-1 text-xs text-neutral-500">
+                  인증 메일을 보낸 후, 메일함에서 인증 버튼을 눌러 주세요.
+                </p>
+              )}
             </div>
 
             {/* 비밀번호 */}
@@ -138,6 +357,7 @@ export default function SignupPersonalPage() {
                 onChange={e => {
                   setPassword(e.target.value)
                   setIsPasswordMatched(null)
+                  setIsPasswordConfirmed(false)
                 }}
               />
             </div>
@@ -154,6 +374,7 @@ export default function SignupPersonalPage() {
                   onChange={e => {
                     setPasswordConfirm(e.target.value)
                     setIsPasswordMatched(null)
+                    setIsPasswordConfirmed(false)
                   }}
                 />
                 <button
@@ -177,6 +398,9 @@ export default function SignupPersonalPage() {
                 type="text"
                 placeholder="name"
                 className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
+                value={name}
+                required
+                onChange={e => setName(e.target.value)}
               />
             </div>
 
@@ -187,6 +411,8 @@ export default function SignupPersonalPage() {
                 type="text"
                 placeholder="nickname"
                 className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
+                value={nickname ?? ''}
+                onChange={e => setNickname(e.target.value || null)}
               />
             </div>
 
@@ -198,6 +424,8 @@ export default function SignupPersonalPage() {
                   type="tel"
                   placeholder="phone"
                   className="h-9 w-full flex-1 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
+                  value={phone ?? ''}
+                  onChange={e => setPhone(e.target.value || null)}
                 />
                 <button type="button" className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white">
                   인증
@@ -213,7 +441,7 @@ export default function SignupPersonalPage() {
                   type="text"
                   placeholder="address"
                   className="h-9 w-full flex-1 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
-                  value={address}
+                  value={address ?? ''}
                   readOnly
                 />
                 <button
@@ -228,7 +456,7 @@ export default function SignupPersonalPage() {
                 type="text"
                 placeholder="상세 주소"
                 className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
-                value={detailAddress}
+                value={detailAddress ?? ''}
                 onChange={e => setDetailAddress(e.target.value)}
               />
             </div>
