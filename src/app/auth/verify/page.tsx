@@ -13,9 +13,6 @@ export default function VerifyPage() {
       alert('인증 토큰이 없습니다.')
       return
     }
-
-    // ✅ fetch ❌ / CORS ❌
-    // ✅ 브라우저 직접 이동 ✅ (리다이렉트 방식)
     window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/email/verify?token=${token}`
   }, [token])
 

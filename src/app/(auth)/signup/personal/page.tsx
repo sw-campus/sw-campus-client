@@ -13,6 +13,25 @@ export default function SignupPersonalPage() {
   const [email, setEmail] = useState('')
   const [isSendingEmail, setIsSendingEmail] = useState(false)
 
+  // 비밀번호
+  const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [isPasswordMatched, setIsPasswordMatched] = useState<boolean | null>(null)
+
+  const handleCheckPasswordMatch = () => {
+    if (!password || !passwordConfirm) {
+      alert('비밀번호와 비밀번호 확인을 모두 입력해 주세요.')
+      setIsPasswordMatched(null)
+      return
+    }
+
+    if (password === passwordConfirm) {
+      setIsPasswordMatched(true)
+    } else {
+      setIsPasswordMatched(false)
+    }
+  }
+
   const handleSendEmailAuth = async () => {
     if (!email) {
       alert('이메일을 입력해 주세요.')
@@ -115,6 +134,11 @@ export default function SignupPersonalPage() {
                 type="password"
                 placeholder="password"
                 className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
+                value={password}
+                onChange={e => {
+                  setPassword(e.target.value)
+                  setIsPasswordMatched(null)
+                }}
               />
             </div>
 
@@ -126,11 +150,24 @@ export default function SignupPersonalPage() {
                   type="password"
                   placeholder="password"
                   className="h-9 w-full flex-1 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
+                  value={passwordConfirm}
+                  onChange={e => {
+                    setPasswordConfirm(e.target.value)
+                    setIsPasswordMatched(null)
+                  }}
                 />
-                <button type="button" className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white">
+                <button
+                  type="button"
+                  onClick={handleCheckPasswordMatch}
+                  className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white"
+                >
                   확인
                 </button>
               </div>
+              {isPasswordMatched === true && <p className="mt-1 text-xs text-green-600">비밀번호가 일치합니다.</p>}
+              {isPasswordMatched === false && (
+                <p className="mt-1 text-xs text-red-600">비밀번호가 일치하지 않습니다.</p>
+              )}
             </div>
 
             {/* 이름 */}
