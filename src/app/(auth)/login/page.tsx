@@ -1,14 +1,54 @@
 'use client'
 
-import { FormEvent } from 'react'
+import { FormEvent, useState } from 'react'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { FaGoogle, FaGithub } from 'react-icons/fa'
 
+import { login as loginApi } from '@/features/auth/authApi'
+import { useAuthStore } from '@/store/authStore'
+
 export default function LoginPage() {
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const router = useRouter()
+  const { login: setLogin } = useAuthStore()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
+  // 로그인 전송
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // TODO: 실제 로그인 로직 넣기 (API 요청 등)
+
+    if (!email || !password) {
+      alert('이메일과 비밀번호를 모두 입력해주세요.')
+      return
+    }
+
+    try {
+      setIsLoading(true)
+
+      // authApi를 통한 로그인 요청
+      const data = await loginApi({ email, password })
+
+      // 응답에 유저 정보가 있을 경우 대비
+      let userName = email.split('@')[0]
+
+      if (data) {
+        userName = (data as any).name ?? (data as any).nickname ?? userName
+      }
+
+      setLogin(userName)
+
+      // 로그인 성공 후 메인으로 이동
+      router.push('/')
+    } catch (error) {
+      console.error(error)
+      alert('이메일 또는 비밀번호를 다시 확인해주세요.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -24,6 +64,8 @@ export default function LoginPage() {
               <input
                 type="email"
                 placeholder="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
               />
             </div>
@@ -34,6 +76,8 @@ export default function LoginPage() {
               <input
                 type="password"
                 placeholder="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
                 className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
               />
             </div>
@@ -49,8 +93,12 @@ export default function LoginPage() {
             </div>
 
             {/* 로그인 버튼 */}
-            <button type="submit" className="mt-1 h-9 w-full rounded-md bg-neutral-900 font-semibold text-white">
-              로그인
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="mt-1 h-9 w-full rounded-md bg-neutral-900 font-semibold text-white disabled:opacity-60"
+            >
+              {isLoading ? '로그인 중...' : '로그인'}
             </button>
 
             {/* 소셜 로그인 영역 */}
