@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useRef } from 'react'
+import { FormEvent, Suspense, useEffect, useRef } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import Script from 'next/script'
@@ -14,12 +14,14 @@ import {
   signupSchema,
   SignupInput,
 } from '@/features/auth/authApi'
+import { EmailVerificationField } from '@/features/auth/components/EmailVerificationField'
 import { useSignupStore } from '@/store/signupStore'
 
 const INPUT_BASE_CLASS =
   'h-9 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white'
 
-export default function SignupPersonalPage() {
+// 실제 로직 컴포넌트
+function SignupPersonalPageContent() {
   const {
     address,
     detailAddress,
@@ -235,7 +237,7 @@ export default function SignupPersonalPage() {
             className="w-full max-w-xl rounded-xl bg-white/90 p-8 shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
           >
             {/* 이메일 + 인증 */}
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <label className="mb-1 block text-neutral-700">이메일</label>
               <div className="flex gap-2">
                 <input
@@ -261,7 +263,14 @@ export default function SignupPersonalPage() {
                   인증 메일을 보낸 후, 메일함에서 인증 버튼을 눌러 주세요.
                 </p>
               )}
-            </div>
+            </div> */}
+            <EmailVerificationField
+              email={email}
+              isEmailVerified={isEmailVerified}
+              isSendingEmail={isSendingEmail}
+              setEmail={setEmail}
+              handleSendEmailAuth={handleSendEmailAuth}
+            />
 
             {/* 비밀번호 */}
             <div className="mb-4">
@@ -384,5 +393,13 @@ export default function SignupPersonalPage() {
         </div>
       </section>
     </div>
+  )
+}
+
+export default function SignupPersonalPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignupPersonalPageContent />
+    </Suspense>
   )
 }
