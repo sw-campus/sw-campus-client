@@ -2,7 +2,7 @@
 
 import LargeBanner from '@/features/banner/components/LargeBanner'
 import MidBanner from '@/features/banner/components/MidBanner'
-import CourseSection from '@/features/course/components/CourseSection'
+import CourseSection from '@/features/lecture/components/LectureSection'
 
 export default function Home() {
   return (

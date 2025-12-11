@@ -1,6 +1,6 @@
-import { Course } from '@/features/course/types/course.type'
+import { Lecture } from '@/features/lecture/types/lecture.type'
 
-export const mockCourses: Course[] = [
+export const mockLectures: Lecture[] = [
   {
     id: 'course-1',
     title: '프론트엔드 실전 웹 서비스 개발 Bootcamp',

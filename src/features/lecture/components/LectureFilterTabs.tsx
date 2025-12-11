@@ -1,12 +1,12 @@
 'use client'
 
-interface CourseFilterTabsProps {
+interface LectureFilterTabsProps {
   categories: string[]
   selected: string
   onSelect: (value: string) => void
 }
 
-export function CourseFilterTabs({ categories, selected, onSelect }: CourseFilterTabsProps) {
+export function LectureFilterTabs({ categories, selected, onSelect }: LectureFilterTabsProps) {
   return (
     <div className="no-scrollbar mb-6 flex gap-3 whitespace-nowrap">
       {categories.map(c => {
