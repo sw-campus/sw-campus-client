@@ -2,6 +2,7 @@
 
 import { FormEvent, Suspense, useEffect, useRef } from 'react'
 import { FormEvent, Suspense, useEffect, useRef } from 'react'
+import { FormEvent, useEffect, useRef } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import Script from 'next/script'
@@ -21,7 +22,7 @@ import { useSignupStore } from '@/store/signupStore'
 const INPUT_BASE_CLASS =
   'h-9 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white'
 
-function SignupPersonalContent() {
+export default function SignupPersonalPage() {
   const {
     address,
     detailAddress,
@@ -393,13 +394,5 @@ function SignupPersonalContent() {
         </div>
       </section>
     </div>
-  )
-}
-
-export default function SignupPersonalPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SignupPersonalContent />
-    </Suspense>
   )
 }
