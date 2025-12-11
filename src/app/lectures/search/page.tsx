@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { FilterGroup } from '@/features/lecture/components/FilterGroups'
-import { FilterTag } from '@/features/lecture/components/FilterTag'
+import { FilterGroup } from '@/features/lectures/components/FilterGroups'
+import { FilterTag } from '@/features/lectures/components/FilterTag'
 import {
   COST_FILTERS,
   PROCEDURE_FILTERS,
@@ -18,7 +18,7 @@ import {
   DEFAULT_SORT,
   COST_QUERY_MAP,
   PROCEDURE_QUERY_MAP,
-} from '@/features/lecture/types/filter.type'
+} from '@/features/lectures/types/filter.type'
 import { BOOT_NAV_DATA } from '@/features/navi/types/navigation.type'
 
 const filterSelectTriggerClass =

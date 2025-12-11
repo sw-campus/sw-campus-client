@@ -43,7 +43,7 @@ const difficultyLevels = [
 const textareaClassName =
   'min-h-[120px] w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm leading-relaxed text-foreground shadow-xs transition-colors duration-200 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]'
 
-export function CourseRegistrationForm() {
+export function LectureCreateForm() {
   return (
     <div className="space-y-6">
       <FieldSet>
