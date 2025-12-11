@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 
 import { useSearchParams } from 'next/navigation'
 
+import { getVerifyEmailRedirectUrl } from '@/lib/axios'
+
 export default function VerifyPage() {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
@@ -13,7 +15,7 @@ export default function VerifyPage() {
       alert('인증 토큰이 없습니다.')
       return
     }
-    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/email/verify?token=${token}`
+    window.location.href = getVerifyEmailRedirectUrl(token)
   }, [token])
 
   return (

@@ -1,96 +1,22 @@
 'use client'
 
-import { FormEvent, useEffect } from 'react'
+import { FormEvent, useEffect, useRef } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import Script from 'next/script'
-import { create } from 'zustand'
+
+import {
+  checkEmailStatus,
+  getVerifiedEmail,
+  sendEmailAuth,
+  signup,
+  signupSchema,
+  SignupInput,
+} from '@/features/auth/authApi'
+import { useSignupStore } from '@/store/signupStore'
 
 const INPUT_BASE_CLASS =
   'h-9 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white'
-
-// Zustand 스토어
-type SignupState = {
-  // 주소
-  address: string | null
-  detailAddress: string | null
-
-  // 이메일
-  email: string
-  isSendingEmail: boolean
-  isEmailVerified: boolean
-
-  // 비밀번호
-  password: string
-  passwordConfirm: string
-  isPasswordMatched: boolean | null
-  isPasswordConfirmed: boolean
-
-  // 사용자 정보
-  name: string
-  nickname: string
-  phone: string | null
-
-  // actions
-  setAddress: (value: string) => void
-  setDetailAddress: (value: string) => void
-  setEmail: (value: string) => void
-  setIsSendingEmail: (value: boolean) => void
-  setIsEmailVerified: (value: boolean) => void
-  setPassword: (value: string) => void
-  setPasswordConfirm: (value: string) => void
-  setIsPasswordMatched: (value: boolean | null) => void
-  setIsPasswordConfirmed: (value: boolean) => void
-  setName: (value: string) => void
-  setNickname: (value: string) => void
-  setPhone: (value: string | null) => void
-  reset: () => void
-}
-
-const useSignupStore = create<SignupState>(set => ({
-  // 상태 초기값
-  address: null,
-  detailAddress: null,
-  email: '',
-  isSendingEmail: false,
-  isEmailVerified: false,
-  password: '',
-  passwordConfirm: '',
-  isPasswordMatched: null,
-  isPasswordConfirmed: false,
-  name: '',
-  nickname: '',
-  phone: null,
-
-  // actions
-  setAddress: value => set({ address: value || null }),
-  setDetailAddress: value => set({ detailAddress: value || null }),
-  setEmail: value => set({ email: value }),
-  setIsSendingEmail: value => set({ isSendingEmail: value }),
-  setIsEmailVerified: value => set({ isEmailVerified: value }),
-  setPassword: value => set({ password: value }),
-  setPasswordConfirm: value => set({ passwordConfirm: value }),
-  setIsPasswordMatched: value => set({ isPasswordMatched: value }),
-  setIsPasswordConfirmed: value => set({ isPasswordConfirmed: value }),
-  setName: value => set({ name: value }),
-  setNickname: value => set({ nickname: value }),
-  setPhone: value => set({ phone: value }),
-  reset: () =>
-    set({
-      address: null,
-      detailAddress: null,
-      email: '',
-      isSendingEmail: false,
-      isEmailVerified: false,
-      password: '',
-      passwordConfirm: '',
-      isPasswordMatched: null,
-      isPasswordConfirmed: false,
-      name: '',
-      nickname: '',
-      phone: null,
-    }),
-}))
 
 export default function SignupPersonalPage() {
   const {
@@ -124,6 +50,8 @@ export default function SignupPersonalPage() {
 
   const searchParams = useSearchParams()
   const router = useRouter()
+  const verifiedParam = searchParams.get('verified')
+  const hasInitializedRef = useRef(false)
 
   const resetPasswordValidation = () => {
     setIsPasswordMatched(null)
@@ -131,60 +59,48 @@ export default function SignupPersonalPage() {
   }
 
   useEffect(() => {
-    const verified = searchParams.get('verified')
-    if (verified !== 'true') {
-      reset()
-    }
-  }, [reset, searchParams])
+    if (hasInitializedRef.current) return
+    hasInitializedRef.current = true
+
+    if (verifiedParam !== 'true') reset()
+  }, [reset, verifiedParam])
 
   useEffect(() => {
-    const verified = searchParams.get('verified')
-
-    if (verified === 'true') {
+    if (verifiedParam === 'true') {
       ;(async () => {
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/email/verified`, {
-            credentials: 'include',
-          })
-
-          if (res.ok) {
-            const data = await res.json()
-            setEmail(data.email)
-            setIsEmailVerified(true)
-          } else {
-            setIsEmailVerified(false)
-          }
+          const data = await getVerifiedEmail()
+          setEmail(data.email)
+          setIsEmailVerified(true)
         } catch (e) {
           console.error('인증된 이메일 조회 실패', e)
+          setIsEmailVerified(false)
         } finally {
           router.replace('/signup/personal')
         }
       })()
     }
-  }, [searchParams, router, setIsEmailVerified, setEmail])
+  }, [verifiedParam, router, setIsEmailVerified, setEmail])
 
+  // 이메일 인증 상태 polling
   useEffect(() => {
     if (!email || isEmailVerified) return
 
     const intervalId = setInterval(async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/email/status?email=${encodeURIComponent(email)}`,
-        )
+        const data = await checkEmailStatus(email)
 
-        if (!res.ok) return
-
-        const data = await res.json()
-
-        if (data && data.verified) {
+        if (data?.verified) {
           setIsEmailVerified(true)
           clearInterval(intervalId)
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error('이메일 인증 상태 조회 실패', error)
+      }
     }, 1000)
 
     return () => clearInterval(intervalId)
-  }, [email, isEmailVerified, setIsEmailVerified])
+  }, [email, isEmailVerified])
 
   // 비밀번호 일치 확인
   const handleCheckPasswordMatch = () => {
@@ -226,32 +142,13 @@ export default function SignupPersonalPage() {
     try {
       setIsSendingEmail(true)
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/email/send`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      })
-
-      if (!response.ok) {
-        let message = '인증 메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-
-        try {
-          const data = await response.json()
-          if (data && typeof data.message === 'string') {
-            message = data.message
-          }
-        } catch (error) {}
-
-        alert(message)
-        return
-      }
+      await sendEmailAuth(email)
 
       alert('인증 메일을 발송했습니다. 메일함을 확인해 주세요.')
       setIsEmailVerified(false)
-    } catch (error) {
-      alert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.')
+    } catch (error: any) {
+      const message = error?.response?.data?.message ?? '인증 메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+      alert(message)
     } finally {
       setIsSendingEmail(false)
     }
@@ -279,16 +176,6 @@ export default function SignupPersonalPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!name.trim()) {
-      alert('이름은 필수 입력값입니다.')
-      return
-    }
-
-    if (!nickname || !nickname.trim()) {
-      alert('닉네임은 필수 입력값입니다.')
-      return
-    }
-
     if (!isEmailVerified) {
       alert('이메일 인증을 완료해 주세요.')
       return
@@ -301,7 +188,7 @@ export default function SignupPersonalPage() {
 
     const location = address && detailAddress ? `${address} ${detailAddress}` : (address ?? detailAddress ?? null)
 
-    const payload = {
+    const payload: SignupInput = {
       email,
       password,
       name,
@@ -310,35 +197,28 @@ export default function SignupPersonalPage() {
       location,
     }
 
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        let message = '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-
-        try {
-          const data = await response.json()
-          if (data && typeof data.message === 'string') {
-            message = data.message
-          }
-        } catch (error) {}
-
-        alert(message)
-        return
+    // Zod로 유효성 검증
+    const result = signupSchema.safeParse(payload)
+    if (!result.success) {
+      const firstError = result.error.issues[0]
+      if (firstError?.message) {
+        alert(firstError.message)
+      } else {
+        alert('입력값을 다시 확인해 주세요.')
       }
+      return
+    }
+
+    try {
+      await signup(result.data)
 
       reset()
 
       alert('회원가입이 완료되었습니다.')
       router.push('/')
-    } catch (error) {
-      alert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.')
+    } catch (error: any) {
+      const message = error?.response?.data?.message ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+      alert(message)
     }
   }
 
