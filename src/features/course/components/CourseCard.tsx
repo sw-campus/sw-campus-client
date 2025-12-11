@@ -38,7 +38,7 @@ export function CourseCard({ course }: { course: Course }) {
 
         {/* 장바구니 버튼 */}
         <div className="mt-auto">
-          <AddToCartButton item={{ id, title, image: imageUrl || '' }} className="w-full rounded-lg py-2 transition">
+          <AddToCartButton item={{ id, title, image: imageUrl }} className="w-full rounded-lg py-2 transition">
             Add to cart
           </AddToCartButton>
         </div>
