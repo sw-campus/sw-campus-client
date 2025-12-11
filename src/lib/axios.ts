@@ -39,3 +39,8 @@ api.interceptors.response.use(
     return Promise.reject(error)
   },
 )
+
+// 이메일 인증 리다이렉트 URL 생성
+export const getVerifyEmailRedirectUrl = (token: string) => {
+  return `${env.NEXT_PUBLIC_API_URL}/auth/email/verify?token=${token}`
+}
