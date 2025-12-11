@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import Script from 'next/script'
+import { Toaster, toast } from 'sonner'
 
 import {
   checkEmailStatus,
@@ -108,19 +109,19 @@ export default function SignupPersonalPage() {
     const SPECIAL_CHAR_REGEX = /[!@#$%^&*(),.?":{}|<>]/
 
     if (!password || !passwordConfirm) {
-      alert('비밀번호와 비밀번호 확인을 모두 입력해 주세요.')
+      toast.error('비밀번호와 비밀번호 확인을 모두 입력해 주세요.')
       resetPasswordValidation()
       return
     }
 
     if (password.length < MIN_LENGTH) {
-      alert(`비밀번호는 ${MIN_LENGTH}자 이상이어야 합니다`)
+      toast.error(`비밀번호는 ${MIN_LENGTH}자 이상이어야 합니다`)
       resetPasswordValidation()
       return
     }
 
     if (!SPECIAL_CHAR_REGEX.test(password)) {
-      alert('비밀번호에 특수문자가 1개 이상 포함되어야 합니다')
+      toast.error('비밀번호에 특수문자가 1개 이상 포함되어야 합니다')
       resetPasswordValidation()
       return
     }
@@ -131,7 +132,7 @@ export default function SignupPersonalPage() {
     } else {
       setIsPasswordMatched(false)
       setIsPasswordConfirmed(false)
-      alert('비밀번호와 비밀번호 확인이 일치하지 않습니다')
+      toast.error('비밀번호와 비밀번호 확인이 일치하지 않습니다')
     }
   }
 
@@ -144,11 +145,11 @@ export default function SignupPersonalPage() {
 
       await sendEmailAuth(email)
 
-      alert('인증 메일을 발송했습니다. 메일함을 확인해 주세요.')
+      toast.success('인증 메일을 발송했습니다. 메일함을 확인해 주세요.')
       setIsEmailVerified(false)
     } catch (error: any) {
       const message = error?.response?.data?.message ?? '인증 메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-      alert(message)
+      toast.error(message)
     } finally {
       setIsSendingEmail(false)
     }
@@ -160,7 +161,7 @@ export default function SignupPersonalPage() {
 
     const { daum } = window as any
     if (!daum || !daum.Postcode) {
-      alert('주소 검색 스크립트가 아직 로드되지 않았어요. 잠시 후 다시 시도해 주세요.')
+      toast.error('주소 검색 스크립트가 아직 로드되지 않았어요. 잠시 후 다시 시도해 주세요.')
       return
     }
 
@@ -177,12 +178,12 @@ export default function SignupPersonalPage() {
     e.preventDefault()
 
     if (!isEmailVerified) {
-      alert('이메일 인증을 완료해 주세요.')
+      toast.error('이메일 인증을 완료해 주세요.')
       return
     }
 
     if (!isPasswordConfirmed) {
-      alert('비밀번호 확인을 완료해 주세요.')
+      toast.error('비밀번호 확인을 완료해 주세요.')
       return
     }
 
@@ -202,9 +203,9 @@ export default function SignupPersonalPage() {
     if (!result.success) {
       const firstError = result.error.issues[0]
       if (firstError?.message) {
-        alert(firstError.message)
+        toast.error(firstError.message)
       } else {
-        alert('입력값을 다시 확인해 주세요.')
+        toast.error('입력값을 다시 확인해 주세요.')
       }
       return
     }
@@ -214,17 +215,18 @@ export default function SignupPersonalPage() {
 
       reset()
 
-      alert('회원가입이 완료되었습니다.')
+      toast.success('회원가입이 완료되었습니다.')
       router.push('/')
     } catch (error: any) {
       const message = error?.response?.data?.message ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-      alert(message)
+      toast.error(message)
     }
   }
 
   return (
     <div className="flex flex-col gap-4">
       <Script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" strategy="lazyOnload" />
+      <Toaster richColors closeButton position="bottom-center" />
       {/* 전체 영역 */}
       <section className="relative flex min-h-[540px] w-full items-center justify-center rounded-3xl px-8 py-10">
         {/* 가운데 회원가입 카드 */}
@@ -326,7 +328,6 @@ export default function SignupPersonalPage() {
                 placeholder="nickname"
                 className={`${INPUT_BASE_CLASS} w-full`}
                 value={nickname}
-                required
                 onChange={e => setNickname(e.target.value)}
               />
             </div>

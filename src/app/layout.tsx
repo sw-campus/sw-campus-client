@@ -28,7 +28,7 @@ export default function RootLayout({
         <div className="pointer-events-none absolute inset-0 bg-black/40" />
         <QueryClientProviderWrapper>
           {children}
-          <Toaster richColors closeButton />
+          <Toaster richColors closeButton position="bottom-center" />
         </QueryClientProviderWrapper>
       </body>
     </html>
