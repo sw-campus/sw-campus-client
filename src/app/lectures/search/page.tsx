@@ -135,6 +135,7 @@ export default function LectureSearchPage() {
   return (
     <div className="custom-container">
       <div className="custom-card">
+        {/* 필터 */}
         <Card className="flex flex-col gap-6 bg-white/50 px-20 py-10">
           <div className="flex flex-wrap items-end gap-4">
             <FilterGroup label="대분류">
@@ -218,9 +219,10 @@ export default function LectureSearchPage() {
           </FilterGroup>
         </Card>
 
-        <div className="flex w-full flex-wrap items-center gap-2 pt-4">
+        {/* 검색 */}
+        <div className="flex w-full flex-wrap items-center gap-5 pt-4">
           <Select value={selectedSort} onValueChange={value => setSelectedSort(value)}>
-            <SelectTrigger className={`${filterSelectTriggerClass} w-[220px]`}>
+            <SelectTrigger className={`${filterSelectTriggerClass} w-[180px]`}>
               <SelectValue placeholder="정렬 기준" />
             </SelectTrigger>
             <SelectContent>
@@ -241,7 +243,7 @@ export default function LectureSearchPage() {
           />
           <Button
             type="button"
-            className="bg-accent-foreground hover:bg-accent-foreground/90 text-white"
+            className="border-primary bg-primary focus-visible:ring-offset-primary/20 hover:bg-primary/90 w-[100px] text-white"
             onClick={handleSearch}
           >
             검색
