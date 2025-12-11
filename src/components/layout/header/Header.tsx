@@ -2,7 +2,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FiLogIn, FiUser, FiHeart, FiMenu } from 'react-icons/fi'
 
-export default function Header({ onOpenNav, onBootcampEnter }: { onOpenNav: () => void; onBootcampEnter: () => void }) {
+export default function Header({
+  onOpenNav,
+  onBootcampEnter,
+  onOtherNavEnter,
+}: {
+  onOpenNav: () => void
+  onBootcampEnter: () => void
+  onOtherNavEnter: () => void
+}) {
   return (
     <header className="sticky top-0 z-50 mx-auto mt-6 flex w-full max-w-7xl items-center justify-between rounded-full border border-white/15 bg-white/10 px-10 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-xl">
       <div className="flex flex-1 items-center gap-8">
@@ -31,11 +39,20 @@ export default function Header({ onOpenNav, onBootcampEnter }: { onOpenNav: () =
 
       {/* 네비게이션 */}
       <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 text-sm text-white md:flex">
-        <Link href="/lectures/search" onMouseEnter={onBootcampEnter} onFocus={onBootcampEnter}>
+        <Link
+          href="/lectures/search"
+          onMouseEnter={onBootcampEnter}
+          onFocus={onBootcampEnter}
+          onClick={onBootcampEnter}
+        >
           부트캠프
         </Link>
-        <Link href="/">훈련 기관</Link>
-        <Link href="/">커뮤니케이션</Link>
+        <Link href="/" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
+          훈련 기관
+        </Link>
+        <Link href="/" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
+          커뮤니케이션
+        </Link>
       </nav>
 
       {/* 아이콘 */}
