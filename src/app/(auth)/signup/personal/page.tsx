@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, Suspense, useEffect, useRef } from 'react'
+import { FormEvent, Suspense, useEffect, useRef } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import Script from 'next/script'
@@ -20,8 +21,7 @@ import { useSignupStore } from '@/store/signupStore'
 const INPUT_BASE_CLASS =
   'h-9 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white'
 
-// 실제 로직 컴포넌트
-function SignupPersonalPageContent() {
+function SignupPersonalContent() {
   const {
     address,
     detailAddress,
@@ -398,8 +398,8 @@ function SignupPersonalPageContent() {
 
 export default function SignupPersonalPage() {
   return (
-    <Suspense fallback={null}>
-      <SignupPersonalPageContent />
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignupPersonalContent />
     </Suspense>
   )
 }
