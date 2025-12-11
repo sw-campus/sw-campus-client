@@ -1,14 +1,13 @@
 'use client'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 
 const dashboardStats = [
-  { label: '진행중인 교육과정', value: '2개', note: '이번 분기 시작 예정' },
-  { label: '완료된 교육과정', value: '5개', note: '평균 수강률 86%' },
   { label: '등록 대기', value: '1개', note: '내부 승인 대기중' },
+  { label: '반려된 교육과정', value: '2개', note: '이번 분기 시작 예정' },
+  { label: '승인된 교육과정', value: '5개', note: '평균 수강률 86%' },
 ]
 
 export default function MyPage() {
