@@ -1,8 +1,6 @@
 'use client'
 
 import { FormEvent, Suspense, useEffect, useRef } from 'react'
-import { FormEvent, Suspense, useEffect, useRef } from 'react'
-import { FormEvent, useEffect, useRef } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import Script from 'next/script'
