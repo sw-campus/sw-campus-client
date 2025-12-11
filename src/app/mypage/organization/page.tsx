@@ -13,7 +13,7 @@ const dashboardStats = [
 export default function MyPage() {
   const router = useRouter()
   const openProductModal = () => {
-    router.push('/mypage/organization/lectures')
+    router.push('/mypage/organization/lectures/new')
   }
 
   return (

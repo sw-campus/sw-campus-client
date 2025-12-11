@@ -7,9 +7,9 @@ import { XIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
-import { CourseRegistrationForm } from '@/features/mypage/organization/components/CourseRegistrationForm'
+import { CourseRegistrationForm } from '@/features/lecture/components/CourseRegistrationForm'
 
-export default function OrganizationCourseModal() {
+export default function LectureCreatePage() {
   const router = useRouter()
   const [closing, setClosing] = useState(false)
 

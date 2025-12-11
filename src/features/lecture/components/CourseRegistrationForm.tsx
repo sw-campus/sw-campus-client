@@ -1,6 +1,15 @@
 'use client'
 
-import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSeparator, FieldSet } from '@/components/ui/field'
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSeparator,
+  FieldSet,
+} from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -58,7 +67,7 @@ export function CourseRegistrationForm() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {deliveryModes.map((mode) => (
+                    {deliveryModes.map(mode => (
                       <SelectItem key={mode.value} value={mode.value}>
                         {mode.label}
                       </SelectItem>
@@ -79,7 +88,7 @@ export function CourseRegistrationForm() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {categories.map((category) => (
+                    {categories.map(category => (
                       <SelectItem key={category.value} value={category.value}>
                         {category.label}
                       </SelectItem>
@@ -131,7 +140,7 @@ export function CourseRegistrationForm() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {difficultyLevels.map((level) => (
+                    {difficultyLevels.map(level => (
                       <SelectItem key={level.value} value={level.value}>
                         {level.label}
                       </SelectItem>
