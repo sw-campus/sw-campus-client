@@ -10,46 +10,17 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { FilterGroup } from '@/features/lecture/components/FilterGroups'
 import { FilterTag } from '@/features/lecture/components/FilterTag'
+import {
+  COST_FILTERS,
+  PROCEDURE_FILTERS,
+  REGION_FILTERS,
+  SORT_OPTIONS,
+  DEFAULT_SORT,
+  COST_QUERY_MAP,
+  PROCEDURE_QUERY_MAP,
+} from '@/features/lecture/types/filter.type'
 import { BOOT_NAV_DATA } from '@/features/navi/types/navigation.type'
 
-const COST_FILTERS = ['무료(내배카 필요)', '무료(내배카 필요X)', '유료(자부담)']
-const PROCEDURE_FILTERS = ['면접 없음', '코딩테스트 없음', '사전학습과제 없음']
-const REGION_FILTERS = [
-  '서울특별시',
-  '인천광역시',
-  '부산광역시',
-  '대구광역시',
-  '울산광역시',
-  '세종특별자치시',
-  '경기도',
-  '강원도',
-  '충청북도',
-  '충청남도',
-  '전라북도',
-  '전라남도',
-  '경상북도',
-  '경상남도',
-  '제주특별자치도',
-]
-const SORT_OPTIONS = [
-  { value: 'latest', label: '최신순(기본)' },
-  { value: 'fee_asc', label: '자기부담금 낮은 순' },
-  { value: 'fee_desc', label: '자기부담금 높은 순' },
-  { value: 'start_soon', label: '개강 빠른 순' },
-  { value: 'duration_asc', label: '교육기간 짧은 순' },
-  { value: 'duration_desc', label: '교육기간 긴 순' },
-]
-const DEFAULT_SORT = SORT_OPTIONS[0].value
-const COST_QUERY_MAP: Record<string, string> = {
-  '무료(내배카 필요)': 'isFreekdt',
-  '무료(내배카 필요X)': 'isFreeNoKdt',
-  '유료(자부담)': 'isPaid',
-}
-const PROCEDURE_QUERY_MAP: Record<string, string> = {
-  '면접 없음': 'hasInterview',
-  '코딩테스트 없음': 'hasCodingTest',
-  '사전학습과제 없음': 'hasPreTask',
-}
 const filterSelectTriggerClass =
   'flex items-center justify-between gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-medium text-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white'
 
