@@ -3,6 +3,7 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  output: 'standalone', // Docker 이미지 최적화를 위한 standalone 모드
   images: {
     remotePatterns: [
       {
