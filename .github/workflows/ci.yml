@@ -5,12 +5,17 @@ on:
     branches:
       - develop  # 리눅스 서버 (테스트 환경)
       - main     # AWS (프로덕션 환경)
+  pull_request:
+    branches:
+      - develop
+      - main
   release:
     types: [published]  # main 브랜치에서만 Release 생성
   workflow_dispatch:
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -67,7 +72,13 @@ jobs:
           echo "target_branch=main" >> $GITHUB_OUTPUT
         fi
         
+    - name: Build Docker image (PR only - no push)
+      if: github.event_name == 'pull_request'
+      run: |
+        docker build --no-cache -t ghcr.io/sw-campus/sw-campus-client:pr-test -f ./Dockerfile .
+        
     - name: Build and push Docker image
+      if: github.event_name != 'pull_request'
       run: |
         docker build --no-cache -t ghcr.io/sw-campus/sw-campus-client:latest -t ghcr.io/sw-campus/sw-campus-client:${{ steps.version.outputs.version }} -f ./Dockerfile .
         docker push ghcr.io/sw-campus/sw-campus-client:latest
