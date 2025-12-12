@@ -1,27 +1,23 @@
-'use client'
+import React from 'react'
 
-type EmailVerificationFieldProps = {
-  email: string
-  isEmailVerified: boolean
-  isSendingEmail: boolean
-  // 이메일 값 변경 (Zustand의 setEmail 그대로 넘겨서 사용)
-  setEmail: (value: string) => void
-  // 이메일 인증 메일 전송 핸들러
-  handleSendEmailAuth: () => void
-}
-
-// 입력 공통 스타일 (page.tsx와 동일하게 맞춰줌)
 const INPUT_BASE_CLASS =
   'h-9 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white'
 
-// 이메일 입력 + 인증 버튼 공통 컴포넌트
-export function EmailVerificationField({
+interface EmailAuthInputProps {
+  email: string
+  isEmailVerified: boolean
+  isSendingEmail: boolean
+  onEmailChange: (value: string) => void
+  onClickAuth: () => void
+}
+
+const EmailAuthInput: React.FC<EmailAuthInputProps> = ({
   email,
   isEmailVerified,
   isSendingEmail,
-  setEmail,
-  handleSendEmailAuth,
-}: EmailVerificationFieldProps) {
+  onEmailChange,
+  onClickAuth,
+}) => {
   return (
     <div className="mb-4">
       <label className="mb-1 block text-neutral-700">이메일</label>
@@ -31,11 +27,12 @@ export function EmailVerificationField({
           placeholder="email"
           className={`${INPUT_BASE_CLASS} w-full flex-1`}
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={e => onEmailChange(e.target.value)}
+          disabled={isEmailVerified}
         />
         <button
           type="button"
-          onClick={handleSendEmailAuth}
+          onClick={onClickAuth}
           disabled={isSendingEmail || isEmailVerified}
           className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
         >
@@ -50,3 +47,5 @@ export function EmailVerificationField({
     </div>
   )
 }
+
+export default EmailAuthInput

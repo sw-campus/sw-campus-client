@@ -15,10 +15,7 @@ export default function HeaderSection() {
 
   return (
     <div className="relative">
-      <Header
-        onOpenNav={() => setOpen(true)}
-        onBootcampEnter={() => setShowDesktopNav(true)}
-      />
+      <Header onOpenNav={() => setOpen(true)} onBootcampEnter={() => setShowDesktopNav(true)} />
       <Navigation
         open={open}
         showDesktop={showDesktopNav}
