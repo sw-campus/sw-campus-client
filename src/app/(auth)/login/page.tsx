@@ -2,11 +2,11 @@
 
 import { FormEvent, useCallback, useMemo, useState } from 'react'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FaGoogle, FaGithub } from 'react-icons/fa'
+import { toast } from 'sonner'
 
 import { login as loginApi } from '@/features/auth/authApi'
+import { LoginFormCard } from '@/features/auth/components/LoginFormCard'
 import { useAuthStore } from '@/store/authStore'
 
 export default function LoginPage() {
@@ -36,10 +36,6 @@ export default function LoginPage() {
     url.searchParams.set('redirect_uri', oauthRedirectUri.google)
     url.searchParams.set('response_type', 'code')
     url.searchParams.set('scope', 'openid email profile')
-    // 필요 시 동의 화면을 항상 띄우려면 아래 주석 해제
-    // url.searchParams.set('prompt', 'consent')
-    // refresh token 필요하면 access_type=offline 고려
-    // url.searchParams.set('access_type', 'offline')
 
     return url.toString()
   }, [oauthRedirectUri.google])
@@ -89,9 +85,7 @@ export default function LoginPage() {
       // 응답에 유저 정보가 있을 경우 대비
       let userName = email.split('@')[0]
 
-      if (data) {
-        userName = (data as any).name ?? (data as any).nickname ?? userName
-      }
+      if (data) userName = (data as any).name ?? (data as any).nickname ?? userName
 
       setLogin(userName)
 
@@ -111,76 +105,19 @@ export default function LoginPage() {
       <section className="flex min-h-[500px] w-full items-center justify-center px-6 py-10">
         {/* 가운데 로그인 카드 */}
         <div className="relative z-10 flex w-full items-center justify-center">
-          <form onSubmit={handleSubmit} className="w-full max-w-md rounded-xl bg-white p-10">
-            {/* 이메일 */}
-            <div className="mb-4">
-              <label className="mb-1 block text-neutral-700">이메일</label>
-              <input
-                type="email"
-                placeholder="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
-              />
-            </div>
-
-            {/* 비밀번호 */}
-            <div className="mb-3">
-              <label className="mb-1 block text-neutral-700">비밀번호</label>
-              <input
-                type="password"
-                placeholder="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
-              />
-            </div>
-
-            {/* 아이디/비번 찾기 + 회원가입 */}
-            <div className="mb-4 flex justify-between text-neutral-500">
-              <button type="button" className="underline-offset-2 hover:underline">
-                아이디/비밀번호 찾기
-              </button>
-              <Link href="/signup" className="underline-offset-2 hover:underline">
-                회원가입
-              </Link>
-            </div>
-
-            {/* 로그인 버튼 */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="mt-1 h-9 w-full rounded-md bg-neutral-900 font-semibold text-white disabled:opacity-60"
-            >
-              {isLoading ? '로그인 중...' : '로그인'}
-            </button>
-
-            {/* 소셜 로그인 영역 */}
-            {/* 하단 구글 / 깃허브 로고 */}
-            <div className="mt-4 flex justify-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white transition hover:scale-105 hover:bg-neutral-100">
-                <button
-                  type="button"
-                  onClick={() => handleOAuthStart('google')}
-                  aria-label="Google로 로그인"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border bg-white transition hover:scale-105 hover:bg-neutral-100"
-                >
-                  <FaGoogle className="text-red-500" size={18} />
-                </button>
-              </div>
-
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white transition hover:scale-105 hover:bg-neutral-100">
-                <button
-                  type="button"
-                  onClick={() => handleOAuthStart('github')}
-                  aria-label="GitHub로 로그인"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border bg-white transition hover:scale-105 hover:bg-neutral-100"
-                >
-                  <FaGithub className="text-black" size={18} />
-                </button>
-              </div>
-            </div>
-          </form>
+          <LoginFormCard
+            email={email}
+            password={password}
+            isLoading={isLoading}
+            onChangeEmail={setEmail}
+            onChangePassword={setPassword}
+            onSubmit={handleSubmit}
+            onOAuthStart={handleOAuthStart}
+            signupHref="/signup"
+            onFindAccountClick={() => {
+              toast.message('아이디/비밀번호 찾기 기능은 아직 연결되지 않았어요.')
+            }}
+          />
         </div>
       </section>
     </div>
