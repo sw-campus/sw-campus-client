@@ -117,5 +117,14 @@ export const organizationSignupSchema = baseSignupSchema.extend({
   certificateImage: z.instanceof(File, { message: '재직증명서는 필수입니다.' }),
 })
 
+// OAuth
+// OAuth 로그인 (Google / GitHub)
+export const oauthLogin = async (provider: 'google' | 'github', code: string) => {
+  const res = await api.post(`/auth/oauth/${provider}`, {
+    code,
+  })
+  return res.data
+}
+
 export type SignupInput = z.infer<typeof signupSchema>
 export type OrganizationSignupInput = z.infer<typeof organizationSignupSchema>
