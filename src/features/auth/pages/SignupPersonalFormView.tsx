@@ -10,7 +10,6 @@ import { useSignupForm } from '@/features/auth/hooks/useSignupForm'
 
 export default function SignupPersonalFormView() {
   const {
-    // store values
     address,
     detailAddress,
     email,
@@ -23,7 +22,6 @@ export default function SignupPersonalFormView() {
     nickname,
     phone,
 
-    // store setters
     setEmail,
     setPassword,
     setPasswordConfirm,
@@ -31,7 +29,6 @@ export default function SignupPersonalFormView() {
     setNickname,
     setPhone,
 
-    // handlers
     handleSendEmailAuth,
     handleCheckPasswordMatch,
     handleSubmit,

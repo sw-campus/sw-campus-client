@@ -6,10 +6,12 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { checkEmailStatus, sendEmailAuth, signupOrganization, signupSchema } from '@/features/auth/authApi'
+import { useAuthStore } from '@/store/authStore'
 import { useSignupStore } from '@/store/signupStore'
 
 export function useSignupOrganizationForm() {
   const router = useRouter()
+  const { login: setLogin } = useAuthStore()
 
   const {
     address,
@@ -46,7 +48,6 @@ export function useSignupOrganizationForm() {
     setIsPasswordConfirmed(false)
   }
 
-  // 이메일 인증 상태 polling
   useEffect(() => {
     if (!email || isEmailVerified) return
 
@@ -123,6 +124,11 @@ export function useSignupOrganizationForm() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    if (!isEmailVerified) {
+      toast.error('이메일 인증을 완료해 주세요.')
+      return
+    }
+
     if (password !== passwordConfirm) {
       toast.error('비밀번호와 비밀번호 확인이 일치하지 않습니다.')
       return
@@ -147,6 +153,10 @@ export function useSignupOrganizationForm() {
         certificateImage: certificateImage || '',
       })
 
+      const headerName = organizationName.trim()
+
+      if (headerName) setLogin(headerName)
+
       router.push('/')
     } catch (error) {
       console.error('Organization signup error:', error)
@@ -157,7 +167,6 @@ export function useSignupOrganizationForm() {
   }
 
   return {
-    // values
     address,
     email,
     isSendingEmail,
@@ -172,7 +181,6 @@ export function useSignupOrganizationForm() {
     certificateImage,
     isSubmitting,
 
-    // setters
     setEmail,
     setPassword,
     setPasswordConfirm,
@@ -181,7 +189,6 @@ export function useSignupOrganizationForm() {
     setPhone,
     setOrganizationName,
 
-    // handlers
     handleSendEmailAuth,
     handleCheckPasswordMatch,
     handleFileChange,

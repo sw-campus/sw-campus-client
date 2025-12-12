@@ -13,8 +13,6 @@ const INPUT_BASE_CLASS =
 
 export default function SignupOrganizationFormView() {
   const {
-    // values
-    address,
     email,
     isSendingEmail,
     isEmailVerified,
@@ -28,7 +26,6 @@ export default function SignupOrganizationFormView() {
     certificateImage,
     isSubmitting,
 
-    // setters
     setEmail,
     setPassword,
     setPasswordConfirm,
@@ -37,7 +34,6 @@ export default function SignupOrganizationFormView() {
     setPhone,
     setOrganizationName,
 
-    // handlers
     handleSendEmailAuth,
     handleCheckPasswordMatch,
     handleFileChange,
