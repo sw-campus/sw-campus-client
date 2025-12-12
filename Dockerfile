@@ -6,17 +6,13 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# pnpm 설치
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# package.json과 lock 파일 복사
-COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+# package.json과 package-lock.json 복사 (있으면)
+COPY package.json package-lock.json* ./
+RUN npm ci || npm install
 
 # 빌드 단계
 FROM base AS builder
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # 의존성 복사
 COPY --from=deps /app/node_modules ./node_modules
@@ -26,7 +22,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Next.js 빌드
-RUN pnpm build
+RUN npm run build
 
 # 프로덕션 이미지
 FROM base AS runner
