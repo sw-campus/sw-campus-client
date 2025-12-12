@@ -1,21 +1,16 @@
 'use client'
 
-import { FormEvent, useState, useEffect, useRef, ChangeEvent } from 'react'
+import { FormEvent, useState, useEffect, ChangeEvent } from 'react'
 
 import { useRouter } from 'next/navigation'
-import { Toaster, toast } from 'sonner'
+import { toast } from 'sonner'
 
 import { signupOrganization } from '@/features/auth/authApi'
-import {
-  checkEmailStatus,
-  getVerifiedEmail,
-  sendEmailAuth,
-  signup,
-  signupSchema,
-  SignupInput,
-} from '@/features/auth/authApi'
+import { checkEmailStatus, sendEmailAuth, signupSchema } from '@/features/auth/authApi'
 import AddressInput from '@/features/auth/components/AddressInput'
+import CertificateUploadSection from '@/features/auth/components/CertificateUploadSection'
 import EmailAuthInput from '@/features/auth/components/EmailAuthInput'
+import LabeledInput from '@/features/auth/components/LabeledInput'
 import PasswordFields from '@/features/auth/components/PasswordFields'
 import { useSignupStore } from '@/store/signupStore'
 
@@ -25,22 +20,18 @@ const INPUT_BASE_CLASS =
 export default function SignupOrganizationPage() {
   const {
     address,
-    detailAddress,
     email,
     isSendingEmail,
     isEmailVerified,
     password,
     passwordConfirm,
     isPasswordMatched,
-    isPasswordConfirmed,
     name,
     nickname,
     phone,
     organizationName,
     certificateImage,
 
-    setAddress,
-    setDetailAddress,
     setEmail,
     setIsSendingEmail,
     setIsEmailVerified,
@@ -53,7 +44,6 @@ export default function SignupOrganizationPage() {
     setPhone,
     setOrganizationName,
     setCertificateImage,
-    reset,
   } = useSignupStore()
 
   const router = useRouter()
@@ -210,44 +200,35 @@ export default function SignupOrganizationPage() {
       />
 
       {/* 이름 */}
-      <div className="mb-4">
-        <label className="mb-1 block text-neutral-700" htmlFor="">
-          이름
-        </label>
-        <input
-          id=""
-          type="text"
-          placeholder="name"
-          className={`${INPUT_BASE_CLASS} w-full`}
-          value={name}
-          onChange={e => setName(e.target.value)}
-        />
-      </div>
+      <LabeledInput
+        label="이름"
+        type="text"
+        placeholder="name"
+        value={name}
+        onChangeValue={setName}
+        className={INPUT_BASE_CLASS}
+      />
 
       {/* 닉네임 */}
-      <div className="mb-4">
-        <label className="mb-1 block text-neutral-700">닉네임</label>
-        <input
-          type="text"
-          placeholder="nickname"
-          className={`${INPUT_BASE_CLASS} w-full`}
-          value={nickname}
-          onChange={e => setNickname(e.target.value)}
-        />
-      </div>
+      <LabeledInput
+        label="닉네임"
+        type="text"
+        placeholder="nickname"
+        value={nickname}
+        onChangeValue={setNickname}
+        className={INPUT_BASE_CLASS}
+      />
 
       {/* 기관명 */}
-      <div className="mb-4">
-        <label className="mb-1 block text-neutral-700">기관명</label>
-        <input
-          type="text"
-          name="organizationName"
-          value={organizationName}
-          onChange={e => setOrganizationName(e.target.value)}
-          placeholder="기관명을 입력해 주세요"
-          className="h-9 w-full rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white"
-        />
-      </div>
+      <LabeledInput
+        label="기관명"
+        type="text"
+        name="organizationName"
+        placeholder="기관명을 입력해 주세요"
+        value={organizationName}
+        onChangeValue={setOrganizationName}
+        className={INPUT_BASE_CLASS}
+      />
 
       {/* 전화번호 + 인증 */}
       <div className="mb-4">
@@ -271,24 +252,13 @@ export default function SignupOrganizationPage() {
       <AddressInput />
 
       {/* 재직증명서 (파일 선택) */}
-      <div className="mb-4">
-        <label className="mb-1 block text-neutral-700">재직증명서</label>
-        <div className="flex flex-col gap-2">
-          <div className="flex gap-2">
-            <input
-              type="file"
-              name="certificateImage"
-              accept=".pdf,image/*"
-              onChange={handleFileChange}
-              className="h-9 w-full flex-1 rounded-md border border-neutral-300 bg-neutral-100 px-2 py-1 text-sm outline-none file:mr-2 file:cursor-pointer file:rounded-md file:border-0 file:bg-neutral-900 file:px-3 file:py-1 file:text-sm file:font-semibold file:text-white focus:border-neutral-500 focus:bg-white"
-            />
-            <button type="button" className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white">
-              인증
-            </button>
-          </div>
-          {certificateImage && <p className="text-xs text-neutral-500">선택된 파일: {certificateImage.name}</p>}
-        </div>
-      </div>
+      <CertificateUploadSection
+        certificateImage={certificateImage}
+        onChangeFile={handleFileChange}
+        onClickVerify={() => {
+          toast.message('재직증명서 인증 기능은 아직 연결되지 않았어요.')
+        }}
+      />
 
       {/* 회원가입 버튼 */}
       <button
