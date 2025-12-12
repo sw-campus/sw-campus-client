@@ -2,6 +2,13 @@ import { z } from 'zod'
 
 import { api } from '@/lib/axios'
 
+interface OAuthLoginResponse {
+  name?: string
+  nickname?: string
+  email?: string
+  // API 응답에 따라 토큰 등 다른 필드 추가
+}
+
 // 이메일 인증 상태 조회 API
 export const checkEmailStatus = async (email: string) => {
   const res = await api.get('/auth/email/status', {
@@ -117,10 +124,9 @@ export const organizationSignupSchema = baseSignupSchema.extend({
   certificateImage: z.instanceof(File, { message: '재직증명서는 필수입니다.' }),
 })
 
-// OAuth
 // OAuth 로그인 (Google / GitHub)
-export const oauthLogin = async (provider: 'google' | 'github', code: string) => {
-  const res = await api.post(`/auth/oauth/${provider}`, {
+export const oauthLogin = async (provider: 'google' | 'github', code: string): Promise<OAuthLoginResponse> => {
+  const res = await api.post<OAuthLoginResponse>(`/auth/oauth/${provider}`, {
     code,
   })
   return res.data

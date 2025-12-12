@@ -62,7 +62,7 @@ export default function LoginPage() {
       const target = provider === 'google' ? googleAuthUrl : githubAuthUrl
 
       if (!target) {
-        alert('OAuth 환경변수(NEXT_PUBLIC_*_CLIENT_ID)가 설정되지 않았어요.')
+        toast.error('OAuth 환경변수(NEXT_PUBLIC_*_CLIENT_ID)가 설정되지 않았어요.')
         return
       }
 

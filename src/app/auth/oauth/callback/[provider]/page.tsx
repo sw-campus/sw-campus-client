@@ -14,6 +14,13 @@ export default function OAuthCallbackPage() {
 
   const { login: setLogin } = useAuthStore()
 
+  const { provider } = params
+  if (provider !== 'google' && provider !== 'github') {
+    alert('지원하지 않는 소셜 로그인 제공자입니다.')
+    router.replace('/login')
+    return
+  }
+
   useEffect(() => {
     const provider = params.provider as 'google' | 'github'
     const code = searchParams.get('code')
@@ -36,7 +43,7 @@ export default function OAuthCallbackPage() {
         const data = await oauthLogin(provider, code)
 
         // 응답 형태에 맞게 골라서 저장 (예시)
-        const userName = (data as any)?.name ?? (data as any)?.nickname ?? (data as any)?.email ?? '사용자'
+        const userName = data.name ?? data.nickname ?? data.email ?? '사용자'
 
         setLogin(userName)
 
