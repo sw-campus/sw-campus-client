@@ -1,6 +1,6 @@
 'use client'
 
-import { INPUT_BASE_CLASS } from '@/features/auth/components/inputBaseClass'
+import { INPUT_BASE_CLASS } from '@/features/auth/inputBaseClass'
 
 type NameInputProps = {
   value: string
