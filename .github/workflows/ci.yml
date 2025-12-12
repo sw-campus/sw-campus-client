@@ -77,12 +77,12 @@ jobs:
     - name: Build Docker image (PR only - no push)
       if: github.event_name == 'pull_request'
       run: |
-        docker build --no-cache -t ghcr.io/sw-campus/sw-campus-client:pr-test -f ./Dockerfile .
+        docker build --no-cache --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:8080' }} -t ghcr.io/sw-campus/sw-campus-client:pr-test -f ./Dockerfile .
         
     - name: Build and push Docker image
       if: github.event_name != 'pull_request'
       run: |
-        docker build --no-cache -t ghcr.io/sw-campus/sw-campus-client:latest -t ghcr.io/sw-campus/sw-campus-client:${{ steps.version.outputs.version }} -f ./Dockerfile .
+        docker build --no-cache --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:8080' }} -t ghcr.io/sw-campus/sw-campus-client:latest -t ghcr.io/sw-campus/sw-campus-client:${{ steps.version.outputs.version }} -f ./Dockerfile .
         docker push ghcr.io/sw-campus/sw-campus-client:latest
         docker push ghcr.io/sw-campus/sw-campus-client:${{ steps.version.outputs.version }}
         
