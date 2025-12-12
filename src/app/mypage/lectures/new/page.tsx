@@ -22,7 +22,7 @@ export default function LectureCreatePage() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="w-[900px] max-w-4xl">
+      <DialogContent style={{ width: '1000px', maxWidth: '1000px' }}>
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>교육과정 등록</DialogTitle>
         </DialogHeader>
