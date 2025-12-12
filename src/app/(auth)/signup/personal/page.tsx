@@ -20,7 +20,6 @@ import { useSignupStore } from '@/store/signupStore'
 const INPUT_BASE_CLASS =
   'h-9 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white'
 
-// 실제 로직 컴포넌트
 function SignupPersonalPageContent() {
   const {
     address,
@@ -398,7 +397,7 @@ function SignupPersonalPageContent() {
 
 export default function SignupPersonalPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div>Loading...</div>}>
       <SignupPersonalPageContent />
     </Suspense>
   )
