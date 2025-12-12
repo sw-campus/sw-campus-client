@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { Toaster, toast } from 'sonner'
 
 import { oauthLogin } from '@/features/auth/authApi'
 import { useAuthStore } from '@/store/authStore'
@@ -16,7 +17,7 @@ export default function OAuthCallbackPage() {
 
   const { provider } = params
   if (provider !== 'google' && provider !== 'github') {
-    alert('지원하지 않는 소셜 로그인 제공자입니다.')
+    toast.error('지원하지 않는 소셜 로그인 제공자입니다.')
     router.replace('/login')
     return
   }
@@ -27,13 +28,13 @@ export default function OAuthCallbackPage() {
     const error = searchParams.get('error')
 
     if (error) {
-      alert('OAuth 인증이 취소/실패했어요.')
+      toast.error('OAuth 인증이 취소/실패했어요.')
       router.replace('/login')
       return
     }
 
     if (!code) {
-      alert('인가 코드(code)가 없어요.')
+      toast.error('인가 코드(code)가 없어요.')
       router.replace('/login')
       return
     }
@@ -50,7 +51,7 @@ export default function OAuthCallbackPage() {
         router.replace('/')
       } catch (e) {
         console.error(e)
-        alert('소셜 로그인에 실패했어요. 다시 시도해주세요.')
+        toast.error('소셜 로그인에 실패했어요. 다시 시도해주세요.')
         router.replace('/login')
       }
     })()
