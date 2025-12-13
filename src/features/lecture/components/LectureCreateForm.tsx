@@ -5,6 +5,7 @@ import { useRef } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
@@ -42,6 +43,7 @@ export function LectureCreateForm() {
   const onSubmit = async (values: LectureFormValues) => {
     const payload = mapLectureFormToCreateRequest(values)
     await mutateAsync(payload)
+    toast.success('강의가 성공적으로 등록되었습니다.')
     router.back()
   }
 
