@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { LectureCreateForm } from '@/features/lecture/components/LectureCreateForm'
+import { LectureCreateForm } from '@/features/lecture/components/lecture-create/LectureCreateForm'
 
 export default function LectureCreatePage() {
   const router = useRouter()

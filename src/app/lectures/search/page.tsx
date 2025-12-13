@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { FilterGroup } from '@/features/lecture/components/FilterGroups'
-import { FilterTag } from '@/features/lecture/components/FilterTag'
+import { FilterGroup } from '@/features/lecture/components/lecture-search/FilterGroups'
+import { FilterTag } from '@/features/lecture/components/lecture-search/FilterTag'
 import {
   COST_FILTERS,
   PROCEDURE_FILTERS,

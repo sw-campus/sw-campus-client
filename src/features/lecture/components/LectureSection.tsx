@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 import { FiArrowRight } from 'react-icons/fi'
 
 import { mockLectures } from '@/features/lecture/api/mockLectures'
-import { LectureFilterTabs } from '@/features/lecture/components/LectureFilterTabs'
 import { LectureList } from '@/features/lecture/components/LectureList'
+import { LectureFilterTabs } from '@/features/lecture/components/lecture-search/LectureFilterTabs'
 
 const CATEGORIES = [
   '웹개발',
