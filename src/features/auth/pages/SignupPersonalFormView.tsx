@@ -37,7 +37,7 @@ export default function SignupPersonalFormView() {
 
   return (
     <form
-      onSubmit={e => handleSubmit(e, { address, detailAddress })}
+      onSubmit={handleSubmit}
       className="w-full max-w-xl rounded-xl bg-white/90 p-8 shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
     >
       {/* 이메일 + 인증 */}
