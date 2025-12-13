@@ -1,14 +1,15 @@
 import { OrganizationList } from "@/features/organization/components/OrganizationList";
-import Header from "@/components/layout/Header";
+import { MOCK_ORGS } from "@/features/organization/api/mockOrganizations";
+import HeaderSection from "@/components/layout/header/HeaderSection";
 
 export default function OrganizationsPage() {
     return (
         <>
-            <Header />
+            <HeaderSection />
             <main className="min-h-screen pt-20">
                 <div className="custom-container">
                     <div className="custom-card">
-                        <OrganizationList />
+                        <OrganizationList organizations={MOCK_ORGS} />
                     </div>
                 </div>
             </main>

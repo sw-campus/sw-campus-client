@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Organization } from '../types/organization.type';
@@ -16,9 +17,11 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
                 {/* Circular Logo with Ring */}
                 <div className="mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-card shadow-sm ring-2 ring-border transition-all group-hover:ring-primary/30 group-hover:shadow-md">
                     {organization.imageUrl ? (
-                        <img
+                        <Image
                             src={organization.imageUrl}
                             alt={organization.name}
+                            width={64}
+                            height={64}
                             className="h-full w-full object-contain p-1"
                         />
                     ) : (
