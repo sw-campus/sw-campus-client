@@ -33,7 +33,11 @@ export function DatePicker({
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" id={inputId} className="w-48 justify-between font-normal">
+          <Button
+            variant="outline"
+            id={inputId}
+            className="hover:bg-background hover:text-accent-foreground w-full justify-between font-normal"
+          >
             {selectedDate ? selectedDate.toLocaleDateString() : '날짜 선택'}
             <ChevronDownIcon />
           </Button>
