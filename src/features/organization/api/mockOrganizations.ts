@@ -1,13 +1,14 @@
-import { Organization } from '../types/organization.type';
+import type { OrganizationSummary } from '../types/organization.type';
 
 const COMMON_LOGO = "https://boottent.com/_next/image?url=https%3A%2F%2Fcdn.sayun.studio%2Fboottent%2Ffiles%2Fcompany%2Fcover%2Fintroduction_dedddcb7-b77b-4015-8b47-849f237a4e45.png&w=128&q=75";
 const FACILITY_IMAGE = "https://picsum.photos/800/450";
 
-export const MOCK_ORGS: Organization[] = [
+export const MOCK_ORGS: OrganizationSummary[] = [
     {
         id: 1,
         name: "멋쟁이사자처럼",
-        desc: "국내 최대 IT 교육 스타트업으로, 코딩 교육과 창업 지원을 통해 누구나 아이디어를 실현할 수 있도록 돕습니다.",
+        recruitingLectureCount: 3,
+        logoUrl: COMMON_LOGO,
         description: "멋쟁이사자처럼은 대한민국 최대 규모의 IT 창업 동아리이자 교육 기관입니다. 2013년에 설립되어 전국 대학교에서 운영되고 있으며, 비전공자도 쉽게 프로그래밍을 배울 수 있도록 체계적인 커리큘럼을 제공합니다. 웹 개발, 앱 개발, 인공지능, 블록체인 등 다양한 기술 분야의 교육을 진행하고 있으며, 교육 이후에도 창업 지원 프로그램을 통해 수강생들의 아이디어 실현을 돕고 있습니다.",
         activeCourseCount: 3,
         imageUrl: COMMON_LOGO,
@@ -21,6 +22,9 @@ export const MOCK_ORGS: Organization[] = [
     {
         id: 2,
         name: "원티드랩",
+        description: "AI 기반 채용 플랫폼 '원티드'를 운영하며, 실무 중심의 부트캠프 프로그램을 제공합니다.",
+        recruitingLectureCount: 1,
+        logoUrl: COMMON_LOGO,
         desc: "AI 기반 채용 플랫폼 '원티드'를 운영하며, 실무 중심의 부트캠프 프로그램을 제공합니다.",
         description: "원티드랩은 AI 기반 채용 매칭 플랫폼 '원티드'를 운영하는 HR 테크 기업입니다. 채용 시장에서 쌓은 경험을 바탕으로 실무 중심의 부트캠프 프로그램을 제공하고 있습니다. 프론트엔드, 백엔드, 데이터 분석 등 다양한 직무별 교육 과정을 운영하며, 수료 후 원티드 플랫폼을 통한 취업 연계까지 지원합니다.",
         activeCourseCount: 1,
@@ -35,6 +39,9 @@ export const MOCK_ORGS: Organization[] = [
     {
         id: 3,
         name: "코드스테이츠",
+        description: "소프트웨어 엔지니어링, 데이터 사이언스 등 IT 분야의 실무 중심 교육을 제공하는 부트캠프입니다.",
+        recruitingLectureCount: 5,
+        logoUrl: COMMON_LOGO,
         desc: "소프트웨어 엔지니어링, 데이터 사이언스 등 IT 분야의 실무 중심 교육을 제공하는 부트캠프입니다.",
         description: "코드스테이츠는 소프트웨어 엔지니어링, 데이터 사이언스, 프로덕트 매니지먼트 등 IT 분야의 실무 중심 교육을 제공하는 부트캠프입니다. ISA(Income Share Agreement) 모델을 도입하여 취업 후 수강료를 납부하는 혁신적인 교육 모델을 운영하고 있습니다. 철저한 실습 중심의 커리큘럼과 1:1 멘토링으로 수강생들의 성장을 돕습니다.",
         activeCourseCount: 5,
@@ -49,6 +56,9 @@ export const MOCK_ORGS: Organization[] = [
     {
         id: 4,
         name: "멀티캠퍼스",
+        description: "삼성 계열 IT 교육 전문기관으로, 다양한 기술 분야의 체계적인 교육 프로그램을 운영합니다.",
+        recruitingLectureCount: 0,
+        logoUrl: COMMON_LOGO,
         desc: "삼성 계열 IT 교육 전문기관으로, 다양한 기술 분야의 체계적인 교육 프로그램을 운영합니다.",
         description: "멀티캠퍼스는 삼성SDS의 교육 사업 부문에서 분사한 IT 교육 전문 기관입니다. 30년 이상의 역사를 가진 국내 최고의 IT 교육 기관으로, 인공지능, 클라우드, 빅데이터, 보안 등 다양한 첨단 기술 분야의 교육을 제공합니다. 기업 맞춤형 교육과 정부 지원 훈련 과정을 함께 운영하고 있습니다.",
         activeCourseCount: 0,
@@ -62,6 +72,9 @@ export const MOCK_ORGS: Organization[] = [
     {
         id: 5,
         name: "패스트캠퍼스",
+        description: "실무에 필요한 IT, 비즈니스, 디자인 등 다양한 분야의 온오프라인 강의를 제공합니다.",
+        recruitingLectureCount: 2,
+        logoUrl: COMMON_LOGO,
         desc: "실무에 필요한 IT, 비즈니스, 디자인 등 다양한 분야의 온오프라인 강의를 제공합니다.",
         description: "패스트캠퍼스는 '세상의 모든 직장인을 위한 실무 교육'을 슬로건으로 IT, 비즈니스, 디자인, 영상 등 다양한 분야의 온오프라인 강의를 제공하는 교육 플랫폼입니다. 업계 현직자 강사진의 실무 중심 커리큘럼으로 빠르게 변화하는 업계 트렌드에 맞는 교육을 제공합니다.",
         activeCourseCount: 2,
@@ -76,6 +89,9 @@ export const MOCK_ORGS: Organization[] = [
     {
         id: 6,
         name: "한국경제신문",
+        description: "대한민국 대표 경제 신문사로, 디지털 전환 시대에 필요한 다양한 교육 프로그램을 운영합니다.",
+        recruitingLectureCount: 4,
+        logoUrl: COMMON_LOGO,
         desc: "대한민국 대표 경제 신문사로, 디지털 전환 시대에 필요한 다양한 교육 프로그램을 운영합니다.",
         description: "한국경제신문은 1964년 창간된 대한민국 대표 경제 전문 일간지입니다. 디지털 전환 시대에 발맞춰 IT, 금융, 경영 등 다양한 분야의 교육 프로그램을 운영하고 있습니다. 한경 아카데미를 통해 현직 전문가들의 실무 교육과 자격증 과정을 제공합니다.",
         activeCourseCount: 4,
