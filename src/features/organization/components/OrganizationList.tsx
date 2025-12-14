@@ -39,6 +39,7 @@ export function OrganizationList() {
                         <input
                             type="text"
                             placeholder="검색"
+                            aria-label="훈련기관 검색"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full rounded-full border border-border bg-card/50 px-4 py-3 pl-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
@@ -55,21 +56,20 @@ export function OrganizationList() {
                 </div>
             )}
 
-            {/* Grid Section */}
+            {/* Grid Section or No Results */}
             {!showLoading && (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {filteredOrgs.map((org) => (
-                        <OrganizationCard key={org.id} organization={org} />
-                    ))}
-                </div>
-            )}
-
-            {/* No Results */}
-            {!showLoading && filteredOrgs.length === 0 && (
-                <div className="py-20 text-center text-muted-foreground">
-                    <p className="text-lg">"{searchTerm}"에 대한 검색 결과가 없습니다.</p>
-                    <p className="mt-2 text-sm">다른 검색어로 시도해보세요.</p>
-                </div>
+                filteredOrgs.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {filteredOrgs.map((org) => (
+                            <OrganizationCard key={org.id} organization={org} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="py-20 text-center text-muted-foreground">
+                        <p className="text-lg">"{searchTerm}"에 대한 검색 결과가 없습니다.</p>
+                        <p className="mt-2 text-sm">다른 검색어로 시도해보세요.</p>
+                    </div>
+                )
             )}
         </div>
     );
