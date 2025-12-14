@@ -1,31 +1,21 @@
 "use client";
 
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { CourseCard } from '@/features/course/components/CourseCard';
-import { MOCK_REVIEWS } from '../api/mockOrganizations';
 import type { OrganizationDetail as OrganizationDetailType } from '../types/organization.type';
 import type { Course } from '@/features/course/types/course.type';
+import type { Review } from '../api/mockOrganizations';
 
 interface OrganizationDetailProps {
     organization: OrganizationDetailType;
     courses?: Course[];
+    reviews?: Review[];
 }
 
-// Tab types
-type TabValue = 'intro' | 'reviews' | 'programs';
-
-const TABS: { value: TabValue; label: string }[] = [
-    { value: 'intro', label: '기관 소개' },
-    { value: 'reviews', label: '수강생 후기' },
-    { value: 'programs', label: '등록된 프로그램' },
-];
-
-export function OrganizationDetail({ organization, courses = [] }: OrganizationDetailProps) {
-    const [activeTab, setActiveTab] = useState<TabValue>('intro');
-
+export function OrganizationDetail({ organization, courses = [], reviews = [] }: OrganizationDetailProps) {
     // Collect facility images that exist
     const facilityImages = [
         organization.facilityImageUrl,
@@ -55,7 +45,7 @@ export function OrganizationDetail({ organization, courses = [] }: OrganizationD
                     <div className="mb-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-white shadow-lg ring-4 ring-white/20 md:h-24 md:w-24">
                         {organization.logoUrl ? (
                             <Image
-                                src={organization.logoUrl || ''}
+                                src={organization.logoUrl}
                                 alt={organization.name}
                                 width={96}
                                 height={96}
@@ -73,7 +63,9 @@ export function OrganizationDetail({ organization, courses = [] }: OrganizationD
 
                     {/* Homepage Button */}
                     <Link
-                        href="#"
+                        href={organization.homepageUrl || '#'}
+                        target={organization.homepageUrl ? '_blank' : undefined}
+                        rel={organization.homepageUrl ? 'noopener noreferrer' : undefined}
                         className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg transition-all duration-200 hover:bg-primary/90 hover:scale-105"
                     >
                         홈페이지 바로가기
@@ -81,132 +73,137 @@ export function OrganizationDetail({ organization, courses = [] }: OrganizationD
                 </div>
             </div>
 
-            {/* ===== PILL TABS (CourseFilterTabs style) ===== */}
-            <div className="no-scrollbar mb-8 flex gap-3 overflow-x-auto whitespace-nowrap">
-                {TABS.map((tab) => {
-                    const isActive = tab.value === activeTab;
-                    return (
-                        <button
-                            key={tab.value}
-                            onClick={() => setActiveTab(tab.value)}
-                            className={`rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 ${isActive
-                                ? 'bg-foreground text-background shadow-md'
-                                : 'bg-card/60 text-muted-foreground hover:bg-card/80 hover:text-foreground'
-                                }`}
-                        >
-                            {tab.label}
-                        </button>
-                    );
-                })}
-            </div>
+            {/* ===== ACCESSIBLE TABS (Radix UI) ===== */}
+            <Tabs defaultValue="intro" className="w-full">
+                <TabsList className="no-scrollbar mb-8 flex h-auto w-full gap-3 overflow-x-auto whitespace-nowrap bg-transparent p-0">
+                    <TabsTrigger
+                        value="intro"
+                        className="rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:shadow-md data-[state=inactive]:bg-card/60 data-[state=inactive]:text-muted-foreground hover:bg-card/80 hover:text-foreground"
+                    >
+                        기관 소개
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="reviews"
+                        className="rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:shadow-md data-[state=inactive]:bg-card/60 data-[state=inactive]:text-muted-foreground hover:bg-card/80 hover:text-foreground"
+                    >
+                        수강생 후기
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="programs"
+                        className="rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:shadow-md data-[state=inactive]:bg-card/60 data-[state=inactive]:text-muted-foreground hover:bg-card/80 hover:text-foreground"
+                    >
+                        등록된 프로그램
+                    </TabsTrigger>
+                </TabsList>
 
-            {/* ===== TAB CONTENT ===== */}
-            <div className="pb-20">
-                {/* 기관 소개 */}
-                {activeTab === 'intro' && (
-                    <div className="space-y-10">
-                        {/* Facility Images */}
-                        {facilityImages.length > 0 && (
+                {/* ===== TAB CONTENT ===== */}
+                <div className="pb-20">
+                    {/* 기관 소개 */}
+                    <TabsContent value="intro">
+                        <div className="space-y-10">
+                            {/* Facility Images */}
+                            {facilityImages.length > 0 && (
+                                <section>
+                                    <h2 className="mb-5 text-xl font-bold text-foreground">
+                                        {organization.name}의 현장이에요.
+                                    </h2>
+                                    <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+                                        {facilityImages.map((url, index) => (
+                                            <div
+                                                key={url}
+                                                className="group aspect-square overflow-hidden rounded-xl bg-muted shadow-sm transition-all duration-200 hover:shadow-lg"
+                                            >
+                                                <Image
+                                                    src={url}
+                                                    alt={`${organization.name} 현장 이미지 ${index + 1}`}
+                                                    width={400}
+                                                    height={400}
+                                                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Philosophy */}
                             <section>
                                 <h2 className="mb-5 text-xl font-bold text-foreground">
-                                    {organization.name}의 현장이에요.
+                                    이런 철학으로 운영해요
                                 </h2>
-                                <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-                                    {facilityImages.map((url, index) => (
-                                        <div
-                                            key={index}
-                                            className="group aspect-square overflow-hidden rounded-xl bg-muted shadow-sm transition-all duration-200 hover:shadow-lg"
-                                        >
-                                            <Image
-                                                src={url}
-                                                alt={`${organization.name} 현장 이미지 ${index + 1}`}
-                                                width={400}
-                                                height={400}
-                                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
-                        {/* Philosophy */}
-                        <section>
-                            <h2 className="mb-5 text-xl font-bold text-foreground">
-                                이런 철학으로 운영해요
-                            </h2>
-                            <Card className="border-0 bg-card/40 p-6 shadow-sm backdrop-blur-xl transition-all duration-200 hover:shadow-md md:p-8">
-                                <p className="whitespace-pre-line text-base leading-relaxed text-muted-foreground md:text-lg">
-                                    {organization.description}
-                                </p>
-                            </Card>
-                        </section>
-                    </div>
-                )}
-
-                {/* 수강생 후기 */}
-                {activeTab === 'reviews' && (
-                    <section>
-                        <h2 className="mb-6 text-xl font-bold text-foreground">
-                            수강생 분들의 솔직한 후기예요.
-                        </h2>
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {MOCK_REVIEWS.map((review) => (
-                                <Card
-                                    key={review.id}
-                                    className="group flex flex-col justify-between border-0 bg-card/40 p-5 shadow-sm backdrop-blur-xl transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
-                                >
-                                    <div>
-                                        {/* Quote mark */}
-                                        <span className="mb-2 block text-4xl leading-none text-primary/30 font-serif select-none">
-                                            "
-                                        </span>
-                                        {/* Quote text */}
-                                        <h3 className="mb-3 text-base font-bold leading-snug text-foreground">
-                                            {review.quote}
-                                        </h3>
-                                        {/* Description */}
-                                        <p className="mb-4 text-sm leading-relaxed text-muted-foreground line-clamp-3">
-                                            {review.description}
-                                        </p>
-                                    </div>
-                                    {/* Author */}
-                                    <div className="flex items-center gap-3 border-t border-border/30 pt-4">
-                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                                            {review.author.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-semibold text-foreground">{review.author}</p>
-                                            <p className="text-xs text-muted-foreground">{review.role}</p>
-                                        </div>
-                                    </div>
+                                <Card className="border-0 bg-card/40 p-6 shadow-sm backdrop-blur-xl transition-all duration-200 hover:shadow-md md:p-8">
+                                    <p className="whitespace-pre-line text-base leading-relaxed text-muted-foreground md:text-lg">
+                                        {organization.description}
+                                    </p>
                                 </Card>
-                            ))}
+                            </section>
                         </div>
-                    </section>
-                )}
+                    </TabsContent>
 
-                {/* 등록된 프로그램 */}
-                {activeTab === 'programs' && (
-                    <section>
-                        {courses.length > 0 ? (
-                            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                {courses.map((course) => (
-                                    <CourseCard key={course.id} course={course} />
+                    {/* 수강생 후기 */}
+                    <TabsContent value="reviews">
+                        <section>
+                            <h2 className="mb-6 text-xl font-bold text-foreground">
+                                수강생 분들의 솔직한 후기예요.
+                            </h2>
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                {reviews.map((review) => (
+                                    <Card
+                                        key={review.id}
+                                        className="group flex flex-col justify-between border-0 bg-card/40 p-5 shadow-sm backdrop-blur-xl transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
+                                    >
+                                        <div>
+                                            {/* Quote mark */}
+                                            <span className="mb-2 block text-4xl leading-none text-primary/30 select-none">
+                                                "
+                                            </span>
+                                            {/* Quote text */}
+                                            <h3 className="mb-3 text-base font-bold leading-snug text-foreground">
+                                                {review.quote}
+                                            </h3>
+                                            {/* Description */}
+                                            <p className="mb-4 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                                                {review.description}
+                                            </p>
+                                        </div>
+                                        {/* Author */}
+                                        <div className="flex items-center gap-3 border-t border-border/30 pt-4">
+                                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                                                {review.author.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-semibold text-foreground">{review.author}</p>
+                                                <p className="text-xs text-muted-foreground">{review.role}</p>
+                                            </div>
+                                        </div>
+                                    </Card>
                                 ))}
                             </div>
-                        ) : (
-                            <Card className="flex h-60 flex-col items-center justify-center border-0 bg-card/40 text-center shadow-sm backdrop-blur-xl">
-                                <div className="mb-3 text-4xl">📚</div>
-                                <p className="text-lg font-medium text-foreground">등록된 프로그램이 없습니다.</p>
-                                <p className="mt-2 text-sm text-muted-foreground">
-                                    추후 새로운 프로그램이 개설되면 업데이트됩니다.
-                                </p>
-                            </Card>
-                        )}
-                    </section>
-                )}
-            </div>
+                        </section>
+                    </TabsContent>
+
+                    {/* 등록된 프로그램 */}
+                    <TabsContent value="programs">
+                        <section>
+                            {courses.length > 0 ? (
+                                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                    {courses.map((course) => (
+                                        <CourseCard key={course.id} course={course} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <Card className="flex h-60 flex-col items-center justify-center border-0 bg-card/40 text-center shadow-sm backdrop-blur-xl">
+                                    <div className="mb-3 text-4xl">📚</div>
+                                    <p className="text-lg font-medium text-foreground">등록된 프로그램이 없습니다.</p>
+                                    <p className="mt-2 text-sm text-muted-foreground">
+                                        추후 새로운 프로그램이 개설되면 업데이트됩니다.
+                                    </p>
+                                </Card>
+                            )}
+                        </section>
+                    </TabsContent>
+                </div>
+            </Tabs>
         </div>
     );
 }

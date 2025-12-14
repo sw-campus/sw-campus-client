@@ -40,13 +40,13 @@ interface LectureResponse {
  */
 function mapLectureToCourse(lecture: LectureResponse): Course {
     return {
-        id: String(lecture.lectureId),
+        id: lecture.lectureId,
         title: lecture.lectureName,
         organization: lecture.orgName,
         periodStart: lecture.startAt?.split('T')[0] ?? '',
         periodEnd: lecture.endAt?.split('T')[0] ?? '',
         tags: lecture.curriculums.slice(0, 3).map(c => ({
-            id: String(c.curriculumId),
+            id: c.curriculumId,
             name: c.curriculumName,
         })),
         imageUrl: lecture.lectureImageUrl ?? undefined,

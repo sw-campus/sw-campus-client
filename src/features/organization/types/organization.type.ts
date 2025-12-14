@@ -26,13 +26,6 @@ export interface OrganizationDetail {
     facilityImageUrl3: string | null;
     facilityImageUrl4: string | null;
     logoUrl: string | null;
+    homepageUrl?: string | null;  // 기관 홈페이지 URL (optional)
 }
 
-/**
- * 컴포넌트에서 사용하는 기관 타입 (Mock 데이터 호환)
- */
-export interface Organization extends OrganizationDetail {
-    // Mock 데이터 호환용 optional 필드
-    imageUrl?: string;
-    desc?: string;
-}

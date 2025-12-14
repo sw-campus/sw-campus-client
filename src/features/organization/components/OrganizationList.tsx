@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { OrganizationCard } from "./OrganizationCard";
 import { useOrganizationsQuery } from "../hooks/useOrganizations";
@@ -9,19 +9,21 @@ import { MOCK_ORGS } from "../api/mockOrganizations";
 export function OrganizationList() {
     const [searchTerm, setSearchTerm] = useState("");
 
-    // API에서 기관 목록 조회 (실패시 mock 데이터 사용)
-    const { data: apiData, isLoading, isError } = useOrganizationsQuery();
+    // API에서 기관 목록 조회 (서버 사이드 필터링, 실패시 mock 데이터 사용)
+    const { data: apiData, isLoading } = useOrganizationsQuery(searchTerm || undefined);
 
     // API 데이터가 있으면 사용, 없으면 mock 데이터 fallback
     const organizations = apiData ?? MOCK_ORGS;
 
-    // 클라이언트 사이드 검색 필터링 (이름만)
-    const filteredOrgs = useMemo(() => {
-        if (!searchTerm) return organizations;
-        return organizations.filter((org) =>
-            org.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [organizations, searchTerm]);
+    // mock 데이터 fallback 시에만 클라이언트 사이드 필터링
+    // API 데이터는 이미 서버에서 필터링됨
+    const filteredOrgs = apiData
+        ? organizations
+        : (searchTerm
+            ? organizations.filter((org) =>
+                org.name.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            : organizations);
 
     // 로딩 상태 (API 호출 중일 때도 mock 데이터를 보여줌)
     const showLoading = isLoading && !apiData;

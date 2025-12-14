@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import HeaderSection from "@/components/layout/header/HeaderSection";
 import { OrganizationDetailPageClient } from "@/features/organization/components/OrganizationDetailPageClient";
 import { mockCourses } from "@/features/course/api/mockCourses";
@@ -12,6 +13,11 @@ interface OrganizationDetailPageProps {
 export default async function OrganizationDetailPage({ params }: OrganizationDetailPageProps) {
     const { id } = await params;
     const orgId = parseInt(id, 10);
+
+    // 유효하지 않은 ID인 경우 404 반환
+    if (isNaN(orgId) || orgId <= 0) {
+        notFound();
+    }
 
     // Mock 데이터에서 기관 이름 가져오기 (courses 필터링용)
     const mockOrg = MOCK_ORG_DETAILS.find(org => org.id === orgId);
