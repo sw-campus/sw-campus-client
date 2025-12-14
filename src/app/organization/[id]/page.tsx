@@ -1,8 +1,7 @@
-import { notFound } from 'next/navigation';
 import HeaderSection from "@/components/layout/header/HeaderSection";
-import { OrganizationDetail } from "@/features/organization/components/OrganizationDetail";
-import { MOCK_ORGS } from "@/features/organization/api/mockOrganizations";
+import { OrganizationDetailPageClient } from "@/features/organization/components/OrganizationDetailPageClient";
 import { mockCourses } from "@/features/course/api/mockCourses";
+import { MOCK_ORG_DETAILS } from "@/features/organization/api/mockOrganizations";
 
 interface OrganizationDetailPageProps {
     params: Promise<{
@@ -14,18 +13,13 @@ export default async function OrganizationDetailPage({ params }: OrganizationDet
     const { id } = await params;
     const orgId = parseInt(id, 10);
 
-    // Find organization by ID
-    const organization = MOCK_ORGS.find(org => org.id === orgId);
-
-    if (!organization) {
-        notFound();
-    }
+    // Mock 데이터에서 기관 이름 가져오기 (courses 필터링용)
+    const mockOrg = MOCK_ORG_DETAILS.find(org => org.id === orgId);
 
     // Filter courses by organization name (mock implementation)
-    // In real app, this would be an API call
-    const organizationCourses = mockCourses.filter(
-        course => course.organization === organization.name
-    );
+    const organizationCourses = mockOrg
+        ? mockCourses.filter(course => course.organization === mockOrg.name)
+        : [];
 
     return (
         <>
@@ -33,9 +27,9 @@ export default async function OrganizationDetailPage({ params }: OrganizationDet
             <main className="min-h-screen pt-20">
                 <div className="custom-container">
                     <div className="custom-card">
-                        <OrganizationDetail
-                            organization={organization}
-                            courses={organizationCourses}
+                        <OrganizationDetailPageClient
+                            organizationId={orgId}
+                            mockCourses={organizationCourses}
                         />
                     </div>
                 </div>

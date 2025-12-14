@@ -16,19 +16,23 @@ export interface OrganizationSummary {
  */
 export interface OrganizationDetail {
     id: number;
+    userId: number;
     name: string;
+    description: string | null;
+    certificateUrl: string | null;
+    govAuth: string | null;
+    facilityImageUrl: string | null;
+    facilityImageUrl2: string | null;
+    facilityImageUrl3: string | null;
+    facilityImageUrl4: string | null;
     logoUrl: string | null;
-    description: string;
-    websiteUrl: string | null;
-    facilityImages: string[];
-    desc: string;  // Short description for list
-    description?: string;  // Full description for detail
-    activeCourseCount?: number;
-    imageUrl?: string;  // Image for list card
-    logoUrl?: string;  // Logo for detail page
-    govAuth?: string;  // Government certification (e.g., "K-DIGITAL")
-    facilityImageUrl?: string;
-    facilityImageUrl2?: string;
-    facilityImageUrl3?: string;
-    facilityImageUrl4?: string;
+}
+
+/**
+ * 컴포넌트에서 사용하는 기관 타입 (Mock 데이터 호환)
+ */
+export interface Organization extends OrganizationDetail {
+    // Mock 데이터 호환용 optional 필드
+    imageUrl?: string;
+    desc?: string;
 }
