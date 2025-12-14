@@ -20,7 +20,7 @@ type TabValue = 'intro' | 'reviews' | 'programs';
 const TABS: { value: TabValue; label: string }[] = [
     { value: 'intro', label: '기관 소개' },
     { value: 'reviews', label: '수강생 후기' },
-    { value: 'programs', label: '모집 중인 프로그램' },
+    { value: 'programs', label: '등록된 프로그램' },
 ];
 
 export function OrganizationDetail({ organization, courses = [] }: OrganizationDetailProps) {
@@ -186,7 +186,7 @@ export function OrganizationDetail({ organization, courses = [] }: OrganizationD
                     </section>
                 )}
 
-                {/* 모집 중인 프로그램 */}
+                {/* 등록된 프로그램 */}
                 {activeTab === 'programs' && (
                     <section>
                         {courses.length > 0 ? (
@@ -198,7 +198,7 @@ export function OrganizationDetail({ organization, courses = [] }: OrganizationD
                         ) : (
                             <Card className="flex h-60 flex-col items-center justify-center border-0 bg-card/40 text-center shadow-sm backdrop-blur-xl">
                                 <div className="mb-3 text-4xl">📚</div>
-                                <p className="text-lg font-medium text-foreground">현재 모집 중인 프로그램이 없습니다.</p>
+                                <p className="text-lg font-medium text-foreground">등록된 프로그램이 없습니다.</p>
                                 <p className="mt-2 text-sm text-muted-foreground">
                                     추후 새로운 프로그램이 개설되면 업데이트됩니다.
                                 </p>
