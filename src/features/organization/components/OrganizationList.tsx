@@ -1,21 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { FiSearch } from "react-icons/fi";
 import { OrganizationCard } from "./OrganizationCard";
-import type { Organization } from "../types/organization.type";
+import { useOrganizationsQuery } from "../hooks/useOrganizations";
+import { MOCK_ORGS } from "../api/mockOrganizations";
 
-interface OrganizationListProps {
-    organizations: Organization[];
-}
-
-export function OrganizationList({ organizations }: OrganizationListProps) {
+export function OrganizationList() {
     const [searchTerm, setSearchTerm] = useState("");
 
-    // 검색어로 기관 필터링 (이름만)
-    const filteredOrgs = organizations.filter((org) =>
-        org.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // API에서 기관 목록 조회 (실패시 mock 데이터 사용)
+    const { data: apiData, isLoading, isError } = useOrganizationsQuery();
+
+    // API 데이터가 있으면 사용, 없으면 mock 데이터 fallback
+    const organizations = apiData ?? MOCK_ORGS;
+
+    // 클라이언트 사이드 검색 필터링 (이름만)
+    const filteredOrgs = useMemo(() => {
+        if (!searchTerm) return organizations;
+        return organizations.filter((org) =>
+            org.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [organizations, searchTerm]);
+
+    // 로딩 상태 (API 호출 중일 때도 mock 데이터를 보여줌)
+    const showLoading = isLoading && !apiData;
 
     return (
         <div className="w-full pb-20 pt-10">
@@ -37,18 +46,26 @@ export function OrganizationList({ organizations }: OrganizationListProps) {
                         <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-muted-foreground" />
                     </div>
                 </div>
-
             </div>
+
+            {/* Loading State */}
+            {showLoading && (
+                <div className="flex items-center justify-center py-20">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                </div>
+            )}
 
             {/* Grid Section */}
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredOrgs.map((org) => (
-                    <OrganizationCard key={org.id} organization={org} />
-                ))}
-            </div>
+            {!showLoading && (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {filteredOrgs.map((org) => (
+                        <OrganizationCard key={org.id} organization={org} />
+                    ))}
+                </div>
+            )}
 
             {/* No Results */}
-            {filteredOrgs.length === 0 && (
+            {!showLoading && filteredOrgs.length === 0 && (
                 <div className="py-20 text-center text-muted-foreground">
                     <p className="text-lg">"{searchTerm}"에 대한 검색 결과가 없습니다.</p>
                     <p className="mt-2 text-sm">다른 검색어로 시도해보세요.</p>
