@@ -42,7 +42,7 @@ export type RecruitType = 'CARD_REQUIRED' | 'GENERAL' | (string & {})
 
 export type EquipmentType = 'NONE' | 'PC' | 'LAPTOP' | 'PERSONAL' | (string & {})
 
-export type LectureStatus = 'OPEN' | 'CLOSED' | 'DRAFT' | (string & {})
+export type LectureStatus = 'RECRUITING' | 'FINISHED' | (string & {})
 
 export type LectureAuthStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | (string & {})
 

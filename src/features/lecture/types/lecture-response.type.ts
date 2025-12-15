@@ -86,4 +86,6 @@ export interface LectureResponseDto {
   quals: LectureQualResponseDto[]
   teachers: LectureTeacherResponseDto[]
   curriculums: LectureCurriculumResponseDto[]
+  categoryName: string | null
+  averageScore: number | null
 }
