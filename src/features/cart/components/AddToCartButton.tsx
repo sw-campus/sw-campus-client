@@ -1,14 +1,14 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { useAddToCart } from '@/features/cart/hooks/useAddToCart'
+import type { AddToCartItem } from '@/features/cart/types/cart.type'
 
-import { useAddToCart } from '../hooks/useAddToCart'
-import { CartItem } from '../types/cart.type'
+type ButtonProps = React.ComponentProps<typeof Button>
 
-interface AddToCartButtonProps {
-  item: CartItem
-  children?: React.ReactNode
-  [key: string]: any // 다른 모든 props 허용 (className 등)
+interface AddToCartButtonProps extends Omit<ButtonProps, 'onClick'> {
+  item: AddToCartItem
+  onClick?: ButtonProps['onClick']
 }
 
 export function AddToCartButton({ item, children, onClick, ...props }: AddToCartButtonProps) {

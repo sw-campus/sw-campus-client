@@ -1,24 +1,22 @@
-import { toast } from 'sonner'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { useCartStore, type CartItem } from '@/store/cart.store'
+import { addCartLecture } from '@/features/cart/api/cart.api'
+import { cartLecturesQueryKey } from '@/features/cart/hooks/useCartLecturesQuery'
+import type { AddToCartItem } from '@/features/cart/types/cart.type'
 
 export function useAddToCart() {
-  const add = useCartStore(s => s.add)
+  const queryClient = useQueryClient()
 
-  const addToCart = (item: CartItem) => {
-    const result = add(item)
+  const mutation = useMutation({
+    mutationFn: (lectureId: string) => addCartLecture(lectureId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cartLecturesQueryKey })
+    },
+  })
 
-    switch (result) {
-      case 'duplicate':
-        toast.error('이미 장바구니에 있는 상품입니다.')
-        break
-      case 'limit':
-        toast.error('장바구니는 최대 10개까지만 담을 수 있습니다.')
-        break
-    }
-
-    return result
+  const addToCart = (item: AddToCartItem) => {
+    mutation.mutate(String(item.lectureId))
   }
 
-  return { addToCart }
+  return { addToCart, ...mutation }
 }

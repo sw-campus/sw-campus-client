@@ -6,8 +6,8 @@ import Image from 'next/image'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useCartLecturesQuery } from '@/features/cart/hooks/useCartLecturesQuery'
 import { cn } from '@/lib/utils'
-import { useCartStore } from '@/store/cart.store'
 
 type Side = 'left' | 'right'
 
@@ -69,13 +69,14 @@ function DropZone({
 }
 
 export default function CartComparePage() {
-  const items = useCartStore(s => s.items)
+  const { data, isLoading, isError } = useCartLecturesQuery()
+  const items = useMemo(() => data ?? [], [data])
 
   const [leftId, setLeftId] = useState<string | null>(null)
   const [rightId, setRightId] = useState<string | null>(null)
 
-  const left = useMemo(() => items.find(i => i.id === leftId) ?? null, [items, leftId])
-  const right = useMemo(() => items.find(i => i.id === rightId) ?? null, [items, rightId])
+  const left = useMemo(() => items.find(i => i.lectureId === leftId) ?? null, [items, leftId])
+  const right = useMemo(() => items.find(i => i.lectureId === rightId) ?? null, [items, rightId])
 
   const onDropLecture = (side: Side, lectureId: string) => {
     if (side === 'left') setLeftId(lectureId)
@@ -90,28 +91,41 @@ export default function CartComparePage() {
             <CardTitle className="text-base">장바구니</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {items.length === 0 ? (
+            {isLoading ? (
+              <div className="text-muted-foreground text-sm">불러오는 중...</div>
+            ) : isError ? (
+              <div className="text-muted-foreground text-sm">장바구니 목록을 불러오지 못했습니다.</div>
+            ) : items.length === 0 ? (
               <div className="text-muted-foreground text-sm">장바구니가 비어있습니다.</div>
             ) : (
               items.map(item => (
                 <button
-                  key={item.id}
+                  key={item.lectureId}
                   type="button"
                   draggable
-                  onDragStart={e => setDragLectureId(e, item.id)}
+                  onDragStart={e => setDragLectureId(e, item.lectureId)}
                   onClick={() => {
-                    if (!leftId) setLeftId(item.id)
-                    else if (!rightId) setRightId(item.id)
-                    else setLeftId(item.id)
+                    if (!leftId) setLeftId(item.lectureId)
+                    else if (!rightId) setRightId(item.lectureId)
+                    else setLeftId(item.lectureId)
                   }}
                   className="hover:bg-muted/50 border-border flex w-full items-center gap-3 rounded-md border p-2 text-left"
                 >
                   <div className="bg-muted relative h-10 w-10 overflow-hidden rounded-md">
-                    {item.image ? <Image src={item.image} alt="" fill sizes="40px" className="object-cover" /> : null}
+                    {item.thumbnailUrl ? (
+                      <Image
+                        src={item.thumbnailUrl}
+                        alt=""
+                        fill
+                        sizes="40px"
+                        className="object-cover"
+                        unoptimized={item.thumbnailUrl.startsWith('http')}
+                      />
+                    ) : null}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-medium">{item.title}</div>
-                    <div className="text-muted-foreground truncate text-xs">{item.id}</div>
+                    <div className="text-muted-foreground truncate text-xs">{item.lectureId}</div>
                   </div>
                 </button>
               ))
@@ -135,7 +149,7 @@ export default function CartComparePage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[160px]">항목</TableHead>
+                    <TableHead className="w-40">항목</TableHead>
                     <TableHead>왼쪽</TableHead>
                     <TableHead>오른쪽</TableHead>
                   </TableRow>
@@ -148,8 +162,12 @@ export default function CartComparePage() {
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-medium">ID</TableCell>
-                    <TableCell className={cn(!left && 'text-muted-foreground')}>{left?.id ?? '미선택'}</TableCell>
-                    <TableCell className={cn(!right && 'text-muted-foreground')}>{right?.id ?? '미선택'}</TableCell>
+                    <TableCell className={cn(!left && 'text-muted-foreground')}>
+                      {left?.lectureId ?? '미선택'}
+                    </TableCell>
+                    <TableCell className={cn(!right && 'text-muted-foreground')}>
+                      {right?.lectureId ?? '미선택'}
+                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
