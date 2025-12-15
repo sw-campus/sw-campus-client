@@ -1,4 +1,4 @@
-import { LectureDetailPage } from '@/features/lectures/components/LectureDetailPage'
+import { LectureDetailPage } from '@/features/lecture/components/LectureDetailPage'
 
 interface PageProps {
   params: { id: string }
