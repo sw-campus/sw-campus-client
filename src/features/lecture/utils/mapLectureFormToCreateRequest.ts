@@ -1,5 +1,5 @@
 import type { LectureCreateRequest } from '@/features/lecture/types/lecture-request.type'
-import { toLocalTimeString, toWonString, toLocalDateString } from '@/features/lecture/utils/inputFormat'
+import { toLocalTimeString, toLocalDateString } from '@/features/lecture/utils/inputFormat'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 export const mapLectureFormToCreateRequest = (values: LectureFormValues): LectureCreateRequest => {
@@ -20,6 +20,13 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
   const equipMeritText = values.equipMerit?.trim() ? values.equipMerit.trim() : null
   const equipMeritMerged = [equipMeritText, osLine].filter(Boolean).join('\n')
 
+  const steps = (values.recruitProcedures ?? []).map((p, idx) => ({
+    stepType: p.type,
+    stepOrder: idx + 1,
+  }))
+
+  const afterCompletion = values.afterCompletion
+
   return {
     lectureName: values.lectureName,
     days: values.days,
@@ -28,9 +35,9 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     lectureLoc: values.lectureLoc,
     location: values.location?.trim() ? values.location.trim() : null,
     recruitType: values.recruitType,
-    subsidy: toWonString(values.subsidy),
-    lectureFee: toWonString(values.lectureFee),
-    eduSubsidy: toWonString(values.eduSubsidy),
+    subsidy: values.subsidy,
+    lectureFee: values.lectureFee,
+    eduSubsidy: values.eduSubsidy,
     goal: values.goal?.trim() ? values.goal.trim() : null,
     maxCapacity: values.maxCapacity ?? null,
     equipPc: values.equipPc ?? null,
@@ -39,8 +46,8 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     resume: values.resume,
     mockInterview: values.mockInterview,
     employmentHelp: values.employmentHelp,
-    afterCompletion: values.afterCompletion ?? null,
-    url: null,
+    afterCompletion,
+    url: values.url?.trim() ? values.url.trim() : null,
     lectureImageUrl,
     projectNum: values.projectNum ?? null,
     projectTime: values.projectTime ?? null,
@@ -52,5 +59,9 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     deadline: values.deadlineDate ? toLocalDateString(values.deadlineDate) : null,
     totalDays: values.totalDays,
     totalTimes: values.totalTimes,
+    steps,
+    quals: values.quals?.length ? values.quals : undefined,
+    teachers: values.teachers?.length ? values.teachers : undefined,
+    adds: values.adds?.length ? values.adds : undefined,
   }
 }

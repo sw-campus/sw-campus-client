@@ -2,8 +2,25 @@ import type { LectureCreateRequest, LectureCreateResponse } from '@/features/lec
 import type { LectureResponseDto } from '@/features/lecture/types/lecture-response.type'
 import { api } from '@/lib/axios'
 
-export const createLecture = async (payload: LectureCreateRequest): Promise<LectureCreateResponse> => {
-  const res = await api.post('/lectures', payload)
+export type CreateLectureParams = {
+  payload: LectureCreateRequest
+  lectureImageFile?: File | null
+}
+
+export const createLecture = async ({
+  payload,
+  lectureImageFile,
+}: CreateLectureParams): Promise<LectureCreateResponse> => {
+  const formData = new FormData()
+  const payloadJson = JSON.stringify(payload)
+  formData.append('request', new Blob([payloadJson], { type: 'application/json' }))
+  formData.append('lecture', new Blob([payloadJson], { type: 'application/json' }))
+
+  if (lectureImageFile) {
+    formData.append('lectureImageFile', lectureImageFile)
+  }
+
+  const res = await api.post('/lectures', formData)
   return res.data
 }
 

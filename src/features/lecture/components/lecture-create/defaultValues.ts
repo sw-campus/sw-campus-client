@@ -21,7 +21,8 @@ export const lectureCreateFormDefaultValues: LectureFormValues = {
   resume: false,
   mockInterview: false,
   employmentHelp: false,
-  afterCompletion: null,
+  afterCompletion: false,
+  url: null,
   lectureImageFile: null,
   startAtDate: new Date(),
   endAtDate: new Date(),
@@ -33,4 +34,8 @@ export const lectureCreateFormDefaultValues: LectureFormValues = {
   projectTeam: null,
   projectTool: null,
   projectMentor: false,
+
+  quals: [],
+  teachers: [],
+  adds: [],
 }

@@ -9,15 +9,20 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
-import { LectureCreateBasicInfoFields } from '@/features/lecture/components/lecture-create/LectureCreateBasicInfoFields'
-import { LectureCreateCostFields } from '@/features/lecture/components/lecture-create/LectureCreateCostFields'
-import { LectureCreateEquipmentFields } from '@/features/lecture/components/lecture-create/LectureCreateEquipmentFields'
-import { LectureCreateLocationFields } from '@/features/lecture/components/lecture-create/LectureCreateLocationFields'
-import { LectureCreateOptionsFields } from '@/features/lecture/components/lecture-create/LectureCreateOptionsFields'
-import { LectureCreateProjectFields } from '@/features/lecture/components/lecture-create/LectureCreateProjectFields'
-import { LectureCreateRecruitProcedureFields } from '@/features/lecture/components/lecture-create/LectureCreateRecruitProcedureFields'
-import { LectureCreateScheduleFields } from '@/features/lecture/components/lecture-create/LectureCreateScheduleFields'
-import { lectureCreateFormDefaultValues } from '@/features/lecture/components/lecture-create/defaultValues'
+import {
+  LectureCreateAddsFields,
+  LectureCreateBasicInfoFields,
+  LectureCreateCostFields,
+  LectureCreateEquipmentFields,
+  LectureCreateLocationFields,
+  LectureCreateOptionsFields,
+  LectureCreateProjectFields,
+  LectureCreateQualificationFields,
+  LectureCreateRecruitProcedureFields,
+  LectureCreateScheduleFields,
+  LectureCreateTeachersFields,
+  lectureCreateFormDefaultValues,
+} from '@/features/lecture/components/lecture-create'
 import { useCreateLectureMutation } from '@/features/lecture/hooks/useCreateLectureMutation'
 import { mapLectureFormToCreateRequest } from '@/features/lecture/utils/mapLectureFormToCreateRequest'
 import { lectureFormSchema, type LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
@@ -42,7 +47,7 @@ export function LectureCreateForm() {
 
   const onSubmit = async (values: LectureFormValues) => {
     const payload = mapLectureFormToCreateRequest(values)
-    await mutateAsync(payload)
+    await mutateAsync({ payload, lectureImageFile: values.lectureImageFile ?? null })
     toast.success('강의가 성공적으로 등록되었습니다.')
     router.back()
   }
@@ -56,10 +61,13 @@ export function LectureCreateForm() {
             <LectureCreateLocationFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateScheduleFields />
             <LectureCreateRecruitProcedureFields selectTriggerClassName={selectTriggerClassName} />
+            <LectureCreateQualificationFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateCostFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateOptionsFields />
             <LectureCreateEquipmentFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateProjectFields />
+            <LectureCreateTeachersFields />
+            <LectureCreateAddsFields />
 
             <div className="pt-4">
               <Button type="submit" disabled={!isValid || isPending}>

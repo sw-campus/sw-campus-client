@@ -38,7 +38,7 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
       </Field>
 
       <Field>
-        <FieldLabel>총 회차</FieldLabel>
+        <FieldLabel>총 교육시간</FieldLabel>
         <FieldContent>
           <Controller
             control={control}
@@ -49,7 +49,7 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
                 inputMode="numeric"
                 min={1}
                 step={1}
-                placeholder="예) 24"
+                placeholder="예) 960"
                 {...field}
                 value={String(field.value ?? 1)}
                 onChange={e => field.onChange(e.target.value === '' ? 1 : Number(e.target.value))}

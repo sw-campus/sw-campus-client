@@ -28,15 +28,11 @@ export type LocalDateString = string
 export type LocalTimeString = string
 export type DecimalString = string
 
-export type LectureDay =
-  | 'MONDAY'
-  | 'TUESDAY'
-  | 'WEDNESDAY'
-  | 'THURSDAY'
-  | 'FRIDAY'
-  | 'SATURDAY'
-  | 'SUNDAY'
-  | (string & {})
+export const LECTURE_DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const
+
+export type LectureDayLiteral = (typeof LECTURE_DAYS)[number]
+
+export type LectureDay = LectureDayLiteral | (string & {})
 
 export type LectureLocation = 'ONLINE' | 'OFFLINE' | 'HYBRID' | (string & {})
 

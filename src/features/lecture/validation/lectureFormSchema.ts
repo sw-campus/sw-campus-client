@@ -1,16 +1,13 @@
 import { z } from 'zod'
 
+import { LECTURE_DAYS } from '@/features/lecture/types/lecture.type'
+
 export const lectureFormSchema = z
   .object({
     lectureName: z.string().trim().min(1, '강의명은 필수입니다.'),
-
     lectureLoc: z.enum(['ONLINE', 'OFFLINE', 'HYBRID']),
     location: z.string().trim().optional().nullable(),
-
-    // backend: HashSet<LectureDay>
-    days: z
-      .array(z.enum(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']))
-      .min(1, '운영 요일을 1개 이상 선택해 주세요.'),
+    days: z.array(z.enum(LECTURE_DAYS)).min(1, '운영 요일을 1개 이상 선택해 주세요.'),
 
     startTime: z.string().trim().min(1, '시작 시간은 필수입니다.'), // HH:mm
     endTime: z.string().trim().min(1, '종료 시간은 필수입니다.'), // HH:mm
@@ -26,7 +23,7 @@ export const lectureFormSchema = z
     // backend: RecruitType
     recruitType: z.enum(['GENERAL', 'CARD_REQUIRED']),
 
-    // 만원 단위로 입력(0 이상 정수)
+    // 원 단위로 입력(0 이상 정수)
     subsidy: z.number().int().nonnegative('0 이상만 입력할 수 있어요.'),
     lectureFee: z.number().int().nonnegative('0 이상만 입력할 수 있어요.'),
     eduSubsidy: z.number().int().nonnegative('0 이상만 입력할 수 있어요.'),
@@ -43,7 +40,8 @@ export const lectureFormSchema = z
     mockInterview: z.boolean(),
     employmentHelp: z.boolean(),
 
-    afterCompletion: z.number().int().nonnegative().optional().nullable(),
+    afterCompletion: z.boolean(),
+    url: z.string().trim().url('올바른 URL 형식이 아닙니다.').optional().nullable(),
     lectureImageFile: z.instanceof(File).optional().nullable(),
 
     // 강의 기간은 날짜로만 입력(전송 시 LocalDateTime으로 변환)
@@ -53,13 +51,39 @@ export const lectureFormSchema = z
     deadlineDate: z.date().optional().nullable(),
 
     totalDays: z.number().int().positive('총 교육일수는 1 이상이어야 합니다.'),
-    totalTimes: z.number().int().positive('총 교육회차는 1 이상이어야 합니다.'),
+    totalTimes: z.number().int().positive('총 교육시간은 1 이상이어야 합니다.'),
 
     projectNum: z.number().int().nonnegative().optional().nullable(),
     projectTime: z.number().int().nonnegative().optional().nullable(),
     projectTeam: z.string().trim().optional().nullable(),
     projectTool: z.string().trim().optional().nullable(),
     projectMentor: z.boolean().optional(),
+
+    quals: z
+      .array(
+        z.object({
+          type: z.enum(['REQUIRED', 'PREFERRED']),
+          text: z.string().trim().min(1, '자격 요건 내용을 입력해 주세요.'),
+        }),
+      )
+      .optional(),
+
+    teachers: z
+      .array(
+        z.object({
+          teacherName: z.string().trim().min(1, '강사명을 입력해 주세요.'),
+          teacherDescription: z.string().trim().optional().nullable(),
+        }),
+      )
+      .optional(),
+
+    adds: z
+      .array(
+        z.object({
+          addName: z.string().trim().min(1, '추가 제공 항목명을 입력해 주세요.'),
+        }),
+      )
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.startAtDate && data.endAtDate && data.startAtDate > data.endAtDate) {
