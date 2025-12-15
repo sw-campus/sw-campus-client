@@ -139,6 +139,7 @@ export function useSignupOrganizationForm() {
 
       if (!certificateImage) {
         toast.error('재직증명서를 첨부해 주세요.')
+        setIsSubmitting(false)
         return
       }
 
