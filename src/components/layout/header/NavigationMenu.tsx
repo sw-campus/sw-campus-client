@@ -1,5 +1,6 @@
 'use client'
 
+import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import { FiX } from 'react-icons/fi'
 
@@ -11,20 +12,20 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu'
 import { BOOT_NAV_DATA } from '@/features/navi/types/navigation.type'
+import { useDesktopNavigationStore } from '@/store/navigation.store'
 
 export default function Navigation({
   open,
-  showDesktop,
   onClose,
   onDesktopEnter,
   onDesktopLeave,
 }: {
   open: boolean
-  showDesktop: boolean
   onClose: () => void
   onDesktopEnter?: () => void
   onDesktopLeave?: () => void
 }) {
+  const showDesktop = useDesktopNavigationStore(state => state.showDesktopNav)
   return (
     <>
       {/* 모바일인 경우 */}
@@ -57,36 +58,47 @@ export default function Navigation({
       )}
 
       {/* 데스크탑인 경우 */}
-      {showDesktop && (
-        <NavigationMenu
-          viewport={false}
-          className="relative mx-auto mt-4 hidden w-full max-w-7xl items-center justify-center px-8 md:flex"
-          onMouseEnter={onDesktopEnter}
-          onMouseLeave={onDesktopLeave}
-        >
-          <NavigationMenuList className="justify-start">
-            {BOOT_NAV_DATA.map((item, key) => (
-              <NavigationMenuItem key={key} className="relative">
-                {/* 중분류 */}
-                <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
+      <AnimatePresence>
+        {showDesktop && (
+          <motion.div
+            key="desktop-nav"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="relative mx-auto mt-4 hidden w-full max-w-7xl items-center justify-center px-8 md:flex"
+          >
+            <NavigationMenu
+              viewport={false}
+              className="w-full"
+              onMouseEnter={onDesktopEnter}
+              onMouseLeave={onDesktopLeave}
+            >
+              <NavigationMenuList className="justify-start">
+                {BOOT_NAV_DATA.map((item, key) => (
+                  <NavigationMenuItem key={key} className="relative">
+                    {/* 중분류 */}
+                    <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
 
-                {/* 소분류 */}
-                {item.items && (
-                  <NavigationMenuContent className="absolute top-full left-0 w-[200px] md:w-[200px]">
-                    <div className="flex flex-col gap-2 p-4">
-                      {item.items.map(child => (
-                        <Link href={child.href} key={child.title} className="hover:text-accent-foreground">
-                          {child.title}
-                        </Link>
-                      ))}
-                    </div>
-                  </NavigationMenuContent>
-                )}
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
-      )}
+                    {/* 소분류 */}
+                    {item.items && (
+                      <NavigationMenuContent className="absolute top-full left-0 w-[200px] md:w-[200px]">
+                        <div className="flex flex-col gap-2 p-4">
+                          {item.items.map(child => (
+                            <Link href={child.href} key={child.title} className="hover:text-accent-foreground">
+                              {child.title}
+                            </Link>
+                          ))}
+                        </div>
+                      </NavigationMenuContent>
+                    )}
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

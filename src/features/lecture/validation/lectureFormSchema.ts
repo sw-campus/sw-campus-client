@@ -1,0 +1,103 @@
+import { z } from 'zod'
+
+export const lectureFormSchema = z
+  .object({
+    lectureName: z.string().trim().min(1, '강의명은 필수입니다.'),
+
+    lectureLoc: z.enum(['ONLINE', 'OFFLINE', 'HYBRID']),
+    location: z.string().trim().optional().nullable(),
+
+    // backend: HashSet<LectureDay>
+    days: z
+      .array(z.enum(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']))
+      .min(1, '운영 요일을 1개 이상 선택해 주세요.'),
+
+    startTime: z.string().trim().min(1, '시작 시간은 필수입니다.'), // HH:mm
+    endTime: z.string().trim().min(1, '종료 시간은 필수입니다.'), // HH:mm
+
+    recruitProcedures: z
+      .array(
+        z.object({
+          type: z.enum(['DOCUMENT', 'CODING_TEST', 'INTERVIEW']),
+        }),
+      )
+      .min(1, '선발 절차를 1개 이상 추가해 주세요.'),
+
+    // backend: RecruitType
+    recruitType: z.enum(['GENERAL', 'CARD_REQUIRED']),
+
+    // 만원 단위로 입력(0 이상 정수)
+    subsidy: z.number().int().nonnegative('0 이상만 입력할 수 있어요.'),
+    lectureFee: z.number().int().nonnegative('0 이상만 입력할 수 있어요.'),
+    eduSubsidy: z.number().int().nonnegative('0 이상만 입력할 수 있어요.'),
+
+    goal: z.string().trim().optional().nullable(),
+    maxCapacity: z.number().int().positive('모집 정원은 1 이상이어야 합니다.').optional().nullable(),
+
+    equipPc: z.enum(['NONE', 'PC', 'LAPTOP', 'PERSONAL']).optional().nullable(),
+    equipMerit: z.string().trim().optional().nullable(),
+    equipOs: z.array(z.enum(['WINDOWS', 'MACOS', 'LINUX'])).optional(),
+
+    books: z.boolean(),
+    resume: z.boolean(),
+    mockInterview: z.boolean(),
+    employmentHelp: z.boolean(),
+
+    afterCompletion: z.number().int().nonnegative().optional().nullable(),
+    lectureImageFile: z.instanceof(File).optional().nullable(),
+
+    // 강의 기간은 날짜로만 입력(전송 시 LocalDateTime으로 변환)
+    startAtDate: z.date().refine(d => d instanceof Date && !Number.isNaN(d.getTime()), '강의 시작일은 필수입니다.'),
+    endAtDate: z.date().refine(d => d instanceof Date && !Number.isNaN(d.getTime()), '강의 종료일은 필수입니다.'),
+
+    deadlineDate: z.date().optional().nullable(),
+
+    totalDays: z.number().int().positive('총 교육일수는 1 이상이어야 합니다.'),
+    totalTimes: z.number().int().positive('총 교육회차는 1 이상이어야 합니다.'),
+
+    projectNum: z.number().int().nonnegative().optional().nullable(),
+    projectTime: z.number().int().nonnegative().optional().nullable(),
+    projectTeam: z.string().trim().optional().nullable(),
+    projectTool: z.string().trim().optional().nullable(),
+    projectMentor: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.startAtDate && data.endAtDate && data.startAtDate > data.endAtDate) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['startAtDate'],
+        message: '강의 시작일은 종료일보다 앞서야 합니다.',
+      })
+      ctx.addIssue({
+        code: 'custom',
+        path: ['endAtDate'],
+        message: '강의 종료일은 시작일보다 뒤여야 합니다.',
+      })
+    }
+
+    // OFFLINE/HYBRID면 location 필수
+    if ((data.lectureLoc === 'OFFLINE' || data.lectureLoc === 'HYBRID') && !data.location?.trim()) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['location'],
+        message: '오프라인 장소를 입력해 주세요.',
+      })
+    }
+
+    // deadline은 backend에서 LocalDate로 파싱하므로 시간은 선택
+
+    // 선발 절차는 중복 불가
+    if (data.recruitProcedures?.length) {
+      const types = data.recruitProcedures.map(p => p.type)
+      const unique = new Set(types)
+      if (unique.size !== types.length) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['recruitProcedures'],
+          message: '선발 절차는 중복으로 추가할 수 없습니다.',
+        })
+      }
+    }
+  })
+
+export type LectureFormValues = z.infer<typeof lectureFormSchema>
