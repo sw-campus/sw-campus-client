@@ -18,6 +18,7 @@ import {
   DEFAULT_SORT,
   COST_QUERY_MAP,
   PROCEDURE_QUERY_MAP,
+  FilterGroupKey,
 } from '@/features/lecture/types/filter.type'
 import { BOOT_NAV_DATA } from '@/features/navi/types/navigation.type'
 
@@ -31,7 +32,7 @@ export default function LectureSearchPage() {
   const [selectedCost, setSelectedCost] = useState<string | null>(null)
   const [selectedSort, setSelectedSort] = useState(DEFAULT_SORT)
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({
+  const [activeFilters, setActiveFilters] = useState<Record<FilterGroupKey, string[]>>({
     procedure: [],
     region: [],
   })
@@ -41,7 +42,7 @@ export default function LectureSearchPage() {
     [selectedCategory],
   )
 
-  const toggleFilter = (group: string, label: string) => {
+  const toggleFilter = (group: FilterGroupKey, label: string) => {
     setActiveFilters(prev => {
       const currentGroup = prev[group] ?? []
       const nextGroup = currentGroup.includes(label)
@@ -55,7 +56,7 @@ export default function LectureSearchPage() {
     })
   }
 
-  const isActive = (group: string, label: string) => (activeFilters[group] ?? []).includes(label)
+  const isActive = (group: FilterGroupKey, label: string) => (activeFilters[group] ?? []).includes(label)
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category)

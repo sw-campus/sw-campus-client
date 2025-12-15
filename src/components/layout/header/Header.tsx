@@ -23,7 +23,7 @@ export default function Header({
   // 로그아웃
   const handleLogout = async () => {
     try {
-      logout() // 서버에서 쿠키 삭제
+      await logout() // 서버에서 쿠키 삭제
       clearAuth() // 클라이언트 상태 초기화
     } catch (e) {
       console.error(e)

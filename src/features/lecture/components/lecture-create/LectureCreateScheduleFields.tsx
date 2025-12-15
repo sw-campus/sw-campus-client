@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import type { LectureDay } from '@/features/lecture/types/lecture.type'
 import { toDigitsOnly } from '@/features/lecture/utils/inputFormat'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
@@ -29,9 +30,7 @@ export function LectureCreateScheduleFields() {
             render={({ field }) => {
               const value = field.value ?? []
 
-              const toggle = (
-                day: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY',
-              ) => {
+              const toggle = (day: LectureDay) => {
                 const next = value.includes(day) ? value.filter(v => v !== day) : [...value, day]
                 field.onChange(next)
               }
