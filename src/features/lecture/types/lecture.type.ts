@@ -14,6 +14,8 @@ export interface LectureSummary {
   periodEnd: string // YYYY-MM-DD
   tags: LectureTag[]
   imageUrl?: string
+  status?: string // 'RECRUITING' | 'FINISHED' | 'PREPARING'
+  averageScore?: number // 리뷰 평균 점수
 }
 
 // Keep existing imports working
@@ -28,23 +30,19 @@ export type LocalDateString = string
 export type LocalTimeString = string
 export type DecimalString = string
 
-export type LectureDay =
-  | 'MONDAY'
-  | 'TUESDAY'
-  | 'WEDNESDAY'
-  | 'THURSDAY'
-  | 'FRIDAY'
-  | 'SATURDAY'
-  | 'SUNDAY'
-  | (string & {})
+export const LECTURE_DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const
 
-export type LectureLocation = 'ONLINE' | 'OFFLINE' | 'HYBRID' | (string & {})
+export type LectureDayLiteral = (typeof LECTURE_DAYS)[number]
+
+export type LectureDay = LectureDayLiteral | (string & {})
+
+export type LectureLocation = 'ONLINE' | 'OFFLINE' | 'MIXED' | (string & {})
 
 export type RecruitType = 'CARD_REQUIRED' | 'GENERAL' | (string & {})
 
 export type EquipmentType = 'NONE' | 'PC' | 'LAPTOP' | 'PERSONAL' | (string & {})
 
-export type LectureStatus = 'OPEN' | 'CLOSED' | 'DRAFT' | (string & {})
+export type LectureStatus = 'RECRUITING' | 'FINISHED' | (string & {})
 
 export type LectureAuthStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | (string & {})
 

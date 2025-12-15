@@ -51,7 +51,7 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
 
       <Field>
         <FieldLabel>지원금 / 교육비 / 교육지원금</FieldLabel>
-        <FieldDescription>금액은 만원 단위로 입력합니다. (예: 150 = 150만원)</FieldDescription>
+        <FieldDescription>금액은 원 단위로 입력합니다. (예: 1500000 = 150만원)</FieldDescription>
         <FieldContent>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             <Controller
@@ -74,7 +74,7 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
                       value={String(field.value ?? 0)}
                       onChange={e => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
                     />
-                    <span className="text-muted-foreground shrink-0 text-sm whitespace-nowrap">만원</span>
+                    <span className="text-muted-foreground shrink-0 text-sm whitespace-nowrap">원</span>
                   </div>
                 </div>
               )}
@@ -100,7 +100,7 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
                       value={String(field.value ?? 0)}
                       onChange={e => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
                     />
-                    <span className="text-muted-foreground shrink-0 text-sm whitespace-nowrap">만원</span>
+                    <span className="text-muted-foreground shrink-0 text-sm whitespace-nowrap">원</span>
                   </div>
                 </div>
               )}
@@ -126,7 +126,7 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
                       value={String(field.value ?? 0)}
                       onChange={e => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
                     />
-                    <span className="text-muted-foreground shrink-0 text-sm whitespace-nowrap">만원</span>
+                    <span className="text-muted-foreground shrink-0 text-sm whitespace-nowrap">원</span>
                   </div>
                 </div>
               )}

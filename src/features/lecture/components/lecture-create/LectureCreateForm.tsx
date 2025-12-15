@@ -9,15 +9,22 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
-import { LectureCreateBasicInfoFields } from '@/features/lecture/components/lecture-create/LectureCreateBasicInfoFields'
-import { LectureCreateCostFields } from '@/features/lecture/components/lecture-create/LectureCreateCostFields'
-import { LectureCreateEquipmentFields } from '@/features/lecture/components/lecture-create/LectureCreateEquipmentFields'
-import { LectureCreateLocationFields } from '@/features/lecture/components/lecture-create/LectureCreateLocationFields'
-import { LectureCreateOptionsFields } from '@/features/lecture/components/lecture-create/LectureCreateOptionsFields'
-import { LectureCreateProjectFields } from '@/features/lecture/components/lecture-create/LectureCreateProjectFields'
-import { LectureCreateRecruitProcedureFields } from '@/features/lecture/components/lecture-create/LectureCreateRecruitProcedureFields'
-import { LectureCreateScheduleFields } from '@/features/lecture/components/lecture-create/LectureCreateScheduleFields'
-import { lectureCreateFormDefaultValues } from '@/features/lecture/components/lecture-create/defaultValues'
+import {
+  LectureCreateAddsFields,
+  LectureCreateBasicInfoFields,
+  LectureCreateCategoryFields,
+  LectureCreateCostFields,
+  LectureCreateCurriculumFields,
+  LectureCreateEquipmentFields,
+  LectureCreateLocationFields,
+  LectureCreateOptionsFields,
+  LectureCreateProjectFields,
+  LectureCreateQualificationFields,
+  LectureCreateRecruitProcedureFields,
+  LectureCreateScheduleFields,
+  LectureCreateTeachersFields,
+  lectureCreateFormDefaultValues,
+} from '@/features/lecture/components/lecture-create'
 import { useCreateLectureMutation } from '@/features/lecture/hooks/useCreateLectureMutation'
 import { mapLectureFormToCreateRequest } from '@/features/lecture/utils/mapLectureFormToCreateRequest'
 import { lectureFormSchema, type LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
@@ -41,8 +48,24 @@ export function LectureCreateForm() {
   } = methods
 
   const onSubmit = async (values: LectureFormValues) => {
+    console.log('Form values:', values)
+    console.log('Teachers:', values.teachers)
+    console.log('Teacher image files:', values.teachers?.map(t => t.teacherImageFile))
+    console.log('Lecture image file:', values.lectureImageFile)
+
     const payload = mapLectureFormToCreateRequest(values)
-    await mutateAsync(payload)
+    // z.any()로 변경했으므로, 값이 존재하고 Blob/File 여부를 느슨하게 체크하거나 단순히 truthy 체크
+    const teacherImageFiles = (values.teachers ?? [])
+      .map(t => t.teacherImageFile)
+      .filter((f): f is File => !!f) // 단순히 값이 있는지만 체크
+
+    console.log('Filtered teacher image files:', teacherImageFiles)
+
+    await mutateAsync({
+      payload,
+      lectureImageFile: (values.lectureImageFile as File) ?? null,
+      teacherImageFiles: teacherImageFiles.length > 0 ? (teacherImageFiles as File[]) : undefined,
+    })
     toast.success('강의가 성공적으로 등록되었습니다.')
     router.back()
   }
@@ -53,13 +76,18 @@ export function LectureCreateForm() {
         <FieldSet>
           <FieldGroup>
             <LectureCreateBasicInfoFields imageInputRef={imageInputRef} />
+            <LectureCreateCategoryFields selectTriggerClassName={selectTriggerClassName} />
+            <LectureCreateCurriculumFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateLocationFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateScheduleFields />
             <LectureCreateRecruitProcedureFields selectTriggerClassName={selectTriggerClassName} />
+            <LectureCreateQualificationFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateCostFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateOptionsFields />
             <LectureCreateEquipmentFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateProjectFields />
+            <LectureCreateTeachersFields />
+            <LectureCreateAddsFields />
 
             <div className="pt-4">
               <Button type="submit" disabled={!isValid || isPending}>
@@ -72,3 +100,4 @@ export function LectureCreateForm() {
     </FormProvider>
   )
 }
+

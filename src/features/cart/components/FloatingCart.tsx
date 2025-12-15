@@ -24,7 +24,7 @@ export default function FloatingCart() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 120 }}
-          className="no-scrollbar fixed bottom-6 left-1/2 z-999 flex w-[95%] -translate-x-1/2 items-center gap-4 overflow-x-auto rounded-full border border-white/40 bg-white/40 px-6 py-4 shadow-xl backdrop-blur-xl md:w-175"
+          className="fixed bottom-6 left-1/2 z-999 flex w-[95%] -translate-x-1/2 items-center gap-4 overflow-x-auto rounded-full border border-white/40 bg-white/40 px-6 py-4 shadow-xl backdrop-blur-xl md:w-[700px]"
         >
           <div className="flex items-center gap-4">
             {items.map(item => (
