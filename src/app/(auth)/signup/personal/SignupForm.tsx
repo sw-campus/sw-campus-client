@@ -3,8 +3,7 @@
 import { FormEvent, useEffect, useRef } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import Script from 'next/script'
-import { Toaster, toast } from 'sonner'
+import { toast } from 'sonner'
 
 import {
   checkEmailStatus,
@@ -198,7 +197,7 @@ export default function SignupForm() {
       reset()
 
       toast.success('회원가입이 완료되었습니다.')
-      router.push('/')
+      router.push('/login')
     } catch (error: any) {
       const message = error?.response?.data?.message ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.'
       toast.error(message)
