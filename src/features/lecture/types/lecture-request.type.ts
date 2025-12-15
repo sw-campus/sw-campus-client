@@ -1,14 +1,43 @@
 import {
-  DecimalString,
   EquipmentType,
   LectureDay,
   LectureAuthStatus,
   LectureLocation,
   LocalDateString,
-  LocalDateTimeString,
   LocalTimeString,
   RecruitType,
 } from '@/features/lecture/types/lecture.type'
+
+export type LectureQualType = 'REQUIRED' | 'PREFERRED' | (string & {})
+
+export interface LectureQualCreateRequest {
+  type: LectureQualType
+  text: string
+}
+
+export type LectureStepType = 'DOCUMENT' | 'CODING_TEST' | 'INTERVIEW' | (string & {})
+
+export interface LectureStepCreateRequest {
+  stepType: LectureStepType
+  stepOrder: number
+}
+
+export interface LectureTeacherCreateRequest {
+  teacherName: string
+  teacherDescription?: string | null
+  teacherImageUrl?: string | null
+}
+
+export interface LectureAddCreateRequest {
+  addName: string
+}
+
+export type CurriculumLevel = 'NONE' | 'BASIC' | 'ADVANCED'
+
+export interface LectureCurriculumRequest {
+  curriculumId: number
+  level: CurriculumLevel
+}
 
 export interface LectureCreateRequest {
   lectureName: string
@@ -21,9 +50,9 @@ export interface LectureCreateRequest {
 
   recruitType: RecruitType
 
-  subsidy: DecimalString
-  lectureFee: DecimalString
-  eduSubsidy: DecimalString
+  subsidy: number
+  lectureFee: number
+  eduSubsidy: number
 
   goal?: string | null
   maxCapacity?: number | null
@@ -36,10 +65,10 @@ export interface LectureCreateRequest {
   mockInterview: boolean
   employmentHelp: boolean
 
-  afterCompletion?: number | null
+  afterCompletion?: boolean | null
   url?: string | null
   lectureImageUrl?: string | null
-  lectureAuthStatus?: LectureAuthStatus | null
+
 
   projectNum?: number | null
   projectTime?: number | null
@@ -53,8 +82,15 @@ export interface LectureCreateRequest {
 
   totalDays: number
   totalTimes: number
+
+  steps: LectureStepCreateRequest[]
+  quals?: LectureQualCreateRequest[]
+  teachers?: LectureTeacherCreateRequest[]
+  adds?: LectureAddCreateRequest[]
+  curriculums?: LectureCurriculumRequest[]
 }
 
 export interface LectureCreateResponse {
   lectureId: number
 }
+

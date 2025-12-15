@@ -48,7 +48,7 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
         </p>
         {/* 태그 */}
         <div className="mb-6 flex flex-wrap gap-2">
-          {tags.map(tag => (
+          {tags.slice(1).map(tag => (
             <span
               key={tag.id}
               className="rounded-full bg-orange-300/20 px-3 py-1 text-xs text-black/70 backdrop-blur-sm"

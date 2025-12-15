@@ -6,8 +6,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
-import { toDigitsOnly } from '@/features/lecture/utils/inputFormat'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 export function LectureCreateOptionsFields() {
@@ -91,30 +91,38 @@ export function LectureCreateOptionsFields() {
       </Field>
 
       <Field>
-        <FieldLabel>수료 후 지원 기간(개월)</FieldLabel>
-        <FieldDescription>선택 항목입니다.</FieldDescription>
+        <FieldLabel>수료 후 지원</FieldLabel>
+        <FieldDescription>수료 후 지원 제공 여부를 선택해 주세요.</FieldDescription>
         <FieldContent>
           <Controller
             control={control}
             name="afterCompletion"
             render={({ field }) => (
-              <Input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                placeholder="예) 6"
-                {...field}
-                value={field.value === null || field.value === undefined ? '' : String(field.value)}
-                onChange={e => {
-                  const next = toDigitsOnly(e.target.value)
-                  field.onChange(next === '' ? null : Number(next))
-                }}
-              />
+              <div className="border-input flex items-center justify-between gap-4 rounded-md border px-3 py-2">
+                <div className="space-y-0.5">
+                  <div className="text-sm font-medium">수료 후 지원 제공</div>
+                  <div className="text-muted-foreground text-xs">수료 후 지원 프로그램/혜택 제공 여부</div>
+                </div>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </div>
             )}
           />
           {errors.afterCompletion && (
             <FieldDescription className="text-red-600">{errors.afterCompletion.message}</FieldDescription>
           )}
+        </FieldContent>
+      </Field>
+
+      <Field>
+        <FieldLabel>신청 페이지 URL</FieldLabel>
+        <FieldDescription>선택 항목입니다. (예: https://example.com/lecture/1)</FieldDescription>
+        <FieldContent>
+          <Controller
+            control={control}
+            name="url"
+            render={({ field }) => <Input placeholder="https://..." {...field} value={field.value ?? ''} />}
+          />
+          {errors.url && <FieldDescription className="text-red-600">{errors.url.message}</FieldDescription>}
         </FieldContent>
       </Field>
     </>

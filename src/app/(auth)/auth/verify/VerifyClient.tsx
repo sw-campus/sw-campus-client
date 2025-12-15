@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 
 import { useSearchParams } from 'next/navigation'
+import { toast } from 'sonner'
 
 import { getVerifyEmailRedirectUrl } from '@/lib/axios'
 
@@ -12,7 +13,7 @@ export default function VerifyClient() {
 
   useEffect(() => {
     if (!token) {
-      alert('인증 토큰이 없습니다.')
+      toast.error('인증 토큰이 없습니다.')
       return
     }
     window.location.href = getVerifyEmailRedirectUrl(token)

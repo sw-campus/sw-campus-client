@@ -16,6 +16,7 @@ type Props = {
 export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
   const {
     control,
+    setValue,
     formState: { errors },
   } = useFormContext<LectureFormValues>()
 
@@ -38,7 +39,7 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
       </Field>
 
       <Field>
-        <FieldLabel>총 회차</FieldLabel>
+        <FieldLabel>총 교육시간</FieldLabel>
         <FieldContent>
           <Controller
             control={control}
@@ -49,7 +50,7 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
                 inputMode="numeric"
                 min={1}
                 step={1}
-                placeholder="예) 24"
+                placeholder="예) 960"
                 {...field}
                 value={String(field.value ?? 1)}
                 onChange={e => field.onChange(e.target.value === '' ? 1 : Number(e.target.value))}
@@ -68,23 +69,29 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
           <Controller
             control={control}
             name="lectureImageFile"
-            render={({ field }) => (
-              <div className="flex items-center gap-3">
-                <input
-                  ref={imageInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={e => {
-                    const file = e.target.files?.[0] ?? null
-                    field.onChange(file)
-                  }}
-                />
-                <Button type="button" onClick={() => imageInputRef.current?.click()}>
-                  업로드
-                </Button>
-                <span className="text-muted-foreground text-sm">{lectureImageFile?.name ?? '선택된 파일 없음'}</span>
-              </div>
+            render={({ field: { onChange }, fieldState }) => (
+              <>
+                <div className="flex items-center gap-3">
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => {
+                      const file = e.target.files?.[0] ?? null
+                      console.log('Lecture image changed:', file)
+                      onChange(file)
+                    }}
+                  />
+                  <Button type="button" onClick={() => imageInputRef.current?.click()}>
+                    업로드
+                  </Button>
+                  <span className="text-muted-foreground text-sm">{lectureImageFile?.name ?? '선택된 파일 없음'}</span>
+                </div>
+                {fieldState.error && (
+                  <FieldDescription className="text-red-600">{fieldState.error.message}</FieldDescription>
+                )}
+              </>
             )}
           />
         </FieldContent>

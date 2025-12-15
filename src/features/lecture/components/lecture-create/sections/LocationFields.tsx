@@ -40,7 +40,7 @@ export function LectureCreateLocationFields({ selectTriggerClassName }: Props) {
                     <SelectGroup>
                       <SelectItem value="ONLINE">온라인</SelectItem>
                       <SelectItem value="OFFLINE">오프라인</SelectItem>
-                      <SelectItem value="HYBRID">온/오프라인 병행</SelectItem>
+                      <SelectItem value="MIXED">온/오프라인 병행</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>

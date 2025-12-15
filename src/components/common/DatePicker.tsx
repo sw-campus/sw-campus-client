@@ -26,6 +26,11 @@ export function DatePicker({
   const inputId = id ?? `date-${reactId}`
   const selectedDate = value ?? internalDate
 
+  // 현재 연도 기준으로 앞뒤 10년 범위 설정
+  const currentYear = new Date().getFullYear()
+  const fromYear = currentYear - 5
+  const toYear = currentYear + 10
+
   return (
     <div className="flex flex-col gap-3">
       <Label htmlFor={inputId} className="text-muted-foreground">
@@ -47,6 +52,8 @@ export function DatePicker({
             mode="single"
             selected={selectedDate}
             captionLayout="dropdown"
+            fromYear={fromYear}
+            toYear={toYear}
             onSelect={d => {
               if (onSelect) onSelect(d)
               else setInternalDate(d)
@@ -58,3 +65,4 @@ export function DatePicker({
     </div>
   )
 }
+
