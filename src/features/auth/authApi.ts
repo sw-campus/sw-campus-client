@@ -2,6 +2,13 @@ import { z } from 'zod'
 
 import { api } from '@/lib/axios'
 
+interface OAuthLoginResponse {
+  name?: string
+  nickname?: string
+  email?: string
+  // API 응답에 따라 토큰 등 다른 필드 추가
+}
+
 // 이메일 인증 상태 조회 API
 export const checkEmailStatus = async (email: string) => {
   const res = await api.get('/auth/email/status', {
@@ -36,23 +43,38 @@ export const signup = async (payload: {
 }
 
 // 기관 회원가입
-export const signupOrganization = async (payload: OrganizationSignupInput) => {
+export const signupOrganization = async (payload: {
+  email: string
+  password: string
+  name: string
+  nickname: string
+  phone: string
+  location: string
+  organizationName: string
+  certificateImage: File
+}) => {
   const formData = new FormData()
 
-  // FormData에 필드 채우기
+  // 공통 필드 (개인 회원가입 기준과 동일)
   formData.append('email', payload.email)
   formData.append('password', payload.password)
   formData.append('name', payload.name)
   formData.append('nickname', payload.nickname)
-  formData.append('phone', payload.phone)
-  formData.append('location', payload.location)
+
+  // 기관 회원 필수/선택 필드
+  if (payload.phone) formData.append('phone', payload.phone)
+  if (payload.location) formData.append('location', payload.location)
   formData.append('organizationName', payload.organizationName)
+
+  // 재직증명서 (필수)
+  formData.append('certificateImage', payload.certificateImage)
 
   const res = await api.post('/auth/signup/organization', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   })
+
   return res.data
 }
 
@@ -96,10 +118,19 @@ export const signupSchema = baseSignupSchema.extend({
 
 // 기관 회원가입 유효성 검증 스키마
 export const organizationSignupSchema = baseSignupSchema.extend({
-  phone: z.string().trim().min(1, '전화번호는 필수 입력값입니다.'), // required
-  location: z.string().trim().min(1, '주소는 필수 입력값입니다.'), // required
-  organizationName: z.string().trim().min(1, '기관명은 필수 입력값입니다.'), // required
+  phone: z.string().nullable(),
+  location: z.string().nullable(),
+  organizationName: z.string().trim().min(1, '기관명은 필수 입력값입니다.'),
+  certificateImage: z.instanceof(File, { message: '재직증명서는 필수입니다.' }),
 })
+
+// OAuth 로그인 (Google / GitHub)
+export const oauthLogin = async (provider: 'google' | 'github', code: string): Promise<OAuthLoginResponse> => {
+  const res = await api.post<OAuthLoginResponse>(`/auth/oauth/${provider}`, {
+    code,
+  })
+  return res.data
+}
 
 export type SignupInput = z.infer<typeof signupSchema>
 export type OrganizationSignupInput = z.infer<typeof organizationSignupSchema>

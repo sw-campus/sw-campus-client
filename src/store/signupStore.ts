@@ -21,6 +21,10 @@ export type SignupState = {
   nickname: string
   phone: string | null
 
+  // 기업/기관 회원 전용
+  organizationName: string
+  certificateImage: File | null
+
   // actions
   setAddress: (value: string) => void
   setDetailAddress: (value: string) => void
@@ -34,6 +38,8 @@ export type SignupState = {
   setName: (value: string) => void
   setNickname: (value: string) => void
   setPhone: (value: string | null) => void
+  setOrganizationName: (value: string) => void
+  setCertificateImage: (value: File | null) => void
   reset: () => void
 }
 
@@ -51,6 +57,8 @@ export const useSignupStore = create<SignupState>(set => ({
   name: '',
   nickname: '',
   phone: null,
+  organizationName: '',
+  certificateImage: null,
 
   // actions
   setAddress: value => set({ address: value || null }),
@@ -65,6 +73,8 @@ export const useSignupStore = create<SignupState>(set => ({
   setName: value => set({ name: value }),
   setNickname: value => set({ nickname: value }),
   setPhone: value => set({ phone: value }),
+  setOrganizationName: value => set({ organizationName: value }),
+  setCertificateImage: value => set({ certificateImage: value }),
 
   reset: () =>
     set({
@@ -80,5 +90,7 @@ export const useSignupStore = create<SignupState>(set => ({
       name: '',
       nickname: '',
       phone: null,
+      organizationName: '',
+      certificateImage: null,
     }),
 }))
