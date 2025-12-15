@@ -4,7 +4,7 @@ import { AddToCartButton } from '@/features/cart'
 import { Lecture } from '@/features/lecture/types/lecture.type'
 
 export function LectureCard({ lecture }: { lecture: Lecture }) {
-  const { id, title, organization, periodStart, periodEnd, tags, imageUrl, status } = lecture
+  const { id, title, organization, periodStart, periodEnd, tags, imageUrl, status, averageScore } = lecture
 
   const getStatusBadge = (status?: string) => {
     switch (status) {
@@ -35,11 +35,17 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
           )}
         </div>
         <h3 className="mb-3 text-xl leading-tight font-bold">{title}</h3>
-        <p className="mb-4 text-sm">{organization}</p>
+        <p className="mb-2 text-sm">{organization}</p>
+        {/* 별점 */}
+        {averageScore !== undefined && averageScore !== null && (
+          <div className="mb-2 flex items-center gap-1">
+            <span className="text-amber-500">★</span>
+            <span className="text-sm font-medium">{averageScore.toFixed(1)}</span>
+          </div>
+        )}
         <p className="mb-6 text-xs">
           {periodStart} ~ {periodEnd}
         </p>
-        {/* 별점 */}
         {/* 태그 */}
         <div className="mb-6 flex flex-wrap gap-2">
           {tags.map(tag => (

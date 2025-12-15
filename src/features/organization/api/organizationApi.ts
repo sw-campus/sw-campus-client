@@ -33,6 +33,7 @@ interface LectureResponse {
     endAt: string | null;
     lectureImageUrl: string | null;
     status: string; // 'RECRUITING' | 'FINISHED'
+    averageScore: number | null; // 리뷰 평균 점수
     curriculums: { curriculumId: number; curriculumName: string; level: string }[];
 }
 
@@ -52,6 +53,7 @@ function mapLectureToLecture(lecture: LectureResponse): Lecture {
         })),
         imageUrl: lecture.lectureImageUrl ?? undefined,
         status: lecture.status,
+        averageScore: lecture.averageScore ?? undefined,
     };
 }
 
