@@ -17,7 +17,7 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
         {/* 콘텐츠 */}
         <p className="mb-2 text-xs font-semibold tracking-widest">{tags[0]?.name ?? 'CATEGORY'}</p>
         <h3 className="mb-3 text-xl leading-tight font-bold">{title}</h3>
-        <p className="mb-4 text-sm">{organization}</p>co
+        <p className="mb-4 text-sm">{organization}</p>
         <p className="mb-6 text-xs">
           {periodStart} ~ {periodEnd}
         </p>
