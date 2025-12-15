@@ -9,17 +9,17 @@ export default function Footer() {
 
         {/* 메뉴 */}
         <nav className="flex flex-wrap gap-6 text-sm font-medium">
-          <a className="text-white/90 hover:text-white" href="#">
+          <Link href="#" className="text-white/90 hover:text-white">
             서비스 이용약관
-          </a>
+          </Link>
           <span className="text-white/30">|</span>
-          <a className="text-white/90 hover:text-white" href="#">
+          <Link href="#" className="text-white/90 hover:text-white">
             개인정보처리방침
-          </a>
+          </Link>
           <span className="text-white/30">|</span>
-          <a className="text-white/90 hover:text-white" href="#">
+          <Link href="/mypage/organization" className="text-white/90 hover:text-white">
             교육과정 등록
-          </a>
+          </Link>
         </nav>
       </div>
 
