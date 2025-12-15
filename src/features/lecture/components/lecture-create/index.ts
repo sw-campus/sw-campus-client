@@ -1,6 +1,8 @@
 export { LectureCreateAddsFields } from '@/features/lecture/components/lecture-create/sections/AddsFields'
 export { LectureCreateBasicInfoFields } from '@/features/lecture/components/lecture-create/sections/BasicInfoFields'
+export { LectureCreateCategoryFields } from '@/features/lecture/components/lecture-create/sections/CategoryFields'
 export { LectureCreateCostFields } from '@/features/lecture/components/lecture-create/sections/CostFields'
+export { LectureCreateCurriculumFields } from '@/features/lecture/components/lecture-create/sections/CurriculumFields'
 export { LectureCreateEquipmentFields } from '@/features/lecture/components/lecture-create/sections/EquipmentFields'
 export { LectureCreateLocationFields } from '@/features/lecture/components/lecture-create/sections/LocationFields'
 export { LectureCreateOptionsFields } from '@/features/lecture/components/lecture-create/sections/OptionsFields'
@@ -11,3 +13,4 @@ export { LectureCreateScheduleFields } from '@/features/lecture/components/lectu
 export { LectureCreateTeachersFields } from '@/features/lecture/components/lecture-create/sections/TeachersFields'
 
 export { lectureCreateFormDefaultValues } from '@/features/lecture/components/lecture-create/defaultValues'
+

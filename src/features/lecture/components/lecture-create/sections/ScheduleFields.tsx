@@ -7,13 +7,14 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import type { LectureDay } from '@/features/lecture/types/lecture.type'
+import type { LectureDayLiteral } from '@/features/lecture/types/lecture.type'
 import { toDigitsOnly } from '@/features/lecture/utils/inputFormat'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 export function LectureCreateScheduleFields() {
   const {
     control,
+    trigger,
     formState: { errors },
   } = useFormContext<LectureFormValues>()
 
@@ -30,7 +31,7 @@ export function LectureCreateScheduleFields() {
             render={({ field }) => {
               const value = field.value ?? []
 
-              const toggle = (day: LectureDay) => {
+              const toggle = (day: LectureDayLiteral) => {
                 const next = value.includes(day) ? value.filter(v => v !== day) : [...value, day]
                 field.onChange(next)
               }
@@ -156,12 +157,30 @@ export function LectureCreateScheduleFields() {
             <Controller
               control={control}
               name="startAtDate"
-              render={({ field }) => <DatePicker label="시작일" value={field.value} onSelect={field.onChange} />}
+              render={({ field }) => (
+                <DatePicker
+                  label="시작일"
+                  value={field.value}
+                  onSelect={date => {
+                    field.onChange(date)
+                    trigger(['startAtDate', 'endAtDate'])
+                  }}
+                />
+              )}
             />
             <Controller
               control={control}
               name="endAtDate"
-              render={({ field }) => <DatePicker label="종료일" value={field.value} onSelect={field.onChange} />}
+              render={({ field }) => (
+                <DatePicker
+                  label="종료일"
+                  value={field.value}
+                  onSelect={date => {
+                    field.onChange(date)
+                    trigger(['startAtDate', 'endAtDate'])
+                  }}
+                />
+              )}
             />
           </div>
           {(errors.startAtDate || errors.endAtDate) && (

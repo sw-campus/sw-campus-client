@@ -5,11 +5,13 @@ import { api } from '@/lib/axios'
 export type CreateLectureParams = {
   payload: LectureCreateRequest
   lectureImageFile?: File | null
+  teacherImageFiles?: File[]
 }
 
 export const createLecture = async ({
   payload,
   lectureImageFile,
+  teacherImageFiles,
 }: CreateLectureParams): Promise<LectureCreateResponse> => {
   const formData = new FormData()
   const payloadJson = JSON.stringify(payload)
@@ -18,6 +20,12 @@ export const createLecture = async ({
 
   if (lectureImageFile) {
     formData.append('lectureImageFile', lectureImageFile)
+  }
+
+  if (teacherImageFiles && teacherImageFiles.length > 0) {
+    teacherImageFiles.forEach(file => {
+      formData.append('teacherImageFiles', file)
+    })
   }
 
   const res = await api.post('/lectures', formData)
@@ -38,3 +46,4 @@ export const getLectureSearch = async (queryString: string): Promise<LectureResp
 
   throw new Error('Unexpected /lectures/search response shape')
 }
+

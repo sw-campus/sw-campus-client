@@ -31,6 +31,13 @@ export interface LectureAddCreateRequest {
   addName: string
 }
 
+export type CurriculumLevel = 'NONE' | 'BASIC' | 'ADVANCED'
+
+export interface LectureCurriculumRequest {
+  curriculumId: number
+  level: CurriculumLevel
+}
+
 export interface LectureCreateRequest {
   lectureName: string
   days: LectureDay[]
@@ -79,8 +86,10 @@ export interface LectureCreateRequest {
   quals?: LectureQualCreateRequest[]
   teachers?: LectureTeacherCreateRequest[]
   adds?: LectureAddCreateRequest[]
+  curriculums?: LectureCurriculumRequest[]
 }
 
 export interface LectureCreateResponse {
   lectureId: number
 }
+

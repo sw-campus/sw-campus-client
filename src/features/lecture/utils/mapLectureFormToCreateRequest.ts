@@ -6,26 +6,20 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
   // 현재는 업로드 없이 파일명만 저장(추후 S3 URL로 교체 예정)
   const lectureImageUrl = values.lectureImageFile?.name ?? null
 
-  const osLabelMap: Record<'WINDOWS' | 'MACOS' | 'LINUX', string> = {
-    WINDOWS: 'Windows',
-    MACOS: 'macOS',
-    LINUX: 'Linux',
-  }
-
-  const isEquipmentProvided = values.equipPc === 'PC' || values.equipPc === 'LAPTOP'
-  const osLine =
-    isEquipmentProvided && values.equipOs && values.equipOs.length > 0
-      ? `OS: ${values.equipOs.map(v => osLabelMap[v]).join(', ')}`
-      : null
-  const equipMeritText = values.equipMerit?.trim() ? values.equipMerit.trim() : null
-  const equipMeritMerged = [equipMeritText, osLine].filter(Boolean).join('\n')
-
   const steps = (values.recruitProcedures ?? []).map((p, idx) => ({
     stepType: p.type,
     stepOrder: idx + 1,
   }))
 
   const afterCompletion = values.afterCompletion
+
+  // 커리큘럼 매핑
+  const curriculums = values.curriculums?.length
+    ? values.curriculums.map(c => ({
+      curriculumId: c.curriculumId,
+      level: c.level,
+    }))
+    : undefined
 
   return {
     lectureName: values.lectureName,
@@ -41,7 +35,7 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     goal: values.goal?.trim() ? values.goal.trim() : null,
     maxCapacity: values.maxCapacity ?? null,
     equipPc: values.equipPc ?? null,
-    equipMerit: equipMeritMerged || null,
+    equipMerit: values.equipMerit?.trim() ? values.equipMerit.trim() : null,
     books: values.books,
     resume: values.resume,
     mockInterview: values.mockInterview,
@@ -61,7 +55,14 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     totalTimes: values.totalTimes,
     steps,
     quals: values.quals?.length ? values.quals : undefined,
-    teachers: values.teachers?.length ? values.teachers : undefined,
+    teachers: values.teachers?.length
+      ? values.teachers.map(t => ({
+        teacherName: t.teacherName,
+        teacherDescription: t.teacherDescription ?? null,
+      }))
+      : undefined,
     adds: values.adds?.length ? values.adds : undefined,
+    curriculums,
   }
 }
+

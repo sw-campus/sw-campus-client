@@ -12,7 +12,9 @@ import { FieldGroup, FieldSet } from '@/components/ui/field'
 import {
   LectureCreateAddsFields,
   LectureCreateBasicInfoFields,
+  LectureCreateCategoryFields,
   LectureCreateCostFields,
+  LectureCreateCurriculumFields,
   LectureCreateEquipmentFields,
   LectureCreateLocationFields,
   LectureCreateOptionsFields,
@@ -47,7 +49,14 @@ export function LectureCreateForm() {
 
   const onSubmit = async (values: LectureFormValues) => {
     const payload = mapLectureFormToCreateRequest(values)
-    await mutateAsync({ payload, lectureImageFile: values.lectureImageFile ?? null })
+    const teacherImageFiles = (values.teachers ?? [])
+      .map(t => t.teacherImageFile)
+      .filter((f): f is File => f instanceof File)
+    await mutateAsync({
+      payload,
+      lectureImageFile: values.lectureImageFile ?? null,
+      teacherImageFiles: teacherImageFiles.length > 0 ? teacherImageFiles : undefined,
+    })
     toast.success('강의가 성공적으로 등록되었습니다.')
     router.back()
   }
@@ -58,6 +67,8 @@ export function LectureCreateForm() {
         <FieldSet>
           <FieldGroup>
             <LectureCreateBasicInfoFields imageInputRef={imageInputRef} />
+            <LectureCreateCategoryFields selectTriggerClassName={selectTriggerClassName} />
+            <LectureCreateCurriculumFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateLocationFields selectTriggerClassName={selectTriggerClassName} />
             <LectureCreateScheduleFields />
             <LectureCreateRecruitProcedureFields selectTriggerClassName={selectTriggerClassName} />
@@ -80,3 +91,4 @@ export function LectureCreateForm() {
     </FormProvider>
   )
 }
+

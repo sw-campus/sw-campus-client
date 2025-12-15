@@ -33,7 +33,6 @@ export const lectureFormSchema = z
 
     equipPc: z.enum(['NONE', 'PC', 'LAPTOP', 'PERSONAL']).optional().nullable(),
     equipMerit: z.string().trim().optional().nullable(),
-    equipOs: z.array(z.enum(['WINDOWS', 'MACOS', 'LINUX'])).optional(),
 
     books: z.boolean(),
     resume: z.boolean(),
@@ -73,6 +72,7 @@ export const lectureFormSchema = z
         z.object({
           teacherName: z.string().trim().min(1, '강사명을 입력해 주세요.'),
           teacherDescription: z.string().trim().optional().nullable(),
+          teacherImageFile: z.instanceof(File).optional().nullable(),
         }),
       )
       .optional(),
@@ -81,6 +81,17 @@ export const lectureFormSchema = z
       .array(
         z.object({
           addName: z.string().trim().min(1, '추가 제공 항목명을 입력해 주세요.'),
+        }),
+      )
+      .optional(),
+
+    // 카테고리 및 커리큘럼
+    categoryId: z.number().positive('카테고리를 선택해 주세요.').optional().nullable(),
+    curriculums: z
+      .array(
+        z.object({
+          curriculumId: z.number(),
+          level: z.enum(['NONE', 'BASIC', 'ADVANCED']),
         }),
       )
       .optional(),

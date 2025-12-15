@@ -16,7 +16,6 @@ export const lectureCreateFormDefaultValues: LectureFormValues = {
   maxCapacity: null,
   equipPc: null,
   equipMerit: null,
-  equipOs: [],
   books: false,
   resume: false,
   mockInterview: false,
@@ -38,4 +37,8 @@ export const lectureCreateFormDefaultValues: LectureFormValues = {
   quals: [],
   teachers: [],
   adds: [],
+
+  categoryId: null,
+  curriculums: [],
 }
+
