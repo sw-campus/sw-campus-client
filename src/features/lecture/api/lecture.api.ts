@@ -19,12 +19,12 @@ export const createLecture = async ({
   formData.append('lecture', new Blob([payloadJson], { type: 'application/json' }))
 
   if (lectureImageFile) {
-    formData.append('lectureImageFile', lectureImageFile)
+    formData.append('image', lectureImageFile)
   }
 
   if (teacherImageFiles && teacherImageFiles.length > 0) {
     teacherImageFiles.forEach(file => {
-      formData.append('teacherImageFiles', file)
+      formData.append('teacherImages', file)
     })
   }
 

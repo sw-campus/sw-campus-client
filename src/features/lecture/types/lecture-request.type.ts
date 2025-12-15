@@ -25,6 +25,7 @@ export interface LectureStepCreateRequest {
 export interface LectureTeacherCreateRequest {
   teacherName: string
   teacherDescription?: string | null
+  teacherImageUrl?: string | null
 }
 
 export interface LectureAddCreateRequest {
@@ -67,7 +68,7 @@ export interface LectureCreateRequest {
   afterCompletion?: boolean | null
   url?: string | null
   lectureImageUrl?: string | null
-  lectureAuthStatus?: LectureAuthStatus | null
+
 
   projectNum?: number | null
   projectTime?: number | null

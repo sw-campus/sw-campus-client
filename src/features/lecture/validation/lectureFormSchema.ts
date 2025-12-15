@@ -5,7 +5,7 @@ import { LECTURE_DAYS } from '@/features/lecture/types/lecture.type'
 export const lectureFormSchema = z
   .object({
     lectureName: z.string().trim().min(1, '강의명은 필수입니다.'),
-    lectureLoc: z.enum(['ONLINE', 'OFFLINE', 'HYBRID']),
+    lectureLoc: z.enum(['ONLINE', 'OFFLINE', 'MIXED']),
     location: z.string().trim().optional().nullable(),
     days: z.array(z.enum(LECTURE_DAYS)).min(1, '운영 요일을 1개 이상 선택해 주세요.'),
 
@@ -41,7 +41,7 @@ export const lectureFormSchema = z
 
     afterCompletion: z.boolean(),
     url: z.string().trim().url('올바른 URL 형식이 아닙니다.').optional().nullable(),
-    lectureImageFile: z.instanceof(File).optional().nullable(),
+    lectureImageFile: z.any().optional().nullable(), // File | null
 
     // 강의 기간은 날짜로만 입력(전송 시 LocalDateTime으로 변환)
     startAtDate: z.date().refine(d => d instanceof Date && !Number.isNaN(d.getTime()), '강의 시작일은 필수입니다.'),
@@ -72,7 +72,7 @@ export const lectureFormSchema = z
         z.object({
           teacherName: z.string().trim().min(1, '강사명을 입력해 주세요.'),
           teacherDescription: z.string().trim().optional().nullable(),
-          teacherImageFile: z.instanceof(File).optional().nullable(),
+          teacherImageFile: z.any().optional().nullable(), // File | null
         }),
       )
       .optional(),
@@ -110,8 +110,8 @@ export const lectureFormSchema = z
       })
     }
 
-    // OFFLINE/HYBRID면 location 필수
-    if ((data.lectureLoc === 'OFFLINE' || data.lectureLoc === 'HYBRID') && !data.location?.trim()) {
+    // OFFLINE/MIXED면 location 필수
+    if ((data.lectureLoc === 'OFFLINE' || data.lectureLoc === 'MIXED') && !data.location?.trim()) {
       ctx.addIssue({
         code: 'custom',
         path: ['location'],

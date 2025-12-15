@@ -117,37 +117,40 @@ function TeacherItem({ control, index, totalCount, onMove, onRemove }: TeacherIt
       <Controller
         control={control}
         name={`teachers.${index}.teacherImageFile`}
-        render={({ field }) => (
-          <div className="flex items-center gap-3">
-            <input
-              ref={imageInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={e => {
-                const file = e.target.files?.[0] ?? null
-                field.onChange(file)
-              }}
-            />
-            <Button type="button" variant="outline" size="sm" onClick={() => imageInputRef.current?.click()}>
-              <FiUpload className="mr-1 size-4" />
-              이미지
-            </Button>
-            {imageFile && (
-              <div className="flex items-center gap-2">
-                <img
-                  src={URL.createObjectURL(imageFile)}
-                  alt="강사 이미지 미리보기"
-                  className="size-10 rounded-full object-cover"
-                />
-                <span className="text-muted-foreground max-w-32 truncate text-sm">{imageFile.name}</span>
-              </div>
-            )}
-            {!imageFile && <span className="text-muted-foreground text-sm">이미지 없음</span>}
+        render={({ field: { onChange }, fieldState }) => (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={e => {
+                  const file = e.target.files?.[0] ?? null
+                  console.log(`Teacher ${index + 1} image changed:`, file)
+                  onChange(file)
+                }}
+              />
+              <Button type="button" variant="outline" size="sm" onClick={() => imageInputRef.current?.click()}>
+                <FiUpload className="mr-1 size-4" />
+                이미지
+              </Button>
+              {imageFile && (
+                <div className="flex items-center gap-2">
+                  <img
+                    src={URL.createObjectURL(imageFile)}
+                    alt="강사 이미지 미리보기"
+                    className="size-10 rounded-full object-cover"
+                  />
+                  <span className="text-muted-foreground max-w-32 truncate text-sm">{imageFile.name}</span>
+                </div>
+              )}
+              {!imageFile && <span className="text-muted-foreground text-sm">이미지 없음</span>}
+            </div>
+            {fieldState.error && <FieldDescription className="text-red-600">{fieldState.error.message}</FieldDescription>}
           </div>
         )}
       />
     </div>
   )
 }
-

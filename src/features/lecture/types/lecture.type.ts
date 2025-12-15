@@ -34,7 +34,7 @@ export type LectureDayLiteral = (typeof LECTURE_DAYS)[number]
 
 export type LectureDay = LectureDayLiteral | (string & {})
 
-export type LectureLocation = 'ONLINE' | 'OFFLINE' | 'HYBRID' | (string & {})
+export type LectureLocation = 'ONLINE' | 'OFFLINE' | 'MIXED' | (string & {})
 
 export type RecruitType = 'CARD_REQUIRED' | 'GENERAL' | (string & {})
 

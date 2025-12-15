@@ -16,6 +16,7 @@ type Props = {
 export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
   const {
     control,
+    setValue,
     formState: { errors },
   } = useFormContext<LectureFormValues>()
 
@@ -68,23 +69,29 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
           <Controller
             control={control}
             name="lectureImageFile"
-            render={({ field }) => (
-              <div className="flex items-center gap-3">
-                <input
-                  ref={imageInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={e => {
-                    const file = e.target.files?.[0] ?? null
-                    field.onChange(file)
-                  }}
-                />
-                <Button type="button" onClick={() => imageInputRef.current?.click()}>
-                  업로드
-                </Button>
-                <span className="text-muted-foreground text-sm">{lectureImageFile?.name ?? '선택된 파일 없음'}</span>
-              </div>
+            render={({ field: { onChange }, fieldState }) => (
+              <>
+                <div className="flex items-center gap-3">
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => {
+                      const file = e.target.files?.[0] ?? null
+                      console.log('Lecture image changed:', file)
+                      onChange(file)
+                    }}
+                  />
+                  <Button type="button" onClick={() => imageInputRef.current?.click()}>
+                    업로드
+                  </Button>
+                  <span className="text-muted-foreground text-sm">{lectureImageFile?.name ?? '선택된 파일 없음'}</span>
+                </div>
+                {fieldState.error && (
+                  <FieldDescription className="text-red-600">{fieldState.error.message}</FieldDescription>
+                )}
+              </>
             )}
           />
         </FieldContent>

@@ -48,14 +48,23 @@ export function LectureCreateForm() {
   } = methods
 
   const onSubmit = async (values: LectureFormValues) => {
+    console.log('Form values:', values)
+    console.log('Teachers:', values.teachers)
+    console.log('Teacher image files:', values.teachers?.map(t => t.teacherImageFile))
+    console.log('Lecture image file:', values.lectureImageFile)
+
     const payload = mapLectureFormToCreateRequest(values)
+    // z.any()로 변경했으므로, 값이 존재하고 Blob/File 여부를 느슨하게 체크하거나 단순히 truthy 체크
     const teacherImageFiles = (values.teachers ?? [])
       .map(t => t.teacherImageFile)
-      .filter((f): f is File => f instanceof File)
+      .filter((f): f is File => !!f) // 단순히 값이 있는지만 체크
+
+    console.log('Filtered teacher image files:', teacherImageFiles)
+
     await mutateAsync({
       payload,
-      lectureImageFile: values.lectureImageFile ?? null,
-      teacherImageFiles: teacherImageFiles.length > 0 ? teacherImageFiles : undefined,
+      lectureImageFile: (values.lectureImageFile as File) ?? null,
+      teacherImageFiles: teacherImageFiles.length > 0 ? (teacherImageFiles as File[]) : undefined,
     })
     toast.success('강의가 성공적으로 등록되었습니다.')
     router.back()
