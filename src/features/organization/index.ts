@@ -12,4 +12,7 @@ export type { OrganizationSummary, OrganizationDetail as OrganizationDetailType 
 
 // API
 export { fetchOrganizationList, fetchOrganizationDetail, fetchOrganizationLectures } from './api/organizationApi';
-export { MOCK_ORGS, MOCK_ORG_DETAILS, findMockOrgDetail } from './api/mockOrganizations';
+
+// Mock Data
+export { MOCK_REVIEWS } from './api/mockReviews';
+export type { Review } from './api/mockReviews';

@@ -1,46 +1,33 @@
 "use client";
 
 import { useOrganizationDetailQuery, useOrganizationLecturesQuery } from '../hooks/useOrganizations';
-import { findMockOrgDetail, MOCK_REVIEWS } from '../api/mockOrganizations';
+import { MOCK_REVIEWS } from '../api/mockReviews';
 import { OrganizationDetail } from './OrganizationDetail';
-import type { Course } from '@/features/course/types/course.type';
-import type { Review } from '../api/mockOrganizations';
 
 interface OrganizationDetailPageClientProps {
     organizationId: number;
-    mockCourses?: Course[];
-    mockReviews?: Review[];
 }
 
 /**
  * 기관 상세 페이지 클라이언트 컴포넌트
- * API 연동 성공시 실제 데이터, 실패시 mock 데이터 표시
+ * API 연동을 통해 실제 데이터 표시, 리뷰는 mock 데이터 사용
  */
 export function OrganizationDetailPageClient({
     organizationId,
-    mockCourses = [],
-    mockReviews = MOCK_REVIEWS
 }: OrganizationDetailPageClientProps) {
     // 기관 상세 정보 조회
     const {
-        data: orgApiData,
+        data: organization,
         isLoading: isOrgLoading
     } = useOrganizationDetailQuery(organizationId);
 
     // 기관별 강의 목록 조회
     const {
-        data: lecturesApiData,
+        data: courses = [],
     } = useOrganizationLecturesQuery(organizationId);
 
-    // API 데이터가 있으면 사용, 없으면 mock 데이터 fallback
-    const mockOrgData = findMockOrgDetail(organizationId);
-    const organization = orgApiData ?? mockOrgData;
-
-    // 강의 목록: API 데이터 우선, 없으면 mock fallback
-    const courses = lecturesApiData ?? mockCourses;
-
-    // 로딩 중 (기관 정보 로딩 중일 때만 스피너 표시)
-    if (isOrgLoading && !organization) {
+    // 로딩 중
+    if (isOrgLoading) {
         return (
             <div className="flex items-center justify-center py-20">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -60,8 +47,8 @@ export function OrganizationDetailPageClient({
     return (
         <OrganizationDetail
             organization={organization}
-            courses={courses}
-            reviews={mockReviews}
+            lectures={courses}
+            reviews={MOCK_REVIEWS}
         />
     );
 }

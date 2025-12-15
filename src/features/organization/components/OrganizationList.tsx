@@ -4,29 +4,12 @@ import { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { OrganizationCard } from "./OrganizationCard";
 import { useOrganizationsQuery } from "../hooks/useOrganizations";
-import { MOCK_ORGS } from "../api/mockOrganizations";
 
 export function OrganizationList() {
     const [searchTerm, setSearchTerm] = useState("");
 
-    // API에서 기관 목록 조회 (서버 사이드 필터링, 실패시 mock 데이터 사용)
-    const { data: apiData, isLoading } = useOrganizationsQuery(searchTerm || undefined);
-
-    // API 데이터가 있으면 사용, 없으면 mock 데이터 fallback
-    const organizations = apiData ?? MOCK_ORGS;
-
-    // mock 데이터 fallback 시에만 클라이언트 사이드 필터링
-    // API 데이터는 이미 서버에서 필터링됨
-    const filteredOrgs = apiData
-        ? organizations
-        : (searchTerm
-            ? organizations.filter((org) =>
-                org.name.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-            : organizations);
-
-    // 로딩 상태 (API 호출 중일 때도 mock 데이터를 보여줌)
-    const showLoading = isLoading && !apiData;
+    // API에서 기관 목록 조회 (서버 사이드 필터링)
+    const { data: organizations = [], isLoading } = useOrganizationsQuery(searchTerm || undefined);
 
     return (
         <div className="w-full pb-20 pt-10">
@@ -34,7 +17,7 @@ export function OrganizationList() {
             <div className="mb-8 flex flex-col gap-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <h2 className="text-2xl font-bold text-foreground">
-                        {filteredOrgs.length}곳의 훈련기관을 찾았어요.
+                        {organizations.length}곳의 훈련기관을 찾았어요.
                     </h2>
                     {/* Search Bar */}
                     <div className="relative w-full md:w-96">
@@ -52,17 +35,17 @@ export function OrganizationList() {
             </div>
 
             {/* Loading State */}
-            {showLoading && (
+            {isLoading && (
                 <div className="flex items-center justify-center py-20">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
                 </div>
             )}
 
             {/* Grid Section or No Results */}
-            {!showLoading && (
-                filteredOrgs.length > 0 ? (
+            {!isLoading && (
+                organizations.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {filteredOrgs.map((org) => (
+                        {organizations.map((org) => (
                             <OrganizationCard key={org.id} organization={org} />
                         ))}
                     </div>

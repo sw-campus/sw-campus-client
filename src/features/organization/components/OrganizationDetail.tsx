@@ -4,18 +4,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { CourseCard } from '@/features/course/components/CourseCard';
+import { LectureList } from '@/features/lecture/components/LectureList';
 import type { OrganizationDetail as OrganizationDetailType } from '../types/organization.type';
-import type { Course } from '@/features/course/types/course.type';
-import type { Review } from '../api/mockOrganizations';
+import type { Lecture } from '@/features/lecture/types/lecture.type';
+import type { Review } from '../api/mockReviews';
 
 interface OrganizationDetailProps {
     organization: OrganizationDetailType;
-    courses?: Course[];
+    lectures?: Lecture[];
     reviews?: Review[];
 }
 
-export function OrganizationDetail({ organization, courses = [], reviews = [] }: OrganizationDetailProps) {
+export function OrganizationDetail({ organization, lectures = [], reviews = [] }: OrganizationDetailProps) {
     // Collect facility images that exist
     const facilityImages = [
         organization.facilityImageUrl,
@@ -185,12 +185,8 @@ export function OrganizationDetail({ organization, courses = [], reviews = [] }:
                     {/* 등록된 프로그램 */}
                     <TabsContent value="programs">
                         <section>
-                            {courses.length > 0 ? (
-                                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                    {courses.map((course) => (
-                                        <CourseCard key={course.id} course={course} />
-                                    ))}
-                                </div>
+                            {lectures.length > 0 ? (
+                                <LectureList lectures={lectures} />
                             ) : (
                                 <Card className="flex h-60 flex-col items-center justify-center border-0 bg-card/40 text-center shadow-sm backdrop-blur-xl">
                                     <div className="mb-3 text-4xl">📚</div>
