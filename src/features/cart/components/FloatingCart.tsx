@@ -44,7 +44,7 @@ export default function FloatingCart() {
 
           {/* 우측 화살표 */}
           <button
-            // onClick={() => router.push('/')} // 비교하기 페이지로 이동
+            onClick={() => router.push('/cart/compare')}
             className="ml-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/30 text-white backdrop-blur-lg"
           >
             <ArrowUpRight />
