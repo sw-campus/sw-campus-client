@@ -1,31 +1,25 @@
 import { create } from 'zustand'
 
 export type SignupState = {
-  // 주소
   address: string | null
   detailAddress: string | null
 
-  // 이메일
   email: string
   isSendingEmail: boolean
   isEmailVerified: boolean
 
-  // 비밀번호
   password: string
   passwordConfirm: string
   isPasswordMatched: boolean | null
   isPasswordConfirmed: boolean
 
-  // 사용자 정보
   name: string
   nickname: string
   phone: string | null
 
-  // 기업/기관 회원 전용
   organizationName: string
   certificateImage: File | null
 
-  // actions
   setAddress: (value: string) => void
   setDetailAddress: (value: string) => void
   setEmail: (value: string) => void
@@ -44,7 +38,6 @@ export type SignupState = {
 }
 
 export const useSignupStore = create<SignupState>(set => ({
-  // 상태 초기값
   address: null,
   detailAddress: null,
   email: '',
@@ -60,7 +53,6 @@ export const useSignupStore = create<SignupState>(set => ({
   organizationName: '',
   certificateImage: null,
 
-  // actions
   setAddress: value => set({ address: value || null }),
   setDetailAddress: value => set({ detailAddress: value || null }),
   setEmail: value => set({ email: value }),
