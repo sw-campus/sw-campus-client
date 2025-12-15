@@ -1,6 +1,6 @@
 import { api } from '@/lib/axios';
 import type { OrganizationSummary, OrganizationDetail } from '../types/organization.type';
-import type { Course } from '@/features/course/types/course.type';
+import type { Lecture } from '@/features/lecture/types/lecture.type';
 
 /**
  * 기관 목록 조회 API
@@ -32,24 +32,26 @@ interface LectureResponse {
     startAt: string | null;
     endAt: string | null;
     lectureImageUrl: string | null;
+    status: string; // 'RECRUITING' | 'FINISHED'
     curriculums: { curriculumId: number; curriculumName: string; level: string }[];
 }
 
 /**
- * LectureResponse를 Course 타입으로 변환
+ * LectureResponse를 Lecture 타입으로 변환
  */
-function mapLectureToCourse(lecture: LectureResponse): Course {
+function mapLectureToLecture(lecture: LectureResponse): Lecture {
     return {
-        id: lecture.lectureId,
+        id: lecture.lectureId.toString(), // Lecture type uses string id
         title: lecture.lectureName,
         organization: lecture.orgName,
         periodStart: lecture.startAt?.split('T')[0] ?? '',
         periodEnd: lecture.endAt?.split('T')[0] ?? '',
         tags: lecture.curriculums.slice(0, 3).map(c => ({
-            id: c.curriculumId,
+            id: c.curriculumId.toString(),
             name: c.curriculumName,
         })),
         imageUrl: lecture.lectureImageUrl ?? undefined,
+        status: lecture.status,
     };
 }
 
@@ -57,7 +59,7 @@ function mapLectureToCourse(lecture: LectureResponse): Course {
  * 기관별 강의 목록 조회 API
  * @param organizationId - 기관 ID
  */
-export async function fetchOrganizationLectures(organizationId: number): Promise<Course[]> {
+export async function fetchOrganizationLectures(organizationId: number): Promise<Lecture[]> {
     const { data } = await api.get<LectureResponse[]>(`/organizations/${organizationId}/lectures`);
-    return data.map(mapLectureToCourse);
+    return data.map(mapLectureToLecture);
 }

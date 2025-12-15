@@ -9,6 +9,7 @@ export const mockLectures: Lecture[] = [
     periodEnd: '2024-04-30',
     tags: [{ id: 'cat-web', name: '웹개발' }],
     imageUrl: 'https://picsum.photos/seed/web1/300/200',
+    status: 'RECRUITING',
   },
   {
     id: 'course-2',
@@ -18,6 +19,7 @@ export const mockLectures: Lecture[] = [
     periodEnd: '2024-06-20',
     tags: [{ id: 'cat-mobile', name: '모바일' }],
     imageUrl: 'https://picsum.photos/seed/mobile2/300/200',
+    status: 'RECRUITING',
   },
   {
     id: 'course-3',
@@ -27,6 +29,7 @@ export const mockLectures: Lecture[] = [
     periodEnd: '2024-04-10',
     tags: [{ id: 'cat-game', name: '게임·블록체인' }],
     imageUrl: 'https://picsum.photos/seed/game3/300/200',
+    status: 'FINISHED',
   },
   {
     id: 'course-4',
@@ -36,5 +39,6 @@ export const mockLectures: Lecture[] = [
     periodEnd: '2024-03-01',
     tags: [{ id: 'cat-ai', name: '데이터·AI' }],
     imageUrl: 'https://picsum.photos/seed/ai4/300/200',
+    status: 'RECRUITING',
   },
 ]

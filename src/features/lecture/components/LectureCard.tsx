@@ -4,7 +4,20 @@ import { AddToCartButton } from '@/features/cart'
 import { Lecture } from '@/features/lecture/types/lecture.type'
 
 export function LectureCard({ lecture }: { lecture: Lecture }) {
-  const { id, title, organization, periodStart, periodEnd, tags, imageUrl } = lecture
+  const { id, title, organization, periodStart, periodEnd, tags, imageUrl, status } = lecture
+
+  const getStatusBadge = (status?: string) => {
+    switch (status) {
+      case 'RECRUITING':
+        return { text: '모집중', className: 'bg-emerald-500/10 text-emerald-600 border-emerald-200/50' }
+      case 'FINISHED':
+        return { text: '마감', className: 'bg-gray-500/10 text-gray-500 border-gray-200/50' }
+      default:
+        return null
+    }
+  }
+
+  const statusBadge = getStatusBadge(status)
 
   return (
     <Link
@@ -12,10 +25,15 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
       className="group relative flex h-full min-h-[300px] flex-col overflow-hidden rounded-xl p-6 backdrop-blur-xl transition hover:scale-[1.01] active:scale-[0.99]"
     >
       <div className="relative z-10 flex h-full flex-col">
-        {/* 이미지 */}
-        {/* {imageUrl && <img src={imageUrl} alt={title} className="mb-4 h-40 w-full rounded-lg object-cover" />} */}
-        {/* 콘텐츠 */}
-        <p className="mb-2 text-xs font-semibold tracking-widest">{tags[0]?.name ?? 'CATEGORY'}</p>
+        {/* 상단: 카테고리 & 상태 뱃지 */}
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-xs font-semibold tracking-widest">{tags[0]?.name ?? 'CATEGORY'}</p>
+          {statusBadge && (
+            <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${statusBadge.className}`}>
+              {statusBadge.text}
+            </span>
+          )}
+        </div>
         <h3 className="mb-3 text-xl leading-tight font-bold">{title}</h3>
         <p className="mb-4 text-sm">{organization}</p>
         <p className="mb-6 text-xs">
