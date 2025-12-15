@@ -147,7 +147,7 @@ export function useSignupForm() {
   }
 
   // 회원가입
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>, addr: SubmitAddress) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!isEmailVerified) {

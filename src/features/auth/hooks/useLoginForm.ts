@@ -1,11 +1,11 @@
 'use client'
 
 import { FormEvent, useCallback, useState } from 'react'
-
 import { useRouter } from 'next/navigation'
 
 import { login as loginApi } from '@/features/auth/authApi'
 import { useAuthStore } from '@/store/authStore'
+import { toast } from 'sonner'
 
 export function useLoginForm() {
   const router = useRouter()
@@ -20,7 +20,7 @@ export function useLoginForm() {
       e.preventDefault()
 
       if (!email || !password) {
-        alert('이메일과 비밀번호를 모두 입력해주세요.')
+        toast.error('이메일과 비밀번호를 모두 입력해주세요.')
         return
       }
 
@@ -37,7 +37,7 @@ export function useLoginForm() {
         router.push('/')
       } catch (error) {
         console.error(error)
-        alert('이메일 또는 비밀번호를 다시 확인해주세요.')
+        toast.error('이메일 또는 비밀번호를 다시 확인해주세요.')
       } finally {
         setIsLoading(false)
       }
