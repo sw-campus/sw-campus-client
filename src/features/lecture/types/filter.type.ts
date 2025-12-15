@@ -28,12 +28,12 @@ export const REGION_FILTERS = [
 ] as const
 
 export const SORT_OPTIONS: SortOption[] = [
-  { value: 'latest', label: '최신순(기본)' },
-  { value: 'fee_asc', label: '자기부담금 낮은 순' },
-  { value: 'fee_desc', label: '자기부담금 높은 순' },
-  { value: 'start_soon', label: '개강 빠른 순' },
-  { value: 'duration_asc', label: '교육기간 짧은 순' },
-  { value: 'duration_desc', label: '교육기간 긴 순' },
+  { value: 'LATEST', label: '최신순(기본)' },
+  { value: 'FEE_ASC', label: '자기부담금 낮은 순' },
+  { value: 'FEE_DESC', label: '자기부담금 높은 순' },
+  { value: 'START_SOON', label: '개강 빠른 순' },
+  { value: 'DURATION_ASC', label: '교육기간 짧은 순' },
+  { value: 'DURATION_DESC', label: '교육기간 긴 순' },
 ]
 
 export const DEFAULT_SORT = SORT_OPTIONS[0].value
