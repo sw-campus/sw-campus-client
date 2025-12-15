@@ -14,6 +14,8 @@ export interface LectureSummary {
   periodEnd: string // YYYY-MM-DD
   tags: LectureTag[]
   imageUrl?: string
+  status?: string // 'RECRUITING' | 'FINISHED' | 'PREPARING'
+  averageScore?: number // 리뷰 평균 점수
 }
 
 // Keep existing imports working
