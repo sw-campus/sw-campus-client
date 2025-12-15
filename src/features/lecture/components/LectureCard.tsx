@@ -22,7 +22,7 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
   return (
     <Link
       href={`/lectures/${id}`}
-      className="group relative flex h-full min-h-[300px] flex-col overflow-hidden rounded-xl p-6 backdrop-blur-xl transition hover:scale-[1.01] active:scale-[0.99]"
+      className="group relative flex h-full flex-col overflow-hidden rounded-xl p-6 backdrop-blur-xl transition hover:scale-[1.01] active:scale-[0.99]"
     >
       <div className="relative z-10 flex h-full flex-col">
         {/* 상단: 카테고리 & 상태 뱃지 */}
