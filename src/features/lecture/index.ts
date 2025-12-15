@@ -7,3 +7,4 @@ export * from '@/features/lecture/types/lecture.type'
 export * from '@/features/lecture/types/lecture-request.type'
 
 export * from '@/features/lecture/hooks/useCreateLectureMutation'
+export * from '@/features/lecture/hooks/useSearchLectureQuery'

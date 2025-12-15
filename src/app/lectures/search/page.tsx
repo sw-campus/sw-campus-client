@@ -2,14 +2,16 @@
 
 import { useMemo, useState } from 'react'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { LectureList } from '@/features/lecture/components/LectureList'
 import { FilterGroup } from '@/features/lecture/components/lecture-search/FilterGroups'
 import { FilterTag } from '@/features/lecture/components/lecture-search/FilterTag'
+import { useSearchLectureQuery } from '@/features/lecture/hooks/useSearchLectureQuery'
 import {
   COST_FILTERS,
   PROCEDURE_FILTERS,
@@ -20,13 +22,21 @@ import {
   PROCEDURE_QUERY_MAP,
   FilterGroupKey,
 } from '@/features/lecture/types/filter.type'
+import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLectureResponseToSummary'
 import { BOOT_NAV_DATA } from '@/features/navi/types/navigation.type'
 
 const filterSelectTriggerClass =
-  'flex items-center justify-between gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-medium text-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white'
+  'flex items-center justify-between gap-1 rounded-full border border-input bg-background px-3 py-1 text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
 
 export default function LectureSearchPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const queryString = useMemo(() => searchParams.toString(), [searchParams])
+  const { data, isLoading, isError } = useSearchLectureQuery(queryString)
+
+  const lectures = useMemo(() => (data ?? []).map(mapLectureResponseToSummary), [data])
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null)
   const [selectedCost, setSelectedCost] = useState<string | null>(null)
@@ -207,7 +217,7 @@ export default function LectureSearchPage() {
           </Select>
 
           <Input
-            className="min-w-[220px] flex-1"
+            className="text-shadow-accent min-w-[220px] flex-1"
             type="text"
             placeholder="검색어를 입력해주세요."
             value={searchTerm}
@@ -223,7 +233,17 @@ export default function LectureSearchPage() {
         </div>
       </div>
 
-      <div className="custom-card"></div>
+      <div className="custom-card">
+        {isLoading ? (
+          <div className="py-10 text-center text-sm">강의 목록을 불러오는 중...</div>
+        ) : isError ? (
+          <div className="text-destructive py-10 text-center text-sm">강의 목록을 불러오지 못했습니다.</div>
+        ) : lectures.length === 0 ? (
+          <div className="py-10 text-center text-sm">검색 결과가 없습니다.</div>
+        ) : (
+          <LectureList lectures={lectures} />
+        )}
+      </div>
     </div>
   )
 }
