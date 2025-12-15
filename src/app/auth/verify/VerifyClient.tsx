@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation'
 
 import { getVerifyEmailRedirectUrl } from '@/lib/axios'
 
-export default function VerifyPage() {
+export default function VerifyClient() {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
 
