@@ -66,7 +66,7 @@ export default function Header({
         >
           부트캠프
         </Link>
-        <Link href="/" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
+        <Link href="/organizations" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
           훈련 기관
         </Link>
         <Link href="/" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
