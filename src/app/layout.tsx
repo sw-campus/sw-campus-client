@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="relative flex min-h-screen flex-col bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat">
+      <body className="relative flex min-h-screen flex-col bg-[url('/images/bg.jpg')] bg-cover bg-fixed bg-top bg-no-repeat">
         <div className="pointer-events-none absolute inset-0 bg-black/40" />
         <QueryClientProviderWrapper>
           {children}
