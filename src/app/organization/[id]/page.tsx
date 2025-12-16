@@ -13,7 +13,10 @@ export default async function OrganizationDetailPage({ params }: OrganizationDet
   const { id } = await params
   const orgId = parseInt(id, 10)
 
-  if (isNaN(orgId) || orgId <= 0) notFound()
+  // 유효하지 않은 ID인 경우 404 반환
+  if (isNaN(orgId) || orgId <= 0) {
+    notFound()
+  }
 
   return (
     <>

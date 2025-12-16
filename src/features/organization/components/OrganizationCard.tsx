@@ -4,15 +4,8 @@ import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 
 import type { OrganizationSummary } from '../types/organization.type'
-import Image from 'next/image'
-import Link from 'next/link'
-
-import { Card } from '@/components/ui/card'
-
-import type { OrganizationSummary } from '../types/organization.type'
 
 interface OrganizationCardProps {
-  organization: OrganizationSummary
   organization: OrganizationSummary
 }
 
@@ -37,24 +30,10 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
 
         {/* Organization Name */}
         <h3 className="text-foreground mb-1.5 text-base font-semibold">{organization.name}</h3>
-        {/* Organization Name */}
-        <h3 className="text-foreground mb-1.5 text-base font-semibold">{organization.name}</h3>
 
         {/* Description */}
         <p className="text-muted-foreground mb-3 line-clamp-2 text-sm leading-relaxed">{organization.description}</p>
-        {/* Description */}
-        <p className="text-muted-foreground mb-3 line-clamp-2 text-sm leading-relaxed">{organization.description}</p>
 
-        {/* Recruiting Badge - Green semantic color */}
-        {organization.recruitingLectureCount > 0 && (
-          <span className="bg-accent/20 text-accent-foreground mt-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium">
-            <span className="bg-accent h-1.5 w-1.5 rounded-full" />
-            {organization.recruitingLectureCount}개 모집 중
-          </span>
-        )}
-      </Card>
-    </Link>
-  )
         {/* Recruiting Badge - Green semantic color */}
         {organization.recruitingLectureCount > 0 && (
           <span className="bg-accent/20 text-accent-foreground mt-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium">
