@@ -31,7 +31,7 @@ import {
 import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLectureResponseToSummary'
 
 const filterSelectTriggerClass =
-  'flex items-center justify-between gap-1 rounded-full border border-input !bg-white px-3 py-1 text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+  'flex items-center justify-between gap-1 rounded-full border border-input bg-background px-3 py-1 text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
 
 export default function LectureSearchPage() {
   const router = useRouter()
@@ -76,6 +76,30 @@ export default function LectureSearchPage() {
     return parent?.children ?? []
   }, [level2Id, level2Categories])
 
+  // Category ID → Path 매핑 (O(1) 조회를 위한 최적화)
+  type CategoryPath = { l1: number; l2?: number; l3?: number }
+  const categoryPathMap = useMemo(() => {
+    const map = new Map<number, CategoryPath>()
+    if (!categoryTree) return map
+
+    for (const l1 of categoryTree) {
+      map.set(l1.categoryId, { l1: l1.categoryId })
+
+      if (l1.children) {
+        for (const l2 of l1.children) {
+          map.set(l2.categoryId, { l1: l1.categoryId, l2: l2.categoryId })
+
+          if (l2.children) {
+            for (const l3 of l2.children) {
+              map.set(l3.categoryId, { l1: l1.categoryId, l2: l2.categoryId, l3: l3.categoryId })
+            }
+          }
+        }
+      }
+    }
+    return map
+  }, [categoryTree])
+
   // Reset Child Categories on Parent Change
   // Sync State with URL Params
   useEffect(() => {
@@ -97,35 +121,22 @@ export default function LectureSearchPage() {
     let foundL2: number | null = null
     const foundL3s: string[] = []
 
-    // Helper to find path
-    const findPath = (id: number): { l1: number, l2?: number, l3?: number } | null => {
-      for (const l1 of categoryTree) {
-        if (l1.categoryId === id) return { l1: l1.categoryId }
-
-        if (l1.children) {
-          for (const l2 of l1.children) {
-            if (l2.categoryId === id) return { l1: l1.categoryId, l2: l2.categoryId }
-
-            if (l2.children) {
-              for (const l3 of l2.children) {
-                if (l3.categoryId === id) return { l1: l1.categoryId, l2: l2.categoryId, l3: l3.categoryId }
-              }
-            }
-          }
-        }
-      }
-      return null
-    }
-
     // Process all Category IDs
     categoryIdsParam.forEach(idStr => {
       const id = Number(idStr)
       if (!id) return
 
-      const path = findPath(id)
+      const path = categoryPathMap.get(id)
       if (path) {
-        if (path.l1) foundL1 = path.l1
-        if (path.l2) foundL2 = path.l2
+        // L1이 변경되면 하위 상태(L2)도 초기화
+        if (path.l1 && path.l1 !== foundL1) {
+          foundL1 = path.l1
+          foundL2 = null // L1이 바뀌면 L2는 반드시 초기화
+        }
+        // L2는 현재 L1의 자식일 때만 업데이트
+        if (path.l2 && path.l1 === foundL1) {
+          foundL2 = path.l2
+        }
         if (path.l3) foundL3s.push(String(path.l3))
       }
     })
@@ -139,7 +150,7 @@ export default function LectureSearchPage() {
     const isL3Same = foundL3s.length === level3Ids.length && foundL3s.every(id => level3Ids.includes(id))
     if (!isL3Same) setLevel3Ids(foundL3s)
 
-  }, [searchParams, categoryTree])
+  }, [searchParams, categoryTree, categoryPathMap])
 
   const toggleFilter = (group: FilterGroupKey, label: string) => {
     setActiveFilters(prev => {

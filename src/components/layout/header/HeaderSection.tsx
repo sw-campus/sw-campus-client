@@ -26,9 +26,7 @@ export default function HeaderSection() {
     setActiveMenu(null)
   }
 
-  const handleDesktopEnter = (categoryId: number) => {
-    setActiveMenu(categoryId)
-  }
+
 
   const handleDesktopLeave = () => {
     hideDesktopNav()
