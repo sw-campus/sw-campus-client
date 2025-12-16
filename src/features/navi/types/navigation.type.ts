@@ -9,5 +9,3 @@ export interface NavItem {
 }
 
 export type NavData = NavItem[]
-
-

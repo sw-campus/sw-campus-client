@@ -1,9 +1,10 @@
 'use client'
 
+import { useMemo } from 'react'
+
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useMemo } from 'react'
 import { FiX } from 'react-icons/fi'
 
 import {
@@ -39,14 +40,16 @@ export default function Navigation({
     if (!categoryTree) return []
     return categoryTree.map(l1 => ({
       title: l1.categoryName,
-      items: l1.children?.map(l2 => ({
-        title: l2.categoryName,
-        href: `/lectures/search?categoryIds=${l2.categoryId}`,
-        items: l2.children?.map(l3 => ({
-          title: l3.categoryName,
-          href: `/lectures/search?categoryIds=${l3.categoryId}`,
-        })) || []
-      })) || [],
+      items:
+        l1.children?.map(l2 => ({
+          title: l2.categoryName,
+          href: `/lectures/search?categoryIds=${l2.categoryId}`,
+          items:
+            l2.children?.map(l3 => ({
+              title: l3.categoryName,
+              href: `/lectures/search?categoryIds=${l3.categoryId}`,
+            })) || [],
+        })) || [],
     }))
   }, [categoryTree])
 
@@ -59,10 +62,11 @@ export default function Navigation({
     return activeCategory.children.map(l2 => ({
       title: l2.categoryName,
       href: `/lectures/search?categoryIds=${l2.categoryId}`,
-      children: l2.children?.map(l3 => ({
-        title: l3.categoryName,
-        href: `/lectures/search?categoryIds=${l3.categoryId}`,
-      })) || []
+      children:
+        l2.children?.map(l3 => ({
+          title: l3.categoryName,
+          href: `/lectures/search?categoryIds=${l3.categoryId}`,
+        })) || [],
     }))
   }, [categoryTree, activeMenu])
 
@@ -101,7 +105,7 @@ export default function Navigation({
                   <div className="ml-2 flex flex-col gap-2">
                     {item.items.map(child => (
                       <div key={child.title} className="flex flex-col gap-1">
-                        <Link href={child.href} className="text-gray-600 hover:text-orange-500 font-medium">
+                        <Link href={child.href} className="font-medium text-gray-600 hover:text-orange-500">
                           {child.title}
                         </Link>
                         {/* 소분류 렌더링 */}
@@ -141,20 +145,29 @@ export default function Navigation({
             onMouseEnter={onDesktopEnter}
             onMouseLeave={onDesktopLeave}
           >
-            <NavigationMenuList className="justify-start flex-wrap gap-y-2">
+            <NavigationMenuList className="flex-wrap justify-start gap-y-2">
               {activeCategoryChildren.length > 0 ? (
                 activeCategoryChildren.map((item, key) => (
                   <NavigationMenuItem key={key} className="relative">
                     {item.children.length > 0 ? (
                       <>
-                        <NavigationMenuTrigger onClick={() => router.push(item.href)}>{item.title}</NavigationMenuTrigger>
-                        <NavigationMenuContent className="absolute top-8 left-0 w-max min-w-[220px] bg-white rounded-lg shadow-xl z-[100] mt-0 before:absolute before:-top-4 before:-left-10 before:h-10 before:w-[200%] before:bg-transparent">
+                        <NavigationMenuTrigger onClick={() => router.push(item.href)}>
+                          {item.title}
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent className="absolute top-8 left-0 z-[100] mt-0 w-max min-w-[220px] rounded-lg bg-white shadow-xl before:absolute before:-top-4 before:-left-10 before:h-10 before:w-[200%] before:bg-transparent">
                           <div className="flex flex-col gap-2 p-4">
-                            <Link href={item.href} className="font-semibold hover:text-accent-foreground mb-2 whitespace-nowrap">
+                            <Link
+                              href={item.href}
+                              className="hover:text-accent-foreground mb-2 font-semibold whitespace-nowrap"
+                            >
                               전체
                             </Link>
                             {item.children.map(child => (
-                              <Link href={child.href} key={child.title} className="hover:text-accent-foreground text-sm whitespace-nowrap">
+                              <Link
+                                href={child.href}
+                                key={child.title}
+                                className="hover:text-accent-foreground text-sm whitespace-nowrap"
+                              >
                                 {child.title}
                               </Link>
                             ))}
@@ -163,17 +176,13 @@ export default function Navigation({
                       </>
                     ) : (
                       <Link href={item.href} legacyBehavior passHref>
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                          {item.title}
-                        </NavigationMenuLink>
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>{item.title}</NavigationMenuLink>
                       </Link>
                     )}
                   </NavigationMenuItem>
                 ))
               ) : (
-                <div className="p-4 text-sm text-gray-500">
-                  하위 카테고리가 없습니다.
-                </div>
+                <div className="p-4 text-sm text-gray-500">하위 카테고리가 없습니다.</div>
               )}
             </NavigationMenuList>
           </NavigationMenu>

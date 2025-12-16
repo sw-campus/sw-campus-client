@@ -43,7 +43,7 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
             <span className="text-amber-500">★</span>
             <span className="text-sm font-medium">{averageScore.toFixed(1)}</span>
             {lecture.reviewCount !== undefined && (
-              <span className="text-xs text-muted-foreground">({lecture.reviewCount})</span>
+              <span className="text-muted-foreground text-xs">({lecture.reviewCount})</span>
             )}
           </div>
         )}

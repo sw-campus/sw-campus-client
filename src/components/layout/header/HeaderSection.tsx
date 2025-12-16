@@ -26,8 +26,6 @@ export default function HeaderSection() {
     setActiveMenu(null)
   }
 
-
-
   const handleDesktopLeave = () => {
     hideDesktopNav()
   }
@@ -46,7 +44,7 @@ export default function HeaderSection() {
           setOpen(false)
           hideDesktopNav()
         }}
-        onDesktopEnter={() => { }}
+        onDesktopEnter={() => {}}
         onDesktopLeave={handleDesktopLeave}
       />
     </div>

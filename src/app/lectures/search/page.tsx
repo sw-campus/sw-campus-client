@@ -149,7 +149,6 @@ export default function LectureSearchPage() {
     // 배열 비교
     const isL3Same = foundL3s.length === level3Ids.length && foundL3s.every(id => level3Ids.includes(id))
     if (!isL3Same) setLevel3Ids(foundL3s)
-
   }, [searchParams, categoryTree, categoryPathMap])
 
   const toggleFilter = (group: FilterGroupKey, label: string) => {
@@ -208,7 +207,7 @@ export default function LectureSearchPage() {
     }
 
     // Procedure Filters (Inverted logic for "No ...")
-    ; (activeFilters.procedure ?? []).forEach(filter => {
+    ;(activeFilters.procedure ?? []).forEach(filter => {
       const parameter = PROCEDURE_QUERY_MAP[filter]
       if (parameter) {
         // Special handling for "No ...인" filters
@@ -219,12 +218,11 @@ export default function LectureSearchPage() {
         }
       }
     })
-
-      ; (activeFilters.region ?? []).forEach(region => {
-        // Use mapping if available, otherwise use original label
-        const shortRegion = REGION_QUERY_MAP[region] ?? region
-        params.append('regions', shortRegion)
-      })
+    ;(activeFilters.region ?? []).forEach(region => {
+      // Use mapping if available, otherwise use original label
+      const shortRegion = REGION_QUERY_MAP[region] ?? region
+      params.append('regions', shortRegion)
+    })
 
     const trimmedText = searchTerm.trim()
     if (trimmedText) {
@@ -241,8 +239,8 @@ export default function LectureSearchPage() {
 
   // Convert categories to options for MultiSelect
   const level3Options = useMemo(
-    () => categoryTree ? level3Categories.map(c => ({ label: c.categoryName, value: String(c.categoryId) })) : [],
-    [level3Categories, categoryTree]
+    () => (categoryTree ? level3Categories.map(c => ({ label: c.categoryName, value: String(c.categoryId) })) : []),
+    [level3Categories, categoryTree],
   )
 
   return (
