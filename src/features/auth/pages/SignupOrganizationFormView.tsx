@@ -53,7 +53,7 @@ export default function SignupOrganizationFormView() {
         isEmailVerified={isEmailVerified}
         isSendingEmail={isSendingEmail}
         onEmailChange={setEmail}
-        onClickAuth={handleSendEmailAuth}
+        onClickAuth={() => handleSendEmailAuth('organization')}
       />
 
       {/* 비밀번호 + 비밀번호 확인 */}

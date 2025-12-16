@@ -99,12 +99,12 @@ export function useSignupOrganizationForm() {
   }
 
   // 이메일 인증 메일 보내기
-  const handleSendEmailAuth = async () => {
+  const handleSendEmailAuth = async (signupType: 'personal' | 'organization' = 'personal') => {
     if (isEmailVerified) return
 
     try {
       setIsSendingEmail(true)
-      await sendEmailAuth(email)
+      await sendEmailAuth(email, signupType)
       toast.success('인증 메일을 발송했습니다. 메일함을 확인해 주세요.')
       setIsEmailVerified(false)
     } catch (error: any) {
