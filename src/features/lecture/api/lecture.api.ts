@@ -47,3 +47,11 @@ export const getLectureSearch = async (queryString: string): Promise<LectureResp
   throw new Error('Unexpected /lectures/search response shape')
 }
 
+/**
+ * 카테고리별 평점 높은 강의 조회 API
+ * @param categoryId - 카테고리 ID
+ */
+export const getTopRatedLecturesByCategory = async (categoryId: number): Promise<LectureResponseDto[]> => {
+  const res = await api.get(`/lectures/category/${categoryId}/top-rated`)
+  return res.data
+}

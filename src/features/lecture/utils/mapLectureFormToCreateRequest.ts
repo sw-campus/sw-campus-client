@@ -7,7 +7,6 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
   // 파일명은 로깅/참조용으로 전송되며, 실제 파일은 FormData를 통해 서버로 전송되어 S3에 업로드됩니다.
   const lectureImageUrl = values.lectureImageFile?.name ?? null
 
-
   const steps = (values.recruitProcedures ?? []).map((p, idx) => ({
     stepType: p.type,
     stepOrder: idx + 1,
@@ -18,9 +17,9 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
   // 커리큘럼 매핑
   const curriculums = values.curriculums?.length
     ? values.curriculums.map(c => ({
-      curriculumId: c.curriculumId,
-      level: c.level,
-    }))
+        curriculumId: c.curriculumId,
+        level: c.level,
+      }))
     : undefined
 
   return {
@@ -59,13 +58,12 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     quals: values.quals?.length ? values.quals : undefined,
     teachers: values.teachers?.length
       ? values.teachers.map(t => ({
-        teacherName: t.teacherName,
-        teacherDescription: t.teacherDescription ?? null,
-        teacherImageUrl: t.teacherImageFile?.name ?? null,
-      }))
+          teacherName: t.teacherName,
+          teacherDescription: t.teacherDescription ?? null,
+          teacherImageUrl: t.teacherImageFile?.name ?? null,
+        }))
       : undefined,
     adds: values.adds?.length ? values.adds : undefined,
     curriculums,
   }
 }
-

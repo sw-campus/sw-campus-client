@@ -5,15 +5,18 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FiLogIn, FiUser, FiHeart, FiMenu, FiLogOut } from 'react-icons/fi'
 
+import type { CategoryTreeNode } from '@/features/category'
 import { useAuthStore } from '@/store/authStore'
 
 export default function Header({
+  categories,
   onOpenNav,
-  onBootcampEnter,
+  onCategoryEnter,
   onOtherNavEnter,
 }: {
+  categories: CategoryTreeNode[]
   onOpenNav: () => void
-  onBootcampEnter: () => void
+  onCategoryEnter: (id: number) => void
   onOtherNavEnter: () => void
 }) {
   const router = useRouter()
@@ -56,16 +59,18 @@ export default function Header({
         </Link>
       </div>
 
-      {/* 네비게이션 */}
       <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 text-sm text-white md:flex">
-        <Link
-          href="/lectures/search"
-          onMouseEnter={onBootcampEnter}
-          onFocus={onBootcampEnter}
-          onClick={onBootcampEnter}
-        >
-          부트캠프
-        </Link>
+        {categories.map(category => (
+          <Link
+            key={category.categoryId}
+            href={`/lectures/search?categoryIds=${category.categoryId}`}
+            onMouseEnter={() => onCategoryEnter(category.categoryId)}
+            onFocus={() => onCategoryEnter(category.categoryId)}
+            onClick={() => onCategoryEnter(category.categoryId)}
+          >
+            {category.categoryName}
+          </Link>
+        ))}
         <Link href="/organizations" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
           훈련 기관
         </Link>

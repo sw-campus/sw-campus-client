@@ -1,6 +1,8 @@
 import { api } from '@/lib/axios';
 import type { OrganizationSummary, OrganizationDetail } from '../types/organization.type';
 import type { Lecture } from '@/features/lecture/types/lecture.type';
+import type { LectureResponseDto } from '@/features/lecture/types/lecture-response.type';
+import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLectureResponseToSummary';
 
 /**
  * 기관 목록 조회 API
@@ -22,46 +24,10 @@ export async function fetchOrganizationDetail(organizationId: number): Promise<O
 }
 
 /**
- * LectureResponse API 응답 타입 (간소화)
- */
-interface LectureResponse {
-    lectureId: number;
-    orgId: number;
-    orgName: string;
-    lectureName: string;
-    startAt: string | null;
-    endAt: string | null;
-    lectureImageUrl: string | null;
-    status: string; // 'RECRUITING' | 'FINISHED'
-    averageScore: number | null; // 리뷰 평균 점수
-    curriculums: { curriculumId: number; curriculumName: string; level: string }[];
-}
-
-/**
- * LectureResponse를 Lecture 타입으로 변환
- */
-function mapLectureToLecture(lecture: LectureResponse): Lecture {
-    return {
-        id: lecture.lectureId.toString(), // Lecture type uses string id
-        title: lecture.lectureName,
-        organization: lecture.orgName,
-        periodStart: lecture.startAt?.split('T')[0] ?? '',
-        periodEnd: lecture.endAt?.split('T')[0] ?? '',
-        tags: lecture.curriculums.slice(0, 3).map(c => ({
-            id: c.curriculumId.toString(),
-            name: c.curriculumName,
-        })),
-        imageUrl: lecture.lectureImageUrl ?? undefined,
-        status: lecture.status,
-        averageScore: lecture.averageScore ?? undefined,
-    };
-}
-
-/**
  * 기관별 강의 목록 조회 API
  * @param organizationId - 기관 ID
  */
 export async function fetchOrganizationLectures(organizationId: number): Promise<Lecture[]> {
-    const { data } = await api.get<LectureResponse[]>(`/organizations/${organizationId}/lectures`);
-    return data.map(mapLectureToLecture);
+    const { data } = await api.get<LectureResponseDto[]>(`/organizations/${organizationId}/lectures`);
+    return data.map(mapLectureResponseToSummary);
 }
