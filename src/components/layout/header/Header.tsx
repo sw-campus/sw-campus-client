@@ -87,13 +87,13 @@ export default function Header({
               className="flex items-center gap-2 text-sm transition hover:opacity-80"
             >
               <FiLogOut className="text-xl" />
-              <Link href="/mypage/organization">
-                <FiUser className="text-xl" />
-              </Link>
-              <Link href="/">
-                <FiHeart className="text-xl" />
-              </Link>
             </button>
+            <Link href="/mypage/organization">
+              <FiUser className="text-xl" />
+            </Link>
+            <Link href="/">
+              <FiHeart className="text-xl" />
+            </Link>
           </>
         ) : (
           <>

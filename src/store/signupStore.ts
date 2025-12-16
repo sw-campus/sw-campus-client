@@ -1,5 +1,11 @@
 import { create } from 'zustand'
 
+/**
+ *  userType: 'personal' | 'organization' | null
+ * - 'personal': 개인 회원
+ * - 'organization': 기관 회원
+ * - null: 미로그인/미설정
+ */
 export type SignupState = {
   address: string | null
   detailAddress: string | null
@@ -19,6 +25,10 @@ export type SignupState = {
 
   organizationName: string
   certificateImage: File | null
+
+  userType: 'personal' | 'organization' | null
+
+  setUserType: (value: 'personal' | 'organization' | null) => void
 
   setAddress: (value: string) => void
   setDetailAddress: (value: string) => void
@@ -53,6 +63,8 @@ export const useSignupStore = create<SignupState>(set => ({
   organizationName: '',
   certificateImage: null,
 
+  userType: null,
+
   setAddress: value => set({ address: value || null }),
   setDetailAddress: value => set({ detailAddress: value || null }),
   setEmail: value => set({ email: value }),
@@ -67,6 +79,8 @@ export const useSignupStore = create<SignupState>(set => ({
   setPhone: value => set({ phone: value }),
   setOrganizationName: value => set({ organizationName: value }),
   setCertificateImage: value => set({ certificateImage: value }),
+
+  setUserType: value => set({ userType: value }),
 
   reset: () =>
     set({
@@ -84,5 +98,6 @@ export const useSignupStore = create<SignupState>(set => ({
       phone: null,
       organizationName: '',
       certificateImage: null,
+      userType: null,
     }),
 }))
