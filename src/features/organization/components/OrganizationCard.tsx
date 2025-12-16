@@ -15,9 +15,9 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
       <Card className="bg-card/40 flex h-full flex-col items-center border-0 p-5 text-center shadow-sm backdrop-blur-xl transition-all duration-200 hover:scale-[1.02] hover:shadow-lg">
         {/* Circular Logo with Ring */}
         <div className="bg-card ring-border group-hover:ring-primary/30 mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full shadow-sm ring-2 transition-all group-hover:shadow-md">
-          {organization.logoUrl ? (
+          {organization.imageUrl ? (
             <Image
-              src={organization.logoUrl}
+              src={organization.imageUrl}
               alt={organization.name}
               width={64}
               height={64}

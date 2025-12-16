@@ -160,10 +160,7 @@ export function useSignupForm() {
       return
     }
 
-    const location =
-      addr.address && addr.detailAddress
-        ? `${addr.address} ${addr.detailAddress}`
-        : (addr.address ?? addr.detailAddress ?? null)
+    const location = address && detailAddress ? `${address} ${detailAddress}` : (address ?? detailAddress ?? null)
 
     const payload: SignupInput = {
       email,

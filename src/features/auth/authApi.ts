@@ -18,8 +18,8 @@ export const checkEmailStatus = async (email: string) => {
 }
 
 // 이메일 인증 메일 보내기
-export const sendEmailAuth = async (email: string) => {
-  const res = await api.post('/auth/email/send', { email })
+export const sendEmailAuth = async (email: string, signupType: 'personal' | 'organization' = 'personal') => {
+  const res = await api.post('/auth/email/send', { email, signupType })
   return res.data
 }
 
