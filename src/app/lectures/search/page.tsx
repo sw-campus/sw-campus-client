@@ -77,14 +77,69 @@ export default function LectureSearchPage() {
   }, [level2Id, level2Categories])
 
   // Reset Child Categories on Parent Change
+  // Sync State with URL Params
   useEffect(() => {
-    setLevel2Id(null)
-    setLevel3Ids([])
-  }, [level1Id])
+    if (!categoryTree || categoryTree.length === 0) return
 
-  useEffect(() => {
-    setLevel3Ids([])
-  }, [level2Id])
+    const categoryIdsParam = searchParams.getAll('categoryIds')
+    if (categoryIdsParam.length === 0) {
+      setLevel1Id(null)
+      setLevel2Id(null)
+      setLevel3Ids([])
+      return
+    }
+
+    // Find deepest category level from URL
+    // URL에 여러 ID가 있을 수 있음 (L3 다중 선택 등)
+    // 여기서는 첫 번째 유효한 ID를 기준으로 L1, L2를 설정하고, L3는 모아서 설정
+
+    let foundL1: number | null = null
+    let foundL2: number | null = null
+    const foundL3s: string[] = []
+
+    // Helper to find path
+    const findPath = (id: number): { l1: number, l2?: number, l3?: number } | null => {
+      for (const l1 of categoryTree) {
+        if (l1.categoryId === id) return { l1: l1.categoryId }
+
+        if (l1.children) {
+          for (const l2 of l1.children) {
+            if (l2.categoryId === id) return { l1: l1.categoryId, l2: l2.categoryId }
+
+            if (l2.children) {
+              for (const l3 of l2.children) {
+                if (l3.categoryId === id) return { l1: l1.categoryId, l2: l2.categoryId, l3: l3.categoryId }
+              }
+            }
+          }
+        }
+      }
+      return null
+    }
+
+    // Process all Category IDs
+    categoryIdsParam.forEach(idStr => {
+      const id = Number(idStr)
+      if (!id) return
+
+      const path = findPath(id)
+      if (path) {
+        if (path.l1) foundL1 = path.l1
+        if (path.l2) foundL2 = path.l2
+        if (path.l3) foundL3s.push(String(path.l3))
+      }
+    })
+
+    // Update State
+    // Only update if changed to avoid loops (though SetState handles this)
+    if (foundL1 !== level1Id) setLevel1Id(foundL1)
+    if (foundL2 !== level2Id) setLevel2Id(foundL2)
+
+    // 배열 비교
+    const isL3Same = foundL3s.length === level3Ids.length && foundL3s.every(id => level3Ids.includes(id))
+    if (!isL3Same) setLevel3Ids(foundL3s)
+
+  }, [searchParams, categoryTree])
 
   const toggleFilter = (group: FilterGroupKey, label: string) => {
     setActiveFilters(prev => {
@@ -189,7 +244,11 @@ export default function LectureSearchPage() {
             <FilterGroup label="대분류">
               <Select
                 value={level1Id?.toString() ?? ''}
-                onValueChange={v => setLevel1Id(v ? Number(v) : null)}
+                onValueChange={v => {
+                  setLevel1Id(v ? Number(v) : null)
+                  setLevel2Id(null) // Reset child
+                  setLevel3Ids([]) // Reset child
+                }}
               >
                 <SelectTrigger className={`${filterSelectTriggerClass} w-[220px]`}>
                   <SelectValue placeholder="대분류 선택" />
@@ -210,7 +269,10 @@ export default function LectureSearchPage() {
             <FilterGroup label="중분류">
               <Select
                 value={level2Id?.toString() ?? ''}
-                onValueChange={v => setLevel2Id(v ? Number(v) : null)}
+                onValueChange={v => {
+                  setLevel2Id(v ? Number(v) : null)
+                  setLevel3Ids([]) // Reset child
+                }}
                 disabled={!level1Id || level2Categories.length === 0}
               >
                 <SelectTrigger className={`${filterSelectTriggerClass} w-[220px]`}>
