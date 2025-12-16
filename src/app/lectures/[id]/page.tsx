@@ -1,9 +1,7 @@
-import { LectureDetailPage } from '@/features/lectures/components/LectureDetailPage'
+import LectureDetailPage from '@/features/lecture/components/LectureDetailPage'
 
-interface PageProps {
-  params: { id: string }
-}
-
-export default function Page({ params }: PageProps) {
-  return <LectureDetailPage lectureId={params.id} />
+export default async function Page({ params }: { params: { id: string } }) {
+  const resolvedParams = await params
+  const id = typeof resolvedParams.id === 'string' ? resolvedParams.id : await resolvedParams.id
+  return <LectureDetailPage lectureId={id} />
 }

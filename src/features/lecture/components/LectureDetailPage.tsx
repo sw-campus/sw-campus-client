@@ -1,7 +1,7 @@
 'use client'
-
 import { useMemo, type ReactNode } from 'react'
 
+import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 
 import { Badge } from '@/components/ui/badge'
@@ -9,38 +9,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
-type LectureSchedule = {
-  recruitPeriod: { start: string; end: string }
-  coursePeriod: { start: string; end: string }
-  days: string
-  time: string
-  totalHours: number
-}
-
-type LectureSupport = {
-  tuition?: number
-  stipend?: string
-  extraSupport?: string
-}
-
-type LectureDetail = {
-  id: string
-  title: string
-  orgName: string
-  tags: string[]
-  thumbnailUrl?: string
-  summary: string
-  schedule: LectureSchedule
-  support: LectureSupport
-  location: string
-  recruitStatus: 'OPEN' | 'CLOSED' | 'DRAFT'
-  photos: string[]
-}
+import { getLectureDetail, type LectureDetail } from '@/features/lecture/api/lectureApi'
 
 function formatDateDot(iso: string) {
   return iso.replaceAll('-', '.')
 }
+
 function formatKRW(n?: number) {
   if (typeof n !== 'number') return '-'
   return new Intl.NumberFormat('ko-KR').format(n)
@@ -50,11 +24,14 @@ interface Props {
   lectureId: string
 }
 
-export function LectureDetailPage({ lectureId }: Props) {
-  const data: LectureDetail | undefined = undefined
-  const isLoading = false
+export default function LectureDetailPage({ lectureId }: Props) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['lectureDetail', lectureId],
+    queryFn: () => getLectureDetail(lectureId),
+    staleTime: 1000 * 60,
+  })
 
-  // ✅ UI 확인용 더미 (API 연결되면 data가 우선)
+  // 더미 데이터 (로딩/에러/데이터 없음 시)
   const mock: LectureDetail = useMemo(
     () => ({
       id: lectureId,
@@ -84,6 +61,13 @@ export function LectureDetailPage({ lectureId }: Props) {
   )
 
   const lecture = data ?? mock
+
+  if (isLoading) {
+    return <div className="text-muted-foreground py-20 text-center">로딩 중...</div>
+  }
+  if (isError) {
+    return <div className="text-destructive py-20 text-center">데이터를 불러오지 못했습니다.</div>
+  }
 
   return (
     <div className="custom-container">
