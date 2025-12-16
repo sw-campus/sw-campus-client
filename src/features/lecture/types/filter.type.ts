@@ -34,6 +34,8 @@ export const SORT_OPTIONS: SortOption[] = [
   { value: 'START_SOON', label: '마감 임박순' },
   { value: 'DURATION_ASC', label: '교육기간 짧은 순' },
   { value: 'DURATION_DESC', label: '교육기간 긴 순' },
+  { value: 'REVIEW_COUNT_DESC', label: '후기 많은순' },
+  { value: 'SCORE_DESC', label: '별점순' },
 ]
 
 export const DEFAULT_SORT = SORT_OPTIONS[0].value
