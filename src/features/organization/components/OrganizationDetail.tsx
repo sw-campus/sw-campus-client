@@ -63,9 +63,9 @@ export function OrganizationDetail({ organization, lectures = [], reviews = [] }
 
                     {/* Homepage Button */}
                     <Link
-                        href={organization.homepageUrl || '#'}
-                        target={organization.homepageUrl ? '_blank' : undefined}
-                        rel={organization.homepageUrl ? 'noopener noreferrer' : undefined}
+                        href={organization.homepage || '#'}
+                        target={organization.homepage ? '_blank' : undefined}
+                        rel={organization.homepage ? 'noopener noreferrer' : undefined}
                         className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg transition-all duration-200 hover:bg-primary/90 hover:scale-105"
                     >
                         홈페이지 바로가기

@@ -26,6 +26,6 @@ export interface OrganizationDetail {
     facilityImageUrl3: string | null;
     facilityImageUrl4: string | null;
     logoUrl: string | null;
-    homepageUrl?: string | null;  // 기관 홈페이지 URL (optional)
+    homepage?: string | null;  // 기관 홈페이지 URL (optional)
 }
 

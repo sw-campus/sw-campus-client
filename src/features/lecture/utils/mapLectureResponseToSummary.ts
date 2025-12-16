@@ -52,5 +52,6 @@ export const mapLectureResponseToSummary = (dto: LectureResponseDto): LectureSum
     imageUrl: dto.lectureImageUrl ?? undefined,
     status: dto.status ?? undefined, // Pass status for badge
     averageScore: dto.averageScore ?? undefined, // Pass score for star rating
+    reviewCount: dto.reviewCount ?? undefined, // Pass review count
   }
 }

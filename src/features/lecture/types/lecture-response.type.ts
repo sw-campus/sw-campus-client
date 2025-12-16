@@ -88,4 +88,5 @@ export interface LectureResponseDto {
   curriculums: LectureCurriculumResponseDto[]
   categoryName: string | null
   averageScore: number | null
+  reviewCount: number | null
 }

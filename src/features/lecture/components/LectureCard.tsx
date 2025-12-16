@@ -37,10 +37,14 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
         <h3 className="mb-3 text-xl leading-tight font-bold">{title}</h3>
         <p className="mb-2 text-sm">{organization}</p>
         {/* 별점 */}
-        {averageScore !== undefined && averageScore !== null && (
+        {/* 별점 (리뷰가 있을 때만 표시) */}
+        {averageScore !== undefined && averageScore !== null && averageScore > 0 && (
           <div className="mb-2 flex items-center gap-1">
             <span className="text-amber-500">★</span>
             <span className="text-sm font-medium">{averageScore.toFixed(1)}</span>
+            {lecture.reviewCount !== undefined && (
+              <span className="text-xs text-muted-foreground">({lecture.reviewCount})</span>
+            )}
           </div>
         )}
         <p className="mb-6 text-xs">

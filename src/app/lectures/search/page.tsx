@@ -31,7 +31,7 @@ import {
 import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLectureResponseToSummary'
 
 const filterSelectTriggerClass =
-  'flex items-center justify-between gap-1 rounded-full border border-input bg-background px-3 py-1 text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+  'flex items-center justify-between gap-1 rounded-full border border-input !bg-white px-3 py-1 text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
 
 export default function LectureSearchPage() {
   const router = useRouter()
