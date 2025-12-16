@@ -14,6 +14,7 @@ import { getLectureDetail, type LectureDetail } from '@/features/lecture/api/lec
 function formatDateDot(iso: string) {
   return iso.replaceAll('-', '.')
 }
+
 function formatKRW(n?: number) {
   if (typeof n !== 'number') return '-'
   return new Intl.NumberFormat('ko-KR').format(n)
