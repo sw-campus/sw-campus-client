@@ -18,7 +18,7 @@ export default function VerifyClient() {
       return
     }
     window.location.href = getVerifyEmailRedirectUrl(token, signupType)
-  }, [token])
+  }, [token, signupType])
 
   return (
     <div className="flex min-h-screen items-center justify-center">

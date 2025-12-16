@@ -117,25 +117,18 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
 /**
  *   요일 영문(enum) → 한글 변환 함수
  */
+const DAY_KOR_MAP: Record<string, string> = {
+  MONDAY: '월',
+  TUESDAY: '화',
+  WEDNESDAY: '수',
+  THURSDAY: '목',
+  FRIDAY: '금',
+  SATURDAY: '토',
+  SUNDAY: '일',
+}
+
 function dayKor(day: string): string {
-  switch (day) {
-    case 'MONDAY':
-      return '월'
-    case 'TUESDAY':
-      return '화'
-    case 'WEDNESDAY':
-      return '수'
-    case 'THURSDAY':
-      return '목'
-    case 'FRIDAY':
-      return '금'
-    case 'SATURDAY':
-      return '토'
-    case 'SUNDAY':
-      return '일'
-    default:
-      return day
-  }
+  return DAY_KOR_MAP[day] ?? day
 }
 
 /**
