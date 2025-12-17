@@ -4,11 +4,8 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { Button } from '@/components/ui/button'
 import OrganizationAside from '@/features/mypage/components/Organization/OrganizationAside'
 import OrganizationMain from '@/features/mypage/components/Organization/OrganizationMain'
-import PersonalAside from '@/features/mypage/components/Personal/PersonalAside'
-import PersonalMain from '@/features/mypage/components/Personal/PersonalMain'
 import { useAuthStore } from '@/store/authStore'
 
 export default function MyPage() {
@@ -39,41 +36,6 @@ export default function MyPage() {
       router.push('/mypage/organization/lectures/new')
     }
 
-    return (
-      <div className="custom-container">
-        <div className="custom-card">
-          <div className="relative z-10 flex w-full gap-6">
-            <OrganizationAside onClickOrgInfo={handleOpenOrgInfo} onClickLectureManage={handleOpenLectureManage} />
-            <OrganizationMain
-              isOrgPasswordOpen={isOrgPasswordOpen}
-              openInfoModal={openInfoModal}
-              onOpenProductModal={openProductModal}
-            />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // 개인 마이페이지 (간단 예시)
-  if (userType === 'personal') {
-    const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(false)
-
-    const handleOpenOrgInfo = () => {
-      setIsOrgPasswordOpen(true)
-    }
-
-    const handleOpenLectureManage = () => {
-      setIsOrgPasswordOpen(false)
-    }
-
-    const openInfoModal = () => {
-      router.push('/mypage/organization/info')
-    }
-
-    const openProductModal = () => {
-      router.push('/mypage/organization/lectures/new')
-    }
     return (
       <div className="custom-container">
         <div className="custom-card">

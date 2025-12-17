@@ -15,7 +15,7 @@ export default function PersonalAside({ onClickOrgInfo, onClickLectureManage }: 
           onClick={onClickOrgInfo}
           className="block w-full rounded-lg px-3 py-2 text-left font-medium transition hover:bg-neutral-100"
         >
-          기업정보 관리
+          개인정보 관리
         </button>
 
         <button

@@ -5,14 +5,11 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { OrgInfoForm } from '@/features/mypage/components/Organization/OrgInfoForm'
-import { PeronalInfoForm } from '@/features/mypage/components/Personal/PersonalForm'
-import { useAuthStore } from '@/store/authStore'
+import { SurveyForm } from '@/features/mypage/components/survey/SurveyForm'
 
-export default function OrgInfoPage() {
+export default function SurveyCreatePage() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
-  const { isLoggedIn, userName, userType, logout } = useAuthStore()
 
   useEffect(() => {
     setOpen(true)
@@ -27,11 +24,11 @@ export default function OrgInfoPage() {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-[700px]">
         <DialogHeader className="px-6 pt-6">
-          <DialogTitle>확인</DialogTitle>
+          <DialogTitle>설문조사 등록</DialogTitle>
         </DialogHeader>
 
         <div className="max-h-[75vh] overflow-y-auto px-6 pb-6">
-          <>{userType === 'ORGANIZATION' ? <OrgInfoForm /> : <PeronalInfoForm />}</>
+          <SurveyForm />
         </div>
       </DialogContent>
     </Dialog>

@@ -21,7 +21,7 @@ const orgInfoSchema = z.object({
 })
 type OrgInfoFormValues = z.infer<typeof orgInfoSchema>
 
-export function PeronalInfoForm() {
+export function SurveyForm() {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
 
