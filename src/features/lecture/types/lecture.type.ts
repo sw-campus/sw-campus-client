@@ -16,6 +16,8 @@ export interface LectureSummary {
   imageUrl?: string
   status?: string // 'RECRUITING' | 'FINISHED' | 'PREPARING'
   averageScore?: number // 리뷰 평균 점수
+  reviewCount?: number // 리뷰 수
+  recruitType?: string // 모집 유형
 }
 
 // Keep existing imports working

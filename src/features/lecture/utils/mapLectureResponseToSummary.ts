@@ -17,7 +17,7 @@ export const mapLectureResponseToSummary = (dto: LectureResponseDto): LectureSum
   // 2. Localized Recruit Type
   const recruitTypeMap: Record<string, string> = {
     CARD_REQUIRED: '내배카 필요 O',
-    GENERAL: '내배카 필요 X'
+    GENERAL: '내배카 필요 X',
   }
   if (dto.recruitType) {
     const name = recruitTypeMap[dto.recruitType] || dto.recruitType
@@ -52,5 +52,6 @@ export const mapLectureResponseToSummary = (dto: LectureResponseDto): LectureSum
     imageUrl: dto.lectureImageUrl ?? undefined,
     status: dto.status ?? undefined, // Pass status for badge
     averageScore: dto.averageScore ?? undefined, // Pass score for star rating
+    reviewCount: dto.reviewCount ?? undefined, // Pass review count
   }
 }

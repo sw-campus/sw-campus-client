@@ -76,15 +76,80 @@ export default function LectureSearchPage() {
     return parent?.children ?? []
   }, [level2Id, level2Categories])
 
-  // Reset Child Categories on Parent Change
-  useEffect(() => {
-    setLevel2Id(null)
-    setLevel3Ids([])
-  }, [level1Id])
+  // Category ID → Path 매핑 (O(1) 조회를 위한 최적화)
+  type CategoryPath = { l1: number; l2?: number; l3?: number }
+  const categoryPathMap = useMemo(() => {
+    const map = new Map<number, CategoryPath>()
+    if (!categoryTree) return map
 
+    for (const l1 of categoryTree) {
+      map.set(l1.categoryId, { l1: l1.categoryId })
+
+      if (l1.children) {
+        for (const l2 of l1.children) {
+          map.set(l2.categoryId, { l1: l1.categoryId, l2: l2.categoryId })
+
+          if (l2.children) {
+            for (const l3 of l2.children) {
+              map.set(l3.categoryId, { l1: l1.categoryId, l2: l2.categoryId, l3: l3.categoryId })
+            }
+          }
+        }
+      }
+    }
+    return map
+  }, [categoryTree])
+
+  // Reset Child Categories on Parent Change
+  // Sync State with URL Params
   useEffect(() => {
-    setLevel3Ids([])
-  }, [level2Id])
+    if (!categoryTree || categoryTree.length === 0) return
+
+    const categoryIdsParam = searchParams.getAll('categoryIds')
+    if (categoryIdsParam.length === 0) {
+      setLevel1Id(null)
+      setLevel2Id(null)
+      setLevel3Ids([])
+      return
+    }
+
+    // Find deepest category level from URL
+    // URL에 여러 ID가 있을 수 있음 (L3 다중 선택 등)
+    // 여기서는 첫 번째 유효한 ID를 기준으로 L1, L2를 설정하고, L3는 모아서 설정
+
+    let foundL1: number | null = null
+    let foundL2: number | null = null
+    const foundL3s: string[] = []
+
+    // Process all Category IDs
+    categoryIdsParam.forEach(idStr => {
+      const id = Number(idStr)
+      if (!id) return
+
+      const path = categoryPathMap.get(id)
+      if (path) {
+        // L1이 변경되면 하위 상태(L2)도 초기화
+        if (path.l1 && path.l1 !== foundL1) {
+          foundL1 = path.l1
+          foundL2 = null // L1이 바뀌면 L2는 반드시 초기화
+        }
+        // L2는 현재 L1의 자식일 때만 업데이트
+        if (path.l2 && path.l1 === foundL1) {
+          foundL2 = path.l2
+        }
+        if (path.l3) foundL3s.push(String(path.l3))
+      }
+    })
+
+    // Update State
+    // Only update if changed to avoid loops (though SetState handles this)
+    if (foundL1 !== level1Id) setLevel1Id(foundL1)
+    if (foundL2 !== level2Id) setLevel2Id(foundL2)
+
+    // 배열 비교
+    const isL3Same = foundL3s.length === level3Ids.length && foundL3s.every(id => level3Ids.includes(id))
+    if (!isL3Same) setLevel3Ids(foundL3s)
+  }, [searchParams, categoryTree, categoryPathMap])
 
   const toggleFilter = (group: FilterGroupKey, label: string) => {
     setActiveFilters(prev => {
@@ -142,7 +207,7 @@ export default function LectureSearchPage() {
     }
 
     // Procedure Filters (Inverted logic for "No ...")
-    ; (activeFilters.procedure ?? []).forEach(filter => {
+    ;(activeFilters.procedure ?? []).forEach(filter => {
       const parameter = PROCEDURE_QUERY_MAP[filter]
       if (parameter) {
         // Special handling for "No ...인" filters
@@ -153,12 +218,11 @@ export default function LectureSearchPage() {
         }
       }
     })
-
-      ; (activeFilters.region ?? []).forEach(region => {
-        // Use mapping if available, otherwise use original label
-        const shortRegion = REGION_QUERY_MAP[region] ?? region
-        params.append('regions', shortRegion)
-      })
+    ;(activeFilters.region ?? []).forEach(region => {
+      // Use mapping if available, otherwise use original label
+      const shortRegion = REGION_QUERY_MAP[region] ?? region
+      params.append('regions', shortRegion)
+    })
 
     const trimmedText = searchTerm.trim()
     if (trimmedText) {
@@ -175,8 +239,8 @@ export default function LectureSearchPage() {
 
   // Convert categories to options for MultiSelect
   const level3Options = useMemo(
-    () => categoryTree ? level3Categories.map(c => ({ label: c.categoryName, value: String(c.categoryId) })) : [],
-    [level3Categories, categoryTree]
+    () => (categoryTree ? level3Categories.map(c => ({ label: c.categoryName, value: String(c.categoryId) })) : []),
+    [level3Categories, categoryTree],
   )
 
   return (
@@ -189,7 +253,11 @@ export default function LectureSearchPage() {
             <FilterGroup label="대분류">
               <Select
                 value={level1Id?.toString() ?? ''}
-                onValueChange={v => setLevel1Id(v ? Number(v) : null)}
+                onValueChange={v => {
+                  setLevel1Id(v ? Number(v) : null)
+                  setLevel2Id(null) // Reset child
+                  setLevel3Ids([]) // Reset child
+                }}
               >
                 <SelectTrigger className={`${filterSelectTriggerClass} w-[220px]`}>
                   <SelectValue placeholder="대분류 선택" />
@@ -210,7 +278,10 @@ export default function LectureSearchPage() {
             <FilterGroup label="중분류">
               <Select
                 value={level2Id?.toString() ?? ''}
-                onValueChange={v => setLevel2Id(v ? Number(v) : null)}
+                onValueChange={v => {
+                  setLevel2Id(v ? Number(v) : null)
+                  setLevel3Ids([]) // Reset child
+                }}
                 disabled={!level1Id || level2Categories.length === 0}
               >
                 <SelectTrigger className={`${filterSelectTriggerClass} w-[220px]`}>

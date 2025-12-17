@@ -4,8 +4,8 @@ import { create } from 'zustand'
 
 type DesktopNavigationState = {
   showDesktopNav: boolean
-  activeMenu: 'bootcamp' | null
-  setActiveMenu: (menu: 'bootcamp' | null) => void
+  activeMenu: number | null
+  setActiveMenu: (menu: number | null) => void
   hideDesktopNav: () => void
 }
 
@@ -15,7 +15,7 @@ export const useDesktopNavigationStore = create<DesktopNavigationState>(set => (
   setActiveMenu: menu =>
     set({
       activeMenu: menu,
-      showDesktopNav: menu === 'bootcamp',
+      showDesktopNav: menu !== null,
     }),
   hideDesktopNav: () =>
     set({
