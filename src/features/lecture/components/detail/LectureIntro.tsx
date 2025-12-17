@@ -11,9 +11,31 @@ interface Props {
 export default function LectureIntro({ lecture }: Props) {
   return (
     <div className="space-y-8">
-      <Section title="강의 소개">
-        <p className="text-lg leading-relaxed whitespace-pre-line text-gray-700">{lecture.summary}</p>
-      </Section>
+      {/* 훈련 목표 */}
+      {lecture.goal && (
+        <Section title="훈련 목표">
+          <div className="space-y-3">
+            {lecture.goal
+              .split('\n')
+              .filter(line => line.trim())
+              .map((line, idx) => {
+                // 숫자.로 시작하면 숫자 부분 제거 (예: "1.내용" → "내용")
+                const cleanLine = line.replace(/^\d+\.?\s*/, '')
+                return (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-4 rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:ring-orange-100"
+                  >
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600">
+                      {idx + 1}
+                    </div>
+                    <p className="text-base leading-relaxed text-gray-900">{cleanLine}</p>
+                  </div>
+                )
+              })}
+          </div>
+        </Section>
+      )}
 
       <Section title="강사진 소개">
         {lecture.teachers && lecture.teachers.length > 0 ? (
