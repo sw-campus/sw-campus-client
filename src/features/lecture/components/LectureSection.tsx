@@ -18,17 +18,21 @@ export default function LectureSection() {
   const { data: categoryTree } = useCategoryTree()
   const subcategories = useMemo(() => categoryTree?.[0]?.children ?? [], [categoryTree])
 
-  // 선택된 중분류 ID 및 이름
+  // 선택된 중분류 ID
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
-  const [selectedCategoryName, setSelectedCategoryName] = useState<string>('')
 
   // 중분류가 로드되면 첫 번째 중분류를 기본값으로 설정
   useEffect(() => {
     if (subcategories.length > 0 && selectedCategoryId === null) {
       setSelectedCategoryId(subcategories[0].categoryId)
-      setSelectedCategoryName(subcategories[0].categoryName)
     }
   }, [subcategories, selectedCategoryId])
+
+  // selectedCategoryId로부터 카테고리명 파생
+  const selectedCategoryName = useMemo(
+    () => subcategories.find(c => c.categoryId === selectedCategoryId)?.categoryName ?? '',
+    [subcategories, selectedCategoryId],
+  )
 
   // 선택된 중분류의 평점 높은 강의 조회
   const { data: lecturesData, isLoading } = useTopRatedLecturesByCategory(selectedCategoryId)
@@ -44,7 +48,6 @@ export default function LectureSection() {
     const category = subcategories.find(c => c.categoryName === name)
     if (category) {
       setSelectedCategoryId(category.categoryId)
-      setSelectedCategoryName(category.categoryName)
     }
   }
 
@@ -74,13 +77,20 @@ export default function LectureSection() {
         <div className="mt-10 flex justify-center">
           <button
             onClick={() => router.push(`/lectures/search?categoryIds=${selectedCategoryId}`)}
-            className="flex items-center gap-2 rounded-full bg-black/30 px-8 py-3 text-sm text-white transition hover:bg-black/50"
+            disabled={selectedCategoryId === null}
+            className={`flex items-center gap-2 rounded-full px-8 py-3 text-sm transition ${
+              selectedCategoryId === null
+                ? 'cursor-not-allowed bg-black/20 text-gray-500'
+                : 'bg-black/30 text-white hover:bg-black/50'
+            }`}
           >
-            <span className="text-orange-300">{selectedCategoryName}</span>프로그램 더 보기 <FiArrowRight size={16} />
+            <span className={selectedCategoryId === null ? 'text-gray-500' : 'text-orange-300'}>
+              {selectedCategoryName || '카테고리'}
+            </span>
+            프로그램 더 보기 <FiArrowRight size={16} />
           </button>
         </div>
       </div>
     </div>
   )
 }
-
