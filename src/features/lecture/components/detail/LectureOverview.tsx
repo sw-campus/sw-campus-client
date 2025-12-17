@@ -26,7 +26,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
         ) : isAiLoading ? (
           <div className="flex animate-pulse items-center gap-2 py-4 text-orange-600">
             <span className="text-xl">✨</span>
-            <span>Gemini 3.0이 강의를 분석하여 요약하고 있습니다...</span>
+            <span>AI가 강의를 분석하여 요약하고 있습니다...</span>
           </div>
         ) : (
           <div className="text-lg leading-loose font-medium text-gray-900">
