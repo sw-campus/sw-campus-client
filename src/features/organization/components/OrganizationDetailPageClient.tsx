@@ -1,6 +1,5 @@
 'use client'
 
-import { MOCK_REVIEWS } from '../api/mockReviews'
 import { useOrganizationDetailQuery, useOrganizationLecturesQuery } from '../hooks/useOrganizations'
 import { OrganizationDetail } from './OrganizationDetail'
 
@@ -10,7 +9,7 @@ interface OrganizationDetailPageClientProps {
 
 /**
  * 기관 상세 페이지 클라이언트 컴포넌트
- * API 연동을 통해 실제 데이터 표시, 리뷰는 mock 데이터 사용
+ * API 연동을 통해 실제 데이터 표시
  */
 export function OrganizationDetailPageClient({ organizationId }: OrganizationDetailPageClientProps) {
   // 기관 상세 정보 조회
@@ -37,5 +36,5 @@ export function OrganizationDetailPageClient({ organizationId }: OrganizationDet
     )
   }
 
-  return <OrganizationDetail organization={organization} lectures={courses} reviews={MOCK_REVIEWS} />
+  return <OrganizationDetail organization={organization} lectures={courses} />
 }
