@@ -66,8 +66,31 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
           name: c.curriculum?.curriculumName || c.curriculumName || '',
         }))
       : [],
-    teachers: api.teachers
-      ? api.teachers.map(t => ({ name: t.teacherName, desc: t.teacherDescription, imageUrl: t.teacherImageUrl }))
+    teachers: Array.isArray(api.teachers)
+      ? api.teachers
+          .map(t => {
+            if (typeof t === 'string') {
+              return { name: t, desc: '', imageUrl: undefined }
+            }
+            const teacher = (t as any)?.teacher ?? t
+            const name = teacher?.teacherName ?? teacher?.name ?? (t as any)?.teacherName ?? (t as any)?.name ?? ''
+            const desc =
+              teacher?.teacherDescription ??
+              teacher?.teacherDesc ??
+              teacher?.desc ??
+              (t as any)?.teacherDescription ??
+              (t as any)?.teacherDesc ??
+              (t as any)?.desc ??
+              ''
+            const imageUrl =
+              teacher?.teacherImageUrl ??
+              teacher?.imageUrl ??
+              (t as any)?.teacherImageUrl ??
+              (t as any)?.imageUrl ??
+              undefined
+            return { name, desc, imageUrl }
+          })
+          .filter(t => Boolean(t.name))
       : [],
     quals: api.quals ? api.quals.map(q => ({ type: q.type, text: q.text })) : [],
   }

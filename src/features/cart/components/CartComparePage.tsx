@@ -5,19 +5,10 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { CompareTable } from '@/features/cart/components/CompareTable'
 import { LectureSummaryCard } from '@/features/cart/components/LectureSummaryCard'
 import { useCartLecturesWithDetailQuery } from '@/features/cart/hooks/useCartLecturesWithDetailQuery'
-import {
-  formatBoolean,
-  formatDateRange,
-  formatLectureLoc,
-  formatList,
-  formatMoney,
-  formatRecruitType,
-  formatStatus,
-  formatText,
-} from '@/features/cart/utils/cartCompareFormatters'
+import type { CartItem } from '@/features/cart/types/cart.type'
 import { useLectureDetailQuery } from '@/features/lecture'
 import { cn } from '@/lib/utils'
 import { useCartCompareStore } from '@/store/cartCompare.store'
@@ -25,6 +16,9 @@ import { useCartCompareStore } from '@/store/cartCompare.store'
 type Side = 'left' | 'right'
 
 const DND_MIME = 'application/x-sw-campus-lecture-id'
+const EMPTY_CART_ITEMS: CartItem[] = []
+const LABEL_COL_GRID_CLASS = 'md:grid-cols-[10rem_1fr_1px_1fr]'
+const LABEL_COL_TABLE_CLASS = 'w-40'
 
 function setDragLectureId(e: React.DragEvent, lectureId: string) {
   e.dataTransfer.setData(DND_MIME, lectureId)
@@ -38,7 +32,7 @@ function getDragLectureId(e: React.DragEvent) {
 
 export default function CartComparePage() {
   const { data, isLoading, isError } = useCartLecturesWithDetailQuery()
-  const items = data ?? []
+  const items = data ?? EMPTY_CART_ITEMS
 
   const { leftId, rightId, setLeftId, setRightId } = useCartCompareStore()
   const [isLeftOver, setIsLeftOver] = useState(false)
@@ -55,24 +49,6 @@ export default function CartComparePage() {
   const { data: leftDetail } = useLectureDetailQuery(leftId)
   const { data: rightDetail } = useLectureDetailQuery(rightId)
 
-  const curriculumNames = (() => {
-    const names = new Set<string>()
-    leftDetail?.curriculum?.forEach(c => c?.name && names.add(c.name))
-    rightDetail?.curriculum?.forEach(c => c?.name && names.add(c.name))
-    return Array.from(names)
-  })()
-
-  const stepTypes = (() => {
-    const names = new Set<string>()
-    leftDetail?.steps?.forEach(stepType => stepType && names.add(stepType))
-    rightDetail?.steps?.forEach(stepType => stepType && names.add(stepType))
-    return Array.from(names)
-  })()
-
-  const hasStep = (dto: typeof leftDetail, stepType: string) => {
-    return Boolean(dto?.steps?.some(s => s === stepType))
-  }
-
   const leftCategory = left?.categoryName ?? leftDetail?.categoryName
   const rightCategory = right?.categoryName ?? rightDetail?.categoryName
   const lockedCategory = leftCategory ?? rightCategory ?? null
@@ -86,45 +62,6 @@ export default function CartComparePage() {
   const isAlreadySelected = (lectureId: string) => {
     return lectureId === leftId || lectureId === rightId
   }
-
-  const curriculumLevel = (dto: typeof leftDetail, name: string) => {
-    const found = dto?.curriculum?.find(c => c?.name === name)
-    if (!found) return '-'
-    return found.level ? String(found.level) : '-'
-  }
-
-  const sectionRow = (label: string) => (
-    <TableRow>
-      <TableCell colSpan={4} className="bg-accent/10 text-accent-foreground px-6 py-3 text-sm font-semibold">
-        {label}
-      </TableCell>
-    </TableRow>
-  )
-
-  const dividerCell = () => (
-    <TableCell className="w-0 px-0">
-      <div className="bg-border h-full w-px" />
-    </TableCell>
-  )
-
-  const dataRow = (label: string, leftValue: string, rightValue: string) => (
-    <TableRow>
-      <TableCell className="bg-muted/10 w-56 px-6 py-4 align-top text-base font-semibold whitespace-normal">
-        {label}
-      </TableCell>
-      <TableCell
-        className={cn('px-6 py-4 align-top text-base whitespace-normal', !leftDetail && 'text-muted-foreground')}
-      >
-        {leftValue}
-      </TableCell>
-      {dividerCell()}
-      <TableCell
-        className={cn('px-6 py-4 align-top text-base whitespace-normal', !rightDetail && 'text-muted-foreground')}
-      >
-        {rightValue}
-      </TableCell>
-    </TableRow>
-  )
 
   const onDropLecture = (side: Side, lectureId: string) => {
     if (isAlreadySelected(lectureId)) return
@@ -212,7 +149,8 @@ export default function CartComparePage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="border-border grid grid-cols-1 overflow-hidden rounded-md border md:grid-cols-[1fr_1px_1fr]">
+          <div className={cn('border-border grid grid-cols-1 overflow-hidden rounded-md border', LABEL_COL_GRID_CLASS)}>
+            <div aria-hidden className="bg-muted/10 hidden md:block" />
             <div
               className={cn(isLeftOver && 'bg-muted/20')}
               onDragEnter={e => {
@@ -273,177 +211,13 @@ export default function CartComparePage() {
               />
             </div>
           </div>
-
-          <div className="border-border rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-56 px-6 py-4 text-base">비교항목</TableHead>
-                  <TableHead className="px-6 py-4 text-base wrap-break-word whitespace-normal">
-                    {left?.title ?? 'A과정(미선택)'}
-                  </TableHead>
-                  <TableHead className="w-0 px-0">
-                    <div className="bg-border h-7 w-px" />
-                  </TableHead>
-                  <TableHead className="px-6 py-4 text-base wrap-break-word whitespace-normal">
-                    {right?.title ?? 'B과정(미선택)'}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="[&_tr:nth-child(even)]:bg-muted/20 [&_td]:leading-relaxed">
-                {sectionRow('교육정보')}
-                {dataRow(
-                  '교육기간',
-                  leftDetail
-                    ? formatDateRange(leftDetail.schedule?.coursePeriod?.start, leftDetail.schedule?.coursePeriod?.end)
-                    : '미선택',
-                  rightDetail
-                    ? formatDateRange(
-                        rightDetail.schedule?.coursePeriod?.start,
-                        rightDetail.schedule?.coursePeriod?.end,
-                      )
-                    : '미선택',
-                )}
-                {dataRow(
-                  '교육시간',
-                  leftDetail ? `시간: ${formatText(leftDetail.schedule?.time)}` : '미선택',
-                  rightDetail ? `시간: ${formatText(rightDetail.schedule?.time)}` : '미선택',
-                )}
-                {dataRow(
-                  '교육장소',
-                  leftDetail
-                    ? `${formatLectureLoc(leftDetail.lectureLoc)}${leftDetail.location ? ` (${leftDetail.location})` : ''}`
-                    : '미선택',
-                  rightDetail
-                    ? `${formatLectureLoc(rightDetail.lectureLoc)}${rightDetail.location ? ` (${rightDetail.location})` : ''}`
-                    : '미선택',
-                )}
-
-                {sectionRow('모집정보')}
-                {dataRow('모집상태', formatStatus(leftDetail?.recruitStatus), formatStatus(rightDetail?.recruitStatus))}
-                {dataRow(
-                  '모집유형',
-                  formatRecruitType(leftDetail?.recruitType),
-                  formatRecruitType(rightDetail?.recruitType),
-                )}
-                {dataRow(
-                  '자기부담금',
-                  formatMoney(leftDetail?.support?.tuition),
-                  formatMoney(rightDetail?.support?.tuition),
-                )}
-                {dataRow(
-                  '훈련장려금',
-                  formatText(leftDetail?.support?.stipend),
-                  formatText(rightDetail?.support?.stipend),
-                )}
-                {dataRow(
-                  '훈련비 지원',
-                  formatText(leftDetail?.support?.extraSupport),
-                  formatText(rightDetail?.support?.extraSupport),
-                )}
-
-                {sectionRow('훈련목표')}
-                {dataRow('훈련목표', leftDetail?.goal ?? '-', rightDetail?.goal ?? '-')}
-
-                {sectionRow('지원자격')}
-                {dataRow(
-                  '필수',
-                  formatList(leftDetail?.quals?.filter(q => q.type === 'REQUIRED').map(q => q.text)),
-                  formatList(rightDetail?.quals?.filter(q => q.type === 'REQUIRED').map(q => q.text)),
-                )}
-                {dataRow(
-                  '우대',
-                  formatList(leftDetail?.quals?.filter(q => q.type === 'PREFERRED').map(q => q.text)),
-                  formatList(rightDetail?.quals?.filter(q => q.type === 'PREFERRED').map(q => q.text)),
-                )}
-
-                {sectionRow('선발절차')}
-                {stepTypes.length === 0
-                  ? dataRow('절차', '-', '-')
-                  : stepTypes.map(stepType =>
-                      dataRow(
-                        stepType,
-                        leftDetail ? (hasStep(leftDetail, stepType) ? '있음' : '없음') : '미선택',
-                        rightDetail ? (hasStep(rightDetail, stepType) ? '있음' : '없음') : '미선택',
-                      ),
-                    )}
-
-                {sectionRow('훈련시설 및 장비')}
-                {dataRow('장비', leftDetail?.equipment?.pc ?? '-', rightDetail?.equipment?.pc ?? '-')}
-                {dataRow(
-                  '교재지원 유무',
-                  formatBoolean(leftDetail?.services?.books),
-                  formatBoolean(rightDetail?.services?.books),
-                )}
-                {dataRow('훈련시설 장점', leftDetail?.equipment?.merit ?? '-', rightDetail?.equipment?.merit ?? '-')}
-
-                {sectionRow('프로젝트')}
-                {dataRow(
-                  '개수(회)',
-                  leftDetail?.project?.num !== null && leftDetail?.project?.num !== undefined
-                    ? String(leftDetail.project.num)
-                    : '-',
-                  rightDetail?.project?.num !== null && rightDetail?.project?.num !== undefined
-                    ? String(rightDetail.project.num)
-                    : '-',
-                )}
-                {dataRow(
-                  '기간(시간)',
-                  leftDetail?.project?.time !== null && leftDetail?.project?.time !== undefined
-                    ? String(leftDetail.project.time)
-                    : '-',
-                  rightDetail?.project?.time !== null && rightDetail?.project?.time !== undefined
-                    ? String(rightDetail.project.time)
-                    : '-',
-                )}
-                {dataRow('팀 구성 방식', leftDetail?.project?.team ?? '-', rightDetail?.project?.team ?? '-')}
-                {dataRow('협업툴', leftDetail?.project?.tool ?? '-', rightDetail?.project?.tool ?? '-')}
-                {dataRow(
-                  '멘토링/코드리뷰',
-                  leftDetail ? formatBoolean(leftDetail.project?.mentor) : '-',
-                  rightDetail ? formatBoolean(rightDetail.project?.mentor) : '-',
-                )}
-
-                {sectionRow('취업 지원 서비스')}
-                {dataRow(
-                  '이력서/자소서 첨삭',
-                  formatBoolean(leftDetail?.services?.resume),
-                  formatBoolean(rightDetail?.services?.resume),
-                )}
-                {dataRow(
-                  '모의 면접',
-                  formatBoolean(leftDetail?.services?.mockInterview),
-                  formatBoolean(rightDetail?.services?.mockInterview),
-                )}
-                {dataRow(
-                  '취업 지원',
-                  formatBoolean(leftDetail?.services?.employmentHelp),
-                  formatBoolean(rightDetail?.services?.employmentHelp),
-                )}
-                {dataRow(
-                  '수료 후 사후관리',
-                  leftDetail?.services?.afterCompletion !== null && leftDetail?.services?.afterCompletion !== undefined
-                    ? String(leftDetail.services.afterCompletion)
-                    : '-',
-                  rightDetail?.services?.afterCompletion !== null &&
-                    rightDetail?.services?.afterCompletion !== undefined
-                    ? String(rightDetail.services.afterCompletion)
-                    : '-',
-                )}
-
-                {sectionRow('커리큘럼')}
-                {curriculumNames.length === 0
-                  ? dataRow('커리큘럼', '-', '-')
-                  : curriculumNames.map(name =>
-                      dataRow(
-                        name,
-                        leftDetail ? curriculumLevel(leftDetail, name) : '미선택',
-                        rightDetail ? curriculumLevel(rightDetail, name) : '미선택',
-                      ),
-                    )}
-              </TableBody>
-            </Table>
-          </div>
+          <CompareTable
+            leftTitle={left?.title}
+            rightTitle={right?.title}
+            leftDetail={leftDetail}
+            rightDetail={rightDetail}
+            labelColClassName={LABEL_COL_TABLE_CLASS}
+          />
         </CardContent>
       </Card>
     </div>

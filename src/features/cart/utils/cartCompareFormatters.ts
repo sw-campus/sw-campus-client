@@ -1,6 +1,42 @@
+import { getNetTrainingHoursFromTimeRange } from '@/lib/time'
+
 export function formatDateRange(start: string | null | undefined, end: string | null | undefined) {
   if (!start && !end) return '-'
   return `${start ?? '-'} ~ ${end ?? '-'}`
+}
+
+function formatHours(value: number) {
+  if (Number.isInteger(value)) return String(value)
+  return value.toFixed(1).replace(/\.0$/, '')
+}
+
+export function formatDateRangeWithTotalDays(
+  start: string | null | undefined,
+  end: string | null | undefined,
+  totalDays: number | null | undefined,
+) {
+  const base = formatDateRange(start, end)
+  if (!totalDays) return base
+  return `${base} (총 ${totalDays}일)`
+}
+
+export function formatCourseTime(
+  days: string | null | undefined,
+  time: string | null | undefined,
+  totalHours: number | null | undefined,
+  totalDays: number | null | undefined,
+) {
+  const parts = [days, time].filter(Boolean) as string[]
+  const base = parts.length ? parts.join(' ') : '-'
+
+  const perDayFromTime = getNetTrainingHoursFromTimeRange(time)
+  if (perDayFromTime) return `${base} (하루 ${formatHours(perDayFromTime)}시간)`
+
+  if (!totalHours || !totalDays) return base
+  if (totalDays <= 0) return base
+  const perDayFromTotals = totalHours / totalDays
+  if (!Number.isFinite(perDayFromTotals) || perDayFromTotals <= 0) return base
+  return `${base} (하루 ${formatHours(perDayFromTotals)}시간)`
 }
 
 export function formatMoney(value: number | null | undefined) {

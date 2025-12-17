@@ -53,7 +53,12 @@ export function LectureSummaryCard({
       </div>
 
       <div className="space-y-1">
-        <div className={cn('text-xl font-bold', !hasSelection && 'text-muted-foreground')}>
+        <div
+          className={cn(
+            '[display:-webkit-box] overflow-hidden text-xl leading-snug font-bold break-keep [-webkit-box-orient:vertical] [-webkit-line-clamp:2]',
+            !hasSelection && 'text-muted-foreground',
+          )}
+        >
           {hasSelection ? title : '미선택'}
         </div>
         <div className={cn('text-muted-foreground text-sm', !hasSelection && 'opacity-60')}>
