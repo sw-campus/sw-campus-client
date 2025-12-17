@@ -27,51 +27,6 @@ function getDragLectureId(e: React.DragEvent) {
   return e.dataTransfer.getData(DND_MIME) || e.dataTransfer.getData('text/plain')
 }
 
-function DropZone({
-  side,
-  title,
-  selectedTitle,
-  onDropLecture,
-}: {
-  side: Side
-  title: string
-  selectedTitle?: string
-  onDropLecture: (side: Side, lectureId: string) => void
-}) {
-  const [isOver, setIsOver] = useState(false)
-
-  return (
-    <div
-      className={cn(
-        'border-border flex items-center justify-between rounded-md border border-dashed px-3 py-2 text-sm',
-        isOver && 'bg-muted/50',
-      )}
-      onDragEnter={e => {
-        e.preventDefault()
-        setIsOver(true)
-      }}
-      onDragLeave={() => setIsOver(false)}
-      onDragOver={e => {
-        e.preventDefault()
-        e.dataTransfer.dropEffect = 'copy'
-      }}
-      onDrop={e => {
-        e.preventDefault()
-        setIsOver(false)
-        const lectureId = getDragLectureId(e)
-        if (!lectureId) return
-        onDropLecture(side, lectureId)
-      }}
-      aria-label={`${title} 드롭 영역`}
-    >
-      <div className="font-medium">{title}</div>
-      <div className="text-muted-foreground w-1/2 truncate text-right">
-        {selectedTitle ? selectedTitle : '여기에 드래그'}
-      </div>
-    </div>
-  )
-}
-
 function LectureSummaryCard({
   side,
   title,
@@ -143,6 +98,8 @@ export default function CartComparePage() {
 
   const [leftId, setLeftId] = useState<string | null>(null)
   const [rightId, setRightId] = useState<string | null>(null)
+  const [isLeftOver, setIsLeftOver] = useState(false)
+  const [isRightOver, setIsRightOver] = useState(false)
 
   const left = items.find(i => i.lectureId === leftId) ?? null
   const right = items.find(i => i.lectureId === rightId) ?? null
@@ -317,29 +274,66 @@ export default function CartComparePage() {
           <CardTitle className="text-base">과정비교 페이지</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid gap-2 md:grid-cols-2">
-            <DropZone side="left" title="왼쪽" selectedTitle={left?.title} onDropLecture={onDropLecture} />
-            <DropZone side="right" title="오른쪽" selectedTitle={right?.title} onDropLecture={onDropLecture} />
-          </div>
-
           <div className="border-border grid grid-cols-1 overflow-hidden rounded-md border md:grid-cols-[1fr_1px_1fr]">
-            <LectureSummaryCard
-              side="left"
-              title={left?.title ?? ''}
-              orgName={leftDetail?.orgName}
-              thumbnailUrl={leftDetail?.thumbnailUrl}
-              lectureId={leftId}
-              onClear={() => setLeftId(null)}
-            />
+            <div
+              className={cn(isLeftOver && 'bg-muted/20')}
+              onDragEnter={e => {
+                e.preventDefault()
+                setIsLeftOver(true)
+              }}
+              onDragLeave={() => setIsLeftOver(false)}
+              onDragOver={e => {
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'copy'
+              }}
+              onDrop={e => {
+                e.preventDefault()
+                setIsLeftOver(false)
+                const lectureId = getDragLectureId(e)
+                if (!lectureId) return
+                onDropLecture('left', lectureId)
+              }}
+              aria-label="왼쪽 드롭 영역"
+            >
+              <LectureSummaryCard
+                side="left"
+                title={left?.title ?? ''}
+                orgName={leftDetail?.orgName}
+                thumbnailUrl={leftDetail?.thumbnailUrl}
+                lectureId={leftId}
+                onClear={() => setLeftId(null)}
+              />
+            </div>
             <div className="bg-border hidden w-px md:block" />
-            <LectureSummaryCard
-              side="right"
-              title={right?.title ?? ''}
-              orgName={rightDetail?.orgName}
-              thumbnailUrl={rightDetail?.thumbnailUrl}
-              lectureId={rightId}
-              onClear={() => setRightId(null)}
-            />
+            <div
+              className={cn(isRightOver && 'bg-muted/20')}
+              onDragEnter={e => {
+                e.preventDefault()
+                setIsRightOver(true)
+              }}
+              onDragLeave={() => setIsRightOver(false)}
+              onDragOver={e => {
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'copy'
+              }}
+              onDrop={e => {
+                e.preventDefault()
+                setIsRightOver(false)
+                const lectureId = getDragLectureId(e)
+                if (!lectureId) return
+                onDropLecture('right', lectureId)
+              }}
+              aria-label="오른쪽 드롭 영역"
+            >
+              <LectureSummaryCard
+                side="right"
+                title={right?.title ?? ''}
+                orgName={rightDetail?.orgName}
+                thumbnailUrl={rightDetail?.thumbnailUrl}
+                lectureId={rightId}
+                onClear={() => setRightId(null)}
+              />
+            </div>
           </div>
 
           <div className="border-border rounded-md border">
