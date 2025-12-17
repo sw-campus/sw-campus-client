@@ -1,3 +1,6 @@
+import PersonalAside from '@/features/mypage/components/Personal/PersonalAside'
+import PersonalMain from '@/features/mypage/components/Personal/PersonalMain'
+
 export default function MyPage() {
   return (
     <div className="custom-container">
@@ -10,7 +13,7 @@ export default function MyPage() {
 
             <nav className="space-y-2 leading-relaxed">
               <button className="block w-full text-left font-medium text-neutral-900 hover:underline">
-                회원정보 수정
+                개인정보 수정
               </button>
               <button className="block w-full text-left text-neutral-700 hover:underline">찜한 강의</button>
               <button className="block w-full text-left text-neutral-700 hover:underline">내가 쓴 리뷰</button>
