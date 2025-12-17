@@ -58,22 +58,24 @@ export default function LectureSidebar({ lecture }: Props) {
         </div>
       </div>
 
-      <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-        <p className="flex items-center gap-2 text-base font-bold text-gray-900">
-          <span className="text-orange-500">🎁</span> 채용연계 혜택
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Badge variant="secondary" className="rounded-lg bg-gray-100 px-3 py-1.5 font-medium text-gray-600">
-            인재 추천
-          </Badge>
-          <Badge variant="secondary" className="rounded-lg bg-gray-100 px-3 py-1.5 font-medium text-gray-600">
-            인터십 진행
-          </Badge>
-          <Badge variant="secondary" className="rounded-lg bg-gray-100 px-3 py-1.5 font-medium text-gray-600">
-            협약 기업
-          </Badge>
+      {lecture.steps && lecture.steps.length > 0 && (
+        <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+          <p className="flex items-center gap-2 text-base font-bold text-gray-900">
+            <span className="text-orange-500">📋</span> 지원절차
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {lecture.steps.map((step, index) => (
+              <Badge
+                key={index}
+                variant="secondary"
+                className="rounded-lg bg-orange-50 px-3 py-1.5 font-medium text-orange-700"
+              >
+                {index + 1}. {step}
+              </Badge>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

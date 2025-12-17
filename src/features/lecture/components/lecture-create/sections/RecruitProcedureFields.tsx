@@ -21,7 +21,9 @@ export function LectureCreateRecruitProcedureFields({ selectTriggerClassName }: 
   } = useFormContext<LectureFormValues>()
 
   const recruitProcedures = useWatch({ control, name: 'recruitProcedures' })
-  const [selectedRecruit, setSelectedRecruit] = useState<'DOCUMENT' | 'CODING_TEST' | 'INTERVIEW'>('DOCUMENT')
+  const [selectedRecruit, setSelectedRecruit] = useState<'DOCUMENT' | 'CODING_TEST' | 'INTERVIEW' | 'PRE_TASK'>(
+    'DOCUMENT',
+  )
   const [showRecruitDuplicateError, setShowRecruitDuplicateError] = useState(false)
 
   const {
@@ -64,6 +66,9 @@ export function LectureCreateRecruitProcedureFields({ selectTriggerClassName }: 
                   <SelectItem value="INTERVIEW" disabled={selectedRecruitTypes.has('INTERVIEW')}>
                     면접
                   </SelectItem>
+                  <SelectItem value="PRE_TASK" disabled={selectedRecruitTypes.has('PRE_TASK')}>
+                    사전 과제
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -97,7 +102,9 @@ export function LectureCreateRecruitProcedureFields({ selectTriggerClassName }: 
                     ? '코딩테스트'
                     : value === 'INTERVIEW'
                       ? '면접'
-                      : value
+                      : value === 'PRE_TASK'
+                        ? '사전 과제'
+                        : value
 
               return (
                 <div
@@ -149,7 +156,7 @@ export function LectureCreateRecruitProcedureFields({ selectTriggerClassName }: 
             </FieldDescription>
           )}
 
-          <Controller control={control} name="recruitProcedures" render={() => null} />
+          <Controller control={control} name="recruitProcedures" render={() => <></>} />
         </div>
       </FieldContent>
     </Field>

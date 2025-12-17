@@ -19,7 +19,7 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
     recruitType: api.recruitType,
     summary: generateSummary(api),
     schedule: {
-      recruitPeriod: formatDate(api.deadline),
+      recruitPeriod: formatDate(api.deadline ?? api.startAt),
       coursePeriod: { start: formatDate(api.startAt), end: formatDate(api.endAt) },
       days: sortDays(api.days)
         .map(day => dayKor(day))

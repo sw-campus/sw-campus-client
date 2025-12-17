@@ -15,7 +15,7 @@ export const lectureFormSchema = z
     recruitProcedures: z
       .array(
         z.object({
-          type: z.enum(['DOCUMENT', 'CODING_TEST', 'INTERVIEW']),
+          type: z.enum(['DOCUMENT', 'CODING_TEST', 'INTERVIEW', 'PRE_TASK']),
         }),
       )
       .min(1, '선발 절차를 1개 이상 추가해 주세요.'),
