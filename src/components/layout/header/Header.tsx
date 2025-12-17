@@ -114,10 +114,10 @@ export default function Header({
             <Link href="/login">
               <FiLogIn />
             </Link>
-            <Link href="/mypage/organization">
+            <Link href="/login">
               <FiUser />
             </Link>
-            <Link href="/">
+            <Link href="/login">
               <FiHeart />
             </Link>
           </>
