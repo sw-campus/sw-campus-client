@@ -1,7 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
-
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -36,7 +34,7 @@ export default function Navigation({
   const { data: categoryTree } = useCategoryTree()
 
   // 모바일용 전체 메뉴 데이터
-  const mobileNavData = useMemo(() => {
+  const mobileNavData = (() => {
     if (!categoryTree) return []
     return categoryTree.map(l1 => ({
       title: l1.categoryName,
@@ -51,10 +49,10 @@ export default function Navigation({
             })) || [],
         })) || [],
     }))
-  }, [categoryTree])
+  })()
 
   // 데스크탑용: 현재 선택된 대분류의 하위 메뉴(중분류 + 소분류)
-  const activeCategoryChildren = useMemo(() => {
+  const activeCategoryChildren = (() => {
     if (!categoryTree || activeMenu === null) return []
     const activeCategory = categoryTree.find(c => c.categoryId === activeMenu)
     if (!activeCategory || !activeCategory.children) return []
@@ -68,7 +66,7 @@ export default function Navigation({
           href: `/lectures/search?categoryIds=${l3.categoryId}`,
         })) || [],
     }))
-  }, [categoryTree, activeMenu])
+  })()
 
   const menuVariants: Variants = {
     open: {

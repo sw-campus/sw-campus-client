@@ -34,7 +34,7 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
       extraSupport: api.eduSubsidy ? `교육비 지원 ${api.eduSubsidy.toLocaleString()}원` : undefined,
     },
     location: api.location,
-    recruitStatus: api.status === 'RECRUITING' ? 'OPEN' : api.status === 'DRAFT' ? 'DRAFT' : 'CLOSED',
+    recruitStatus: api.status === 'RECRUITING' ? 'RECRUITING' : 'FINISHED',
     photos: api.orgFacilityImageUrls ?? [],
     steps: api.steps ? api.steps.sort((a, b) => a.stepOrder - b.stepOrder).map(s => stepTypeKor(s.stepType)) : [],
     benefits: api.adds ? api.adds.map(a => a.addName) : [],

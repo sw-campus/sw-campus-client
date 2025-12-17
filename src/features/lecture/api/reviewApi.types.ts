@@ -1,8 +1,13 @@
 /**
+ * 리뷰 카테고리 타입
+ */
+export type ReviewCategory = 'TEACHER' | 'CURRICULUM' | 'MANAGEMENT' | 'FACILITY' | 'PROJECT'
+
+/**
  * 카테고리별 점수 응답 타입
  */
 export interface DetailScore {
-  category: string // TEACHER, CURRICULUM, MANAGEMENT, FACILITY, PROJECT
+  category: ReviewCategory
   score: number
   comment: string
 }
@@ -27,7 +32,7 @@ export interface Review {
 /**
  * 카테고리 한국어 라벨 매핑
  */
-export const CATEGORY_LABELS: Record<string, string> = {
+export const CATEGORY_LABELS: Record<ReviewCategory, string> = {
   TEACHER: '강사',
   CURRICULUM: '커리큘럼',
   MANAGEMENT: '취업지원',

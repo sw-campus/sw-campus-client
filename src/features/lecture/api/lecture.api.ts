@@ -1,5 +1,5 @@
 import type { LectureCreateRequest, LectureCreateResponse } from '@/features/lecture/types/lecture-request.type'
-import type { LectureResponseDto } from '@/features/lecture/types/lecture-response.type'
+import type { LectureResponseDto, PageResponse } from '@/features/lecture/types/lecture-response.type'
 import { api } from '@/lib/axios'
 
 export type CreateLectureParams = {
@@ -32,16 +32,44 @@ export const createLecture = async ({
   return res.data
 }
 
-export const getLectureSearch = async (queryString: string): Promise<LectureResponseDto[]> => {
+export const getLectureSearch = async (queryString: string): Promise<PageResponse<LectureResponseDto>> => {
   const path = queryString ? `/lectures/search?${queryString}` : '/lectures/search'
   const res = await api.get(path)
 
   const payload = res.data
-  if (Array.isArray(payload)) return payload
 
-  const wrappedCandidates = [payload?.data, payload?.items, payload?.content, payload?.lectures]
+  // Spring Data Page 응답 구조 확인 (page 객체가 중첩됨)
+  if (payload && typeof payload === 'object' && 'content' in payload && 'page' in payload) {
+    return payload as PageResponse<LectureResponseDto>
+  }
+
+  // Fallback: 배열 응답인 경우 Page 구조로 변환
+  if (Array.isArray(payload)) {
+    return {
+      content: payload,
+      page: {
+        size: payload.length,
+        number: 0,
+        totalElements: payload.length,
+        totalPages: 1,
+      },
+    }
+  }
+
+  // 기타 래핑된 응답 처리
+  const wrappedCandidates = [payload?.data, payload?.items, payload?.lectures]
   for (const candidate of wrappedCandidates) {
-    if (Array.isArray(candidate)) return candidate
+    if (Array.isArray(candidate)) {
+      return {
+        content: candidate,
+        page: {
+          size: candidate.length,
+          number: 0,
+          totalElements: candidate.length,
+          totalPages: 1,
+        },
+      }
+    }
   }
 
   throw new Error('Unexpected /lectures/search response shape')

@@ -9,38 +9,10 @@ import { Card } from '@/components/ui/card'
 
 import { getLectureReviews } from '../../api/reviewApi.client'
 import { CATEGORY_LABELS, type Review } from '../../api/reviewApi.types'
-import { Section } from './DetailShared'
+import { formatDate, Section, StarRating } from './DetailShared'
 
 interface Props {
   lectureId: string
-}
-
-function formatDate(dateStr: string) {
-  if (!dateStr) return ''
-  return dateStr.split('T')[0].replaceAll('-', '.')
-}
-
-function StarRating({ score }: { score: number }) {
-  const fullStars = Math.floor(score)
-  const hasHalf = score - fullStars >= 0.5
-
-  return (
-    <div className="flex items-center gap-1">
-      {[...Array(5)].map((_, i) => (
-        <Star
-          key={i}
-          className={`h-4 w-4 ${
-            i < fullStars
-              ? 'fill-yellow-400 text-yellow-400'
-              : i === fullStars && hasHalf
-                ? 'fill-yellow-400/50 text-yellow-400'
-                : 'text-gray-300'
-          }`}
-        />
-      ))}
-      <span className="ml-1 text-sm font-medium text-gray-700">{score.toFixed(1)}</span>
-    </div>
-  )
 }
 
 function ReviewCard({ review }: { review: Review }) {
@@ -59,7 +31,7 @@ function ReviewCard({ review }: { review: Review }) {
             <p className="text-muted-foreground text-xs">{formatDate(review.createdAt)}</p>
           </div>
         </div>
-        <StarRating score={review.score} />
+        <StarRating score={review.score} showScore />
       </div>
 
       {/* Comment */}

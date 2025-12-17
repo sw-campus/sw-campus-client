@@ -1,6 +1,17 @@
 import { type ReactNode } from 'react'
 
+import { Star } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
+
+/**
+ * ISO 날짜 문자열을 YYYY.MM.DD 형식으로 변환합니다.
+ * 시간 부분(T 이후)은 제거됩니다.
+ */
+export function formatDate(dateStr: string) {
+  if (!dateStr) return ''
+  return dateStr.split('T')[0].replaceAll('-', '.')
+}
 
 export function formatDateDot(iso: string) {
   return iso.replaceAll('-', '.')
@@ -9,6 +20,45 @@ export function formatDateDot(iso: string) {
 export function formatKRW(n?: number) {
   if (typeof n !== 'number') return '-'
   return new Intl.NumberFormat('ko-KR').format(n)
+}
+
+/**
+ * 별점을 표시하는 컴포넌트입니다.
+ * @param score - 0~5 사이의 점수
+ * @param size - 별 크기 ('sm' | 'md')
+ * @param showScore - 점수 텍스트 표시 여부
+ */
+export function StarRating({
+  score,
+  size = 'md',
+  showScore = false,
+}: {
+  score: number
+  size?: 'sm' | 'md'
+  showScore?: boolean
+}) {
+  const fullStars = Math.floor(score)
+  const hasHalf = score - fullStars >= 0.5
+  const starSize = size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'
+  const gap = size === 'sm' ? 'gap-0.5' : 'gap-1'
+
+  return (
+    <div className={`flex items-center ${gap}`}>
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          className={`${starSize} ${
+            i < fullStars
+              ? 'fill-yellow-400 text-yellow-400'
+              : i === fullStars && hasHalf
+                ? 'fill-yellow-400/50 text-yellow-400'
+                : 'text-gray-300'
+          }`}
+        />
+      ))}
+      {showScore && <span className="ml-1 text-sm font-medium text-gray-700">{score.toFixed(1)}</span>}
+    </div>
+  )
 }
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
