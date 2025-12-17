@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -40,7 +40,18 @@ export default function LectureSearchPage() {
   const queryString = useMemo(() => searchParams.toString(), [searchParams])
   const { data, isLoading, isError } = useSearchLectureQuery(queryString)
 
-  const lectures = useMemo(() => (data ?? []).map(mapLectureResponseToSummary), [data])
+  const lectures = useMemo(() => (data?.content ?? []).map(mapLectureResponseToSummary), [data])
+  const pageInfo = useMemo(
+    () => ({
+      currentPage: data?.page?.number ?? 0,
+      totalPages: data?.page?.totalPages ?? 0,
+      totalElements: data?.page?.totalElements ?? 0,
+      size: data?.page?.size ?? 20,
+      isFirst: (data?.page?.number ?? 0) === 0,
+      isLast: (data?.page?.number ?? 0) >= (data?.page?.totalPages ?? 1) - 1,
+    }),
+    [data],
+  )
 
   // Category Tree Data
   const { data: categoryTree } = useCategoryTree()
@@ -232,10 +243,42 @@ export default function LectureSearchPage() {
     const sortValue = selectedSort || DEFAULT_SORT
     params.append('sort', sortValue)
 
+    // 검색 시 첫 페이지로 초기화 (백엔드는 1-indexed)
+    params.set('page', '1')
+
     const queryString = params.toString()
     const destination = `/lectures/search${queryString ? `?${queryString}` : ''}`
     router.push(destination)
   }
+
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      const params = new URLSearchParams(searchParams.toString())
+      // 백엔드는 1-indexed 페이지를 기대하므로 +1
+      params.set('page', String(newPage + 1))
+      router.push(`/lectures/search?${params.toString()}`)
+    },
+    [searchParams, router],
+  )
+
+  // 페이지 번호 목록 생성 (최대 5개)
+  const getPageNumbers = useCallback(() => {
+    const { currentPage, totalPages } = pageInfo
+    const maxVisible = 5
+    let start = Math.max(0, currentPage - Math.floor(maxVisible / 2))
+    const end = Math.min(totalPages - 1, start + maxVisible - 1)
+
+    // 끝에 가까우면 시작점 조정
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(0, end - maxVisible + 1)
+    }
+
+    const pages = []
+    for (let i = start; i <= end; i++) {
+      pages.push(i)
+    }
+    return pages
+  }, [pageInfo])
 
   // Convert categories to options for MultiSelect
   const level3Options = useMemo(
@@ -397,7 +440,61 @@ export default function LectureSearchPage() {
         ) : lectures.length === 0 ? (
           <div className="py-10 text-center text-sm">검색 결과가 없습니다.</div>
         ) : (
-          <LectureList lectures={lectures} />
+          <>
+            <LectureList lectures={lectures} />
+
+            {/* 페이지네이션 */}
+            {pageInfo.totalPages > 1 && (
+              <div className="mt-8 flex items-center justify-center gap-2">
+                {/* 이전 페이지 */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(pageInfo.currentPage - 1)}
+                  disabled={pageInfo.isFirst}
+                  className="h-9 px-3"
+                >
+                  이전
+                </Button>
+
+                {/* 페이지 번호 */}
+                <div className="flex items-center gap-1">
+                  {getPageNumbers().map(pageNum => (
+                    <Button
+                      key={pageNum}
+                      variant={pageNum === pageInfo.currentPage ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`h-9 w-9 ${
+                        pageNum === pageInfo.currentPage
+                          ? 'bg-primary hover:bg-primary/90 text-white'
+                          : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      {pageNum + 1}
+                    </Button>
+                  ))}
+                </div>
+
+                {/* 다음 페이지 */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(pageInfo.currentPage + 1)}
+                  disabled={pageInfo.isLast}
+                  className="h-9 px-3"
+                >
+                  다음
+                </Button>
+
+                {/* 전체 페이지 정보 */}
+                <span className="ml-4 text-sm text-gray-500">
+                  총 {pageInfo.totalElements}개 중 {pageInfo.currentPage * pageInfo.size + 1}-
+                  {Math.min((pageInfo.currentPage + 1) * pageInfo.size, pageInfo.totalElements)}개
+                </span>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
