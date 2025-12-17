@@ -16,7 +16,3 @@ export type { OrganizationSummary, OrganizationDetail as OrganizationDetailType 
 
 // API
 export { fetchOrganizationList, fetchOrganizationDetail, fetchOrganizationLectures } from './api/organizationApi'
-
-// Mock Data
-export { MOCK_REVIEWS } from './api/mockReviews'
-export type { Review } from './api/mockReviews'
