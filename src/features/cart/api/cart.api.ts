@@ -6,16 +6,54 @@ type LectureId = string | number
 
 const CART_ENDPOINT = '/carts'
 
+function toRecord(value: unknown): AnyRecord | null {
+  return value && typeof value === 'object' ? (value as AnyRecord) : null
+}
+
+function pickString(...candidates: unknown[]): string | undefined {
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string') {
+      const trimmed = candidate.trim()
+      if (trimmed) return trimmed
+    }
+  }
+  return undefined
+}
+
 function toCartItem(raw: unknown): CartItem | null {
   if (!raw || typeof raw !== 'object') return null
   const r = raw as AnyRecord
 
-  const lecture = (r.lecture && typeof r.lecture === 'object' ? (r.lecture as AnyRecord) : null) ?? null
+  const lecture = toRecord(r.lecture)
+  const org = toRecord(r.org) ?? toRecord(r.organization) ?? toRecord(r.organisation) ?? null
+  const lectureOrg =
+    (lecture
+      ? (toRecord(lecture.org) ?? toRecord(lecture.organization) ?? toRecord(lecture.organisation) ?? null)
+      : null) ?? null
 
   const lectureId = String((r.lectureId ?? r.id ?? lecture?.id ?? '') as unknown)
   if (!lectureId || lectureId === 'undefined' || lectureId === 'null') return null
 
-  const title = String((r.title ?? r.lectureTitle ?? r.name ?? lecture?.title ?? '') as unknown)
+  const titleCandidate =
+    r.title ?? r.lectureName ?? r.lectureTitle ?? r.name ?? lecture?.lectureName ?? lecture?.title ?? lecture?.name
+  const title = pickString(titleCandidate) ?? String(titleCandidate ?? '')
+
+  const orgName = pickString(
+    r.orgName,
+    r.organizationName,
+    r.organisationName,
+    org?.orgName,
+    org?.organizationName,
+    org?.name,
+    org?.title,
+    lecture?.orgName,
+    lecture?.organizationName,
+    lecture?.organisationName,
+    lectureOrg?.orgName,
+    lectureOrg?.organizationName,
+    lectureOrg?.name,
+    lectureOrg?.title,
+  )
 
   const thumbnailCandidate = (r.thumbnailUrl ??
     r.imageUrl ??
@@ -27,6 +65,7 @@ function toCartItem(raw: unknown): CartItem | null {
   return {
     lectureId,
     title: title || lectureId,
+    orgName,
     thumbnailUrl,
   }
 }

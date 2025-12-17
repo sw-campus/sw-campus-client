@@ -2,6 +2,7 @@
 export type CartItem = {
   lectureId: string
   title: string
+  orgName?: string
   thumbnailUrl?: string
 }
 
