@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { FiLogIn, FiUser, FiHeart, FiMenu, FiLogOut } from 'react-icons/fi'
 
 import type { CategoryTreeNode } from '@/features/category'
@@ -10,7 +9,6 @@ import { useAuthStore } from '@/store/authStore'
 
 export default function Header({
   categories,
-  onOpenNav,
   onCategoryEnter,
   onOtherNavEnter,
 }: {
@@ -19,7 +17,6 @@ export default function Header({
   onCategoryEnter: (id: number) => void
   onOtherNavEnter: () => void
 }) {
-  const router = useRouter()
   const { logout: clearAuth } = useAuthStore()
   const { isLoggedIn, userName, logout } = useAuthStore()
 
