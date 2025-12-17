@@ -1,9 +1,21 @@
 'use client'
 
+import { useState } from 'react'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { FiLogIn, FiUser, FiHeart, FiMenu, FiLogOut } from 'react-icons/fi'
 
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { useLogout } from '@/features/auth/hooks/useLogout'
 import type { CategoryTreeNode } from '@/features/category'
 import { useAuthStore } from '@/store/authStore'
 
@@ -17,14 +29,15 @@ export default function Header({
   onCategoryEnter: (id: number) => void
   onOtherNavEnter: () => void
 }) {
-  const { logout: clearAuth } = useAuthStore()
-  const { isLoggedIn, userName, logout } = useAuthStore()
+  const { isLoggedIn, userName } = useAuthStore()
+  const { logout, isPending } = useLogout()
+
+  const [logoutOpen, setLogoutOpen] = useState(false)
 
   // 로그아웃
   const handleLogout = async () => {
     try {
-      await logout() // 서버에서 쿠키 삭제
-      clearAuth() // 클라이언트 상태 초기화
+      await logout()
     } catch (e) {
       console.error(e)
     }
@@ -82,7 +95,8 @@ export default function Header({
             <span className="text-sm font-medium">{userName ?? '사용자'}님</span>
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={() => setLogoutOpen(true)}
+              disabled={isPending}
               className="flex items-center gap-2 text-sm transition hover:opacity-80"
             >
               <FiLogOut className="text-xl" />
@@ -90,7 +104,7 @@ export default function Header({
             <Link href="/mypage/organization">
               <FiUser className="text-xl" />
             </Link>
-            <Link href="/">
+            <Link href="/cart/compare">
               <FiHeart className="text-xl" />
             </Link>
           </>
@@ -109,6 +123,31 @@ export default function Header({
           </>
         )}
       </div>
+
+      <Dialog open={logoutOpen} onOpenChange={setLogoutOpen}>
+        <DialogContent>
+          <DialogHeader className="gap-5">
+            <DialogTitle>로그아웃</DialogTitle>
+            <DialogDescription>장바구니에 있는 항목은 7일간 유지됩니다.</DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setLogoutOpen(false)}>
+              취소
+            </Button>
+            <Button
+              type="button"
+              onClick={async () => {
+                await handleLogout()
+                setLogoutOpen(false)
+              }}
+              disabled={isPending}
+            >
+              확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   )
 }

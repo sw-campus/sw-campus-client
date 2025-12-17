@@ -7,14 +7,19 @@ import { useRouter } from 'next/navigation'
 
 import { useCartLecturesQuery } from '@/features/cart/hooks/useCartLecturesQuery'
 import { useRemoveFromCart } from '@/features/cart/hooks/useRemoveFromCart'
+import { useAuthStore } from '@/store/authStore'
 
 export default function FloatingCart() {
   const router = useRouter()
+
+  const isLoggedIn = useAuthStore(state => state.isLoggedIn)
 
   const { data } = useCartLecturesQuery()
   const items = data ?? []
 
   const { mutate: remove } = useRemoveFromCart()
+
+  if (!isLoggedIn) return null
 
   return (
     <AnimatePresence>
