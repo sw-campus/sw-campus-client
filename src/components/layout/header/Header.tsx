@@ -71,9 +71,6 @@ export default function Header({
         <Link href="/organizations" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
           훈련 기관
         </Link>
-        <Link href="/" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
-          커뮤니케이션
-        </Link>
       </nav>
 
       {/* 아이콘 */}
