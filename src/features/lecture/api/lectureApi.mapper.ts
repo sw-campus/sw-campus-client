@@ -8,17 +8,25 @@ import { ApiLectureDetail, LectureDetail } from './lectureApi.types'
 export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): LectureDetail {
   return {
     id: String(api.lectureId),
+    orgId: api.orgId,
     title: api.lectureName,
     orgName: api.orgName,
     tags: [api.categoryName, api.recruitType].filter(Boolean),
+    lectureLoc: api.lectureLoc,
+    categoryName: api.categoryName,
     thumbnailUrl: api.lectureImageUrl,
-    summary: api.goal,
+    url: api.url,
+    recruitType: api.recruitType,
+    summary: generateSummary(api),
     schedule: {
-      recruitPeriod: { start: api.deadline, end: api.startAt },
-      coursePeriod: { start: api.startAt, end: api.endAt },
-      days: api.days.map(day => dayKor(day)).join(', '),
+      recruitPeriod: formatDate(api.deadline),
+      coursePeriod: { start: formatDate(api.startAt), end: formatDate(api.endAt) },
+      days: sortDays(api.days)
+        .map(day => dayKor(day))
+        .join(', '),
       time: `${api.startTime.slice(0, 5)} - ${api.endTime.slice(0, 5)}`,
       totalHours: api.totalTimes,
+      totalDays: api.totalDays,
     },
     support: {
       tuition: api.lectureFee,
@@ -26,9 +34,80 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
       extraSupport: api.eduSubsidy ? `교육비 지원 ${api.eduSubsidy.toLocaleString()}원` : undefined,
     },
     location: api.location,
-    recruitStatus: api.status === 'RECRUITING' ? 'OPEN' : api.status === 'DRAFT' ? 'DRAFT' : 'CLOSED',
+    recruitStatus: api.status === 'RECRUITING' ? 'RECRUITING' : 'FINISHED',
     photos: api.orgFacilityImageUrls ?? [],
+    steps: api.steps ? api.steps.sort((a, b) => a.stepOrder - b.stepOrder).map(s => stepTypeKor(s.stepType)) : [],
+    benefits: api.adds ? api.adds.map(a => a.addName) : [],
+
+    // Expanded fields mapping
+    goal: api.goal,
+    maxCapacity: api.maxCapacity,
+    equipment: {
+      pc: api.equipPc,
+      merit: api.equipMerit,
+    },
+    services: {
+      books: api.books,
+      resume: api.resume,
+      mockInterview: api.mockInterview,
+      employmentHelp: api.employmentHelp,
+      afterCompletion: api.afterCompletion,
+    },
+    project: {
+      num: api.projectNum,
+      time: api.projectTime,
+      team: api.projectTeam,
+      tool: api.projectTool,
+      mentor: api.projectMentor,
+    },
+    curriculum: api.curriculums
+      ? api.curriculums.map(c => ({
+          level: c.level,
+          name: c.curriculum?.curriculumName || c.curriculumName || '',
+        }))
+      : [],
+    teachers: api.teachers
+      ? api.teachers.map(t => ({ name: t.teacherName, desc: t.teacherDescription, imageUrl: t.teacherImageUrl }))
+      : [],
+    quals: api.quals ? api.quals.map(q => ({ type: q.type, text: q.text })) : [],
   }
+}
+
+function generateSummary(api: ApiLectureDetail): string {
+  const parts = []
+
+  // Location & Type
+  const loc = api.lectureLoc === 'OFFLINE' ? '오프라인에서 진행되는' : '온라인으로 진행되는'
+  const type = api.recruitType === 'CARD_REQUIRED' || api.recruitType === 'KDT' ? 'KDT(우수형)' : '국비지원'
+  parts.push(`${loc} ${type} ${api.categoryName} 부트캠프입니다.`)
+
+  // Goal
+  if (api.goal) {
+    parts.push(`\n${api.goal}`)
+  }
+
+  // Target/Pre-req (Simulated based on common patterns or fields)
+  if (api.quals && api.quals.length > 0) {
+    const required = api.quals
+      .filter(q => q.type === 'REQUIRED')
+      .map(q => q.text)
+      .join(', ')
+    if (required) {
+      parts.push(`\n주요 지원 자격: ${required}`)
+    }
+  }
+
+  return parts.join('')
+}
+
+function stepTypeKor(type: string): string {
+  const map: Record<string, string> = {
+    DOCUMENT: '서류심사',
+    INTERVIEW: '면접',
+    CODING_TEST: '코딩테스트',
+    PRE_TASK: '사전과제',
+  }
+  return map[type] ?? type
 }
 
 /**
@@ -46,4 +125,14 @@ const DAY_KOR_MAP: Record<string, string> = {
 
 export function dayKor(day: string): string {
   return DAY_KOR_MAP[day] ?? day
+}
+
+function formatDate(isoString: string): string {
+  if (!isoString) return ''
+  return isoString.split('T')[0]
+}
+
+function sortDays(days: string[]): string[] {
+  const order = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
+  return days.sort((a, b) => order.indexOf(a) - order.indexOf(b))
 }

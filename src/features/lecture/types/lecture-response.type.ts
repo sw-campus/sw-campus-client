@@ -90,3 +90,16 @@ export interface LectureResponseDto {
   averageScore: number | null
   reviewCount: number | null
 }
+
+// Spring Data Page 응답 타입 (실제 백엔드 응답 구조)
+export interface PageInfo {
+  size: number
+  number: number // 현재 페이지 (0-indexed)
+  totalElements: number
+  totalPages: number
+}
+
+export interface PageResponse<T> {
+  content: T[]
+  page: PageInfo
+}
