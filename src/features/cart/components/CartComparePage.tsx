@@ -1,17 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Image from 'next/image'
-import Link from 'next/link'
-import { FiX } from 'react-icons/fi'
 
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { LectureSummaryCard } from '@/features/cart/components/LectureSummaryCard'
 import { useCartLecturesWithDetailQuery } from '@/features/cart/hooks/useCartLecturesWithDetailQuery'
+import {
+  formatBoolean,
+  formatDateRange,
+  formatLectureLoc,
+  formatList,
+  formatMoney,
+  formatRecruitType,
+  formatStatus,
+  formatText,
+} from '@/features/cart/utils/cartCompareFormatters'
 import { useLectureDetailQuery } from '@/features/lecture'
 import { cn } from '@/lib/utils'
+import { useCartCompareStore } from '@/store/cartCompare.store'
 
 type Side = 'left' | 'right'
 
@@ -27,79 +36,18 @@ function getDragLectureId(e: React.DragEvent) {
   return e.dataTransfer.getData(DND_MIME) || e.dataTransfer.getData('text/plain')
 }
 
-function LectureSummaryCard({
-  side,
-  title,
-  orgName,
-  thumbnailUrl,
-  lectureId,
-  onClear,
-}: {
-  side: Side
-  title: string
-  orgName?: string | null
-  thumbnailUrl?: string | null
-  lectureId?: string | null
-  onClear: () => void
-}) {
-  const hasSelection = Boolean(lectureId)
-
-  return (
-    <div className="relative flex flex-col items-center gap-3 px-6 py-8 text-center">
-      {hasSelection ? (
-        <button
-          type="button"
-          onClick={onClear}
-          aria-label={`${side === 'left' ? '왼쪽' : '오른쪽'} 선택 해제`}
-          className="bg-background text-muted-foreground hover:text-foreground absolute top-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full border"
-        >
-          <FiX />
-        </button>
-      ) : null}
-
-      <div className="bg-muted/30 relative h-24 w-24 overflow-hidden rounded-full">
-        {thumbnailUrl ? (
-          <Image
-            src={thumbnailUrl}
-            alt=""
-            fill
-            sizes="96px"
-            className="object-cover"
-            unoptimized={thumbnailUrl.startsWith('http')}
-          />
-        ) : null}
-      </div>
-
-      <div className="space-y-1">
-        <div className={cn('text-xl font-bold', !hasSelection && 'text-muted-foreground')}>
-          {hasSelection ? title : '미선택'}
-        </div>
-        <div className={cn('text-muted-foreground text-sm', !hasSelection && 'opacity-60')}>
-          {hasSelection ? (orgName ?? '-') : '강의를 선택해 주세요'}
-        </div>
-      </div>
-
-      {hasSelection ? (
-        <Button asChild className="mt-2 w-40">
-          <Link href={`/lectures/${lectureId}`}>자세히 보기</Link>
-        </Button>
-      ) : (
-        <Button disabled className="mt-2 w-40">
-          자세히 보기
-        </Button>
-      )}
-    </div>
-  )
-}
-
 export default function CartComparePage() {
   const { data, isLoading, isError } = useCartLecturesWithDetailQuery()
   const items = data ?? []
 
-  const [leftId, setLeftId] = useState<string | null>(null)
-  const [rightId, setRightId] = useState<string | null>(null)
+  const { leftId, rightId, setLeftId, setRightId } = useCartCompareStore()
   const [isLeftOver, setIsLeftOver] = useState(false)
   const [isRightOver, setIsRightOver] = useState(false)
+
+  useEffect(() => {
+    if (leftId && !items.some(i => i.lectureId === leftId)) setLeftId(null)
+    if (rightId && !items.some(i => i.lectureId === rightId)) setRightId(null)
+  }, [items, leftId, rightId, setLeftId, setRightId])
 
   const left = items.find(i => i.lectureId === leftId) ?? null
   const right = items.find(i => i.lectureId === rightId) ?? null
@@ -121,57 +69,22 @@ export default function CartComparePage() {
     return Array.from(names)
   })()
 
-  const formatDateRange = (start: string | null | undefined, end: string | null | undefined) => {
-    if (!start && !end) return '-'
-    return `${start ?? '-'} ~ ${end ?? '-'}`
-  }
-
-  const formatMoney = (value: number | null | undefined) => {
-    if (value === null || value === undefined) return '-'
-    return `${value.toLocaleString()}원`
-  }
-
-  const formatText = (value: string | null | undefined) => {
-    if (!value) return '-'
-    return value
-  }
-
-  const formatBoolean = (value: boolean | null | undefined) => {
-    if (value === null || value === undefined) return '-'
-    return value ? '있음' : '없음'
-  }
-
-  const formatList = (values: Array<string | null | undefined> | null | undefined) => {
-    const list = (values ?? []).filter(Boolean) as string[]
-    return list.length ? list.join(', ') : '-'
-  }
-
-  const formatRecruitType = (value: string | null | undefined) => {
-    if (!value) return '-'
-    if (value === 'CARD_REQUIRED') return '내일배움카드 필요'
-    if (value === 'GENERAL') return '내일배움카드 불필요'
-    if (value === 'KDT') return 'KDT(우수형)'
-    return value
-  }
-
-  const formatLectureLoc = (value: string | null | undefined) => {
-    if (!value) return '-'
-    if (value === 'ONLINE') return '온라인'
-    if (value === 'OFFLINE') return '오프라인'
-    if (value === 'MIXED' || value === 'HYBRID') return '온/오프라인 병행'
-    return value
-  }
-
-  const formatStatus = (value: string | null | undefined) => {
-    if (!value) return '-'
-    if (value === 'OPEN') return '모집중'
-    if (value === 'CLOSED') return '마감'
-    if (value === 'DRAFT') return '임시저장'
-    return value
-  }
-
   const hasStep = (dto: typeof leftDetail, stepType: string) => {
     return Boolean(dto?.steps?.some(s => s === stepType))
+  }
+
+  const leftCategory = left?.categoryName ?? leftDetail?.categoryName
+  const rightCategory = right?.categoryName ?? rightDetail?.categoryName
+  const lockedCategory = leftCategory ?? rightCategory ?? null
+
+  const canUseItem = (itemCategory: string | undefined) => {
+    if (!lockedCategory) return true
+    if (!itemCategory) return false
+    return itemCategory === lockedCategory
+  }
+
+  const isAlreadySelected = (lectureId: string) => {
+    return lectureId === leftId || lectureId === rightId
   }
 
   const curriculumLevel = (dto: typeof leftDetail, name: string) => {
@@ -182,7 +95,7 @@ export default function CartComparePage() {
 
   const sectionRow = (label: string) => (
     <TableRow>
-      <TableCell colSpan={4} className="bg-muted/50 text-muted-foreground px-6 py-3 text-sm font-semibold">
+      <TableCell colSpan={4} className="bg-accent/10 text-accent-foreground px-6 py-3 text-sm font-semibold">
         {label}
       </TableCell>
     </TableRow>
@@ -214,6 +127,12 @@ export default function CartComparePage() {
   )
 
   const onDropLecture = (side: Side, lectureId: string) => {
+    if (isAlreadySelected(lectureId)) return
+
+    const dropped = items.find(i => i.lectureId === lectureId)
+    const droppedCategory = dropped?.categoryName
+    if (!canUseItem(droppedCategory)) return
+
     if (side === 'left') setLeftId(lectureId)
     else setRightId(lectureId)
   }
@@ -237,16 +156,32 @@ export default function CartComparePage() {
                 <button
                   key={item.lectureId}
                   type="button"
-                  draggable
-                  onDragStart={e => setDragLectureId(e, item.lectureId)}
+                  disabled={!canUseItem(item.categoryName) || isAlreadySelected(item.lectureId)}
+                  draggable={canUseItem(item.categoryName) && !isAlreadySelected(item.lectureId)}
+                  onDragStart={e => {
+                    if (isAlreadySelected(item.lectureId)) {
+                      e.preventDefault()
+                      return
+                    }
+                    if (!canUseItem(item.categoryName)) {
+                      e.preventDefault()
+                      return
+                    }
+                    setDragLectureId(e, item.lectureId)
+                  }}
                   onClick={() => {
+                    if (isAlreadySelected(item.lectureId)) return
+                    if (!canUseItem(item.categoryName)) return
                     if (!leftId) setLeftId(item.lectureId)
                     else if (!rightId) setRightId(item.lectureId)
                     else setLeftId(item.lectureId)
                   }}
-                  className="hover:bg-muted/50 border-border flex w-full items-center gap-3 rounded-md border p-2 text-left"
+                  className="hover:bg-muted/50 border-border disabled:bg-muted/20 disabled:text-muted-foreground relative flex w-full items-center gap-3 overflow-hidden rounded-md border p-2 text-left disabled:cursor-not-allowed"
                 >
-                  <div className="bg-muted relative h-10 w-10 overflow-hidden rounded-md">
+                  {(!canUseItem(item.categoryName) || isAlreadySelected(item.lectureId)) && (
+                    <span aria-hidden className="bg-foreground/10 absolute inset-0" />
+                  )}
+                  <div className="bg-muted relative z-10 h-10 w-10 overflow-hidden rounded-md">
                     {item.thumbnailUrl ? (
                       <Image
                         src={item.thumbnailUrl}
@@ -258,9 +193,9 @@ export default function CartComparePage() {
                       />
                     ) : null}
                   </div>
-                  <div className="min-w-0 flex-1">
+                  <div className="relative z-10 min-w-0 flex-1">
                     <div className="truncate text-sm font-medium">{item.title}</div>
-                    <div className="text-muted-foreground truncate text-xs">{item.orgName ?? item.lectureId}</div>
+                    <div className="text-muted-foreground truncate text-xs">{item.categoryName ?? '-'}</div>
                   </div>
                 </button>
               ))
@@ -269,9 +204,12 @@ export default function CartComparePage() {
         </Card>
       </aside>
 
-      <Card className="min-w-0">
-        <CardHeader className="pb-3">
+      <Card>
+        <CardHeader>
           <CardTitle className="text-base">과정비교 페이지</CardTitle>
+          <div className="text-muted-foreground text-sm">
+            사이드바에서 강의를 드래그해서 왼쪽/오른쪽 영역에 놓으면 비교표가 업데이트됩니다.
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="border-border grid grid-cols-1 overflow-hidden rounded-md border md:grid-cols-[1fr_1px_1fr]">
@@ -505,10 +443,6 @@ export default function CartComparePage() {
                     )}
               </TableBody>
             </Table>
-          </div>
-
-          <div className="text-muted-foreground text-xs">
-            사이드바에서 강의를 드래그해서 왼쪽/오른쪽 영역에 놓으면 비교표가 업데이트됩니다.
           </div>
         </CardContent>
       </Card>

@@ -10,7 +10,11 @@ export function useCartLecturesWithDetailQuery() {
 
   const items = cartQuery.data ?? []
   const lectureIds = Array.from(
-    new Set(items.filter(item => !item.orgName || !item.title || !item.thumbnailUrl).map(item => item.lectureId)),
+    new Set(
+      items
+        .filter(item => !item.categoryName || !item.orgName || !item.title || !item.thumbnailUrl)
+        .map(item => item.lectureId),
+    ),
   )
 
   const detailQueries = useQueries({
@@ -22,7 +26,10 @@ export function useCartLecturesWithDetailQuery() {
     })),
   })
 
-  const detailByLectureId = new Map<string, { title?: string; orgName?: string; thumbnailUrl?: string }>()
+  const detailByLectureId = new Map<
+    string,
+    { title?: string; orgName?: string; thumbnailUrl?: string; categoryName?: string }
+  >()
 
   for (const q of detailQueries) {
     if (!q.data) continue
@@ -30,6 +37,7 @@ export function useCartLecturesWithDetailQuery() {
       title: q.data.title,
       orgName: q.data.orgName,
       thumbnailUrl: q.data.thumbnailUrl,
+      categoryName: q.data.categoryName,
     })
   }
 
@@ -39,6 +47,7 @@ export function useCartLecturesWithDetailQuery() {
       ...item,
       title: item.title || detail?.title || item.lectureId,
       orgName: item.orgName || detail?.orgName,
+      categoryName: item.categoryName || detail?.categoryName,
       thumbnailUrl: item.thumbnailUrl || detail?.thumbnailUrl,
     }
   })

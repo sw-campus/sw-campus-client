@@ -55,6 +55,15 @@ function toCartItem(raw: unknown): CartItem | null {
     lectureOrg?.title,
   )
 
+  const categoryName = pickString(
+    r.categoryName,
+    r.category,
+    r.categoryTitle,
+    lecture?.categoryName,
+    lecture?.category,
+    lecture?.categoryTitle,
+  )
+
   const thumbnailCandidate = (r.thumbnailUrl ??
     r.imageUrl ??
     r.image ??
@@ -65,6 +74,7 @@ function toCartItem(raw: unknown): CartItem | null {
   return {
     lectureId,
     title: title || lectureId,
+    categoryName,
     orgName,
     thumbnailUrl,
   }
