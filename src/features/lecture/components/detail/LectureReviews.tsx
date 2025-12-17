@@ -93,7 +93,7 @@ function ReviewCard({ review }: { review: Review }) {
                 </span>
                 <div className="flex items-center gap-1.5">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="min-w-[2rem] text-right text-sm font-bold text-yellow-500">
+                  <span className="min-w-8 text-right text-sm font-bold text-yellow-500">
                     {detail.score.toFixed(1)}
                   </span>
                 </div>
