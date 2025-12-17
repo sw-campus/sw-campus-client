@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { getOrganizationReviews } from '@/features/lecture/api/reviewApi.client'
 import { CATEGORY_LABELS, type Review } from '@/features/lecture/api/reviewApi.types'
 import { LectureList } from '@/features/lecture/components/LectureList'
+import { formatDate, StarRating } from '@/features/lecture/components/detail/DetailShared'
 import type { Lecture } from '@/features/lecture/types/lecture.type'
 
 import type { OrganizationDetail as OrganizationDetailType } from '../types/organization.type'
@@ -19,34 +20,6 @@ import type { OrganizationDetail as OrganizationDetailType } from '../types/orga
 interface OrganizationDetailProps {
   organization: OrganizationDetailType
   lectures?: Lecture[]
-}
-
-function formatDate(dateStr: string) {
-  if (!dateStr) return ''
-  return dateStr.split('T')[0].replaceAll('-', '.')
-}
-
-function StarRating({ score, size = 'md' }: { score: number; size?: 'sm' | 'md' }) {
-  const fullStars = Math.floor(score)
-  const hasHalf = score - fullStars >= 0.5
-  const starSize = size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'
-
-  return (
-    <div className="flex items-center gap-0.5">
-      {[...Array(5)].map((_, i) => (
-        <Star
-          key={i}
-          className={`${starSize} ${
-            i < fullStars
-              ? 'fill-yellow-400 text-yellow-400'
-              : i === fullStars && hasHalf
-                ? 'fill-yellow-400/50 text-yellow-400'
-                : 'text-gray-300'
-          }`}
-        />
-      ))}
-    </div>
-  )
 }
 
 function OrganizationReviewCard({ review }: { review: Review }) {

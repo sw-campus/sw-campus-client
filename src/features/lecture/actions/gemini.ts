@@ -2,9 +2,11 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
+import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
-export async function generateGeminiSummary(lectureData: any) {
+export async function generateGeminiSummary(lectureData: LectureDetail) {
   if (!process.env.GEMINI_API_KEY) {
     console.warn('GEMINI_API_KEY is missing')
     return 'API 키가 설정되지 않아 AI 요약을 생성할 수 없습니다. (GEMINI_API_KEY 확인 필요)'
@@ -38,11 +40,11 @@ export async function generateGeminiSummary(lectureData: any) {
       
       [핵심 내용]
       목표: ${lectureData.goal}
-      커리큘럼 요약: ${lectureData.curriculum.join(', ')}
+      커리큘럼 요약: ${lectureData.curriculum.map(c => c.name).join(', ')}
       
       [교육 환경 및 혜택]
       모집 정원: ${lectureData.maxCapacity}명
-      지원금/수당: ${lectureData.support.stipend}, ${lectureData.support.extraSupport}
+      지원금/수당: ${lectureData.support.stipend ?? '정보 없음'}, ${lectureData.support.extraSupport ?? '정보 없음'}
       장비 지원: ${lectureData.equipment.pc} (${lectureData.equipment.merit})
       취업 지원 서비스: ${[
         lectureData.services.books ? '교재제공' : '',
@@ -55,7 +57,7 @@ export async function generateGeminiSummary(lectureData: any) {
         .join(', ')}
       
       [기타]
-      지원 자격: ${lectureData.quals.map((q: any) => q.text).join(', ')}
+      지원 자격: ${lectureData.quals.map(q => q.text).join(', ')}
       채용 혜택: ${lectureData.benefits.join(', ')}
     `
 
