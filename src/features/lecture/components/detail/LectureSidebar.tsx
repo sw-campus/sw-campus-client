@@ -1,6 +1,9 @@
+'use client'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { AddToCartButton } from '@/features/cart'
 import { type LectureDetail } from '@/features/lecture/api/lectureApi'
 
 import { formatDateDot, SideInfoRow } from './DetailShared'
@@ -26,9 +29,14 @@ export default function LectureSidebar({ lecture }: Props) {
             신청페이지 바로가기
           </Button>
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" size="lg" className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50">
+            <AddToCartButton
+              item={{ lectureId: String(lecture.id) }}
+              variant="outline"
+              size="lg"
+              className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50"
+            >
               장바구니
-            </Button>
+            </AddToCartButton>
             <Button variant="outline" size="lg" className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50">
               공유하기
             </Button>

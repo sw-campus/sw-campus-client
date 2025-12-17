@@ -75,7 +75,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
               variant="outline"
               className="shrink-0 rounded-lg border-gray-200 text-gray-700 hover:bg-gray-50"
             >
-              <Link href={`/organization/${org.id}`}>자세히 보기</Link>
+              <Link href={`/organizations/${org.id}`}>자세히 보기</Link>
             </Button>
           </div>
         </Section>
