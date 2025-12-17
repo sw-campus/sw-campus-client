@@ -74,7 +74,7 @@ export type LectureDetail = {
     extraSupport?: string
   }
   location: string
-  recruitStatus: 'OPEN' | 'CLOSED' | 'DRAFT'
+  recruitStatus: 'RECRUITING' | 'FINISHED'
   photos: string[]
   steps: string[]
   benefits: string[]

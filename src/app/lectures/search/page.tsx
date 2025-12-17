@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -37,21 +37,18 @@ export default function LectureSearchPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const queryString = useMemo(() => searchParams.toString(), [searchParams])
+  const queryString = searchParams.toString()
   const { data, isLoading, isError } = useSearchLectureQuery(queryString)
 
-  const lectures = useMemo(() => (data?.content ?? []).map(mapLectureResponseToSummary), [data])
-  const pageInfo = useMemo(
-    () => ({
-      currentPage: data?.page?.number ?? 0,
-      totalPages: data?.page?.totalPages ?? 0,
-      totalElements: data?.page?.totalElements ?? 0,
-      size: data?.page?.size ?? 20,
-      isFirst: (data?.page?.number ?? 0) === 0,
-      isLast: (data?.page?.number ?? 0) >= (data?.page?.totalPages ?? 1) - 1,
-    }),
-    [data],
-  )
+  const lectures = (data?.content ?? []).map(mapLectureResponseToSummary)
+  const pageInfo = {
+    currentPage: data?.page?.number ?? 0,
+    totalPages: data?.page?.totalPages ?? 0,
+    totalElements: data?.page?.totalElements ?? 0,
+    size: data?.page?.size ?? 20,
+    isFirst: (data?.page?.number ?? 0) === 0,
+    isLast: (data?.page?.number ?? 0) >= (data?.page?.totalPages ?? 1) - 1,
+  }
 
   // Category Tree Data
   const { data: categoryTree } = useCategoryTree()
@@ -71,25 +68,25 @@ export default function LectureSearchPage() {
   })
 
   // Level 1 Categories
-  const level1Categories = useMemo(() => categoryTree ?? [], [categoryTree])
+  const level1Categories = categoryTree ?? []
 
   // Level 2 Categories (Children of single L1)
-  const level2Categories = useMemo(() => {
+  const level2Categories = (() => {
     if (!level1Id || !categoryTree) return []
     const parent = categoryTree.find((c: CategoryTreeNode) => c.categoryId === level1Id)
     return parent?.children ?? []
-  }, [level1Id, categoryTree])
+  })()
 
   // Level 3 Categories (Children of single L2)
-  const level3Categories = useMemo(() => {
+  const level3Categories = (() => {
     if (!level2Id || !level2Categories.length) return []
     const parent = level2Categories.find((c: CategoryTreeNode) => c.categoryId === level2Id)
     return parent?.children ?? []
-  }, [level2Id, level2Categories])
+  })()
 
   // Category ID → Path 매핑 (O(1) 조회를 위한 최적화)
   type CategoryPath = { l1: number; l2?: number; l3?: number }
-  const categoryPathMap = useMemo(() => {
+  const categoryPathMap = (() => {
     const map = new Map<number, CategoryPath>()
     if (!categoryTree) return map
 
@@ -109,7 +106,7 @@ export default function LectureSearchPage() {
       }
     }
     return map
-  }, [categoryTree])
+  })()
 
   // Reset Child Categories on Parent Change
   // Sync State with URL Params
@@ -251,18 +248,15 @@ export default function LectureSearchPage() {
     router.push(destination)
   }
 
-  const handlePageChange = useCallback(
-    (newPage: number) => {
-      const params = new URLSearchParams(searchParams.toString())
-      // 백엔드는 1-indexed 페이지를 기대하므로 +1
-      params.set('page', String(newPage + 1))
-      router.push(`/lectures/search?${params.toString()}`)
-    },
-    [searchParams, router],
-  )
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    // 백엔드는 1-indexed 페이지를 기대하므로 +1
+    params.set('page', String(newPage + 1))
+    router.push(`/lectures/search?${params.toString()}`)
+  }
 
   // 페이지 번호 목록 생성 (최대 5개)
-  const getPageNumbers = useCallback(() => {
+  const getPageNumbers = () => {
     const { currentPage, totalPages } = pageInfo
     const maxVisible = 5
     let start = Math.max(0, currentPage - Math.floor(maxVisible / 2))
@@ -278,13 +272,12 @@ export default function LectureSearchPage() {
       pages.push(i)
     }
     return pages
-  }, [pageInfo])
+  }
 
   // Convert categories to options for MultiSelect
-  const level3Options = useMemo(
-    () => (categoryTree ? level3Categories.map(c => ({ label: c.categoryName, value: String(c.categoryId) })) : []),
-    [level3Categories, categoryTree],
-  )
+  const level3Options = categoryTree
+    ? level3Categories.map(c => ({ label: c.categoryName, value: String(c.categoryId) }))
+    : []
 
   return (
     <div className="custom-container">

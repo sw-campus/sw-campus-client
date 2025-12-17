@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 
 import { useRouter } from 'next/navigation'
 import { FiArrowRight } from 'react-icons/fi'
@@ -16,7 +16,7 @@ export default function LectureSection() {
 
   // 카테고리 트리에서 첫 번째 대분류의 중분류(children)를 가져옴
   const { data: categoryTree } = useCategoryTree()
-  const subcategories = useMemo(() => categoryTree?.[0]?.children ?? [], [categoryTree])
+  const subcategories = categoryTree?.[0]?.children ?? []
 
   // 선택된 중분류 ID
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
@@ -29,19 +29,16 @@ export default function LectureSection() {
   }, [subcategories, selectedCategoryId])
 
   // selectedCategoryId로부터 카테고리명 파생
-  const selectedCategoryName = useMemo(
-    () => subcategories.find(c => c.categoryId === selectedCategoryId)?.categoryName ?? '',
-    [subcategories, selectedCategoryId],
-  )
+  const selectedCategoryName = subcategories.find(c => c.categoryId === selectedCategoryId)?.categoryName ?? ''
 
   // 선택된 중분류의 평점 높은 강의 조회
   const { data: lecturesData, isLoading } = useTopRatedLecturesByCategory(selectedCategoryId)
 
   // API 응답을 LectureSummary 타입으로 변환
-  const lectures = useMemo(() => (lecturesData ?? []).map(mapLectureResponseToSummary), [lecturesData])
+  const lectures = (lecturesData ?? []).map(mapLectureResponseToSummary)
 
   // 탭에 표시할 카테고리명 배열
-  const categoryNames = useMemo(() => subcategories.map(c => c.categoryName), [subcategories])
+  const categoryNames = subcategories.map(c => c.categoryName)
 
   // 탭 선택 핸들러
   const handleTabSelect = (name: string) => {

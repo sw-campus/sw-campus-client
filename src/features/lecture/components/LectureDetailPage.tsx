@@ -1,5 +1,4 @@
 'use client'
-import { useMemo } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
@@ -34,48 +33,45 @@ export default function LectureDetailPage({ lectureId }: Props) {
   })
 
   // 더미 데이터 (로딩/에러/데이터 없음 시)
-  const mock: LectureDetail = useMemo(
-    () => ({
-      id: lectureId,
-      orgId: 1,
-      title: '지역사회 지역혁신프로젝트 기업연계형 SW 직무교육 1기',
-      orgName: '한국소프트웨어인재개발원',
-      tags: ['KDT', '인재추천', '입반선발'],
-      lectureLoc: 'OFFLINE',
-      categoryName: '백엔드',
-      thumbnailUrl: '',
-      recruitType: 'CARD_REQUIRED',
-      summary:
-        'KDT(우수형) 백엔드 부트캠프입니다.\n취업을 위한 인재추천, 입반선발 전형이 있으며, 선발전형 통과테스트가 있습니다.',
-      schedule: {
-        recruitPeriod: '2025-12-28',
-        coursePeriod: { start: '2025-12-30', end: '2026-07-28' },
-        days: '월, 화, 수, 목, 금',
-        time: '09:00 - 19:00',
-        totalHours: 60,
-        totalDays: 20,
-      },
-      support: {
-        tuition: 2800000,
-        stipend: '훈련장려금 월 11만 6천원',
-        extraSupport: '특별훈련수당 월 20만원',
-      },
-      location: '서울시 금천구',
-      recruitStatus: 'OPEN',
-      photos: ['', '', '', ''],
-      steps: ['서류심사', '면접', '최종합격'],
-      benefits: ['인재추천', '인턴십 진행'],
-      goal: '',
-      maxCapacity: 0,
-      equipment: { pc: '', merit: '' },
-      services: { books: false, resume: false, mockInterview: false, employmentHelp: false, afterCompletion: false },
-      project: { num: 0, time: 0, team: '', tool: '', mentor: false },
-      curriculum: [],
-      teachers: [],
-      quals: [],
-    }),
-    [lectureId],
-  )
+  const mock: LectureDetail = {
+    id: lectureId,
+    orgId: 1,
+    title: '지역사회 지역혁신프로젝트 기업연계형 SW 직무교육 1기',
+    orgName: '한국소프트웨어인재개발원',
+    tags: ['KDT', '인재추천', '입반선발'],
+    lectureLoc: 'OFFLINE',
+    categoryName: '백엔드',
+    thumbnailUrl: '',
+    recruitType: 'CARD_REQUIRED',
+    summary:
+      'KDT(우수형) 백엔드 부트캠프입니다.\n취업을 위한 인재추천, 입반선발 전형이 있으며, 선발전형 통과테스트가 있습니다.',
+    schedule: {
+      recruitPeriod: '2025-12-28',
+      coursePeriod: { start: '2025-12-30', end: '2026-07-28' },
+      days: '월, 화, 수, 목, 금',
+      time: '09:00 - 19:00',
+      totalHours: 60,
+      totalDays: 20,
+    },
+    support: {
+      tuition: 2800000,
+      stipend: '훈련장려금 월 11만 6천원',
+      extraSupport: '특별훈련수당 월 20만원',
+    },
+    location: '서울시 금천구',
+    recruitStatus: 'RECRUITING',
+    photos: ['', '', '', ''],
+    steps: ['서류심사', '면접', '최종합격'],
+    benefits: ['인재추천', '인턴십 진행'],
+    goal: '',
+    maxCapacity: 0,
+    equipment: { pc: '', merit: '' },
+    services: { books: false, resume: false, mockInterview: false, employmentHelp: false, afterCompletion: false },
+    project: { num: 0, time: 0, team: '', tool: '', mentor: false },
+    curriculum: [],
+    teachers: [],
+    quals: [],
+  }
 
   const lecture = data ?? mock
 
