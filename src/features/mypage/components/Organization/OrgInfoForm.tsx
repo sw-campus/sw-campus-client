@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { FormProvider, useForm } from 'react-hook-form'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { FiX } from 'react-icons/fi'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -73,7 +74,7 @@ const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
 const loadDaumPostcodeScript = () => {
   if (typeof window === 'undefined') return
 
-  const w = window as any
+  const w = window as unknown as { daum?: { Postcode?: unknown } }
   // 이미 로드되어 있으면 종료
   if (w.daum?.Postcode) return
 
@@ -125,6 +126,17 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     formState: { isValid, errors },
     register,
   } = methods
+  const logoFileInputRef = useRef<HTMLInputElement | null>(null)
+  const facilityFileInputRef1 = useRef<HTMLInputElement | null>(null)
+  const facilityFileInputRef2 = useRef<HTMLInputElement | null>(null)
+  const facilityFileInputRef3 = useRef<HTMLInputElement | null>(null)
+  const facilityFileInputRef4 = useRef<HTMLInputElement | null>(null)
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [certificateFile, setCertificateFile] = useState<File | null>(null)
+  const [facilityFile1, setFacilityFile1] = useState<File | null>(null)
+  const [facilityFile2, setFacilityFile2] = useState<File | null>(null)
+  const [facilityFile3, setFacilityFile3] = useState<File | null>(null)
+  const [facilityFile4, setFacilityFile4] = useState<File | null>(null)
 
   useEffect(() => {
     let mounted = true
@@ -162,7 +174,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
         // AddressInput(store) 값 세팅
         setAddress(data.location ?? '')
         setDetailAddress('')
-      } catch (e) {
+      } catch {
         toast.error('기관 정보 조회에 실패했습니다.')
       } finally {
         if (mounted) setIsLoading(false)
@@ -176,25 +188,51 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     }
   }, [methods, setAddress, setDetailAddress])
 
-  const onSubmit = async (values: OrgInfoFormValues) => {
+  const onSubmit = async (_values: OrgInfoFormValues) => {
     setIsPending(true)
     try {
       // AddressInput은 store 기반이므로 여기서 location 조합
-      const nextLocation = detailAddress?.trim() ? `${address ?? ''} ${detailAddress}`.trim() : (address ?? '').trim()
+      const _nextLocation = detailAddress?.trim() ? `${address ?? ''} ${detailAddress}`.trim() : (address ?? '').trim()
+      const fd = new FormData()
+      // 텍스트 필드 (Swagger 스펙 기반)
+      fd.append('organizationName', methods.getValues('organizationName') ?? '')
+      fd.append('description', methods.getValues('description') ?? '')
+      fd.append('phone', methods.getValues('phone') ?? '')
+      fd.append('location', _nextLocation)
+      fd.append('homepage', methods.getValues('homepage') ?? '')
+      fd.append('govAuth', methods.getValues('govAuth') ?? '')
 
-      // NOTE: 현재 제공된 Swagger 이미지에는 수정(POST/PUT) 스펙이 없어서 임의로 호출하지 않습니다.
-      // 수정 API 스펙이 확정되면 아래를 실제 호출로 교체하세요.
-      // await api.put('/mypage/organization', {
-      //   ...values,
-      //   location: nextLocation,
-      // })
+      // 파일 필드 (백엔드가 파일 업로드 포함임)
+      if (logoFile) fd.append('logo', logoFile)
+      if (certificateFile) fd.append('certificate', certificateFile)
+      if (facilityFile1) fd.append('facilityImage1', facilityFile1)
+      if (facilityFile2) fd.append('facilityImage2', facilityFile2)
+      if (facilityFile3) fd.append('facilityImage3', facilityFile3)
+      if (facilityFile4) fd.append('facilityImage4', facilityFile4)
 
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await api.patch('/mypage/organization', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
       toast.success('저장되었습니다.')
       router.back()
     } finally {
       setIsPending(false)
     }
+  }
+
+  // 상태 표시용 UI 설정 (색상/라벨)
+  const getApprovalStatusUI = (status: string) => {
+    const s = (status || '').toLowerCase()
+    if (s === 'approved') return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
+    if (s === 'rejected') return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
+    // pending 또는 기타 상태는 보류로 표시
+    return { label: '승인 대기', dot: 'bg-amber-500', text: 'text-amber-700' }
+  }
+
+  const isImageUrl = (url: string | undefined | null) => {
+    if (!url) return false
+    if (url.startsWith('blob:')) return true
+    return /(\.png|\.jpg|\.jpeg|\.gif|\.webp|\.bmp|\.svg)$/i.test(url)
   }
 
   const formContent = (
@@ -214,7 +252,15 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-800">승인 상태</label>
               <div className={`${INPUT_CLASS} flex items-center bg-gray-50`}>
-                <span className="truncate">{approvalStatus || '-'}</span>
+                {(() => {
+                  const ui = getApprovalStatusUI(approvalStatus)
+                  return (
+                    <span className="inline-flex items-center gap-2">
+                      <span className={`h-2.5 w-2.5 rounded-full ${ui.dot}`} />
+                      <span className={`truncate text-sm font-medium ${ui.text}`}>{ui.label}</span>
+                    </span>
+                  )
+                })()}
               </div>
             </div>
 
@@ -225,7 +271,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
               <input
                 id="organizationName"
                 type="text"
-                placeholder="예) (주)캠퍼스랩"
+                placeholder="예) (주)SWCampus"
                 {...register('organizationName')}
                 className={INPUT_CLASS}
               />
@@ -301,34 +347,112 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label htmlFor="logoUrl" className="mb-1 block text-sm font-medium text-gray-800">
-                    logoUrl
-                  </label>
-                  <input
-                    id="logoUrl"
-                    type="text"
-                    placeholder="예) https://..."
-                    {...register('logoUrl')}
-                    className={INPUT_CLASS}
+                  <label className="mb-1 block text-sm font-medium text-gray-800">로고</label>
+                  <Controller
+                    control={methods.control}
+                    name="logoUrl"
+                    render={({ field }) => (
+                      <div className="flex items-center gap-3">
+                        <input
+                          ref={logoFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0] ?? null
+                            setLogoFile(file)
+                          }}
+                        />
+                        <Button type="button" onClick={() => logoFileInputRef.current?.click()}>
+                          업로드
+                        </Button>
+                        <div className="flex items-center gap-2">
+                          {logoFile ? (
+                            <Image
+                              src={URL.createObjectURL(logoFile)}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : field.value ? (
+                            <Image
+                              src={field.value}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded border bg-gray-50" />
+                          )}
+                          <span className="text-muted-foreground text-sm">
+                            {logoFile || field.value ? '미리보기' : '선택된 파일 없음'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="certificateUrl" className="mb-1 block text-sm font-medium text-gray-800">
-                    certificateUrl
-                  </label>
-                  <input
-                    id="certificateUrl"
-                    type="text"
-                    placeholder="예) https://..."
-                    {...register('certificateUrl')}
-                    className={INPUT_CLASS}
+                  <label className="mb-1 block text-sm font-medium text-gray-800">재직증명서</label>
+                  <Controller
+                    control={methods.control}
+                    name="certificateUrl"
+                    render={({ field }) => (
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0] ?? null
+                            setCertificateFile(file)
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          onClick={e => (e.currentTarget.previousElementSibling as HTMLInputElement)?.click()}
+                        >
+                          업로드
+                        </Button>
+                        <div className="flex items-center gap-2">
+                          {certificateFile ? (
+                            <Image
+                              src={URL.createObjectURL(certificateFile)}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : isImageUrl(field.value) ? (
+                            <Image
+                              src={field.value as string}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded border bg-gray-50" />
+                          )}
+                          <span className="text-muted-foreground text-sm">
+                            {certificateFile || field.value ? '미리보기' : '선택된 파일 없음'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="govAuth" className="mb-1 block text-sm font-medium text-gray-800">
-                    govAuth
+                    정부 인증
                   </label>
                   <input
                     id="govAuth"
@@ -340,54 +464,205 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                 </div>
 
                 <div>
-                  <label htmlFor="facilityImageUrl1" className="mb-1 block text-sm font-medium text-gray-800">
-                    facilityImageUrl1
-                  </label>
-                  <input
-                    id="facilityImageUrl1"
-                    type="text"
-                    placeholder="예) https://..."
-                    {...register('facilityImageUrl1')}
-                    className={INPUT_CLASS}
+                  <label className="mb-1 block text-sm font-medium text-gray-800">업체시설1</label>
+                  <Controller
+                    control={methods.control}
+                    name="facilityImageUrl1"
+                    render={({ field }) => (
+                      <div className="flex items-center gap-3">
+                        <input
+                          ref={facilityFileInputRef1}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0] ?? null
+                            setFacilityFile1(file)
+                          }}
+                        />
+                        <Button type="button" onClick={() => facilityFileInputRef1.current?.click()}>
+                          업로드
+                        </Button>
+                        <div className="flex items-center gap-2">
+                          {facilityFile1 ? (
+                            <Image
+                              src={URL.createObjectURL(facilityFile1)}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : field.value ? (
+                            <Image
+                              src={field.value}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded border bg-gray-50" />
+                          )}
+                          <span className="text-muted-foreground text-sm">
+                            {facilityFile1 || field.value ? '미리보기' : '선택된 파일 없음'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="facilityImageUrl2" className="mb-1 block text-sm font-medium text-gray-800">
-                    facilityImageUrl2
-                  </label>
-                  <input
-                    id="facilityImageUrl2"
-                    type="text"
-                    placeholder="예) https://..."
-                    {...register('facilityImageUrl2')}
-                    className={INPUT_CLASS}
+                  <label className="mb-1 block text-sm font-medium text-gray-800">업체시설2</label>
+                  <Controller
+                    control={methods.control}
+                    name="facilityImageUrl2"
+                    render={({ field }) => (
+                      <div className="flex items-center gap-3">
+                        <input
+                          ref={facilityFileInputRef2}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0] ?? null
+                            setFacilityFile2(file)
+                          }}
+                        />
+                        <Button type="button" onClick={() => facilityFileInputRef2.current?.click()}>
+                          업로드
+                        </Button>
+                        <div className="flex items-center gap-2">
+                          {facilityFile2 ? (
+                            <Image
+                              src={URL.createObjectURL(facilityFile2)}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : field.value ? (
+                            <Image
+                              src={field.value}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded border bg-gray-50" />
+                          )}
+                          <span className="text-muted-foreground text-sm">
+                            {facilityFile2 || field.value ? '미리보기' : '선택된 파일 없음'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="facilityImageUrl3" className="mb-1 block text-sm font-medium text-gray-800">
-                    facilityImageUrl3
-                  </label>
-                  <input
-                    id="facilityImageUrl3"
-                    type="text"
-                    placeholder="예) https://..."
-                    {...register('facilityImageUrl3')}
-                    className={INPUT_CLASS}
+                  <label className="mb-1 block text-sm font-medium text-gray-800">업체시설3</label>
+                  <Controller
+                    control={methods.control}
+                    name="facilityImageUrl3"
+                    render={({ field }) => (
+                      <div className="flex items-center gap-3">
+                        <input
+                          ref={facilityFileInputRef3}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0] ?? null
+                            setFacilityFile3(file)
+                          }}
+                        />
+                        <Button type="button" onClick={() => facilityFileInputRef3.current?.click()}>
+                          업로드
+                        </Button>
+                        <div className="flex items-center gap-2">
+                          {facilityFile3 ? (
+                            <Image
+                              src={URL.createObjectURL(facilityFile3)}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : field.value ? (
+                            <Image
+                              src={field.value}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded border bg-gray-50" />
+                          )}
+                          <span className="text-muted-foreground text-sm">
+                            {facilityFile3 || field.value ? '미리보기' : '선택된 파일 없음'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   />
                 </div>
-
                 <div>
-                  <label htmlFor="facilityImageUrl4" className="mb-1 block text-sm font-medium text-gray-800">
-                    facilityImageUrl4
-                  </label>
-                  <input
-                    id="facilityImageUrl4"
-                    type="text"
-                    placeholder="예) https://..."
-                    {...register('facilityImageUrl4')}
-                    className={INPUT_CLASS}
+                  <label className="mb-1 block text-sm font-medium text-gray-800">업체시설4</label>
+                  <Controller
+                    control={methods.control}
+                    name="facilityImageUrl4"
+                    render={({ field }) => (
+                      <div className="flex items-center gap-3">
+                        <input
+                          ref={facilityFileInputRef4}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0] ?? null
+                            setFacilityFile4(file)
+                          }}
+                        />
+                        <Button type="button" onClick={() => facilityFileInputRef4.current?.click()}>
+                          업로드
+                        </Button>
+                        <div className="flex items-center gap-2">
+                          {facilityFile4 ? (
+                            <Image
+                              src={URL.createObjectURL(facilityFile4)}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : field.value ? (
+                            <Image
+                              src={field.value}
+                              alt="미리보기"
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded border object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded border bg-gray-50" />
+                          )}
+                          <span className="text-muted-foreground text-sm">
+                            {facilityFile4 || field.value ? '미리보기' : '선택된 파일 없음'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   />
                 </div>
               </div>
