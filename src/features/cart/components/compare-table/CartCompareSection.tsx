@@ -17,8 +17,8 @@ type Side = 'left' | 'right'
 
 const DND_MIME = 'application/x-sw-campus-lecture-id'
 const EMPTY_CART_ITEMS: CartItem[] = []
-const LABEL_COL_GRID_CLASS = 'md:grid-cols-[10rem_1fr_1px_1fr]'
-const LABEL_COL_TABLE_CLASS = 'w-40'
+const LABEL_COL_GRID_CLASS = 'md:grid-cols-[13.75rem_1fr_1px_1fr]'
+const LABEL_COL_TABLE_CLASS = 'w-[13.75rem]'
 
 function setDragLectureId(e: React.DragEvent, lectureId: string) {
   e.dataTransfer.setData(DND_MIME, lectureId)
@@ -150,7 +150,7 @@ export default function CartCompareSection() {
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className={cn('border-border grid grid-cols-1 overflow-hidden rounded-md border', LABEL_COL_GRID_CLASS)}>
+          <div className={cn('grid grid-cols-1 overflow-hidden rounded-md', LABEL_COL_GRID_CLASS)}>
             <div aria-hidden className="bg-muted/10 hidden md:block" />
             <div
               className={cn(isLeftOver && 'bg-muted/20')}

@@ -28,6 +28,7 @@ export function LectureSummaryCard({
 
   return (
     <div className="relative flex flex-col items-center gap-3 px-6 py-8 text-center">
+      {/* 닫기 버튼 */}
       {hasSelection ? (
         <button
           type="button"
@@ -39,6 +40,7 @@ export function LectureSummaryCard({
         </button>
       ) : null}
 
+      {/* 이미지 */}
       <div className="bg-muted/30 relative h-24 w-24 overflow-hidden rounded-full">
         {thumbnailUrl ? (
           <Image

@@ -64,7 +64,7 @@ export function CompareTable({
   rightTitle,
   leftDetail,
   rightDetail,
-  labelColClassName = 'w-40',
+  labelColClassName = 'w-[13.75rem]',
 }: {
   leftTitle?: string | null
   rightTitle?: string | null
