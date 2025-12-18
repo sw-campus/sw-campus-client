@@ -30,8 +30,8 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
     },
     support: {
       tuition: api.lectureFee,
-      stipend: api.subsidy ? `월 ${api.subsidy.toLocaleString()}원` : undefined,
-      extraSupport: api.eduSubsidy ? `교육비 지원 ${api.eduSubsidy.toLocaleString()}원` : undefined,
+      stipend: api.subsidy ? `${api.subsidy.toLocaleString()}원` : undefined,
+      extraSupport: api.eduSubsidy ? `${api.eduSubsidy.toLocaleString()}원` : undefined,
     },
     location: api.location,
     recruitStatus: api.status === 'RECRUITING' ? 'RECRUITING' : 'FINISHED',

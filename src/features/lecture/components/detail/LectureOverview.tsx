@@ -112,8 +112,8 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
             )}
           </InfoRow>
 
-          {/* 자부담 */}
-          <InfoRow label="자부담">
+          {/* 자기부담금 */}
+          <InfoRow label="자기부담금">
             {lecture.support.tuition === 0 ? (
               <span className="text-primary font-bold">전액 국비지원 0원</span>
             ) : (
@@ -121,17 +121,19 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
             )}
           </InfoRow>
 
-          {/* 지원금 */}
-          <InfoRow label="지원금">
-            <div className="flex flex-col gap-1">
-              {lecture.support.stipend ? (
-                <span>{lecture.support.stipend}</span>
-              ) : (
-                <span className="text-gray-400">-</span>
-              )}
-              {lecture.support.extraSupport && <span>{lecture.support.extraSupport}</span>}
-            </div>
-          </InfoRow>
+          {/* 정부 지원금 */}
+          {lecture.support.stipend && (
+            <InfoRow label="정부 지원금">
+              <span>{lecture.support.stipend}</span>
+            </InfoRow>
+          )}
+
+          {/* 교육지원금 */}
+          {lecture.support.extraSupport && (
+            <InfoRow label="교육지원금 (월)">
+              <span>{lecture.support.extraSupport}</span>
+            </InfoRow>
+          )}
         </InfoBox>
       </Section>
 
