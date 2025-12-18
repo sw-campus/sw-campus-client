@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { FiX } from 'react-icons/fi'
 
-import type { MobileNavGroup } from './navigation-menu.types'
+import type { MobileNavGroup } from '@/features/navigation/types/navigation-menu.types'
 
 type Props = {
   open: boolean

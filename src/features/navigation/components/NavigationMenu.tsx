@@ -1,15 +1,14 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { useRouter } from 'next/navigation'
 
 import { useCategoryTree } from '@/features/category'
+import { NavigationMenuDesktop } from '@/features/navigation/components/NavigationMenu.desktop'
+import { NavigationMenuMobileOverlay } from '@/features/navigation/components/NavigationMenu.mobile'
+import { buildActiveCategoryChildren, buildMobileNavData } from '@/features/navigation/components/navigation-menu.model'
 import { useDesktopNavigationStore } from '@/store/navigation.store'
-
-import { NavigationMenuDesktop } from './NavigationMenu.desktop'
-import { NavigationMenuMobileOverlay } from './NavigationMenu.mobile'
-import { buildActiveCategoryChildren, buildMobileNavData } from './navigation-menu.model'
 
 export default function Navigation({
   open,
@@ -22,6 +21,8 @@ export default function Navigation({
   onDesktopEnter?: () => void
   onDesktopLeave?: () => void
 }) {
+  const CLOSE_DELAY_MS = 180
+
   const router = useRouter()
   const showDesktop = useDesktopNavigationStore(state => state.showDesktopNav)
   const activeMenu = useDesktopNavigationStore(state => state.activeMenu)
@@ -37,13 +38,19 @@ export default function Navigation({
   }
 
   useEffect(() => {
-    return () => {
-      clearCloseTimer()
+    // Keep timers in sync with desktop open/close.
+    if (!showDesktop && closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
     }
-  }, [])
 
-  useEffect(() => {
-    if (!showDesktop) clearCloseTimer()
+    // Always cleanup on unmount (and before re-run).
+    return () => {
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current)
+        closeTimerRef.current = null
+      }
+    }
   }, [showDesktop])
 
   const handleDesktopMouseEnter = () => {
@@ -56,14 +63,11 @@ export default function Navigation({
     closeTimerRef.current = window.setTimeout(() => {
       onDesktopLeave?.()
       closeTimerRef.current = null
-    }, 180)
+    }, CLOSE_DELAY_MS)
   }
 
-  const mobileNavData = useMemo(() => buildMobileNavData(categoryTree), [categoryTree])
-  const activeCategoryChildren = useMemo(
-    () => buildActiveCategoryChildren(categoryTree, activeMenu),
-    [categoryTree, activeMenu],
-  )
+  const mobileNavData = buildMobileNavData(categoryTree)
+  const activeCategoryChildren = buildActiveCategoryChildren(categoryTree, activeMenu)
 
   return (
     <>

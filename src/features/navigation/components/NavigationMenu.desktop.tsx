@@ -11,7 +11,7 @@ import {
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 
-import type { DesktopNavCategory } from './navigation-menu.types'
+import type { DesktopNavCategory } from '../types/navigation-menu.types'
 
 type Props = {
   showDesktop: boolean

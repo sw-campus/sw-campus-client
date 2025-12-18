@@ -1,4 +1,4 @@
-import type { DesktopNavCategory, MobileNavGroup } from './navigation-menu.types'
+import type { DesktopNavCategory, MobileNavGroup } from '@/features/navigation/types/navigation-menu.types'
 
 type CategoryNode = {
   categoryId: number

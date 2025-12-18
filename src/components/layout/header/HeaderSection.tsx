@@ -3,8 +3,8 @@
 import { useState } from 'react'
 
 import Header from '@/components/layout/header/Header'
-import Navigation from '@/components/layout/header/NavigationMenu'
 import { useCategoryTree } from '@/features/category'
+import { Navigation } from '@/features/navigation'
 import { useDesktopNavigationStore } from '@/store/navigation.store'
 
 export default function HeaderSection() {
