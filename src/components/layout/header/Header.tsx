@@ -23,10 +23,6 @@ export default function Header({
   const { logout: clearAuth } = useAuthStore()
   const { isLoggedIn, userName, userType, logout } = useAuthStore()
 
-  // 디버깅용: userType 확인
-  console.log('[Header] userType:', userType)
-  console.log('[Header] isLoggedIn:', isLoggedIn)
-
   // 로그아웃
   const handleLogout = async () => {
     try {
@@ -122,10 +118,10 @@ export default function Header({
             <Link href="/login">
               <FiLogIn />
             </Link>
-            <Link href="login">
+            <Link href="/login">
               <FiUser />
             </Link>
-            <Link href="/">
+            <Link href="/login">
               <FiHeart />
             </Link>
           </>

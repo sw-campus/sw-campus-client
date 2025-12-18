@@ -12,10 +12,6 @@ export default function MyPage() {
   const router = useRouter()
   const { isLoggedIn, userName, userType, logout } = useAuthStore()
 
-  // 디버깅용: userType 확인
-  console.log('[mypage/organization] userType:', userType)
-  console.log('[mypage/organization] userType:', isLoggedIn)
-
   // 기관 마이페이지
   if (userType === 'ORGANIZATION') {
     const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(false)
