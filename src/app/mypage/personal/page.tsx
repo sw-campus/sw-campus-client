@@ -1,28 +1,56 @@
+'use client'
+
+import { useState } from 'react'
+
+import { useRouter } from 'next/navigation'
+
+import PersonalAside from '@/features/mypage/components/Personal/PersonalAside'
+import PersonalMain from '@/features/mypage/components/Personal/PersonalMain'
+import { useAuthStore } from '@/store/authStore'
+
 export default function MyPage() {
-  return (
-    <div className="custom-container">
-      <div className="custom-card">
-        {/* 실제 내용 영역 */}
-        <div className="relative z-10 flex w-full gap-6">
-          {/* 왼쪽 사이드바 */}
-          <aside className="w-52 self-start rounded-md bg-white/90 p-5 text-neutral-900">
-            <h2 className="mb-4 text-2xl font-semibold">마이페이지</h2>
+  const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(false)
+  const router = useRouter()
+  const { userType } = useAuthStore()
 
-            <nav className="space-y-2 leading-relaxed">
-              <button className="block w-full text-left font-medium text-neutral-900 hover:underline">
-                회원정보 수정
-              </button>
-              <button className="block w-full text-left text-neutral-700 hover:underline">찜한 강의</button>
-              <button className="block w-full text-left text-neutral-700 hover:underline">내가 쓴 리뷰</button>
-            </nav>
-          </aside>
+  if (userType === 'PERSONAL') {
+    const handleOpenOrgInfo = () => {
+      setIsOrgPasswordOpen(true)
+    }
 
-          {/* 오른쪽 본문 영역 (추후 내용 넣을 자리) */}
-          <div className="flex-4 rounded-3xl bg-neutral-600/80">
-            {/* TODO: 회원정보 / 찜한 강의 / 리뷰 내용 들어갈 자리 */}
+    const handleOpenLectureManage = () => {
+      setIsOrgPasswordOpen(false)
+    }
+
+    const openInfoModal = () => {
+      router.push('/mypage/personal/info')
+    }
+
+    const openProductModal = () => {
+      router.push('/mypage/personal/survey')
+    }
+
+    return (
+      <div className="custom-container">
+        <div className="custom-card">
+          {/* 실제 내용 영역 */}
+          <div className="relative z-10 flex w-full gap-6">
+            <PersonalAside onClickOrgInfo={handleOpenOrgInfo} onClickLectureManage={handleOpenLectureManage} />
+            <PersonalMain
+              isOrgPasswordOpen={isOrgPasswordOpen}
+              openInfoModal={openInfoModal}
+              onOpenProductModal={openProductModal}
+            />
           </div>
         </div>
       </div>
+    )
+  }
+
+  // userType이 null이거나 알 수 없을 때
+  return (
+    <div className="flex h-96 items-center justify-center">
+      <span className="text-lg text-neutral-500">로그인 후 이용 가능합니다.</span>
     </div>
   )
 }

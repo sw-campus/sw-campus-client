@@ -15,13 +15,12 @@ const dashboardStats = [
 ]
 
 export default function PersonalMain({ isOrgPasswordOpen, openInfoModal, onOpenProductModal }: OrganizationMainProps) {
-  // 🔐 비밀번호 확인 화면
   if (isOrgPasswordOpen) {
     return (
       <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-neutral-600/80 p-6 shadow-black/40">
         <header>
           <h3 className="text-2xl font-semibold text-white">비밀번호 확인</h3>
-          <p className="mt-1 text-sm text-white/70">기업 정보 수정을 위해 비밀번호를 입력해주세요.</p>
+          <p className="mt-1 text-sm text-white/70">개인 정보 수정을 위해 비밀번호를 입력해주세요.</p>
         </header>
 
         <div className="max-w-sm">
@@ -38,15 +37,14 @@ export default function PersonalMain({ isOrgPasswordOpen, openInfoModal, onOpenP
     )
   }
 
-  // 📊 기본 대시보드 화면
   return (
     <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-neutral-600/80 p-6 shadow-black/40">
       <header className="flex items-center justify-between">
         <div>
           <p className="text-sm text-white/80">조직 전용 교육과정 공간</p>
-          <h3 className="text-2xl font-semibold text-white">교육과정 관리</h3>
+          <h3 className="text-2xl font-semibold text-white">설문 조사</h3>
         </div>
-        <Button onClick={onOpenProductModal}>교육과정 등록</Button>
+        <Button onClick={onOpenProductModal}>설문조사</Button>
       </header>
 
       <section className="rounded-2xl bg-white/10 p-5 text-white/80">

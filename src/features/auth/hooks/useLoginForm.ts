@@ -7,12 +7,10 @@ import { toast } from 'sonner'
 
 import { login as loginApi } from '@/features/auth/authApi'
 import { useAuthStore } from '@/store/authStore'
-import { useSignupStore } from '@/store/signupStore'
 
 export function useLoginForm() {
   const router = useRouter()
-  const { login: setLogin } = useAuthStore()
-  const setUserType = useSignupStore(state => state.setUserType)
+  const { login: setLogin, setUserType: setAuthUserType } = useAuthStore()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -31,21 +29,25 @@ export function useLoginForm() {
 
       const data = await loginApi({ email, password })
 
-      // 응답에 유저 정보가 있을 경우 대비
       let userName = email.split('@')[0]
-      let userType: 'personal' | 'organization' | null = null
+
+      let userType: 'ORGANIZATION' | 'PERSONAL' | null = null
+
       if (data) {
         userName = (data as any).name ?? (data as any).nickname ?? userName
-        // userType 판별: 서버 응답에 role, type, isOrganization 등 필드가 있다고 가정
-        if ((data as any).userType) {
+
+        if ((data as any).userType === 'ORGANIZATION' || (data as any).userType === 'PERSONAL') {
           userType = (data as any).userType
+        } else if ((data as any).userType === 'organization' || (data as any).userType === 'personal') {
+          userType = (data as any).userType === 'organization' ? 'ORGANIZATION' : 'PERSONAL'
         } else if ((data as any).role) {
-          userType = (data as any).role === 'ORGANIZATION' ? 'organization' : 'personal'
+          userType = (data as any).role === 'ORGANIZATION' ? 'ORGANIZATION' : 'PERSONAL'
         } else if ((data as any).isOrganization !== undefined) {
-          userType = (data as any).isOrganization ? 'organization' : 'personal'
+          userType = (data as any).isOrganization ? 'ORGANIZATION' : 'PERSONAL'
         }
       }
-      setUserType(userType)
+      setAuthUserType(userType)
+
       setLogin(userName)
       router.push('/')
     } catch (error) {

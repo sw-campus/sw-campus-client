@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { FiLogIn, FiUser, FiHeart, FiMenu, FiLogOut } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
@@ -21,6 +22,7 @@ import { useAuthStore } from '@/store/authStore'
 
 export default function Header({
   categories,
+  onOpenNav,
   onCategoryEnter,
   onOtherNavEnter,
 }: {
@@ -29,15 +31,16 @@ export default function Header({
   onCategoryEnter: (id: number) => void
   onOtherNavEnter: () => void
 }) {
-  const { isLoggedIn, userName } = useAuthStore()
-  const { logout, isPending } = useLogout()
-
+  const router = useRouter()
   const [logoutOpen, setLogoutOpen] = useState(false)
+  const { isLoggedIn, userName, userType } = useAuthStore()
+  const { logout, isPending } = useLogout()
 
   // 로그아웃
   const handleLogout = async () => {
     try {
-      await logout()
+      await logout() // 서버에서 쿠키 삭제 + 클라이언트 상태 초기화
+      router.push('/') // 홈으로 이동 (프로그램적으로 네비게이션)
     } catch (e) {
       console.error(e)
     }
@@ -47,7 +50,7 @@ export default function Header({
     <header className="sticky top-0 z-50 mx-auto mt-6 flex w-full max-w-7xl items-center justify-between rounded-full border border-white/15 bg-white/10 px-10 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-xl">
       <div className="flex flex-1 items-center gap-8">
         {/* 햄버거 버튼 */}
-        <button className="text-white md:hidden">
+        <button type="button" className="text-white md:hidden" onClick={onOpenNav}>
           <FiMenu size={22} />
         </button>
 
@@ -98,14 +101,22 @@ export default function Header({
               onClick={() => setLogoutOpen(true)}
               disabled={isPending}
               className="flex items-center gap-2 text-sm transition hover:opacity-80"
+              aria-label="로그아웃"
             >
               <FiLogOut className="text-xl" />
             </button>
-            <Link href="/mypage/organization">
-              <FiUser className="text-xl" />
-            </Link>
-            <Link href="/cart/compare">
-              <FiHeart className="text-xl" />
+            {/* userType에 따라 마이페이지 분기 */}
+            {userType === 'ORGANIZATION' ? (
+              <Link href="/mypage/organization">
+                <FiUser />
+              </Link>
+            ) : (
+              <Link href="/mypage/personal">
+                <FiUser />
+              </Link>
+            )}
+            <Link href="/">
+              <FiHeart />
             </Link>
           </>
         ) : (

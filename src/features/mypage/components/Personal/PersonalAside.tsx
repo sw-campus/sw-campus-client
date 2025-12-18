@@ -15,14 +15,14 @@ export default function PersonalAside({ onClickOrgInfo, onClickLectureManage }: 
           onClick={onClickOrgInfo}
           className="block w-full rounded-lg px-3 py-2 text-left font-medium transition hover:bg-neutral-100"
         >
-          기업정보 관리
+          개인정보 관리
         </button>
 
         <button
           onClick={onClickLectureManage}
           className="block w-full rounded-lg px-3 py-2 text-left text-neutral-700 transition hover:bg-neutral-100"
         >
-          강의 관리
+          설문 조사
         </button>
       </nav>
     </aside>

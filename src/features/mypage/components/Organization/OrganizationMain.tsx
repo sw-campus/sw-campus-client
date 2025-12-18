@@ -19,7 +19,6 @@ export default function OrganizationMain({
   openInfoModal,
   onOpenProductModal,
 }: OrganizationMainProps) {
-  // 🔐 비밀번호 확인 화면
   if (isOrgPasswordOpen) {
     return (
       <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-neutral-600/80 p-6 shadow-black/40">
@@ -42,7 +41,6 @@ export default function OrganizationMain({
     )
   }
 
-  // 📊 기본 대시보드 화면
   return (
     <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-neutral-600/80 p-6 shadow-black/40">
       <header className="flex items-center justify-between">
