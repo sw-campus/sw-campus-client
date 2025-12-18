@@ -193,31 +193,18 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
   },
   {
     key: 'cost',
-    title: '수강료',
+    title: '수강료 및 지원',
     rows: centerRows([
-      { key: 'recruitType', label: '모집유형', value: d => formatRecruitType(d?.recruitType) },
-      { key: 'stipend', label: '지원금', value: d => formatText(d?.support?.stipend) },
+      { key: 'recruitType', label: '내배카', value: d => formatRecruitType(d?.recruitType) },
       { key: 'tuition', label: '자기부담금', value: d => formatMoney(d?.support?.tuition) },
-      {
-        key: 'totalCost',
-        label: '수강료 합계',
-        value: d => {
-          const stipend = parseMoneyLike(d?.support?.stipend)
-          const tuition = d?.support?.tuition
-          if (stipend === null || tuition === null || tuition === undefined) return '-'
-          return formatMoney(stipend + tuition)
-        },
-      },
+      { key: 'stipend', label: '정부 지원금', value: d => formatText(d?.support?.stipend) },
+      { key: 'extraSupport', label: '훈련수당 (월)', value: d => formatText(d?.support?.extraSupport) },
     ]),
   },
   {
     key: 'benefits',
-    title: '지원혜택',
-    rows: centerRows([
-      { key: 'stipend', label: '훈련수당', value: d => formatText(d?.support?.stipend) },
-      { key: 'benefits', label: '혜택', value: d => formatList(d?.benefits) },
-      { key: 'extraSupport', label: '추가혜택', value: d => formatText(d?.support?.extraSupport) },
-    ]),
+    title: '추가 제공 항목',
+    rows: centerRows([{ key: 'benefits', label: '추가 혜택', value: d => formatList(d?.benefits) }]),
   },
   {
     key: 'goal',

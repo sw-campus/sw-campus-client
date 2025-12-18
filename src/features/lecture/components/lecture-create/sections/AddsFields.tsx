@@ -22,7 +22,7 @@ export function LectureCreateAddsFields() {
   return (
     <Field>
       <FieldLabel>추가 제공 항목</FieldLabel>
-      <FieldDescription>예) 취업 연계 프로그램</FieldDescription>
+      <FieldDescription>예) 주거비 지원 월 200000원, 취업 연계 프로그램</FieldDescription>
       <FieldContent>
         <div className="space-y-3">
           <Button type="button" onClick={() => append({ addName: '' })}>
