@@ -21,13 +21,14 @@ export default function Header({
 }) {
   const router = useRouter()
   const { logout: clearAuth } = useAuthStore()
-  const { isLoggedIn, userName, logout } = useAuthStore()
+  const { isLoggedIn, userName, userType, logout } = useAuthStore()
 
   // 로그아웃
   const handleLogout = async () => {
     try {
       await logout() // 서버에서 쿠키 삭제
       clearAuth() // 클라이언트 상태 초기화
+      router.push('/') // 홈으로 이동 (프로그램적으로 네비게이션)
     } catch (e) {
       console.error(e)
     }
@@ -86,16 +87,27 @@ export default function Header({
           <>
             {/* 로그인된 경우 */}
             <span className="text-sm font-medium">{userName ?? '사용자'}님</span>
+
             <button
               type="button"
               onClick={handleLogout}
               className="flex items-center gap-2 text-sm transition hover:opacity-80"
+              aria-label="로그아웃"
             >
               <FiLogOut className="text-xl" />
             </button>
-            <Link href="/mypage/organization">
-              <FiUser className="text-xl" />
-            </Link>
+
+            {/* userType에 따라 마이페이지 분기 */}
+            {userType === 'ORGANIZATION' ? (
+              <Link href="/mypage/organization">
+                <FiUser className="text-xl" />
+              </Link>
+            ) : (
+              <Link href="/mypage/personal">
+                <FiUser className="text-xl" />
+              </Link>
+            )}
+
             <Link href="/">
               <FiHeart className="text-xl" />
             </Link>
@@ -106,10 +118,10 @@ export default function Header({
             <Link href="/login">
               <FiLogIn />
             </Link>
-            <Link href="/mypage/organization">
+            <Link href="/login">
               <FiUser />
             </Link>
-            <Link href="/">
+            <Link href="/login">
               <FiHeart />
             </Link>
           </>

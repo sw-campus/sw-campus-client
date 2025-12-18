@@ -1,40 +1,81 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
+import { FiX } from 'react-icons/fi'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
+import AddressInput from '@/features/auth/components/AddressInput'
+import { api } from '@/lib/axios'
+import { useSignupStore } from '@/store/signupStore'
 
-const orgInfoSchema = z.object({
-  organizationName: z.string().min(1, '기관명을 입력해주세요.'),
-  businessRegistrationNumber: z.string().min(1, '사업자등록번호를 입력해주세요.'),
-  ceoName: z.string().min(1, '대표자명을 입력해주세요.'),
-  contactEmail: z.string().min(1, '이메일을 입력해주세요.').email('이메일 형식이 올바르지 않습니다.'),
-  contactPhone: z.string().min(1, '연락처를 입력해주세요.'),
-  address: z.string().optional(),
+const profileSchema = z.object({
+  nickname: z.string().min(1, '닉네임을 입력해주세요.'),
+  phone: z.string().min(1, '휴대폰 번호를 입력해주세요.'),
+  // AddressInput은 store 기반이므로 location은 선택적으로만 유지
+  location: z.string().optional(),
 })
-type OrgInfoFormValues = z.infer<typeof orgInfoSchema>
 
-export function OrgInfoForm() {
+type ProfileFormValues = z.infer<typeof profileSchema>
+
+type MyProfileResponse = {
+  email: string
+  name: string
+  nickname: string
+  phone: string
+  location: string
+  provider: string
+  role: string
+  hasSurvey: boolean
+}
+
+// 모달 스크린샷처럼: 라운드, 얇은 보더, 포커스 앰버 컬러
+
+const INPUT_CLASS =
+  'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
+
+// AddressInput(daum.Postcode)이 동작하려면 postcode 스크립트가 필요합니다.
+const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
+
+const loadDaumPostcodeScript = () => {
+  if (typeof window === 'undefined') return
+
+  const w = window as any
+  // 이미 로드되어 있으면 종료
+  if (w.daum?.Postcode) return
+
+  // 이미 스크립트 태그가 있으면 로드만 기다림
+  if (document.getElementById(DAUM_POSTCODE_SCRIPT_ID)) return
+
+  const script = document.createElement('script')
+  script.id = DAUM_POSTCODE_SCRIPT_ID
+  script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+  script.async = true
+  document.body.appendChild(script)
+}
+
+export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
 
-  const methods = useForm<OrgInfoFormValues>({
-    resolver: zodResolver(orgInfoSchema),
+  const { setAddress, setDetailAddress } = useSignupStore()
+  const [profileEmail, setProfileEmail] = useState<string>('')
+  const [profileName, setProfileName] = useState<string>('')
+  const [isLoading, setIsLoading] = useState(true)
+
+  const methods = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
     mode: 'onChange',
     defaultValues: {
-      organizationName: '',
-      businessRegistrationNumber: '',
-      ceoName: '',
-      contactEmail: '',
-      contactPhone: '',
-      address: '',
+      nickname: '',
+      phone: '',
+      location: '',
     },
   })
 
@@ -44,116 +85,152 @@ export function OrgInfoForm() {
     register,
   } = methods
 
-  const onSubmit = async (values: OrgInfoFormValues) => {
+  useEffect(() => {
+    let mounted = true
+
+    const load = async () => {
+      loadDaumPostcodeScript()
+      setIsLoading(true)
+      try {
+        const res = await api.get<MyProfileResponse>('/mypage/profile')
+        if (!mounted) return
+
+        const data = res.data
+        setProfileEmail(data.email)
+        setProfileName(data.name)
+
+        // react-hook-form 값 세팅
+        methods.reset({
+          nickname: data.nickname ?? '',
+          phone: data.phone ?? '',
+          location: data.location ?? '',
+        })
+
+        // AddressInput(store) 값 세팅
+        setAddress(data.location ?? '')
+        setDetailAddress('')
+      } catch (e) {
+        toast.error('내 정보 조회에 실패했습니다.')
+      } finally {
+        if (mounted) setIsLoading(false)
+      }
+    }
+
+    load()
+
+    return () => {
+      mounted = false
+    }
+  }, [methods, setAddress, setDetailAddress])
+
+  const onSubmit = async (values: ProfileFormValues) => {
     setIsPending(true)
     try {
-      // For now, just simulate a save with a delay
-      await new Promise(resolve => setTimeout(resolve, 500))
-      toast.success('기업 정보가 저장되었습니다.')
+      await new Promise(resolve => setTimeout(resolve, 300))
+      toast.success('저장되었습니다.')
       router.back()
     } finally {
       setIsPending(false)
     }
   }
 
-  return (
+  const formContent = (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <FieldSet>
-          <FieldGroup className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FieldGroup className="grid grid-cols-1 gap-6">
             <div>
-              <label htmlFor="organizationName" className="mb-1 block font-medium">
-                기관명<span className="text-red-500">*</span>
-              </label>
-              <input
-                id="organizationName"
-                type="text"
-                {...register('organizationName')}
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-              {errors.organizationName && (
-                <p className="mt-1 text-sm text-red-600">{errors.organizationName.message}</p>
-              )}
+              <label className="mb-1 block text-sm font-medium text-gray-800">이름</label>
+              <div className={`${INPUT_CLASS} flex items-center bg-gray-50`}>
+                <span className="truncate">{profileName || '-'}</span>
+              </div>
             </div>
 
             <div>
-              <label htmlFor="businessRegistrationNumber" className="mb-1 block font-medium">
-                사업자등록번호<span className="text-red-500">*</span>
-              </label>
-              <input
-                id="businessRegistrationNumber"
-                type="text"
-                {...register('businessRegistrationNumber')}
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-              {errors.businessRegistrationNumber && (
-                <p className="mt-1 text-sm text-red-600">{errors.businessRegistrationNumber.message}</p>
-              )}
+              <label className="mb-1 block text-sm font-medium text-gray-800">이메일</label>
+              <div className={`${INPUT_CLASS} flex items-center bg-gray-50`}>
+                <span className="truncate">{profileEmail || '-'}</span>
+              </div>
             </div>
 
             <div>
-              <label htmlFor="ceoName" className="mb-1 block font-medium">
-                대표자명<span className="text-red-500">*</span>
+              <label htmlFor="nickname" className="mb-1 block text-sm font-medium text-gray-800">
+                닉네임
               </label>
               <input
-                id="ceoName"
+                id="nickname"
                 type="text"
-                {...register('ceoName')}
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="예) dev master"
+                {...register('nickname')}
+                className={INPUT_CLASS}
               />
-              {errors.ceoName && <p className="mt-1 text-sm text-red-600">{errors.ceoName.message}</p>}
+              {errors.nickname && <p className="mt-1 text-xs text-red-600">{errors.nickname.message}</p>}
             </div>
 
             <div>
-              <label htmlFor="contactEmail" className="mb-1 block font-medium">
-                담당자 이메일<span className="text-red-500">*</span>
+              <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-800">
+                휴대폰 번호
               </label>
               <input
-                id="contactEmail"
-                type="email"
-                {...register('contactEmail')}
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                id="phone"
+                type="text"
+                placeholder="예) 010-1234-5678"
+                {...register('phone')}
+                className={INPUT_CLASS}
               />
-              {errors.contactEmail && <p className="mt-1 text-sm text-red-600">{errors.contactEmail.message}</p>}
+              {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone.message}</p>}
             </div>
 
             <div>
-              <label htmlFor="contactPhone" className="mb-1 block font-medium">
-                연락처<span className="text-red-500">*</span>
-              </label>
-              <input
-                id="contactPhone"
-                type="text"
-                {...register('contactPhone')}
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-              {errors.contactPhone && <p className="mt-1 text-sm text-red-600">{errors.contactPhone.message}</p>}
-            </div>
-
-            <div className="md:col-span-2">
-              <label htmlFor="address" className="mb-1 block font-medium">
-                주소
-              </label>
-              <input
-                id="address"
-                type="text"
-                {...register('address')}
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-              {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>}
+              <AddressInput />
             </div>
           </FieldGroup>
 
-          <div className="flex gap-2 pt-4">
-            <Button type="submit" disabled={!isValid || isPending}>
-              저장
-            </Button>
-            <Button variant="outline" type="button" onClick={() => router.back()} disabled={isPending}>
-              취소
+          {/* Footer */}
+          <div className="pt-2">
+            <Button
+              type="submit"
+              disabled={!isValid || isPending || isLoading}
+              className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+            >
+              {isLoading ? '불러오는 중...' : isPending ? '저장 중...' : '저장'}
             </Button>
           </div>
         </FieldSet>
       </form>
     </FormProvider>
+  )
+
+  // 모달(DialogContent) 안에 들어갈 때: 내부 카드/헤더를 또 만들지 않도록
+  if (embedded) {
+    return (
+      <div className="mx-auto w-full">
+        <div className="px-0 pt-0 pb-0">{formContent}</div>
+      </div>
+    )
+  }
+
+  // 단독 페이지/컴포넌트로 렌더링될 때의 카드 UI
+  return (
+    <div className="mx-auto w-full">
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-200 px-8 py-6">
+          <h2 className="text-xl font-semibold text-gray-900">개인 정보 수정</h2>
+
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+            aria-label="닫기"
+          >
+            <FiX className="h-5 w-5" aria-hidden />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-8 py-6">{formContent}</div>
+      </div>
+    </div>
   )
 }
