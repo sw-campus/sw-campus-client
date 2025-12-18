@@ -5,7 +5,7 @@ import { ArrowUpRight, X } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
-import { useCartLecturesQuery } from '@/features/cart/hooks/useCartLecturesQuery'
+import { useCartLecturesWithDetailQuery } from '@/features/cart/hooks/useCartLecturesWithDetailQuery'
 import { useRemoveFromCart } from '@/features/cart/hooks/useRemoveFromCart'
 import { useAuthStore } from '@/store/authStore'
 
@@ -14,7 +14,7 @@ export default function FloatingCart() {
 
   const isLoggedIn = useAuthStore(state => state.isLoggedIn)
 
-  const { data } = useCartLecturesQuery()
+  const { data } = useCartLecturesWithDetailQuery()
   const items = data ?? []
 
   const { mutate: remove } = useRemoveFromCart()
@@ -29,7 +29,7 @@ export default function FloatingCart() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 120 }}
-          className="fixed bottom-6 left-1/2 z-999 flex w-[95%] -translate-x-1/2 items-center gap-4 overflow-x-auto rounded-full border border-white/40 bg-white/40 px-6 py-4 shadow-xl backdrop-blur-xl md:w-[700px]"
+          className="fixed bottom-6 left-1/2 z-999 flex w-[95%] -translate-x-1/2 items-center gap-4 overflow-x-auto rounded-full border border-white/40 bg-white/40 px-6 py-4 shadow-xl backdrop-blur-xl md:w-175"
         >
           <div className="flex items-center gap-4">
             {items.map(item => (

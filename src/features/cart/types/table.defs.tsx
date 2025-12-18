@@ -150,18 +150,24 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
             d?.schedule?.totalHours,
             d?.schedule?.totalDays,
           )
-          const [daysLineRaw, timeLineRaw] = formatted.split('\n')
+
+          const [daysLineRaw, timeLineRaw] = String(formatted).split('\n')
           const daysLine = daysLineRaw || '-'
           const timeLine = timeLineRaw ?? '-'
 
+          const chipClassName =
+            'bg-primary text-primary-foreground inline-flex shrink-0 rounded-md px-2 py-1 font-mono text-xs font-semibold'
+
           return (
-            <div className="flex flex-col gap-1">
-              <span className="bg-muted text-foreground inline-flex w-fit rounded-md px-2 py-1 font-mono text-sm">
-                {daysLine}
-              </span>
-              <span className="bg-muted text-foreground inline-flex w-fit rounded-md px-2 py-1 font-mono text-sm">
-                {timeLine}
-              </span>
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={chipClassName}>요일</span>
+                <span className="text-foreground text-sm">: {daysLine}</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={chipClassName}>시간</span>
+                <span className="text-foreground text-sm">: {timeLine}</span>
+              </div>
             </div>
           )
         },

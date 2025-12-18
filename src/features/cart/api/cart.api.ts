@@ -65,10 +65,16 @@ function toCartItem(raw: unknown): CartItem | null {
   )
 
   const thumbnailCandidate = (r.thumbnailUrl ??
+    r.lecture_image_url ??
+    r.lectureImageUrl ??
     r.imageUrl ??
+    r.image_url ??
     r.image ??
     lecture?.thumbnailUrl ??
-    lecture?.imageUrl) as unknown
+    lecture?.lecture_image_url ??
+    lecture?.lectureImageUrl ??
+    lecture?.imageUrl ??
+    lecture?.image_url) as unknown
   const thumbnailUrl = typeof thumbnailCandidate === 'string' ? thumbnailCandidate : undefined
 
   return {
