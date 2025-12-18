@@ -10,8 +10,6 @@ import { useSignupForm } from '@/features/auth/hooks/useSignupForm'
 
 export default function SignupPersonalFormView() {
   const {
-    address,
-    detailAddress,
     email,
     isSendingEmail,
     isEmailVerified,

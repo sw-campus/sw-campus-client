@@ -1,10 +1,22 @@
 'use client'
 
+import { useState } from 'react'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FiLogIn, FiUser, FiHeart, FiMenu, FiLogOut } from 'react-icons/fi'
 
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { useLogout } from '@/features/auth/hooks/useLogout'
 import type { CategoryTreeNode } from '@/features/category'
 import { useAuthStore } from '@/store/authStore'
 
@@ -20,14 +32,14 @@ export default function Header({
   onOtherNavEnter: () => void
 }) {
   const router = useRouter()
-  const { logout: clearAuth } = useAuthStore()
-  const { isLoggedIn, userName, userType, logout } = useAuthStore()
+  const [logoutOpen, setLogoutOpen] = useState(false)
+  const { isLoggedIn, userName, userType } = useAuthStore()
+  const { logout, isPending } = useLogout()
 
   // 로그아웃
   const handleLogout = async () => {
     try {
-      await logout() // 서버에서 쿠키 삭제
-      clearAuth() // 클라이언트 상태 초기화
+      await logout() // 서버에서 쿠키 삭제 + 클라이언트 상태 초기화
       router.push('/') // 홈으로 이동 (프로그램적으로 네비게이션)
     } catch (e) {
       console.error(e)
@@ -38,7 +50,7 @@ export default function Header({
     <header className="sticky top-0 z-50 mx-auto mt-6 flex w-full max-w-7xl items-center justify-between rounded-full border border-white/15 bg-white/10 px-10 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-xl">
       <div className="flex flex-1 items-center gap-8">
         {/* 햄버거 버튼 */}
-        <button className="text-white md:hidden">
+        <button type="button" className="text-white md:hidden" onClick={onOpenNav}>
           <FiMenu size={22} />
         </button>
 
@@ -75,9 +87,6 @@ export default function Header({
         <Link href="/organizations" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
           훈련 기관
         </Link>
-        <Link href="/" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
-          커뮤니케이션
-        </Link>
       </nav>
 
       {/* 아이콘 */}
@@ -87,29 +96,27 @@ export default function Header({
           <>
             {/* 로그인된 경우 */}
             <span className="text-sm font-medium">{userName ?? '사용자'}님</span>
-
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={() => setLogoutOpen(true)}
+              disabled={isPending}
               className="flex items-center gap-2 text-sm transition hover:opacity-80"
               aria-label="로그아웃"
             >
               <FiLogOut className="text-xl" />
             </button>
-
             {/* userType에 따라 마이페이지 분기 */}
             {userType === 'ORGANIZATION' ? (
               <Link href="/mypage/organization">
-                <FiUser className="text-xl" />
+                <FiUser />
               </Link>
             ) : (
               <Link href="/mypage/personal">
-                <FiUser className="text-xl" />
+                <FiUser />
               </Link>
             )}
-
             <Link href="/">
-              <FiHeart className="text-xl" />
+              <FiHeart />
             </Link>
           </>
         ) : (
@@ -127,6 +134,31 @@ export default function Header({
           </>
         )}
       </div>
+
+      <Dialog open={logoutOpen} onOpenChange={setLogoutOpen}>
+        <DialogContent>
+          <DialogHeader className="gap-5">
+            <DialogTitle>로그아웃</DialogTitle>
+            <DialogDescription>장바구니에 있는 항목은 7일간 유지됩니다.</DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setLogoutOpen(false)}>
+              취소
+            </Button>
+            <Button
+              type="button"
+              onClick={async () => {
+                await handleLogout()
+                setLogoutOpen(false)
+              }}
+              disabled={isPending}
+            >
+              확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   )
 }
