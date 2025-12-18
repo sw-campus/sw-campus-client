@@ -9,7 +9,6 @@ import {
   formatList,
   formatMoney,
   formatRecruitType,
-  formatStatus,
   formatText,
 } from '@/features/cart/utils/cartCompareFormatters'
 import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
@@ -157,7 +156,6 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
     key: 'recruit',
     title: '모집정보',
     rows: [
-      { key: 'status', label: '모집상태', value: d => formatStatus(d?.recruitStatus) },
       { key: 'recruitType', label: '모집유형', value: d => formatRecruitType(d?.recruitType) },
       { key: 'tuition', label: '자기부담금', value: d => formatMoney(d?.support?.tuition) },
       { key: 'stipend', label: '훈련장려금', value: d => formatText(d?.support?.stipend) },
