@@ -17,7 +17,7 @@ export function formatDateRangeWithTotalDays(
 ) {
   const base = formatDateRange(start, end)
   if (!totalDays) return base
-  return `${base} (총 ${totalDays}일)`
+  return `${base}\n(총 ${totalDays}일)`
 }
 
 export function formatCourseTime(
@@ -26,17 +26,20 @@ export function formatCourseTime(
   totalHours: number | null | undefined,
   totalDays: number | null | undefined,
 ) {
-  const parts = [days, time].filter(Boolean) as string[]
-  const base = parts.length ? parts.join(' ') : '-'
+  const dayPart = days || '-'
+  const baseTime = time || '-'
 
   const perDayFromTime = getNetTrainingHoursFromTimeRange(time)
-  if (perDayFromTime) return `${base} (하루 ${formatHours(perDayFromTime)}시간)`
+  if (perDayFromTime) {
+    const timePart = `${baseTime} (하루 ${formatHours(perDayFromTime)}시간)`
+    return `${dayPart}\n${timePart}`
+  }
 
-  if (!totalHours || !totalDays) return base
-  if (totalDays <= 0) return base
+  if (!totalHours || !totalDays) return `${dayPart}\n${baseTime}`
+  if (totalDays <= 0) return `${dayPart}\n${baseTime}`
   const perDayFromTotals = totalHours / totalDays
-  if (!Number.isFinite(perDayFromTotals) || perDayFromTotals <= 0) return base
-  return `${base} (하루 ${formatHours(perDayFromTotals)}시간)`
+  if (!Number.isFinite(perDayFromTotals) || perDayFromTotals <= 0) return `${dayPart}\n${baseTime}`
+  return `${dayPart}\n${baseTime} (하루 ${formatHours(perDayFromTotals)}시간)`
 }
 
 export function formatMoney(value: number | null | undefined) {
@@ -51,7 +54,7 @@ export function formatText(value: string | null | undefined) {
 
 export function formatBoolean(value: boolean | null | undefined) {
   if (value === null || value === undefined) return '-'
-  return value ? '있음' : '없음'
+  return value ? 'O' : 'X'
 }
 
 export function formatList(values: Array<string | null | undefined> | null | undefined) {
@@ -81,4 +84,19 @@ export function formatStatus(value: string | null | undefined) {
   if (value === 'CLOSED') return '마감'
   if (value === 'DRAFT') return '임시저장'
   return value
+}
+export function formatPcType(pc: string | null | undefined) {
+  if (!pc) return '-'
+  const normalized = String(pc).toUpperCase()
+  if (normalized === 'NONE') return '없음'
+  if (normalized === 'DESKTOP') return '데스크톱'
+  if (normalized === 'LAPTOP') return '노트북'
+  return pc
+}
+export function parseMoneyLike(value: string | null | undefined) {
+  if (!value) return null
+  const digits = value.replace(/[^0-9]/g, '')
+  if (!digits) return null
+  const parsed = Number(digits)
+  return Number.isFinite(parsed) ? parsed : null
 }

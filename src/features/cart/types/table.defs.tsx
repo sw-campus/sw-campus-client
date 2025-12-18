@@ -8,8 +8,10 @@ import {
   formatLectureLoc,
   formatList,
   formatMoney,
+  formatPcType,
   formatRecruitType,
   formatText,
+  parseMoneyLike,
 } from '@/features/cart/utils/cartCompareFormatters'
 import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
 import { cn } from '@/lib/utils'
@@ -124,49 +126,88 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
     key: 'education',
     title: '교육정보',
     rows: [
+      { key: 'orgName', label: '훈련기관명', value: d => formatText(d?.orgName) },
       {
         key: 'coursePeriod',
         label: '교육기간',
-        value: d =>
-          formatDateRangeWithTotalDays(
-            d?.schedule?.coursePeriod?.start,
-            d?.schedule?.coursePeriod?.end,
-            d?.schedule?.totalDays,
-          ),
+        value: d => (
+          <span className="whitespace-pre-line">
+            {formatDateRangeWithTotalDays(
+              d?.schedule?.coursePeriod?.start,
+              d?.schedule?.coursePeriod?.end,
+              d?.schedule?.totalDays,
+            )}
+          </span>
+        ),
       },
       {
         key: 'courseTime',
         label: '교육시간',
-        value: d =>
-          formatCourseTime(d?.schedule?.days, d?.schedule?.time, d?.schedule?.totalHours, d?.schedule?.totalDays),
-      },
-      {
-        key: 'teachers',
-        label: '강사명',
-        value: d => formatList(d?.teachers?.map(t => t.name)),
+        value: d => {
+          const formatted = formatCourseTime(
+            d?.schedule?.days,
+            d?.schedule?.time,
+            d?.schedule?.totalHours,
+            d?.schedule?.totalDays,
+          )
+          const [daysLineRaw, timeLineRaw] = formatted.split('\n')
+          const daysLine = daysLineRaw || '-'
+          const timeLine = timeLineRaw ?? '-'
+
+          return (
+            <div className="flex flex-col gap-1">
+              <span className="bg-muted text-foreground inline-flex w-fit rounded-md px-2 py-1 font-mono text-sm">
+                {daysLine}
+              </span>
+              <span className="bg-muted text-foreground inline-flex w-fit rounded-md px-2 py-1 font-mono text-sm">
+                {timeLine}
+              </span>
+            </div>
+          )
+        },
       },
       {
         key: 'location',
         label: '교육장소',
         value: d => `${formatLectureLoc(d?.lectureLoc)}${d?.location ? ` (${d.location})` : ''}`,
       },
+      { key: 'teachers', label: '강사명', value: d => formatList(d?.teachers?.map(t => t.name)) },
     ],
   },
   {
-    key: 'recruit',
-    title: '모집정보',
+    key: 'cost',
+    title: '수강료',
     rows: [
       { key: 'recruitType', label: '모집유형', value: d => formatRecruitType(d?.recruitType) },
+      { key: 'stipend', label: '지원금', value: d => formatText(d?.support?.stipend) },
       { key: 'tuition', label: '자기부담금', value: d => formatMoney(d?.support?.tuition) },
-      { key: 'stipend', label: '훈련장려금', value: d => formatText(d?.support?.stipend) },
-      { key: 'extraSupport', label: '훈련비 지원', value: d => formatText(d?.support?.extraSupport) },
+      {
+        key: 'totalCost',
+        label: '수강료 합계',
+        value: d => {
+          const stipend = parseMoneyLike(d?.support?.stipend)
+          const tuition = d?.support?.tuition
+          if (stipend === null || tuition === null || tuition === undefined) return '-'
+          return formatMoney(stipend + tuition)
+        },
+      },
+    ],
+  },
+  {
+    key: 'benifits',
+    title: '지원혜택',
+    rows: [
+      { key: 'stipend', label: '훈련수당', value: d => formatText(d?.support?.stipend) },
+      { key: 'benefits', label: '혜택', value: d => formatList(d?.benefits) },
+      { key: 'extraSupport', label: '추가혜택', value: d => formatText(d?.support?.extraSupport) },
     ],
   },
   {
     key: 'goal',
     title: '훈련목표',
-    rows: [{ key: 'goal', label: '훈련목표', value: d => d?.goal ?? '-' }],
+    rows: [{ key: 'goal', label: '목표', value: d => formatText(d?.goal) }],
   },
+  // 커리큘럼
   {
     key: 'quals',
     title: '지원자격',
@@ -187,7 +228,7 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
     key: 'equipment',
     title: '훈련시설 및 장비',
     rows: [
-      { key: 'pc', label: '장비', value: d => d?.equipment?.pc ?? '-' },
+      { key: 'pc', label: '장비', value: d => formatPcType(d?.equipment?.pc) },
       { key: 'books', label: '교재지원 유무', value: d => formatBoolean(d?.services?.books) },
       { key: 'merit', label: '훈련시설 장점', value: d => d?.equipment?.merit ?? '-' },
     ],
@@ -198,16 +239,16 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
     rows: [
       {
         key: 'num',
-        label: '개수(회)',
-        value: d => (d?.project?.num !== null && d?.project?.num !== undefined ? String(d.project.num) : '-'),
+        label: '횟수',
+        value: d => (d?.project?.num !== null && d?.project?.num !== undefined ? `총 ${d.project.num}회` : '-'),
       },
       {
         key: 'time',
-        label: '기간(시간)',
-        value: d => (d?.project?.time !== null && d?.project?.time !== undefined ? String(d.project.time) : '-'),
+        label: '기간',
+        value: d => (d?.project?.time !== null && d?.project?.time !== undefined ? `총 ${d.project.time}일` : '-'),
       },
       { key: 'team', label: '팀 구성 방식', value: d => d?.project?.team ?? '-' },
-      { key: 'tool', label: '협업툴', value: d => d?.project?.tool ?? '-' },
+      { key: 'tool', label: '사용하는 협업툴', value: d => d?.project?.tool ?? '-' },
       { key: 'mentor', label: '멘토링/코드리뷰', value: d => formatBoolean(d?.project?.mentor) },
     ],
   },
@@ -219,12 +260,10 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
       { key: 'mock', label: '모의 면접', value: d => formatBoolean(d?.services?.mockInterview) },
       { key: 'help', label: '취업 지원', value: d => formatBoolean(d?.services?.employmentHelp) },
       {
+        // 이것도 OX로 표시
         key: 'after',
         label: '수료 후 사후관리',
-        value: d =>
-          d?.services?.afterCompletion !== null && d?.services?.afterCompletion !== undefined
-            ? String(d.services.afterCompletion)
-            : '-',
+        value: d => formatBoolean(d?.services?.afterCompletion),
       },
     ],
   },

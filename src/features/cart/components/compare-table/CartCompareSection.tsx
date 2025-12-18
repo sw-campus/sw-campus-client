@@ -11,6 +11,7 @@ import { LectureSummaryCard } from '@/features/cart/components/compare-table/Lec
 import { useCartLecturesWithDetailQuery } from '@/features/cart/hooks/useCartLecturesWithDetailQuery'
 import type { CartItem } from '@/features/cart/types/cart.type'
 import { useLectureDetailQuery } from '@/features/lecture'
+import { useOrganizationDetailQuery } from '@/features/organization'
 import { cn } from '@/lib/utils'
 import { useCartCompareStore } from '@/store/cartCompare.store'
 
@@ -50,6 +51,17 @@ export default function CartCompareSection() {
 
   const { data: leftDetail } = useLectureDetailQuery(leftId)
   const { data: rightDetail } = useLectureDetailQuery(rightId)
+
+  const { data: leftOrg } = useOrganizationDetailQuery(leftDetail?.orgId ?? 0)
+  const { data: rightOrg } = useOrganizationDetailQuery(rightDetail?.orgId ?? 0)
+
+  const leftOrgName = leftOrg?.name ?? leftDetail?.orgName ?? left?.orgName
+  const rightOrgName = rightOrg?.name ?? rightDetail?.orgName ?? right?.orgName
+
+  const leftDetailResolved = leftDetail ? { ...leftDetail, orgName: leftOrgName ?? leftDetail.orgName } : leftDetail
+  const rightDetailResolved = rightDetail
+    ? { ...rightDetail, orgName: rightOrgName ?? rightDetail.orgName }
+    : rightDetail
 
   const leftCategory = left?.categoryName ?? leftDetail?.categoryName
   const rightCategory = right?.categoryName ?? rightDetail?.categoryName
@@ -188,7 +200,7 @@ export default function CartCompareSection() {
               <LectureSummaryCard
                 side="left"
                 title={left?.title ?? ''}
-                orgName={leftDetail?.orgName}
+                orgName={leftOrgName}
                 thumbnailUrl={leftDetail?.thumbnailUrl}
                 lectureId={leftId}
                 onClear={() => setLeftId(null)}
@@ -218,7 +230,7 @@ export default function CartCompareSection() {
               <LectureSummaryCard
                 side="right"
                 title={right?.title ?? ''}
-                orgName={rightDetail?.orgName}
+                orgName={rightOrgName}
                 thumbnailUrl={rightDetail?.thumbnailUrl}
                 lectureId={rightId}
                 onClear={() => setRightId(null)}
@@ -228,8 +240,8 @@ export default function CartCompareSection() {
           <CompareTable
             leftTitle={left?.title}
             rightTitle={right?.title}
-            leftDetail={leftDetail}
-            rightDetail={rightDetail}
+            leftDetail={leftDetailResolved}
+            rightDetail={rightDetailResolved}
             labelColClassName={LABEL_COL_TABLE_CLASS}
           />
         </CardContent>

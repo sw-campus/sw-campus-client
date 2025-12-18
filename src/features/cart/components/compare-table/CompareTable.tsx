@@ -1,7 +1,7 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import {
   COMPARE_SECTIONS,
   dataRow,
@@ -12,7 +12,6 @@ import {
   valueOrUnselected,
 } from '@/features/cart/types/table.defs'
 import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
-import { cn } from '@/lib/utils'
 
 function sectionRow(label: string, rowKey: string) {
   return (
@@ -34,6 +33,7 @@ function renderCurriculumLevel(level: string) {
   if (!level || level === '-') return '-'
 
   const normalized = level.toUpperCase()
+  if (normalized === 'NONE') return ''
   const label = normalized === 'BASIC' ? '기본' : normalized === 'ADVANCED' ? '심화' : level
 
   if (normalized === 'BASIC') {
@@ -60,8 +60,6 @@ function renderCurriculumLevel(level: string) {
 }
 
 export function CompareTable({
-  leftTitle,
-  rightTitle,
   leftDetail,
   rightDetail,
   labelColClassName = 'w-[13.75rem]',
@@ -86,21 +84,6 @@ export function CompareTable({
           <col className="w-px" />
           <col />
         </colgroup>
-        <TableHeader>
-          <TableRow>
-            <TableHead className={cn('px-6 py-4 text-base', labelColClassName)}>비교항목</TableHead>
-            <TableHead className="[display:-webkit-box] overflow-hidden px-6 py-4 align-top text-base break-keep whitespace-normal [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
-              {leftTitle ?? <span className="sr-only">A과정(미선택)</span>}
-            </TableHead>
-            <TableHead className="w-px px-0">
-              <div className="bg-border h-7 w-px" />
-            </TableHead>
-            <TableHead className="[display:-webkit-box] overflow-hidden px-6 py-4 align-top text-base break-keep whitespace-normal [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
-              {rightTitle ?? <span className="sr-only">B과정(미선택)</span>}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-
         <TableBody className="[&_tr:nth-child(even)]:bg-muted/20 [&_td]:leading-relaxed">
           {COMPARE_SECTIONS.flatMap(section => [
             sectionRow(section.title, `${section.key}-title`),
@@ -132,8 +115,8 @@ export function CompareTable({
                 dataRow({
                   rowKey: `steps-${stepType}`,
                   label: stepType,
-                  leftValue: valueOrUnselected(leftDetail, hasStep(leftDetail, stepType) ? '있음' : '없음'),
-                  rightValue: valueOrUnselected(rightDetail, hasStep(rightDetail, stepType) ? '있음' : '없음'),
+                  leftValue: valueOrUnselected(leftDetail, hasStep(leftDetail, stepType) ? 'O' : 'X'),
+                  rightValue: valueOrUnselected(rightDetail, hasStep(rightDetail, stepType) ? 'O' : 'X'),
                   labelColClassName,
                   isLeftSelected,
                   isRightSelected,
