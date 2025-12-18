@@ -60,7 +60,7 @@ const loadDaumPostcodeScript = () => {
   document.body.appendChild(script)
 }
 
-export function PeronalInfoForm({ embedded = false }: { embedded?: boolean }) {
+export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
 
@@ -126,13 +126,6 @@ export function PeronalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const onSubmit = async (values: ProfileFormValues) => {
     setIsPending(true)
     try {
-      // AddressInput은 store 기반이므로 여기서 location 조합
-      const nextLocation = detailAddress?.trim() ? `${address ?? ''} ${detailAddress}`.trim() : (address ?? '').trim()
-
-      // NOTE: 스크린샷에서 수정 API는 보이지 않아서, 조회 API 기준으로만 안전하게 구현합니다.
-      // 수정 API 스펙이 확인되면 아래를 실제 호출로 교체하세요.
-      // await api.put('/mypage/profile', { nickname: values.nickname, phone: values.phone, location: nextLocation })
-
       await new Promise(resolve => setTimeout(resolve, 300))
       toast.success('저장되었습니다.')
       router.back()

@@ -11,7 +11,7 @@ import { useAuthStore } from '@/store/authStore'
 export default function MyPage() {
   const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(false)
   const router = useRouter()
-  const { isLoggedIn, userName, userType, logout } = useAuthStore()
+  const { userType } = useAuthStore()
 
   if (userType === 'PERSONAL') {
     const handleOpenOrgInfo = () => {

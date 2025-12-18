@@ -1,5 +1,5 @@
 import OrgInfoPage from '@/app/mypage/Info/page'
 
-export default function OrganizationInfoModal() {
+export default function PersonalInfoModal() {
   return <OrgInfoPage />
 }

@@ -1,5 +1,5 @@
-import SurveyCreatePage from '@/app//mypage/survey/page'
+import SurveyCreatePage from '@/app/mypage/survey/page'
 
-export default function OrganizationLectureCreateModal() {
+export default function SurveyModal() {
   return <SurveyCreatePage />
 }

@@ -28,6 +28,7 @@ export default function Header({
     try {
       await logout() // 서버에서 쿠키 삭제
       clearAuth() // 클라이언트 상태 초기화
+      router.push('/') // 홈으로 이동 (프로그램적으로 네비게이션)
     } catch (e) {
       console.error(e)
     }
@@ -91,10 +92,9 @@ export default function Header({
               type="button"
               onClick={handleLogout}
               className="flex items-center gap-2 text-sm transition hover:opacity-80"
+              aria-label="로그아웃"
             >
-              <Link href="/">
-                <FiLogOut className="text-xl" />
-              </Link>
+              <FiLogOut className="text-xl" />
             </button>
 
             {/* userType에 따라 마이페이지 분기 */}

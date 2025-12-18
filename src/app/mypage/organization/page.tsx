@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/authStore'
 
 export default function MyPage() {
   const router = useRouter()
-  const { isLoggedIn, userName, userType, logout } = useAuthStore()
+  const { userType } = useAuthStore()
   const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(false)
 
   // 기관 마이페이지

@@ -117,6 +117,9 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
       await upsertSurvey.mutateAsync(values)
       toast.success('설문조사가 저장되었습니다.')
       router.back()
+    } catch (error) {
+      console.error('설문조사 저장 중 오류가 발생했습니다:', error)
+      toast.error('설문조사 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
     } finally {
       setIsPending(false)
     }
