@@ -1,10 +1,10 @@
-import CartComparePage from '@/features/cart/components/CartComparePage'
+import CartCompareSection from '@/features/cart/components/compare-table/CartCompareSection'
 
 export default function Page() {
   return (
     <div className="custom-container">
       <div className="custom-card">
-        <CartComparePage />
+        <CartCompareSection />
       </div>
     </div>
   )

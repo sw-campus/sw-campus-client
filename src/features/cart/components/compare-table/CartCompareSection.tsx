@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CompareTable } from '@/features/cart/components/CompareTable'
-import { LectureSummaryCard } from '@/features/cart/components/LectureSummaryCard'
+import { CompareTable } from '@/features/cart/components/compare-table/CompareTable'
+import { LectureSummaryCard } from '@/features/cart/components/compare-table/LectureSummaryCard'
 import { useCartLecturesWithDetailQuery } from '@/features/cart/hooks/useCartLecturesWithDetailQuery'
 import type { CartItem } from '@/features/cart/types/cart.type'
 import { useLectureDetailQuery } from '@/features/lecture'
@@ -30,7 +30,7 @@ function getDragLectureId(e: React.DragEvent) {
   return e.dataTransfer.getData(DND_MIME) || e.dataTransfer.getData('text/plain')
 }
 
-export default function CartComparePage() {
+export default function CartCompareSection() {
   const { data, isLoading, isError } = useCartLecturesWithDetailQuery()
   const items = data ?? EMPTY_CART_ITEMS
 
@@ -117,7 +117,7 @@ export default function CartComparePage() {
                   className="hover:bg-muted/50 border-border disabled:bg-muted/20 disabled:text-muted-foreground relative flex w-full items-center gap-3 overflow-hidden rounded-md border p-2 text-left disabled:cursor-not-allowed"
                 >
                   {(!canUseItem(item.categoryName) || isAlreadySelected(item.lectureId)) && (
-                    <span aria-hidden className="bg-foreground/10 absolute inset-0" />
+                    <span aria-hidden className="bg-foreground/5 absolute inset-0" />
                   )}
                   <div className="bg-muted relative z-10 h-10 w-10 overflow-hidden rounded-md">
                     {item.thumbnailUrl ? (
