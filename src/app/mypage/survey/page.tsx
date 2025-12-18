@@ -28,7 +28,7 @@ export default function SurveyCreatePage() {
         </DialogHeader>
 
         <div className="max-h-[75vh] overflow-y-auto px-6 pb-6">
-          <SurveyForm />
+          <SurveyForm embedded />
         </div>
       </DialogContent>
     </Dialog>

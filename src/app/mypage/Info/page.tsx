@@ -27,11 +27,10 @@ export default function OrgInfoPage() {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-[700px]">
         <DialogHeader className="px-6 pt-6">
-          <DialogTitle>확인</DialogTitle>
+          <DialogTitle>{userType === 'ORGANIZATION' ? '기업 정보 수정' : '개인 정보 수정'}</DialogTitle>
         </DialogHeader>
-
-        <div className="max-h-[75vh] overflow-y-auto px-6 pb-6">
-          <>{userType === 'ORGANIZATION' ? <OrgInfoForm /> : <PeronalInfoForm />}</>
+        <div className="max-h-[75vh] overflow-y-auto px-6 pb-6 pt-4">
+          <>{userType === 'ORGANIZATION' ? <OrgInfoForm embedded /> : <PeronalInfoForm embedded />}</>
         </div>
       </DialogContent>
     </Dialog>
