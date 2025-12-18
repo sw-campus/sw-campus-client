@@ -5,8 +5,10 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { BsCart4 } from 'react-icons/bs'
 import { FiLogIn, FiUser, FiHeart, FiMenu, FiLogOut } from 'react-icons/fi'
 
+import { HeaderIconAction } from '@/components/layout/header/HeaderIconAction'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -35,6 +37,8 @@ export default function Header({
   const [logoutOpen, setLogoutOpen] = useState(false)
   const { isLoggedIn, userName, userType } = useAuthStore()
   const { logout, isPending } = useLogout()
+
+  const mypageHref = userType === 'ORGANIZATION' ? '/mypage/organization' : '/mypage/personal'
 
   // 로그아웃
   const handleLogout = async () => {
@@ -72,7 +76,7 @@ export default function Header({
         </Link>
       </div>
 
-      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 text-sm text-white md:flex">
+      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 font-semibold text-white md:flex">
         {categories.map(category => (
           <Link
             key={category.categoryId}
@@ -95,42 +99,38 @@ export default function Header({
         {isLoggedIn ? (
           <>
             {/* 로그인된 경우 */}
-            <span className="text-sm font-medium">{userName ?? '사용자'}님</span>
-            <button
-              type="button"
+            <span className="text-base font-medium">{userName ?? '사용자'} 님</span>
+
+            <HeaderIconAction
+              kind="button"
+              ariaLabel="로그아웃"
+              tooltip="로그아웃"
               onClick={() => setLogoutOpen(true)}
               disabled={isPending}
-              className="flex items-center gap-2 text-sm transition hover:opacity-80"
-              aria-label="로그아웃"
             >
-              <FiLogOut className="text-xl" />
-            </button>
-            {/* userType에 따라 마이페이지 분기 */}
-            {userType === 'ORGANIZATION' ? (
-              <Link href="/mypage/organization">
-                <FiUser />
-              </Link>
-            ) : (
-              <Link href="/mypage/personal">
-                <FiUser />
-              </Link>
-            )}
-            <Link href="/">
-              <FiHeart />
-            </Link>
+              <FiLogOut />
+            </HeaderIconAction>
+
+            <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href={mypageHref}>
+              <FiUser />
+            </HeaderIconAction>
+
+            <HeaderIconAction kind="link" ariaLabel="위시리스트" tooltip="장바구니" href="/">
+              <BsCart4 />
+            </HeaderIconAction>
           </>
         ) : (
           <>
             {/* 로그인 안된 경우 */}
-            <Link href="/login">
+            <HeaderIconAction kind="link" ariaLabel="로그인" tooltip="로그인" href="/login">
               <FiLogIn />
-            </Link>
-            <Link href="/login">
+            </HeaderIconAction>
+            <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href="/login">
               <FiUser />
-            </Link>
-            <Link href="/login">
-              <FiHeart />
-            </Link>
+            </HeaderIconAction>
+            <HeaderIconAction kind="link" ariaLabel="위시리스트" tooltip="장바구니" href="/login">
+              <BsCart4 />
+            </HeaderIconAction>
           </>
         )}
       </div>

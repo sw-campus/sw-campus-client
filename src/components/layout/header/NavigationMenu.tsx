@@ -152,7 +152,7 @@ export default function Navigation({
                         <NavigationMenuTrigger onClick={() => router.push(item.href)}>
                           {item.title}
                         </NavigationMenuTrigger>
-                        <NavigationMenuContent className="absolute top-8 left-0 z-[100] mt-0 w-max min-w-[220px] rounded-lg bg-white shadow-xl before:absolute before:-top-4 before:-left-10 before:h-10 before:w-[200%] before:bg-transparent">
+                        <NavigationMenuContent className="absolute top-8 left-0 z-100 mt-0 w-max min-w-55 rounded-lg bg-white shadow-xl before:absolute before:-top-4 before:-left-10 before:h-10 before:w-[200%] before:bg-transparent">
                           <div className="flex flex-col gap-2 p-4">
                             <Link
                               href={item.href}
