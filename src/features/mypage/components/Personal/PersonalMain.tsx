@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
+import Image from 'next/image'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -94,19 +96,24 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
 
   if (activeSection === 'password') {
     return (
-      <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-neutral-600/80 p-6 shadow-black/40">
-        <header>
-          <h3 className="text-2xl font-semibold text-white">비밀번호 확인</h3>
-          <p className="mt-1 text-sm text-white/70">개인 정보 수정을 위해 비밀번호를 입력해주세요.</p>
+      <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-white/60 p-6 shadow-black/40">
+        {/* Header Card */}
+        <header className="rounded-2xl bg-white/70 px-5 py-4 ring-1 ring-white/30 backdrop-blur-xl">
+          <h3 className="text-2xl font-semibold text-gray-900">비밀번호 확인</h3>
+          <p className="mt-1 text-sm text-gray-600">개인 정보 수정을 위해 비밀번호를 입력해주세요.</p>
         </header>
 
-        <div className="max-w-sm">
+        {/* Form Card */}
+        <div className="mx-auto max-w-sm rounded-2xl bg-white/70 p-5 ring-1 ring-white/30 backdrop-blur-xl">
           <input
             type="password"
             placeholder="비밀번호 입력"
-            className="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-white placeholder-white/40 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-orange-100"
           />
-          <Button className="mt-4 w-full" onClick={openInfoModal}>
+          <Button
+            className="mt-4 w-full rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
+            onClick={openInfoModal}
+          >
             확인
           </Button>
         </div>
@@ -116,22 +123,34 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
 
   if (activeSection === 'survey') {
     return (
-      <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-neutral-600/80 p-6 shadow-black/40">
-        <header className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-white/80">조직 전용 교육과정 공간</p>
-            <h3 className="text-2xl font-semibold text-white">설문 조사</h3>
+      <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-white/60 p-6 shadow-black/40">
+        {/* Header Card */}
+        <header className="rounded-2xl bg-white/70 px-5 py-4 ring-1 ring-white/30 backdrop-blur-xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">나의 활동</p>
+              <h3 className="text-2xl font-semibold text-gray-900">설문 조사</h3>
+            </div>
+            <Button
+              className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
+              onClick={onOpenProductModal}
+            >
+              설문조사
+            </Button>
           </div>
-          <Button onClick={onOpenProductModal}>설문조사</Button>
         </header>
 
-        <section className="rounded-2xl bg-white/10 p-5 text-white/80">
+        {/* Stats cards */}
+        <section className="rounded-2xl bg-white/70 p-5 text-gray-700 ring-1 ring-white/30 backdrop-blur-xl">
           <div className="grid gap-4 sm:grid-cols-3">
             {dashboardStats.map(stat => (
-              <article key={stat.label} className="rounded-xl bg-white/5 p-4">
-                <p className="text-xs text-white/60 uppercase">{stat.label}</p>
-                <p className="text-2xl font-semibold">{stat.value}</p>
-                <p className="mt-1 text-sm text-white/60">{stat.note}</p>
+              <article
+                key={stat.label}
+                className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5"
+              >
+                <p className="text-xs text-gray-500 uppercase">{stat.label}</p>
+                <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+                <p className="mt-1 text-sm text-gray-500">{stat.note}</p>
               </article>
             ))}
           </div>
@@ -142,21 +161,23 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
 
   // reviews
   return (
-    <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-neutral-600/80 p-6 shadow-black/40">
-      <header className="flex items-center justify-between">
+    <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-white/60 p-6 shadow-black/40">
+      {/* Header Card */}
+      <header className="rounded-2xl bg-white/70 px-5 py-4 ring-1 ring-white/30 backdrop-blur-xl">
         <div>
-          <p className="text-sm text-white/80">나의 활동</p>
-          <h3 className="text-2xl font-semibold text-white">내 후기</h3>
+          <p className="text-sm text-gray-600">나의 활동</p>
+          <h3 className="text-2xl font-semibold text-gray-900">내 후기</h3>
         </div>
       </header>
 
-      <section className="rounded-2xl bg-white/10 p-5 text-white/80">
+      {/* List Card */}
+      <section className="rounded-2xl bg-white/70 p-5 text-gray-700 ring-1 ring-white/30 backdrop-blur-xl">
         <header className="mb-3">
-          <h4 className="text-lg font-semibold text-white">내 강의 목록</h4>
+          <h4 className="text-lg font-semibold text-gray-900">내 강의 목록</h4>
         </header>
-        {lecturesLoading && <p className="text-white/70">불러오는 중...</p>}
+        {lecturesLoading && <p className="text-gray-600">불러오는 중...</p>}
         {lecturesError && !lecturesLoading && (
-          <div className="flex items-center gap-3 text-red-300">
+          <div className="flex items-center gap-3 text-red-600">
             <p>{lecturesError}</p>
             <Button
               size="sm"
@@ -182,23 +203,37 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
           </div>
         )}
         {!lecturesLoading && !lecturesError && (lectures?.length ?? 0) === 0 && (
-          <p className="text-white/70">등록된 강의가 없습니다.</p>
+          <p className="text-gray-600">등록된 강의가 없습니다.</p>
         )}
         {!lecturesLoading && !lecturesError && (lectures?.length ?? 0) > 0 && (
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="space-y-3">
             {lectures!.map(l => (
               <li
                 key={l.certificateId}
-                className="group cursor-pointer rounded-xl bg-white/5 p-4 transition hover:bg-white/10"
+                className="cursor-pointer rounded-2xl border border-white/10 bg-white/90 p-4 text-neutral-900 shadow-sm ring-1 ring-black/5 transition hover:ring-black/10 sm:p-5"
                 onClick={() => setOpenedLecture(l)}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <h5 className="truncate font-medium text-white">{l.lectureName}</h5>
-                  <Badge variant={l.canWriteReview ? 'default' : 'secondary'}>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-white">
+                      {l.lectureImageUrl ? (
+                        <Image src={l.lectureImageUrl} alt={l.lectureName} fill className="object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gray-50 text-sm font-semibold text-gray-600">
+                          {l.lectureName.charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">코스</p>
+                      <p className="text-base font-semibold text-gray-900">{l.lectureName}</p>
+                      <p className="mt-0.5 text-xs text-gray-500">기관: {l.organizationName}</p>
+                    </div>
+                  </div>
+                  <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
                     {l.canWriteReview ? '후기 작성 가능' : '작성 완료'}
                   </Badge>
                 </div>
-                <p className="mt-1 text-xs text-white/60">기관: {l.organizationName}</p>
               </li>
             ))}
           </ul>
