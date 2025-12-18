@@ -71,10 +71,26 @@ export async function generateGeminiSummary(lectureData: LectureDetail) {
 }
 
 /**
+ * AI 비교 분석 결과에서 사용되는 섹션 키 타입
+ * COMPARE_SECTIONS의 key 값과 일치해야 함
+ */
+export type CompareSectionKey =
+  | 'education'
+  | 'cost'
+  | 'benefits'
+  | 'goal'
+  | 'quals'
+  | 'equipment'
+  | 'project'
+  | 'job'
+  | 'steps'
+  | 'curriculum'
+
+/**
  * AI 비교 분석 결과 - 섹션별 코멘트
  */
 export interface SectionComment {
-  section: string
+  sectionKey: CompareSectionKey
   comment: string
   advantage: 'left' | 'right' | 'equal'
 }
@@ -172,15 +188,16 @@ export async function compareCoursesWithAI(
       다음 JSON 형식으로만 응답해줘 (다른 텍스트 없이 순수 JSON만):
       {
         "sectionComments": [
-          {"section": "교육정보", "comment": "교육기간, 시간, 장소에 대한 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
-          {"section": "모집정보", "comment": "모집유형, 비용에 대한 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
-          {"section": "훈련목표", "comment": "훈련목표 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
-          {"section": "지원자격", "comment": "지원자격 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
-          {"section": "선발절차", "comment": "선발절차 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
-          {"section": "훈련시설", "comment": "시설 및 장비 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
-          {"section": "프로젝트", "comment": "프로젝트 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
-          {"section": "취업지원", "comment": "취업지원 서비스 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
-          {"section": "커리큘럼", "comment": "커리큘럼 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"}
+          {"sectionKey": "education", "comment": "교육기간, 시간, 장소에 대한 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
+          {"sectionKey": "cost", "comment": "비용, 지원금에 대한 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
+          {"sectionKey": "benefits", "comment": "추가 제공 항목(주거비, 훈련수당 등) 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
+          {"sectionKey": "goal", "comment": "훈련목표 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
+          {"sectionKey": "quals", "comment": "지원자격 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
+          {"sectionKey": "steps", "comment": "선발절차 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
+          {"sectionKey": "equipment", "comment": "시설 및 장비 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
+          {"sectionKey": "project", "comment": "프로젝트 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
+          {"sectionKey": "job", "comment": "취업지원 서비스 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
+          {"sectionKey": "curriculum", "comment": "커리큘럼 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"}
         ],
         "finalRecommendation": {
           "recommended": "left" 또는 "right",

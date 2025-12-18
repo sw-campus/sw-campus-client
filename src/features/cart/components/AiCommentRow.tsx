@@ -4,7 +4,7 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 
 interface AiCommentRowProps {
-  section: string
+  sectionTitle: string
   comment: string
   advantage: 'left' | 'right' | 'equal'
   leftTitle?: string
@@ -12,14 +12,14 @@ interface AiCommentRowProps {
 }
 
 export function AiCommentRow({
-  section,
+  sectionTitle,
   comment,
   advantage,
   leftTitle = '왼쪽 강의',
   rightTitle = '오른쪽 강의',
 }: AiCommentRowProps) {
   return (
-    <TableRow className="border-y border-orange-300 !bg-orange-100">
+    <TableRow className="border-y-2 border-orange-400 !bg-orange-200/60">
       <TableCell colSpan={4} className="px-6 py-4">
         <div className="flex items-start gap-4">
           {/* AI 아이콘 */}
@@ -32,7 +32,7 @@ export function AiCommentRow({
           {/* 코멘트 내용 */}
           <div className="min-w-0 flex-1">
             <div className="mb-2 flex items-center gap-2">
-              <span className="text-sm font-bold text-orange-700">{section} 분석</span>
+              <span className="text-sm font-bold text-orange-700">{sectionTitle} 분석</span>
               <AdvantageIndicator advantage={advantage} leftTitle={leftTitle} rightTitle={rightTitle} />
             </div>
             <p className="text-base leading-relaxed font-medium text-gray-900">{comment}</p>

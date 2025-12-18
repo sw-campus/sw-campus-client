@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { AddToCartButton } from '@/features/cart'
 import { type LectureDetail } from '@/features/lecture/api/lectureApi'
+import { processApplicationSteps } from '@/features/lecture/utils/processApplicationSteps'
 
 import { formatDateDot, SideInfoRow } from './DetailShared'
 
@@ -72,9 +73,7 @@ export default function LectureSidebar({ lecture }: Props) {
       {lecture.steps &&
         lecture.steps.length > 0 &&
         (() => {
-          // 사전과제를 지원절차에서 분리 (합격 후 진행되는 단계)
-          const applicationSteps = lecture.steps.filter(step => step !== '사전과제')
-          const hasPreTask = lecture.steps.includes('사전과제')
+          const { applicationSteps, hasPreTask } = processApplicationSteps(lecture.steps)
 
           return (
             <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">

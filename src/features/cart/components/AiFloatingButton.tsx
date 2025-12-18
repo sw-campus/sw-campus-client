@@ -41,44 +41,7 @@ export function AiFloatingButton({
   if (!mounted) return null
 
   return createPortal(
-    <>
-      {/* CSS Keyframes */}
-      <style>{`
-        @keyframes magicPulse {
-          0%, 100% {
-            box-shadow:
-              0 0 20px rgba(251, 146, 60, 0.4),
-              0 0 40px rgba(251, 146, 60, 0.3),
-              0 0 60px rgba(249, 115, 22, 0.2),
-              inset 0 0 30px rgba(255, 255, 255, 0.3);
-          }
-          50% {
-            box-shadow:
-              0 0 30px rgba(251, 146, 60, 0.6),
-              0 0 60px rgba(251, 146, 60, 0.4),
-              0 0 90px rgba(249, 115, 22, 0.3),
-              inset 0 0 40px rgba(255, 255, 255, 0.4);
-          }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
-        }
-        @keyframes sparkle {
-          0%, 100% { opacity: 0.3; transform: scale(0.8); }
-          50% { opacity: 1; transform: scale(1.2); }
-        }
-        @keyframes shimmer {
-          0% { transform: translateX(-100%) rotate(45deg); }
-          100% { transform: translateX(200%) rotate(45deg); }
-        }
-        @keyframes rotateGlow {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
-
-      <button
+    <button
         type="button"
         onClick={handleClick}
         disabled={!isEnabled && !hasResult}
@@ -284,8 +247,7 @@ export function AiFloatingButton({
             ✓
           </span>
         )}
-      </button>
-    </>,
+      </button>,
     document.body,
   )
 }

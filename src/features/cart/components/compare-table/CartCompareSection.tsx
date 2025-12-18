@@ -69,21 +69,45 @@ export default function CartCompareSection() {
     setIsAiLoading(true)
     setAiResult(null)
 
+    // 1단계: 모듈 동적 로딩
+    let compareCoursesWithAI: typeof import('@/features/lecture/actions/gemini').compareCoursesWithAI
+    let getSurvey: typeof import('@/features/mypage/api/survey.api').getSurvey
+    let getProfile: typeof import('@/features/mypage/api/survey.api').getProfile
+
     try {
-      // 동적 import로 Server Action과 API 호출
-      const [{ compareCoursesWithAI }, { getSurvey, getProfile }] = await Promise.all([
+      const [geminiModule, surveyModule] = await Promise.all([
         import('@/features/lecture/actions/gemini'),
         import('@/features/mypage/api/survey.api'),
       ])
+      compareCoursesWithAI = geminiModule.compareCoursesWithAI
+      getSurvey = surveyModule.getSurvey
+      getProfile = surveyModule.getProfile
+    } catch (error) {
+      console.error('Module Loading Error:', error)
+      toast.error('서비스 모듈을 불러오는데 실패했습니다. 페이지를 새로고침해주세요.')
+      setIsAiLoading(false)
+      return
+    }
 
-      // 사용자 설문 정보와 프로필 정보 조회
-      const [survey, profile] = await Promise.all([getSurvey(), getProfile()])
+    // 2단계: 사용자 데이터 조회
+    let survey: Awaited<ReturnType<typeof getSurvey>>
+    let profile: Awaited<ReturnType<typeof getProfile>>
 
-      if (!survey.exists) {
-        toast.warning('설문조사를 먼저 작성해주세요. 더 정확한 추천을 받을 수 있습니다.')
-      }
+    try {
+      ;[survey, profile] = await Promise.all([getSurvey(), getProfile()])
+    } catch (error) {
+      console.error('User Data Fetch Error:', error)
+      toast.error('사용자 정보를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.')
+      setIsAiLoading(false)
+      return
+    }
 
-      // AI 비교 분석 실행 (프로필의 주소 정보 포함)
+    if (!survey.exists) {
+      toast.warning('설문조사를 먼저 작성해주세요. 더 정확한 추천을 받을 수 있습니다.')
+    }
+
+    // 3단계: AI 비교 분석 실행
+    try {
       const result = await compareCoursesWithAI(leftDetail, rightDetail, {
         ...survey,
         userLocation: profile.location,
@@ -92,7 +116,8 @@ export default function CartCompareSection() {
       toast.success('AI 분석이 완료되었습니다!')
     } catch (error) {
       console.error('AI Analysis Error:', error)
-      toast.error('AI 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      const errorMessage = error instanceof Error ? error.message : 'AI 분석 중 오류가 발생했습니다.'
+      toast.error(`${errorMessage} 잠시 후 다시 시도해주세요.`)
     } finally {
       setIsAiLoading(false)
     }

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { type LectureDetail } from '@/features/lecture/api/lectureApi'
+import { processApplicationSteps } from '@/features/lecture/utils/processApplicationSteps'
 import { type OrganizationDetail } from '@/features/organization/types/organization.type'
 
 import { Section, InfoBox, InfoRow, RequirementItem, InlineBadge, formatDateDot, formatKRW } from './DetailShared'
@@ -155,9 +156,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
       {/* 지원 절차 */}
       <Section title="이런 절차로 지원할 수 있어요">
         {(() => {
-          // 사전과제를 지원절차에서 분리 (합격 후 진행되는 단계)
-          const applicationSteps = lecture.steps.filter(step => step !== '사전과제')
-          const hasPreTask = lecture.steps.includes('사전과제')
+          const { applicationSteps, hasPreTask } = processApplicationSteps(lecture.steps)
 
           return (
             <>
