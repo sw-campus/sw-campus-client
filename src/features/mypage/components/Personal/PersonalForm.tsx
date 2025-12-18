@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
@@ -12,17 +12,28 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import AddressInput from '@/features/auth/components/AddressInput'
+import { api } from '@/lib/axios'
+import { useSignupStore } from '@/store/signupStore'
 
-const orgInfoSchema = z.object({
-  organizationName: z.string().min(1, '기관명을 입력해주세요.'),
-  businessRegistrationNumber: z.string().min(1, '사업자등록번호를 입력해주세요.'),
-  ceoName: z.string().min(1, '대표자명을 입력해주세요.'),
-  contactEmail: z.string().min(1, '이메일을 입력해주세요.').email('이메일 형식이 올바르지 않습니다.'),
-  contactPhone: z.string().min(1, '연락처를 입력해주세요.'),
-  address: z.string().optional(),
+const profileSchema = z.object({
+  nickname: z.string().min(1, '닉네임을 입력해주세요.'),
+  phone: z.string().min(1, '휴대폰 번호를 입력해주세요.'),
+  // AddressInput은 store 기반이므로 location은 선택적으로만 유지
+  location: z.string().optional(),
 })
 
-type OrgInfoFormValues = z.infer<typeof orgInfoSchema>
+type ProfileFormValues = z.infer<typeof profileSchema>
+
+type MyProfileResponse = {
+  email: string
+  name: string
+  nickname: string
+  phone: string
+  location: string
+  provider: string
+  role: string
+  hasSurvey: boolean
+}
 
 // 모달 스크린샷처럼: 라운드, 얇은 보더, 포커스 앰버 컬러
 const INPUT_CLASS =
@@ -32,16 +43,18 @@ export function PeronalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
 
-  const methods = useForm<OrgInfoFormValues>({
-    resolver: zodResolver(orgInfoSchema),
+  const { address, detailAddress, setAddress, setDetailAddress } = useSignupStore()
+  const [profileEmail, setProfileEmail] = useState<string>('')
+  const [profileName, setProfileName] = useState<string>('')
+  const [isLoading, setIsLoading] = useState(true)
+
+  const methods = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
     mode: 'onChange',
     defaultValues: {
-      organizationName: '',
-      businessRegistrationNumber: '',
-      ceoName: '',
-      contactEmail: '',
-      contactPhone: '',
-      address: '',
+      nickname: '',
+      phone: '',
+      location: '',
     },
   })
 
@@ -51,12 +64,55 @@ export function PeronalInfoForm({ embedded = false }: { embedded?: boolean }) {
     register,
   } = methods
 
-  const onSubmit = async (_values: OrgInfoFormValues) => {
+  useEffect(() => {
+    let mounted = true
+
+    const load = async () => {
+      setIsLoading(true)
+      try {
+        const res = await api.get<MyProfileResponse>('/mypage/profile')
+        if (!mounted) return
+
+        const data = res.data
+        setProfileEmail(data.email)
+        setProfileName(data.name)
+
+        // react-hook-form 값 세팅
+        methods.reset({
+          nickname: data.nickname ?? '',
+          phone: data.phone ?? '',
+          location: data.location ?? '',
+        })
+
+        // AddressInput(store) 값 세팅
+        setAddress(data.location ?? '')
+        setDetailAddress('')
+      } catch (e) {
+        toast.error('내 정보 조회에 실패했습니다.')
+      } finally {
+        if (mounted) setIsLoading(false)
+      }
+    }
+
+    load()
+
+    return () => {
+      mounted = false
+    }
+  }, [methods, setAddress, setDetailAddress])
+
+  const onSubmit = async (values: ProfileFormValues) => {
     setIsPending(true)
     try {
-      // TODO: 실제 API 연결 전 임시 처리
-      await new Promise(resolve => setTimeout(resolve, 500))
-      toast.success('기업 정보가 저장되었습니다.')
+      // AddressInput은 store 기반이므로 여기서 location 조합
+      const nextLocation = detailAddress?.trim() ? `${address ?? ''} ${detailAddress}`.trim() : (address ?? '').trim()
+
+      // NOTE: 스크린샷에서 수정 API는 보이지 않아서, 조회 API 기준으로만 안전하게 구현합니다.
+      // 수정 API 스펙이 확인되면 아래를 실제 호출로 교체하세요.
+      // await api.put('/mypage/profile', { nickname: values.nickname, phone: values.phone, location: nextLocation })
+
+      await new Promise(resolve => setTimeout(resolve, 300))
+      toast.success('저장되었습니다.')
       router.back()
     } finally {
       setIsPending(false)
@@ -68,89 +124,50 @@ export function PeronalInfoForm({ embedded = false }: { embedded?: boolean }) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <FieldSet>
           <FieldGroup className="grid grid-cols-1 gap-6">
-            {/* 기관명 */}
             <div>
-              <label htmlFor="organizationName" className="mb-1 block text-sm font-medium text-gray-800">
-                기관명
+              <label className="mb-1 block text-sm font-medium text-gray-800">이름</label>
+              <div className={`${INPUT_CLASS} flex items-center bg-gray-50`}>
+                <span className="truncate">{profileName || '-'}</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-800">이메일</label>
+              <div className={`${INPUT_CLASS} flex items-center bg-gray-50`}>
+                <span className="truncate">{profileEmail || '-'}</span>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="nickname" className="mb-1 block text-sm font-medium text-gray-800">
+                닉네임
               </label>
               <input
-                id="organizationName"
+                id="nickname"
                 type="text"
-                placeholder="예) (주)캠퍼스랩"
-                {...register('organizationName')}
+                placeholder="예) dev master"
+                {...register('nickname')}
                 className={INPUT_CLASS}
               />
-              {errors.organizationName && (
-                <p className="mt-1 text-xs text-red-600">{errors.organizationName.message}</p>
-              )}
+              {errors.nickname && <p className="mt-1 text-xs text-red-600">{errors.nickname.message}</p>}
             </div>
 
-            {/* 사업자등록번호 */}
             <div>
-              <label htmlFor="businessRegistrationNumber" className="mb-1 block text-sm font-medium text-gray-800">
-                사업자등록번호
+              <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-800">
+                휴대폰 번호
               </label>
               <input
-                id="businessRegistrationNumber"
-                type="text"
-                placeholder="예) 123-45-67890"
-                {...register('businessRegistrationNumber')}
-                className={INPUT_CLASS}
-              />
-              {errors.businessRegistrationNumber && (
-                <p className="mt-1 text-xs text-red-600">{errors.businessRegistrationNumber.message}</p>
-              )}
-            </div>
-
-            {/* 대표자명 */}
-            <div>
-              <label htmlFor="ceoName" className="mb-1 block text-sm font-medium text-gray-800">
-                대표자명
-              </label>
-              <input
-                id="ceoName"
-                type="text"
-                placeholder="예) 홍길동"
-                {...register('ceoName')}
-                className={INPUT_CLASS}
-              />
-              {errors.ceoName && <p className="mt-1 text-xs text-red-600">{errors.ceoName.message}</p>}
-            </div>
-
-            {/* 담당자 이메일 */}
-            <div>
-              <label htmlFor="contactEmail" className="mb-1 block text-sm font-medium text-gray-800">
-                담당자 이메일
-              </label>
-              <input
-                id="contactEmail"
-                type="email"
-                placeholder="예) contact@example.com"
-                {...register('contactEmail')}
-                className={INPUT_CLASS}
-              />
-              {errors.contactEmail && <p className="mt-1 text-xs text-red-600">{errors.contactEmail.message}</p>}
-            </div>
-
-            {/* 연락처 */}
-            <div>
-              <label htmlFor="contactPhone" className="mb-1 block text-sm font-medium text-gray-800">
-                연락처
-              </label>
-              <input
-                id="contactPhone"
+                id="phone"
                 type="text"
                 placeholder="예) 010-1234-5678"
-                {...register('contactPhone')}
+                {...register('phone')}
                 className={INPUT_CLASS}
               />
-              {errors.contactPhone && <p className="mt-1 text-xs text-red-600">{errors.contactPhone.message}</p>}
+              {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone.message}</p>}
             </div>
 
-            {/* 주소: AddressInput 사용 (파일 수정 금지) */}
             <div>
               <AddressInput />
-              {errors.address && <p className="mt-1 text-xs text-red-600">{String(errors.address.message)}</p>}
             </div>
           </FieldGroup>
 
@@ -158,10 +175,10 @@ export function PeronalInfoForm({ embedded = false }: { embedded?: boolean }) {
           <div className="pt-2">
             <Button
               type="submit"
-              disabled={!isValid || isPending}
+              disabled={!isValid || isPending || isLoading}
               className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
             >
-              {isPending ? '저장 중...' : '저장'}
+              {isLoading ? '불러오는 중...' : isPending ? '저장 중...' : '저장'}
             </Button>
           </div>
         </FieldSet>
@@ -184,7 +201,7 @@ export function PeronalInfoForm({ embedded = false }: { embedded?: boolean }) {
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-8 py-6">
-          <h2 className="text-xl font-semibold text-gray-900">기업 정보 수정</h2>
+          <h2 className="text-xl font-semibold text-gray-900">개인 정보 수정</h2>
 
           <button
             type="button"

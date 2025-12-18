@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
@@ -27,6 +27,19 @@ const surveySchema = z.object({
 })
 type SurveyFormValues = z.infer<typeof surveySchema>
 
+// GET /api/v1/mypage/survey 응답(저장된 설문이 있으면 반환)
+type MySurveyResponse = {
+  memberId: number
+  major: string
+  bootcampCompleted: boolean
+  wantedJobs: string
+  licenses: string
+  hasGovCard: boolean
+  affordableAmount: number
+  createdAt: string
+  updatedAt: string
+}
+
 // PersonalForm과 동일 톤의 입력 스타일
 const INPUT_CLASS =
   'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
@@ -37,6 +50,7 @@ const TEXTAREA_CLASS =
 export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const methods = useForm<SurveyFormValues>({
     resolver: zodResolver(surveySchema),
@@ -53,7 +67,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
 
   const upsertSurvey = useMutation({
     mutationFn: async (payload: SurveyFormValues) => {
-      // Swagger 기준: PUT /api/v1/mypage/survey
+      // Swagger 기준: PUT /api/v1/mypage/survey (키 이름이 Swagger와 동일)
       // baseURL = NEXT_PUBLIC_API_URL (예: http://localhost:8080/api/v1)
       await api.put('/mypage/survey', payload)
     },
@@ -64,6 +78,38 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
     formState: { isValid, errors },
     register,
   } = methods
+
+  useEffect(() => {
+    let mounted = true
+
+    const load = async () => {
+      setIsLoading(true)
+      try {
+        const res = await api.get<MySurveyResponse>('/mypage/survey')
+        if (!mounted) return
+
+        const data = res.data
+        methods.reset({
+          major: data.major ?? '',
+          bootcampCompleted: !!data.bootcampCompleted,
+          wantedJobs: data.wantedJobs ?? '',
+          licenses: data.licenses ?? '',
+          hasGovCard: !!data.hasGovCard,
+          affordableAmount: data.affordableAmount ?? 0,
+        })
+      } catch (e: any) {
+        // 저장된 설문이 없으면(404 등) 기본값 유지
+      } finally {
+        if (mounted) setIsLoading(false)
+      }
+    }
+
+    load()
+
+    return () => {
+      mounted = false
+    }
+  }, [methods])
 
   const onSubmit = async (values: SurveyFormValues) => {
     setIsPending(true)
@@ -97,7 +143,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
                 id="affordableAmount"
                 type="number"
                 inputMode="numeric"
-                {...register('affordableAmount')}
+                {...register('affordableAmount', { valueAsNumber: true })}
                 className={INPUT_CLASS}
               />
               {errors.affordableAmount && (
@@ -128,7 +174,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
                 {...register('bootcampCompleted')}
                 className="h-4 w-4 rounded border-gray-300"
               />
-              <label htmlFor="bootcampCompleted" className="font-medium">
+              <label htmlFor="bootcampCompleted" className="text-sm font-medium text-gray-800">
                 부트캠프 수료
               </label>
             </div>
@@ -140,7 +186,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
                 {...register('hasGovCard')}
                 className="h-4 w-4 rounded border-gray-300"
               />
-              <label htmlFor="hasGovCard" className="font-medium">
+              <label htmlFor="hasGovCard" className="text-sm font-medium text-gray-800">
                 국민내일배움카드 보유
               </label>
             </div>
@@ -149,10 +195,10 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
           <div className="pt-2">
             <Button
               type="submit"
-              disabled={!isValid || isPending || upsertSurvey.isPending}
+              disabled={!isValid || isPending || upsertSurvey.isPending || isLoading}
               className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
             >
-              {isPending || upsertSurvey.isPending ? '저장 중...' : '저장'}
+              {isLoading ? '불러오는 중...' : isPending || upsertSurvey.isPending ? '저장 중...' : '저장'}
             </Button>
           </div>
         </FieldSet>
