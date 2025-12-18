@@ -216,6 +216,7 @@ export default function CartCompareSection() {
             leftDetail={leftDetailResolved}
             rightDetail={rightDetailResolved}
             labelColClassName={LABEL_COL_TABLE_CLASS}
+            aiResult={aiResult}
           />
 
           {/* AI 최종 추천 */}

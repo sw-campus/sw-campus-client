@@ -50,7 +50,7 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
       </Field>
 
       <Field>
-        <FieldLabel>정부 지원금 / 자기부담금 / 교육지원금</FieldLabel>
+        <FieldLabel>정부 지원금 / 자기부담금 / 훈련수당</FieldLabel>
         <FieldDescription>금액은 원 단위로 입력합니다. (예: 1500000 = 150만원)</FieldDescription>
         <FieldContent>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -112,7 +112,7 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
               render={({ field }) => (
                 <div className="space-y-1">
                   <div className="space-y-0.5">
-                    <Label>교육지원금 (월)</Label>
+                    <Label>훈련수당 (월)</Label>
                     <p className="text-muted-foreground text-xs">훈련생에게 월 단위로 지급되는 지원금</p>
                   </div>
                   <div className="flex items-center gap-2">

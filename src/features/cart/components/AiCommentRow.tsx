@@ -19,7 +19,7 @@ export function AiCommentRow({
   rightTitle = '오른쪽 강의',
 }: AiCommentRowProps) {
   return (
-    <TableRow className="border-y border-orange-200 !bg-orange-50">
+    <TableRow className="border-y border-orange-300 !bg-orange-100">
       <TableCell colSpan={4} className="px-6 py-4">
         <div className="flex items-start gap-4">
           {/* AI 아이콘 */}

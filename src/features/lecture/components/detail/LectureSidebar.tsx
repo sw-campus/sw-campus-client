@@ -47,12 +47,15 @@ export default function LectureSidebar({ lecture }: Props) {
 
         <div className="space-y-4">
           <SideInfoRow label="모집상태">
-            <Badge
-              className="rounded-full px-3"
-              variant={lecture.recruitStatus === 'RECRUITING' ? 'default' : 'secondary'}
+            <span
+              className={`rounded-full border px-3 py-1 text-xs font-medium ${
+                lecture.recruitStatus === 'RECRUITING'
+                  ? 'border-emerald-200/50 bg-emerald-500/10 text-emerald-600'
+                  : 'border-gray-200/50 bg-gray-500/10 text-gray-500'
+              }`}
             >
               {lecture.recruitStatus === 'RECRUITING' ? '모집중' : '마감'}
-            </Badge>
+            </span>
           </SideInfoRow>
           <SideInfoRow label="모집기간">~ {formatDateDot(lecture.schedule.recruitPeriod)}</SideInfoRow>
           <SideInfoRow label="수업기간">

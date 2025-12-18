@@ -147,7 +147,7 @@ export async function compareCoursesWithAI(
       모의면접: ${lecture.services?.mockInterview ? '있음' : '없음'}
       취업지원: ${lecture.services?.employmentHelp ? '있음' : '없음'}
       프로젝트 수: ${lecture.project?.num ?? 0}회
-      커리큘럼: ${lecture.curriculum?.map(c => c.name).join(', ') || '정보 없음'}
+      커리큘럼: ${lecture.curriculum?.map(c => `${c.name}(${c.level === 'BASIC' ? '기본' : c.level === 'ADVANCED' ? '심화' : (c.level ?? '')})`).join(', ') || '정보 없음'}
       선발절차: ${lecture.steps?.join(', ') || '정보 없음'}
       지원자격: ${lecture.quals?.map(q => `[${q.type}] ${q.text}`).join(', ') || '정보 없음'}
     `

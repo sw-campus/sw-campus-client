@@ -128,9 +128,9 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
             </InfoRow>
           )}
 
-          {/* 교육지원금 */}
+          {/* 훈련수당 */}
           {lecture.support.extraSupport && (
-            <InfoRow label="교육지원금 (월)">
+            <InfoRow label="훈련수당 (월)">
               <span>{lecture.support.extraSupport}</span>
             </InfoRow>
           )}
