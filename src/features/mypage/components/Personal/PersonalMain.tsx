@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react'
 
+import { Star } from 'lucide-react'
 import Image from 'next/image'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { CATEGORY_LABELS, type ReviewCategory } from '@/features/lecture/api/reviewApi.types'
 import { api } from '@/lib/axios'
 
 type PersonalMainProps = {
@@ -34,12 +36,28 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     organizationName: string
     certifiedAt: string
     canWriteReview: boolean
+    reviewId?: number
   }
 
   const [lectures, setLectures] = useState<CompletedLecture[] | null>(null)
   const [lecturesLoading, setLecturesLoading] = useState(false)
   const [lecturesError, setLecturesError] = useState<string | null>(null)
-  const [openedLecture, setOpenedLecture] = useState<CompletedLecture | null>(null)
+  // 리뷰 수정 모달 상태
+  const [editOpen, setEditOpen] = useState(false)
+  // ReviewForm modal state
+  const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null)
+
+  // Create review modal state
+  const [createOpen, setCreateOpen] = useState(false)
+  const [createLectureId, setCreateLectureId] = useState<number | null>(null)
+  const [createLectureName, setCreateLectureName] = useState<string>('')
+  const [createSaving, setCreateSaving] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
+  const [createScore, setCreateScore] = useState<number>(0)
+  const [createComment, setCreateComment] = useState<string>('')
+  const [createDetails, setCreateDetails] = useState<
+    Array<{ category: ReviewCategory; score: number; comment?: string }>
+  >([])
 
   // useEffect(() => {
   //   if (activeSection !== 'reviews') return
@@ -170,14 +188,14 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
         </div>
       </header>
 
-      {/* List Card */}
-      <section className="rounded-2xl bg-white/70 p-5 text-gray-700 ring-1 ring-white/30 backdrop-blur-xl">
+      {/* List Card (match ReviewListModal aesthetic) */}
+      <section className="bg-card/40 text-foreground rounded-2xl p-5 backdrop-blur-xl">
         <header className="mb-3">
-          <h4 className="text-lg font-semibold text-gray-900">내 강의 목록</h4>
+          <h4 className="text-foreground text-lg font-semibold">내 강의 목록</h4>
         </header>
-        {lecturesLoading && <p className="text-gray-600">불러오는 중...</p>}
+        {lecturesLoading && <p className="text-muted-foreground">불러오는 중...</p>}
         {lecturesError && !lecturesLoading && (
-          <div className="flex items-center gap-3 text-red-600">
+          <div className="text-destructive-foreground flex items-center gap-3">
             <p>{lecturesError}</p>
             <Button
               size="sm"
@@ -203,15 +221,14 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
           </div>
         )}
         {!lecturesLoading && !lecturesError && (lectures?.length ?? 0) === 0 && (
-          <p className="text-gray-600">등록된 강의가 없습니다.</p>
+          <p className="text-muted-foreground">등록된 강의가 없습니다.</p>
         )}
         {!lecturesLoading && !lecturesError && (lectures?.length ?? 0) > 0 && (
           <ul className="space-y-3">
             {lectures!.map(l => (
               <li
                 key={l.certificateId}
-                className="cursor-pointer rounded-2xl border border-white/10 bg-white/90 p-4 text-neutral-900 shadow-sm ring-1 ring-black/5 transition hover:ring-black/10 sm:p-5"
-                onClick={() => setOpenedLecture(l)}
+                className="bg-card/40 text-foreground rounded-2xl p-5 shadow-sm backdrop-blur-xl transition hover:shadow-md"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
@@ -219,20 +236,75 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                       {l.lectureImageUrl ? (
                         <Image src={l.lectureImageUrl} alt={l.lectureName} fill className="object-cover" />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gray-50 text-sm font-semibold text-gray-600">
+                        <div className="text-muted-foreground flex h-full w-full items-center justify-center bg-gray-50 text-sm font-semibold">
                           {l.lectureName.charAt(0)}
                         </div>
                       )}
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">코스</p>
-                      <p className="text-base font-semibold text-gray-900">{l.lectureName}</p>
-                      <p className="mt-0.5 text-xs text-gray-500">기관: {l.organizationName}</p>
+                      <p className="text-muted-foreground text-xs">코스</p>
+                      <p className="text-foreground text-base font-semibold">{l.lectureName}</p>
+                      <p className="text-muted-foreground mt-0.5 text-xs">기관: {l.organizationName}</p>
                     </div>
                   </div>
-                  <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                    {l.canWriteReview ? '후기 작성 가능' : '작성 완료'}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    {l.canWriteReview ? (
+                      <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                        작성 가능
+                      </Badge>
+                    ) : (
+                      <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                        작성완료
+                      </Badge>
+                    )}
+                    {l.canWriteReview ? (
+                      <Button
+                        size="sm"
+                        className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
+                        onClick={() => {
+                          setCreateError(null)
+                          setCreateLectureId(l.lectureId)
+                          setCreateLectureName(l.lectureName)
+                          setCreateScore(0)
+                          setCreateComment('')
+                          setCreateDetails([])
+                          setCreateOpen(true)
+                        }}
+                      >
+                        후기 작성
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
+                        onClick={() => {
+                          // Always open modal; show fallback message inside when reviewId is missing
+                          setSelectedReviewId(l.reviewId ?? null)
+                          setEditOpen(true)
+                        }}
+                      >
+                        리뷰 수정
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Inline details in horizontal layout */}
+                <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+                  <span className="text-muted-foreground">
+                    강의 ID: <span className="text-foreground font-medium">{l.lectureId}</span>
+                  </span>
+                  <span className="text-muted-foreground">
+                    교육기관: <span className="text-foreground font-medium">{l.organizationName}</span>
+                  </span>
+                  <span className="text-muted-foreground">
+                    수료일: <span className="text-foreground font-medium">{formatDate(l.certifiedAt)}</span>
+                  </span>
+                  <span className="text-muted-foreground">
+                    후기 작성:{' '}
+                    <span className="text-foreground font-medium">{l.canWriteReview ? '가능' : '완료됨'}</span>
+                  </span>
                 </div>
               </li>
             ))}
@@ -240,16 +312,150 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
         )}
       </section>
 
-      <Dialog open={!!openedLecture} onOpenChange={open => !open && setOpenedLecture(null)}>
-        <DialogContent>
+      {/* 리뷰 수정 모달 - ReviewForm 임베드 */}
+      <Dialog open={editOpen} onOpenChange={open => setEditOpen(open)}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{openedLecture?.lectureName}</DialogTitle>
+            <DialogTitle className="text-foreground text-2xl font-bold">리뷰 수정</DialogTitle>
           </DialogHeader>
-          <div className="text-muted-foreground text-sm">
-            <p>강의 ID: {openedLecture?.lectureId}</p>
-            <p className="mt-1">교육기관: {openedLecture?.organizationName}</p>
-            <p className="mt-1">수료일: {openedLecture ? formatDate(openedLecture.certifiedAt) : ''}</p>
-            <p className="mt-1">후기 작성: {openedLecture?.canWriteReview ? '가능' : '완료됨'}</p>
+          {selectedReviewId ? (
+            <ReviewForm embedded reviewId={selectedReviewId} />
+          ) : (
+            <p className="text-muted-foreground text-sm">리뷰 정보를 찾을 수 없습니다.</p>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 후기 작성 모달 */}
+      <Dialog open={createOpen} onOpenChange={open => setCreateOpen(open)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-foreground text-2xl font-bold">후기 작성</DialogTitle>
+          </DialogHeader>
+          {createError && <p className="text-destructive-foreground text-sm">{createError}</p>}
+
+          <div className="space-y-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-muted-foreground text-xs">강의</p>
+                <p className="text-foreground text-sm font-semibold">{createLectureName}</p>
+                {createLectureId && <p className="text-muted-foreground text-xs">강의 ID: {createLectureId}</p>}
+              </div>
+              <div className="flex items-center gap-2">
+                <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                <input
+                  type="number"
+                  min={0}
+                  max={5}
+                  step={0.5}
+                  value={createScore}
+                  onChange={e => setCreateScore(Number(e.target.value))}
+                  className="w-20 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-foreground mb-1 block text-sm font-medium">한줄 후기</label>
+              <textarea
+                value={createComment}
+                onChange={e => setCreateComment(e.target.value)}
+                rows={3}
+                className="text-foreground w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm placeholder-gray-400"
+                placeholder="후기를 입력하세요"
+              />
+            </div>
+
+            {createDetails && createDetails.length > 0 && (
+              <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                {createDetails.map((d, idx) => (
+                  <div key={`${d.category}-${idx}`} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-gray-800">{CATEGORY_LABELS[d.category]}</span>
+                      <div className="flex items-center gap-2">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <input
+                          type="number"
+                          min={0}
+                          max={5}
+                          step={0.5}
+                          value={d.score}
+                          onChange={e => {
+                            const v = Number(e.target.value)
+                            setCreateDetails(prev => prev.map((x, i) => (i === idx ? { ...x, score: v } : x)))
+                          }}
+                          className="w-16 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm"
+                        />
+                      </div>
+                    </div>
+                    <textarea
+                      value={d.comment ?? ''}
+                      onChange={e =>
+                        setCreateDetails(prev =>
+                          prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)),
+                        )
+                      }
+                      rows={2}
+                      className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
+                      placeholder="세부 의견을 입력하세요"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button size="sm" className="rounded-full" variant="secondary" onClick={() => setCreateOpen(false)}>
+                닫기
+              </Button>
+              <Button
+                size="sm"
+                className="rounded-full"
+                disabled={createSaving || !createLectureId}
+                onClick={async () => {
+                  if (!createLectureId) return
+                  try {
+                    setCreateSaving(true)
+                    setCreateError(null)
+                    // Try several payload/endpoints to match backend
+                    const payloadA = { score: createScore, comment: createComment, detailScores: createDetails }
+                    const payloadB = { score: createScore, content: createComment, items: createDetails }
+                    const payloadC = { lectureId: createLectureId, ...payloadA }
+                    const payloadD = { lectureId: createLectureId, ...payloadB }
+
+                    // Preferred: lecture-scoped endpoint
+                    try {
+                      await api.post(`/lectures/${createLectureId}/reviews`, payloadA)
+                    } catch {
+                      try {
+                        await api.post(`/lectures/${createLectureId}/reviews`, payloadB)
+                      } catch {
+                        try {
+                          await api.post(`/reviews`, payloadC)
+                        } catch {
+                          await api.post(`/reviews`, payloadD)
+                        }
+                      }
+                    }
+                    setCreateOpen(false)
+                    // refresh list to reflect canWriteReview change
+                    try {
+                      setLecturesLoading(true)
+                      const { data } = await api.get<CompletedLecture[]>(`/mypage/completed-lectures`)
+                      setLectures(Array.isArray(data) ? data : [])
+                    } finally {
+                      setLecturesLoading(false)
+                    }
+                  } catch {
+                    setCreateError('후기 저장에 실패했습니다.')
+                  } finally {
+                    setCreateSaving(false)
+                  }
+                }}
+              >
+                저장
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
