@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { BsCart4 } from 'react-icons/bs'
-import { FiLogIn, FiUser, FiHeart, FiMenu, FiLogOut } from 'react-icons/fi'
+import { FiLogIn, FiUser, FiMenu, FiLogOut } from 'react-icons/fi'
 
 import { HeaderIconAction } from '@/components/layout/header/HeaderIconAction'
 import { Button } from '@/components/ui/button'
