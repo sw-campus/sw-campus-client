@@ -22,6 +22,7 @@ export type RowDef = {
   key: string
   label: string
   value: (detail: Detail) => ReactNode
+  valueAlign?: 'left' | 'center'
 }
 
 export function valueOrUnselected(detail: Detail, value: ReactNode) {
@@ -42,6 +43,7 @@ export function dataRow({
   leftValue,
   rightValue,
   labelColClassName,
+  valueAlign = 'center',
   isLeftSelected,
   isRightSelected,
 }: {
@@ -50,6 +52,7 @@ export function dataRow({
   leftValue: ReactNode
   rightValue: ReactNode
   labelColClassName: string
+  valueAlign?: 'left' | 'center'
   isLeftSelected: boolean
   isRightSelected: boolean
 }) {
@@ -61,13 +64,21 @@ export function dataRow({
         {label}
       </TableCell>
       <TableCell
-        className={cn('px-6 py-4 align-top text-base whitespace-normal', !isLeftSelected && 'text-muted-foreground')}
+        className={cn(
+          'px-6 py-4 align-top text-base whitespace-normal',
+          valueAlign === 'center' ? 'text-center' : 'text-left',
+          !isLeftSelected && 'text-muted-foreground',
+        )}
       >
         {leftValue}
       </TableCell>
       {dividerCell()}
       <TableCell
-        className={cn('px-6 py-4 align-top text-base whitespace-normal', !isRightSelected && 'text-muted-foreground')}
+        className={cn(
+          'px-6 py-4 align-top text-base whitespace-normal',
+          valueAlign === 'center' ? 'text-center' : 'text-left',
+          !isRightSelected && 'text-muted-foreground',
+        )}
       >
         {rightValue}
       </TableCell>
@@ -98,9 +109,14 @@ export function renderRow({
     leftValue: valueOrUnselected(leftDetail, row.value(leftDetail)),
     rightValue: valueOrUnselected(rightDetail, row.value(rightDetail)),
     labelColClassName,
+    valueAlign: row.valueAlign,
     isLeftSelected,
     isRightSelected,
   })
+}
+
+function centerRows(rows: RowDef[]): RowDef[] {
+  return rows.map(row => ({ ...row, valueAlign: 'center' }))
 }
 
 export function hasStep(detail: Detail, stepType: string) {
@@ -155,18 +171,13 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
           const daysLine = daysLineRaw || '-'
           const timeLine = timeLineRaw ?? '-'
 
-          const chipClassName =
-            'bg-primary text-primary-foreground inline-flex shrink-0 rounded-md px-2 py-1 font-mono text-xs font-semibold'
-
           return (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={chipClassName}>요일</span>
-                <span className="text-foreground text-sm">: {daysLine}</span>
+            <div className="flex flex-col items-center">
+              <div className="flex flex-wrap items-center justify-center">
+                <span className="text-foreground"> {daysLine}</span>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={chipClassName}>시간</span>
-                <span className="text-foreground text-sm">: {timeLine}</span>
+              <div className="flex flex-wrap items-center justify-center">
+                <span className="text-foreground"> {timeLine}</span>
               </div>
             </div>
           )
@@ -183,7 +194,7 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
   {
     key: 'cost',
     title: '수강료',
-    rows: [
+    rows: centerRows([
       { key: 'recruitType', label: '모집유형', value: d => formatRecruitType(d?.recruitType) },
       { key: 'stipend', label: '지원금', value: d => formatText(d?.support?.stipend) },
       { key: 'tuition', label: '자기부담금', value: d => formatMoney(d?.support?.tuition) },
@@ -197,27 +208,26 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
           return formatMoney(stipend + tuition)
         },
       },
-    ],
+    ]),
   },
   {
     key: 'benifits',
     title: '지원혜택',
-    rows: [
+    rows: centerRows([
       { key: 'stipend', label: '훈련수당', value: d => formatText(d?.support?.stipend) },
       { key: 'benefits', label: '혜택', value: d => formatList(d?.benefits) },
       { key: 'extraSupport', label: '추가혜택', value: d => formatText(d?.support?.extraSupport) },
-    ],
+    ]),
   },
   {
     key: 'goal',
     title: '훈련목표',
-    rows: [{ key: 'goal', label: '목표', value: d => formatText(d?.goal) }],
+    rows: centerRows([{ key: 'goal', label: '목표', value: d => formatText(d?.goal) }]),
   },
-  // 커리큘럼
   {
     key: 'quals',
     title: '지원자격',
-    rows: [
+    rows: centerRows([
       {
         key: 'required',
         label: '필수',
@@ -228,21 +238,21 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
         label: '우대',
         value: d => formatList(d?.quals?.filter(q => q.type === 'PREFERRED').map(q => q.text)),
       },
-    ],
+    ]),
   },
   {
     key: 'equipment',
     title: '훈련시설 및 장비',
-    rows: [
+    rows: centerRows([
       { key: 'pc', label: '장비', value: d => formatPcType(d?.equipment?.pc) },
       { key: 'books', label: '교재지원 유무', value: d => formatBoolean(d?.services?.books) },
       { key: 'merit', label: '훈련시설 장점', value: d => d?.equipment?.merit ?? '-' },
-    ],
+    ]),
   },
   {
     key: 'project',
     title: '프로젝트',
-    rows: [
+    rows: centerRows([
       {
         key: 'num',
         label: '횟수',
@@ -256,21 +266,20 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
       { key: 'team', label: '팀 구성 방식', value: d => d?.project?.team ?? '-' },
       { key: 'tool', label: '사용하는 협업툴', value: d => d?.project?.tool ?? '-' },
       { key: 'mentor', label: '멘토링/코드리뷰', value: d => formatBoolean(d?.project?.mentor) },
-    ],
+    ]),
   },
   {
     key: 'job',
     title: '취업 지원 서비스',
-    rows: [
+    rows: centerRows([
       { key: 'resume', label: '이력서/자소서 첨삭', value: d => formatBoolean(d?.services?.resume) },
       { key: 'mock', label: '모의 면접', value: d => formatBoolean(d?.services?.mockInterview) },
       { key: 'help', label: '취업 지원', value: d => formatBoolean(d?.services?.employmentHelp) },
       {
-        // 이것도 OX로 표시
         key: 'after',
         label: '수료 후 사후관리',
         value: d => formatBoolean(d?.services?.afterCompletion),
       },
-    ],
+    ]),
   },
 ]

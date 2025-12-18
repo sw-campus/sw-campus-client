@@ -108,6 +108,7 @@ export function CompareTable({
                 leftValue: '-',
                 rightValue: '-',
                 labelColClassName,
+                valueAlign: 'center',
                 isLeftSelected,
                 isRightSelected,
               })
@@ -118,6 +119,7 @@ export function CompareTable({
                   leftValue: valueOrUnselected(leftDetail, hasStep(leftDetail, stepType) ? 'O' : 'X'),
                   rightValue: valueOrUnselected(rightDetail, hasStep(rightDetail, stepType) ? 'O' : 'X'),
                   labelColClassName,
+                  valueAlign: 'center',
                   isLeftSelected,
                   isRightSelected,
                 }),
@@ -131,6 +133,7 @@ export function CompareTable({
                 leftValue: '-',
                 rightValue: '-',
                 labelColClassName,
+                valueAlign: 'center',
                 isLeftSelected,
                 isRightSelected,
               })
@@ -141,6 +144,7 @@ export function CompareTable({
                   leftValue: valueOrUnselected(leftDetail, renderCurriculumLevel(curriculumLevel(leftDetail, name))),
                   rightValue: valueOrUnselected(rightDetail, renderCurriculumLevel(curriculumLevel(rightDetail, name))),
                   labelColClassName,
+                  valueAlign: 'center',
                   isLeftSelected,
                   isRightSelected,
                 }),

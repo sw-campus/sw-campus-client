@@ -206,7 +206,9 @@ export default function CartCompareSection() {
                 onClear={() => setLeftId(null)}
               />
             </div>
-            <div className="bg-border hidden w-px md:block" />
+            <div aria-hidden className="hidden w-px md:block">
+              <div className="bg-border h-full w-px" />
+            </div>
             <div
               className={cn(isRightOver && 'bg-muted/20')}
               onDragEnter={e => {
