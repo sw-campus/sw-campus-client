@@ -11,11 +11,10 @@ import { useAuthStore } from '@/store/authStore'
 export default function MyPage() {
   const router = useRouter()
   const { isLoggedIn, userName, userType, logout } = useAuthStore()
+  const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(false)
 
   // 기관 마이페이지
   if (userType === 'ORGANIZATION') {
-    const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(false)
-
     const handleOpenOrgInfo = () => {
       setIsOrgPasswordOpen(true)
     }

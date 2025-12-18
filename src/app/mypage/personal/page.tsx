@@ -46,4 +46,11 @@ export default function MyPage() {
       </div>
     )
   }
+
+  // userType이 null이거나 알 수 없을 때
+  return (
+    <div className="flex h-96 items-center justify-center">
+      <span className="text-lg text-neutral-500">로그인 후 이용 가능합니다.</span>
+    </div>
+  )
 }
