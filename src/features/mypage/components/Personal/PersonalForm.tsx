@@ -36,8 +36,29 @@ type MyProfileResponse = {
 }
 
 // 모달 스크린샷처럼: 라운드, 얇은 보더, 포커스 앰버 컬러
+
 const INPUT_CLASS =
   'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
+
+// AddressInput(daum.Postcode)이 동작하려면 postcode 스크립트가 필요합니다.
+const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
+
+const loadDaumPostcodeScript = () => {
+  if (typeof window === 'undefined') return
+
+  const w = window as any
+  // 이미 로드되어 있으면 종료
+  if (w.daum?.Postcode) return
+
+  // 이미 스크립트 태그가 있으면 로드만 기다림
+  if (document.getElementById(DAUM_POSTCODE_SCRIPT_ID)) return
+
+  const script = document.createElement('script')
+  script.id = DAUM_POSTCODE_SCRIPT_ID
+  script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+  script.async = true
+  document.body.appendChild(script)
+}
 
 export function PeronalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
@@ -68,6 +89,7 @@ export function PeronalInfoForm({ embedded = false }: { embedded?: boolean }) {
     let mounted = true
 
     const load = async () => {
+      loadDaumPostcodeScript()
       setIsLoading(true)
       try {
         const res = await api.get<MyProfileResponse>('/mypage/profile')
