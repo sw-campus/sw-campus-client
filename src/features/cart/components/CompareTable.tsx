@@ -1,5 +1,8 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
+import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
   formatBoolean,
@@ -33,7 +36,7 @@ function dividerCell() {
   )
 }
 
-function valueOrUnselected(detail: LectureDetail | null | undefined, value: string) {
+function valueOrUnselected(detail: LectureDetail | null | undefined, value: ReactNode) {
   return detail ? value : '미선택'
 }
 
@@ -41,6 +44,35 @@ function curriculumLevel(detail: LectureDetail | null | undefined, name: string)
   const found = detail?.curriculum?.find(c => c?.name === name)
   if (!found) return '-'
   return found.level ? String(found.level) : '-'
+}
+
+function renderCurriculumLevel(level: string) {
+  if (!level || level === '-') return '-'
+
+  const normalized = level.toUpperCase()
+  const label = normalized === 'BASIC' ? '기본' : normalized === 'ADVANCED' ? '심화' : level
+
+  if (normalized === 'BASIC') {
+    return (
+      <Badge variant="curriculumBasic" className="px-3 py-1 text-sm">
+        {label}
+      </Badge>
+    )
+  }
+
+  if (normalized === 'ADVANCED') {
+    return (
+      <Badge variant="curriculumAdvanced" className="px-3 py-1 text-sm">
+        {label}
+      </Badge>
+    )
+  }
+
+  return (
+    <Badge variant="outline" className="px-3 py-1 text-sm">
+      {label}
+    </Badge>
+  )
 }
 
 function hasStep(detail: LectureDetail | null | undefined, stepType: string) {
@@ -52,7 +84,7 @@ type Detail = LectureDetail | null | undefined
 type RowDef = {
   key: string
   label: string
-  value: (detail: Detail) => string
+  value: (detail: Detail) => ReactNode
 }
 
 export function CompareTable({
@@ -82,7 +114,7 @@ export function CompareTable({
     return Array.from(names)
   })()
 
-  const dataRow = (rowKey: string, label: string, leftValue: string, rightValue: string) => (
+  const dataRow = (rowKey: string, label: string, leftValue: ReactNode, rightValue: ReactNode) => (
     <TableRow key={rowKey}>
       <TableCell
         className={cn('bg-muted/10 px-6 py-4 align-top text-base font-semibold whitespace-normal', labelColClassName)}
@@ -266,8 +298,8 @@ export function CompareTable({
                 dataRow(
                   `curriculum-${name}`,
                   name,
-                  valueOrUnselected(leftDetail, curriculumLevel(leftDetail, name)),
-                  valueOrUnselected(rightDetail, curriculumLevel(rightDetail, name)),
+                  valueOrUnselected(leftDetail, renderCurriculumLevel(curriculumLevel(leftDetail, name))),
+                  valueOrUnselected(rightDetail, renderCurriculumLevel(curriculumLevel(rightDetail, name))),
                 ),
               )}
         </TableBody>

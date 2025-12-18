@@ -76,10 +76,11 @@ export default function CartComparePage() {
 
   return (
     <div className="mx-auto grid w-full gap-4 overflow-x-hidden py-6 md:grid-cols-[280px_1fr]">
-      <aside className="space-y-3">
+      <aside>
         <Card>
-          <CardHeader className="pb-3">
+          <CardHeader>
             <CardTitle className="text-base">장바구니</CardTitle>
+            <div className="text-sm text-gray-400">동일한 카테고리의 항목끼리 비교할 수 있습니다.</div>
           </CardHeader>
           <CardContent className="space-y-2">
             {isLoading ? (
