@@ -8,8 +8,6 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
       <HeaderSection />
       {children}
       <Footer />
-
-      {/* 장바구니 */}
       <FloatingCart />
     </>
   )

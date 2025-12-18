@@ -55,16 +55,32 @@ function toCartItem(raw: unknown): CartItem | null {
     lectureOrg?.title,
   )
 
+  const categoryName = pickString(
+    r.categoryName,
+    r.category,
+    r.categoryTitle,
+    lecture?.categoryName,
+    lecture?.category,
+    lecture?.categoryTitle,
+  )
+
   const thumbnailCandidate = (r.thumbnailUrl ??
+    r.lecture_image_url ??
+    r.lectureImageUrl ??
     r.imageUrl ??
+    r.image_url ??
     r.image ??
     lecture?.thumbnailUrl ??
-    lecture?.imageUrl) as unknown
+    lecture?.lecture_image_url ??
+    lecture?.lectureImageUrl ??
+    lecture?.imageUrl ??
+    lecture?.image_url) as unknown
   const thumbnailUrl = typeof thumbnailCandidate === 'string' ? thumbnailCandidate : undefined
 
   return {
     lectureId,
     title: title || lectureId,
+    categoryName,
     orgName,
     thumbnailUrl,
   }

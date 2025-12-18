@@ -1,6 +1,6 @@
 'use client'
 
-import { AnimatePresence, motion, Variants } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FiX } from 'react-icons/fi'
@@ -173,7 +173,7 @@ export default function Navigation({
                         </NavigationMenuContent>
                       </>
                     ) : (
-                      <Link href={item.href} legacyBehavior passHref>
+                      <Link href={item.href} passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>{item.title}</NavigationMenuLink>
                       </Link>
                     )}
