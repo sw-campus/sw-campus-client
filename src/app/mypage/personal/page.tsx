@@ -9,18 +9,15 @@ import PersonalMain from '@/features/mypage/components/Personal/PersonalMain'
 import { useAuthStore } from '@/store/authStore'
 
 export default function MyPage() {
-  const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(false)
+  type Section = 'password' | 'survey' | 'reviews'
+  const [activeSection, setActiveSection] = useState<Section>('survey')
   const router = useRouter()
   const { userType } = useAuthStore()
 
   if (userType === 'PERSONAL') {
-    const handleOpenOrgInfo = () => {
-      setIsOrgPasswordOpen(true)
-    }
-
-    const handleOpenLectureManage = () => {
-      setIsOrgPasswordOpen(false)
-    }
+    const handleOpenOrgInfo = () => setActiveSection('password')
+    const handleOpenLectureManage = () => setActiveSection('survey')
+    const handleOpenReviewManage = () => setActiveSection('reviews')
 
     const openInfoModal = () => {
       router.push('/mypage/personal/info')
@@ -35,9 +32,13 @@ export default function MyPage() {
         <div className="custom-card">
           {/* 실제 내용 영역 */}
           <div className="relative z-10 flex w-full gap-6">
-            <PersonalAside onClickOrgInfo={handleOpenOrgInfo} onClickLectureManage={handleOpenLectureManage} />
+            <PersonalAside
+              onClickOrgInfo={handleOpenOrgInfo}
+              onClickLectureManage={handleOpenLectureManage}
+              onClickReviewManage={handleOpenReviewManage}
+            />
             <PersonalMain
-              isOrgPasswordOpen={isOrgPasswordOpen}
+              activeSection={activeSection}
               openInfoModal={openInfoModal}
               onOpenProductModal={openProductModal}
             />
