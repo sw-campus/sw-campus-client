@@ -75,7 +75,7 @@ export const lectureFormSchema = z
           teacherImageFile: z.any().optional().nullable(), // File | null
         }),
       )
-      .optional(),
+      .min(1, '강사를 최소 1명 이상 등록해 주세요.'),
 
     adds: z
       .array(

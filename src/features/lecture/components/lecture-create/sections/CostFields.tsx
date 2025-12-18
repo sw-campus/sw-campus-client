@@ -50,7 +50,7 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
       </Field>
 
       <Field>
-        <FieldLabel>지원금 / 교육비 / 교육지원금</FieldLabel>
+        <FieldLabel>정부 지원금 / 자기부담금 / 교육지원금</FieldLabel>
         <FieldDescription>금액은 원 단위로 입력합니다. (예: 1500000 = 150만원)</FieldDescription>
         <FieldContent>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -60,8 +60,8 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
               render={({ field }) => (
                 <div className="space-y-1">
                   <div className="space-y-0.5">
-                    <Label>지원금</Label>
-                    <p className="text-muted-foreground text-xs">훈련생에게 지급되는 지원금</p>
+                    <Label>정부 지원금</Label>
+                    <p className="text-muted-foreground text-xs">정부에서 지원하는 훈련비</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Input
@@ -86,8 +86,8 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
               render={({ field }) => (
                 <div className="space-y-1">
                   <div className="space-y-0.5">
-                    <Label>교육비</Label>
-                    <p className="text-muted-foreground text-xs">훈련 과정 수강 비용</p>
+                    <Label>자기부담금</Label>
+                    <p className="text-muted-foreground text-xs">훈련생 본인이 부담하는 비용</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Input
@@ -112,8 +112,8 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
               render={({ field }) => (
                 <div className="space-y-1">
                   <div className="space-y-0.5">
-                    <Label>교육지원금</Label>
-                    <p className="text-muted-foreground text-xs">교육 참여를 위한 추가 지원금</p>
+                    <Label>교육지원금 (월)</Label>
+                    <p className="text-muted-foreground text-xs">훈련생에게 월 단위로 지급되는 지원금</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Input
@@ -125,6 +125,7 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
                       {...field}
                       value={String(field.value ?? 0)}
                       onChange={e => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
+                      placeholder="월 금액 입력"
                     />
                     <span className="text-muted-foreground shrink-0 text-sm whitespace-nowrap">원</span>
                   </div>

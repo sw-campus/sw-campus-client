@@ -227,8 +227,8 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
         </div>
       </Section>
 
-      {/* 채용연계 혜택 */}
-      <Section title="채용연계 혜택을 드려요.">
+      {/* 추가 제공 항목 */}
+      <Section title="추가 제공 항목">
         {lecture.benefits.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {lecture.benefits.map((benefit, idx) => (
