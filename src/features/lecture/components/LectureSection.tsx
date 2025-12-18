@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 
+import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { FiArrowRight } from 'react-icons/fi'
 
@@ -10,6 +11,25 @@ import { LectureList } from '@/features/lecture/components/LectureList'
 import { LectureFilterTabs } from '@/features/lecture/components/lecture-search/LectureFilterTabs'
 import { useTopRatedLecturesByCategory } from '@/features/lecture/hooks/useTopRatedLecturesByCategory'
 import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLectureResponseToSummary'
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+}
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: 'easeOut' },
+  },
+}
 
 export default function LectureSection() {
   const router = useRouter()
@@ -50,44 +70,93 @@ export default function LectureSection() {
 
   return (
     <div className="custom-container">
-      <div className="custom-card">
+      <motion.div
+        className="custom-card relative overflow-hidden"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-100px' }}
+      > 
+        {/* Background Decoration */}
+        <div className="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-accent-foreground/5 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -left-20 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
+
         {/* 제목 */}
-        <h2 className="mb-6 text-2xl font-bold text-white">분야별 부트캠프</h2>
+        <motion.h2 className="mb-6 text-2xl font-bold text-white relative z-10" variants={itemVariants}>
+          분야별 부트캠프
+        </motion.h2>
 
         {/* 카테고리 탭 */}
-        <LectureFilterTabs categories={categoryNames} selected={selectedCategoryName} onSelect={handleTabSelect} />
+        <motion.div variants={itemVariants} className="relative z-10">
+          <LectureFilterTabs categories={categoryNames} selected={selectedCategoryName} onSelect={handleTabSelect} />
+        </motion.div>
 
         {/* 카테고리별 부트캠프 리스트 */}
-        {isLoading ? (
-          <div className="flex h-48 items-center justify-center">
-            <span className="text-gray-400">로딩 중...</span>
-          </div>
-        ) : lectures.length > 0 ? (
-          <LectureList lectures={lectures} />
-        ) : (
-          <div className="flex h-48 items-center justify-center">
-            <span className="text-gray-400">해당 분야의 강의가 없습니다.</span>
-          </div>
-        )}
+        <motion.div variants={itemVariants} className="relative z-10 min-h-[300px]">
+          <AnimatePresence mode="wait">
+            {isLoading ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex h-48 items-center justify-center"
+              >
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent/30 border-t-accent-foreground" />
+              </motion.div>
+            ) : lectures.length > 0 ? (
+              <motion.div
+                key={resolvedCategoryId}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <LectureList lectures={lectures} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="flex h-48 flex-col items-center justify-center gap-3 text-muted-foreground"
+              >
+                <div className="rounded-full bg-muted/50 p-4">
+                  <span className="text-2xl">🔍</span>
+                </div>
+                <span>해당 분야의 강의가 없습니다.</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* 더보기 버튼 */}
-        <div className="mt-10 flex justify-center">
-          <button
+        <motion.div variants={itemVariants} className="mt-10 flex justify-center relative z-10">
+          <motion.button
             onClick={() => router.push(`/lectures/search?categoryIds=${resolvedCategoryId}`)}
             disabled={resolvedCategoryId === null}
-            className={`flex items-center gap-2 rounded-full px-8 py-3 text-sm transition ${
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`group flex items-center gap-2 rounded-full px-8 py-3 text-sm font-medium transition-all ${
               resolvedCategoryId === null
-                ? 'cursor-not-allowed bg-black/20 text-gray-500'
-                : 'bg-black/30 text-white hover:bg-black/50'
+                ? 'cursor-not-allowed bg-muted text-muted-foreground'
+                : 'bg-gradient-to-r from-zinc-800 to-zinc-900 text-white shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-accent/10 hover:from-zinc-700 hover:to-zinc-800 ring-1 ring-white/10'
             }`}
           >
-            <span className={resolvedCategoryId === null ? 'text-gray-500' : 'text-orange-300'}>
+            <span className={resolvedCategoryId === null ? 'text-muted-foreground' : 'text-accent-foreground font-semibold'}>
               {selectedCategoryName || '카테고리'}
             </span>
-            프로그램 더 보기 <FiArrowRight size={16} />
-          </button>
-        </div>
-      </div>
+            <span>프로그램 더 보기</span>
+            <motion.span
+              animate={{ x: [0, 4, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, repeatDelay: 1 }}
+            >
+              <FiArrowRight size={16} />
+            </motion.span>
+          </motion.button>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }
