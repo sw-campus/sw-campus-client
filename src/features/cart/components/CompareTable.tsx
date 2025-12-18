@@ -30,7 +30,7 @@ function sectionRow(label: string, rowKey: string) {
 
 function dividerCell() {
   return (
-    <TableCell className="w-0 px-0">
+    <TableCell className="w-px px-0">
       <div className="bg-border h-full w-px" />
     </TableCell>
   )
@@ -257,14 +257,20 @@ export function CompareTable({
 
   return (
     <div className="border-border rounded-md border">
-      <Table className="break-keep">
+      <Table className="table-fixed break-keep">
+        <colgroup>
+          <col className={labelColClassName} />
+          <col />
+          <col className="w-px" />
+          <col />
+        </colgroup>
         <TableHeader>
           <TableRow>
             <TableHead className={cn('px-6 py-4 text-base', labelColClassName)}>비교항목</TableHead>
             <TableHead className="[display:-webkit-box] overflow-hidden px-6 py-4 align-top text-base break-keep whitespace-normal [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
               {leftTitle ?? 'A과정(미선택)'}
             </TableHead>
-            <TableHead className="w-0 px-0">
+            <TableHead className="w-px px-0">
               <div className="bg-border h-7 w-px" />
             </TableHead>
             <TableHead className="[display:-webkit-box] overflow-hidden px-6 py-4 align-top text-base break-keep whitespace-normal [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
