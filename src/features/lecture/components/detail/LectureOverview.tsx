@@ -22,7 +22,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
       {/* 프로그램 요약 */}
       <Section title="프로그램 요약">
         {isLoading ? (
-          <div className="py-4 text-center text-gray-500">기본 정보 로딩 중...</div>
+          <div className="text-muted-foreground py-4 text-center">기본 정보 로딩 중...</div>
         ) : isAiLoading ? (
           <div className="flex animate-pulse items-center gap-2 py-4 text-orange-600">
             <span className="text-xl">✨</span>
@@ -40,7 +40,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
                       return <InlineBadge key={j}>{part.slice(1, -1)}</InlineBadge>
                     }
                     return (
-                      <span key={j} className="text-gray-500">
+                      <span key={j} className="text-muted-foreground">
                         {part}
                       </span>
                     )
@@ -106,7 +106,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
           {/* 내배카 */}
           <InfoRow label="내배카">
             {lecture.recruitType === 'CARD_REQUIRED' ? (
-              <span className="font-bold text-[#6D28D9]">필요함 💳</span>
+              <span className="text-primary font-bold">필요함 💳</span>
             ) : (
               <span className="font-bold text-gray-700">필요없음</span>
             )}
@@ -115,7 +115,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
           {/* 자부담 */}
           <InfoRow label="자부담">
             {lecture.support.tuition === 0 ? (
-              <span className="font-bold text-[#6D28D9]">전액 국비지원 0원</span>
+              <span className="text-primary font-bold">전액 국비지원 0원</span>
             ) : (
               <span className="font-bold">{formatKRW(lecture.support.tuition)}원</span>
             )}
@@ -152,44 +152,64 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
 
       {/* 지원 절차 */}
       <Section title="이런 절차로 지원할 수 있어요">
-        <div className="scrollbar-hide overflow-x-auto pb-4">
-          <div className="flex min-w-max items-center gap-4">
-            {lecture.steps.length > 0 ? (
-              lecture.steps.map((step, idx) => (
-                <div key={idx} className="flex items-center">
-                  <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:ring-orange-100">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600">
-                      {idx + 1}
-                    </div>
-                    <span className="font-bold text-gray-900">{step}</span>
-                  </div>
-                  {idx < lecture.steps.length - 1 && (
-                    <div className="mx-3 text-gray-300">
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="text-gray-300"
-                      >
-                        <path
-                          d="M5 12H19M19 12L12 5M19 12L12 19"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
+        {(() => {
+          // 사전과제를 지원절차에서 분리 (합격 후 진행되는 단계)
+          const applicationSteps = lecture.steps.filter(step => step !== '사전과제')
+          const hasPreTask = lecture.steps.includes('사전과제')
+
+          return (
+            <>
+              <div className="scrollbar-hide overflow-x-auto pb-4">
+                <div className="flex min-w-max items-center gap-4">
+                  {applicationSteps.length > 0 ? (
+                    applicationSteps.map((step, idx) => (
+                      <div key={idx} className="flex items-center">
+                        <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:ring-orange-100">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600">
+                            {idx + 1}
+                          </div>
+                          <span className="font-bold text-gray-900">{step}</span>
+                        </div>
+                        {idx < applicationSteps.length - 1 && (
+                          <div className="mx-3 text-gray-300">
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="text-gray-300"
+                            >
+                              <path
+                                d="M5 12H19M19 12L12 5M19 12L12 19"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-muted-foreground text-sm">등록된 지원 절차가 없습니다.</div>
                   )}
                 </div>
-              ))
-            ) : (
-              <div className="text-muted-foreground text-sm">등록된 지원 절차가 없습니다.</div>
-            )}
-          </div>
-        </div>
+              </div>
+
+              {/* 합격 후 사전과제 안내 */}
+              {hasPreTask && (
+                <div className="mt-4 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-5 py-4">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
+                    ✓
+                  </div>
+                  <span className="font-bold text-blue-700">합격 후: 사전과제 진행</span>
+                </div>
+              )}
+            </>
+          )
+        })()}
       </Section>
 
       {/* 학습공간 사진 */}

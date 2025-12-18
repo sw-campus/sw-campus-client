@@ -66,24 +66,41 @@ export default function LectureSidebar({ lecture }: Props) {
         </div>
       </div>
 
-      {lecture.steps && lecture.steps.length > 0 && (
-        <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-          <p className="flex items-center gap-2 text-base font-bold text-gray-900">
-            <span className="text-orange-500">📋</span> 지원절차
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {lecture.steps.map((step, index) => (
-              <Badge
-                key={index}
-                variant="secondary"
-                className="rounded-lg bg-orange-50 px-3 py-1.5 font-medium text-orange-700"
-              >
-                {index + 1}. {step}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
+      {lecture.steps &&
+        lecture.steps.length > 0 &&
+        (() => {
+          // 사전과제를 지원절차에서 분리 (합격 후 진행되는 단계)
+          const applicationSteps = lecture.steps.filter(step => step !== '사전과제')
+          const hasPreTask = lecture.steps.includes('사전과제')
+
+          return (
+            <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+              <p className="flex items-center gap-2 text-base font-bold text-gray-900">
+                <span className="text-orange-500">📋</span> 지원절차
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {applicationSteps.map((step, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="rounded-lg bg-orange-50 px-3 py-1.5 font-medium text-orange-700"
+                  >
+                    {index + 1}. {step}
+                  </Badge>
+                ))}
+              </div>
+
+              {/* 합격 후 사전과제 안내 */}
+              {hasPreTask && (
+                <div className="mt-4 rounded-lg bg-blue-50 px-3 py-2.5">
+                  <p className="flex items-center gap-2 text-sm font-medium text-blue-700">
+                    <span>✅</span> 합격 후: 사전과제 진행
+                  </p>
+                </div>
+              )}
+            </div>
+          )
+        })()}
     </div>
   )
 }

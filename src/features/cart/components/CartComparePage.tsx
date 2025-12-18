@@ -5,13 +5,19 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FiX } from 'react-icons/fi'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { AiCommentRow } from '@/features/cart/components/AiCommentRow'
+import { AiFinalRecommendation } from '@/features/cart/components/AiFinalRecommendation'
+import { AiFloatingButton } from '@/features/cart/components/AiFloatingButton'
 import { useCartLecturesWithDetailQuery } from '@/features/cart/hooks/useCartLecturesWithDetailQuery'
 import { useLectureDetailQuery } from '@/features/lecture'
+import type { ComparisonResult } from '@/features/lecture/actions/gemini'
 import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/store/authStore'
 
 type Side = 'left' | 'right'
 
@@ -144,11 +150,75 @@ export default function CartComparePage() {
   const [leftId, setLeftId] = useState<string | null>(null)
   const [rightId, setRightId] = useState<string | null>(null)
 
+  // AI 분석 상태
+  const [aiResult, setAiResult] = useState<ComparisonResult | null>(null)
+  const [isAiLoading, setIsAiLoading] = useState(false)
+
+  const isLoggedIn = useAuthStore(state => state.isLoggedIn)
+
   const left = items.find(i => i.lectureId === leftId) ?? null
   const right = items.find(i => i.lectureId === rightId) ?? null
 
   const { data: leftDetail } = useLectureDetailQuery(leftId)
   const { data: rightDetail } = useLectureDetailQuery(rightId)
+
+  // AI 분석이 가능한지 여부
+  const canAnalyze = Boolean(leftDetail && rightDetail && isLoggedIn)
+
+  // AI 분석 실행 핸들러
+  const handleAiAnalyze = async () => {
+    if (!leftDetail || !rightDetail) {
+      toast.error('두 강의를 모두 선택해주세요')
+      return
+    }
+
+    if (!isLoggedIn) {
+      toast.error('로그인이 필요한 기능입니다')
+      return
+    }
+
+    setIsAiLoading(true)
+    setAiResult(null)
+
+    try {
+      // 동적 import로 Server Action과 API 호출
+      const [{ compareCoursesWithAI }, { getSurvey, getProfile }] = await Promise.all([
+        import('@/features/lecture/actions/gemini'),
+        import('@/features/mypage/api/survey.api'),
+      ])
+
+      // 사용자 설문 정보와 프로필 정보 조회
+      const [survey, profile] = await Promise.all([getSurvey(), getProfile()])
+
+      if (!survey.exists) {
+        toast.warning('설문조사를 먼저 작성해주세요. 더 정확한 추천을 받을 수 있습니다.')
+      }
+
+      // AI 비교 분석 실행 (프로필의 주소 정보 포함)
+      const result = await compareCoursesWithAI(leftDetail, rightDetail, {
+        ...survey,
+        userLocation: profile.location,
+      })
+      setAiResult(result)
+      toast.success('AI 분석이 완료되었습니다!')
+    } catch (error) {
+      console.error('AI Analysis Error:', error)
+      toast.error('AI 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+    } finally {
+      setIsAiLoading(false)
+    }
+  }
+
+  // AI 분석 초기화
+  const handleClearAi = () => {
+    setAiResult(null)
+  }
+
+  // 섹션별 AI 코멘트 찾기
+  const getAiComment = (sectionName: string) => {
+    if (!aiResult) return null
+    return aiResult.sectionComments.find(c => c.section === sectionName)
+  }
 
   const curriculumNames = (() => {
     const names = new Set<string>()
@@ -259,6 +329,15 @@ export default function CartComparePage() {
   const onDropLecture = (side: Side, lectureId: string) => {
     if (side === 'left') setLeftId(lectureId)
     else setRightId(lectureId)
+    // 강의가 변경되면 AI 결과 초기화
+    setAiResult(null)
+  }
+
+  // 비활성 이유 메시지
+  const getDisabledReason = () => {
+    if (!isLoggedIn) return '로그인이 필요합니다'
+    if (!leftDetail || !rightDetail) return '두 강의를 모두 선택해주세요'
+    return ''
   }
 
   return (
@@ -387,6 +466,17 @@ export default function CartComparePage() {
                     : '미선택',
                 )}
 
+                {/* AI 코멘트: 교육정보 */}
+                {getAiComment('교육정보') && (
+                  <AiCommentRow
+                    section={getAiComment('교육정보')!.section}
+                    comment={getAiComment('교육정보')!.comment}
+                    advantage={getAiComment('교육정보')!.advantage}
+                    leftTitle={left?.title}
+                    rightTitle={right?.title}
+                  />
+                )}
+
                 {sectionRow('모집정보')}
                 {dataRow('모집상태', formatStatus(leftDetail?.recruitStatus), formatStatus(rightDetail?.recruitStatus))}
                 {dataRow(
@@ -410,8 +500,30 @@ export default function CartComparePage() {
                   formatText(rightDetail?.support?.extraSupport),
                 )}
 
+                {/* AI 코멘트: 모집정보 */}
+                {getAiComment('모집정보') && (
+                  <AiCommentRow
+                    section={getAiComment('모집정보')!.section}
+                    comment={getAiComment('모집정보')!.comment}
+                    advantage={getAiComment('모집정보')!.advantage}
+                    leftTitle={left?.title}
+                    rightTitle={right?.title}
+                  />
+                )}
+
                 {sectionRow('훈련목표')}
                 {dataRow('훈련목표', leftDetail?.goal ?? '-', rightDetail?.goal ?? '-')}
+
+                {/* AI 코멘트: 훈련목표 */}
+                {getAiComment('훈련목표') && (
+                  <AiCommentRow
+                    section={getAiComment('훈련목표')!.section}
+                    comment={getAiComment('훈련목표')!.comment}
+                    advantage={getAiComment('훈련목표')!.advantage}
+                    leftTitle={left?.title}
+                    rightTitle={right?.title}
+                  />
+                )}
 
                 {sectionRow('지원자격')}
                 {dataRow(
@@ -425,6 +537,17 @@ export default function CartComparePage() {
                   formatList(rightDetail?.quals?.filter(q => q.type === 'PREFERRED').map(q => q.text)),
                 )}
 
+                {/* AI 코멘트: 지원자격 */}
+                {getAiComment('지원자격') && (
+                  <AiCommentRow
+                    section={getAiComment('지원자격')!.section}
+                    comment={getAiComment('지원자격')!.comment}
+                    advantage={getAiComment('지원자격')!.advantage}
+                    leftTitle={left?.title}
+                    rightTitle={right?.title}
+                  />
+                )}
+
                 {sectionRow('선발절차')}
                 {stepTypes.length === 0
                   ? dataRow('절차', '-', '-')
@@ -436,6 +559,17 @@ export default function CartComparePage() {
                       ),
                     )}
 
+                {/* AI 코멘트: 선발절차 */}
+                {getAiComment('선발절차') && (
+                  <AiCommentRow
+                    section={getAiComment('선발절차')!.section}
+                    comment={getAiComment('선발절차')!.comment}
+                    advantage={getAiComment('선발절차')!.advantage}
+                    leftTitle={left?.title}
+                    rightTitle={right?.title}
+                  />
+                )}
+
                 {sectionRow('훈련시설 및 장비')}
                 {dataRow('장비', leftDetail?.equipment?.pc ?? '-', rightDetail?.equipment?.pc ?? '-')}
                 {dataRow(
@@ -444,6 +578,17 @@ export default function CartComparePage() {
                   formatBoolean(rightDetail?.services?.books),
                 )}
                 {dataRow('훈련시설 장점', leftDetail?.equipment?.merit ?? '-', rightDetail?.equipment?.merit ?? '-')}
+
+                {/* AI 코멘트: 훈련시설 */}
+                {getAiComment('훈련시설') && (
+                  <AiCommentRow
+                    section={getAiComment('훈련시설')!.section}
+                    comment={getAiComment('훈련시설')!.comment}
+                    advantage={getAiComment('훈련시설')!.advantage}
+                    leftTitle={left?.title}
+                    rightTitle={right?.title}
+                  />
+                )}
 
                 {sectionRow('프로젝트')}
                 {dataRow(
@@ -470,6 +615,17 @@ export default function CartComparePage() {
                   '멘토링/코드리뷰',
                   leftDetail ? formatBoolean(leftDetail.project?.mentor) : '-',
                   rightDetail ? formatBoolean(rightDetail.project?.mentor) : '-',
+                )}
+
+                {/* AI 코멘트: 프로젝트 */}
+                {getAiComment('프로젝트') && (
+                  <AiCommentRow
+                    section={getAiComment('프로젝트')!.section}
+                    comment={getAiComment('프로젝트')!.comment}
+                    advantage={getAiComment('프로젝트')!.advantage}
+                    leftTitle={left?.title}
+                    rightTitle={right?.title}
+                  />
                 )}
 
                 {sectionRow('취업 지원 서비스')}
@@ -499,6 +655,17 @@ export default function CartComparePage() {
                     : '-',
                 )}
 
+                {/* AI 코멘트: 취업지원 */}
+                {getAiComment('취업지원') && (
+                  <AiCommentRow
+                    section={getAiComment('취업지원')!.section}
+                    comment={getAiComment('취업지원')!.comment}
+                    advantage={getAiComment('취업지원')!.advantage}
+                    leftTitle={left?.title}
+                    rightTitle={right?.title}
+                  />
+                )}
+
                 {sectionRow('커리큘럼')}
                 {curriculumNames.length === 0
                   ? dataRow('커리큘럼', '-', '-')
@@ -509,15 +676,47 @@ export default function CartComparePage() {
                         rightDetail ? curriculumLevel(rightDetail, name) : '미선택',
                       ),
                     )}
+
+                {/* AI 코멘트: 커리큘럼 */}
+                {getAiComment('커리큘럼') && (
+                  <AiCommentRow
+                    section={getAiComment('커리큘럼')!.section}
+                    comment={getAiComment('커리큘럼')!.comment}
+                    advantage={getAiComment('커리큘럼')!.advantage}
+                    leftTitle={left?.title}
+                    rightTitle={right?.title}
+                  />
+                )}
               </TableBody>
             </Table>
           </div>
+
+          {/* AI 최종 추천 */}
+          {aiResult && (
+            <AiFinalRecommendation
+              recommendation={aiResult.finalRecommendation}
+              leftTitle={left?.title ?? 'A과정'}
+              rightTitle={right?.title ?? 'B과정'}
+              leftId={leftId}
+              rightId={rightId}
+            />
+          )}
 
           <div className="text-muted-foreground text-xs">
             사이드바에서 강의를 드래그해서 왼쪽/오른쪽 영역에 놓으면 비교표가 업데이트됩니다.
           </div>
         </CardContent>
       </Card>
+
+      {/* AI 플로팅 버튼 - 화면 우하단 고정 */}
+      <AiFloatingButton
+        isEnabled={canAnalyze}
+        isLoading={isAiLoading}
+        hasResult={Boolean(aiResult)}
+        onAnalyze={handleAiAnalyze}
+        onClear={handleClearAi}
+        disabledReason={getDisabledReason()}
+      />
     </div>
   )
 }
