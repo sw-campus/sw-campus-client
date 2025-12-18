@@ -19,7 +19,7 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
     recruitType: api.recruitType,
     summary: generateSummary(api),
     schedule: {
-      recruitPeriod: formatDate(api.deadline),
+      recruitPeriod: formatDate(api.deadline ?? api.startAt),
       coursePeriod: { start: formatDate(api.startAt), end: formatDate(api.endAt) },
       days: sortDays(api.days)
         .map(day => dayKor(day))
@@ -30,8 +30,8 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
     },
     support: {
       tuition: api.lectureFee,
-      stipend: api.subsidy ? `월 ${api.subsidy.toLocaleString()}원` : undefined,
-      extraSupport: api.eduSubsidy ? `교육비 지원 ${api.eduSubsidy.toLocaleString()}원` : undefined,
+      stipend: api.subsidy ? `${api.subsidy.toLocaleString()}원` : undefined,
+      extraSupport: api.eduSubsidy ? `${api.eduSubsidy.toLocaleString()}원` : undefined,
     },
     location: api.location,
     recruitStatus: api.status === 'RECRUITING' ? 'RECRUITING' : 'FINISHED',

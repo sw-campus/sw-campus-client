@@ -41,4 +41,3 @@ export const lectureCreateFormDefaultValues: LectureFormValues = {
   categoryId: null,
   curriculums: [],
 }
-

@@ -44,20 +44,52 @@ export function LectureCreateForm() {
 
   const {
     handleSubmit,
-    formState: { isValid },
+    formState: { errors, isSubmitting },
+    trigger,
   } = methods
+
+  const onInvalid = (formErrors: Record<string, unknown>) => {
+    // Collect all error messages
+    const errorMessages: string[] = []
+    const flattenErrors = (obj: Record<string, unknown>): void => {
+      for (const key in obj) {
+        const value = obj[key] as Record<string, unknown>
+        if (value?.message && typeof value.message === 'string') {
+          errorMessages.push(value.message)
+        } else if (typeof value === 'object' && value !== null) {
+          flattenErrors(value)
+        }
+      }
+    }
+    flattenErrors(formErrors)
+
+    if (errorMessages.length > 0) {
+      toast.error(
+        <div className="space-y-1">
+          <div className="font-bold">필수 항목을 확인해주세요</div>
+          <ul className="list-inside list-disc text-sm">
+            {errorMessages.slice(0, 5).map((msg, i) => (
+              <li key={i}>{msg}</li>
+            ))}
+            {errorMessages.length > 5 && <li>...외 {errorMessages.length - 5}개</li>}
+          </ul>
+        </div>,
+      )
+    }
+  }
 
   const onSubmit = async (values: LectureFormValues) => {
     console.log('Form values:', values)
     console.log('Teachers:', values.teachers)
-    console.log('Teacher image files:', values.teachers?.map(t => t.teacherImageFile))
+    console.log(
+      'Teacher image files:',
+      values.teachers?.map(t => t.teacherImageFile),
+    )
     console.log('Lecture image file:', values.lectureImageFile)
 
     const payload = mapLectureFormToCreateRequest(values)
     // z.any()로 변경했으므로, 값이 존재하고 Blob/File 여부를 느슨하게 체크하거나 단순히 truthy 체크
-    const teacherImageFiles = (values.teachers ?? [])
-      .map(t => t.teacherImageFile)
-      .filter((f): f is File => !!f) // 단순히 값이 있는지만 체크
+    const teacherImageFiles = (values.teachers ?? []).map(t => t.teacherImageFile).filter((f): f is File => !!f) // 단순히 값이 있는지만 체크
 
     console.log('Filtered teacher image files:', teacherImageFiles)
 
@@ -72,7 +104,7 @@ export function LectureCreateForm() {
 
   return (
     <FormProvider {...methods}>
-      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit, onInvalid)}>
         <FieldSet>
           <FieldGroup>
             <LectureCreateBasicInfoFields imageInputRef={imageInputRef} />
@@ -90,8 +122,8 @@ export function LectureCreateForm() {
             <LectureCreateAddsFields />
 
             <div className="pt-4">
-              <Button type="submit" disabled={!isValid || isPending}>
-                등록
+              <Button type="submit" disabled={isSubmitting || isPending}>
+                {isSubmitting || isPending ? '등록 중...' : '등록'}
               </Button>
             </div>
           </FieldGroup>
@@ -100,4 +132,3 @@ export function LectureCreateForm() {
     </FormProvider>
   )
 }
-
