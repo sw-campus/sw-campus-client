@@ -115,7 +115,7 @@ export default function Header({
               <FiUser />
             </HeaderIconAction>
 
-            <HeaderIconAction kind="link" ariaLabel="위시리스트" tooltip="장바구니" href="/">
+            <HeaderIconAction kind="link" ariaLabel="위시리스트" tooltip="장바구니" href="/cart/compare">
               <BsCart4 />
             </HeaderIconAction>
           </>
