@@ -20,38 +20,24 @@ const dashboardStats = [
 ]
 
 export default function PersonalMain({ activeSection, openInfoModal, onOpenProductModal }: PersonalMainProps) {
-  type Review = {
-    reviewId: number
-    lectureId: number
-    lectureName: string
-    score: number
-    content: string
-    approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
-    createdAt: string
-    updatedAt: string
-    canEdit: boolean
-  }
-
-  const [reviews, setReviews] = useState<Review[] | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  // (개인 후기 목록 상태는 현재 사용하지 않음)
 
   // Lectures for survey tab
-  type Lecture = {
+  // 수료 인증된 강의 목록 (후기 작성 가능 여부 포함)
+  type CompletedLecture = {
+    certificateId: number
     lectureId: number
     lectureName: string
     lectureImageUrl?: string
-    lectureAuthStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
-    status: string
-    createdAt: string
-    updatedAt: string
-    canEdit: boolean
+    organizationName: string
+    certifiedAt: string
+    canWriteReview: boolean
   }
 
-  const [lectures, setLectures] = useState<Lecture[] | null>(null)
+  const [lectures, setLectures] = useState<CompletedLecture[] | null>(null)
   const [lecturesLoading, setLecturesLoading] = useState(false)
   const [lecturesError, setLecturesError] = useState<string | null>(null)
-  const [openedLecture, setOpenedLecture] = useState<Lecture | null>(null)
+  const [openedLecture, setOpenedLecture] = useState<CompletedLecture | null>(null)
 
   // useEffect(() => {
   //   if (activeSection !== 'reviews') return
@@ -81,14 +67,15 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
       try {
         setLecturesLoading(true)
         setLecturesError(null)
-        const { data } = await api.get<Lecture[]>('/mypage/lectures')
+        const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
         if (!cancelled) setLectures(Array.isArray(data) ? data : [])
-      } catch (e) {
+      } catch {
         if (!cancelled) setLecturesError('강의 목록을 불러오지 못했습니다.')
       } finally {
         if (!cancelled) setLecturesLoading(false)
       }
     }
+    // (이전 개인 후기 조회 useEffect는 사용하지 않아 정리)
     fetchLectures()
     return () => {
       cancelled = true
@@ -149,7 +136,6 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
             ))}
           </div>
         </section>
-
       </main>
     )
   }
@@ -172,21 +158,27 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
         {lecturesError && !lecturesLoading && (
           <div className="flex items-center gap-3 text-red-300">
             <p>{lecturesError}</p>
-            <Button size="sm" variant="secondary" onClick={() => {
-              // simple retry
-              (async () => {
-                try {
-                  setLecturesLoading(true)
-                  setLecturesError(null)
-                  const { data } = await api.get<Lecture[]>('/mypage/lectures')
-                  setLectures(Array.isArray(data) ? data : [])
-                } catch (e) {
-                  setLecturesError('강의 목록을 불러오지 못했습니다.')
-                } finally {
-                  setLecturesLoading(false)
-                }
-              })()
-            }}>다시 시도</Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => {
+                // simple retry
+                ;(async () => {
+                  try {
+                    setLecturesLoading(true)
+                    setLecturesError(null)
+                    const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
+                    setLectures(Array.isArray(data) ? data : [])
+                  } catch {
+                    setLecturesError('강의 목록을 불러오지 못했습니다.')
+                  } finally {
+                    setLecturesLoading(false)
+                  }
+                })()
+              }}
+            >
+              다시 시도
+            </Button>
           </div>
         )}
         {!lecturesLoading && !lecturesError && (lectures?.length ?? 0) === 0 && (
@@ -196,29 +188,17 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {lectures!.map(l => (
               <li
-                key={l.lectureId}
+                key={l.certificateId}
                 className="group cursor-pointer rounded-xl bg-white/5 p-4 transition hover:bg-white/10"
                 onClick={() => setOpenedLecture(l)}
               >
                 <div className="flex items-center justify-between gap-3">
                   <h5 className="truncate font-medium text-white">{l.lectureName}</h5>
-                  <Badge
-                    variant={
-                      l.lectureAuthStatus === 'APPROVED'
-                        ? 'default'
-                        : l.lectureAuthStatus === 'PENDING'
-                          ? 'secondary'
-                          : 'destructive'
-                    }
-                  >
-                    {l.lectureAuthStatus === 'APPROVED'
-                      ? '승인'
-                      : l.lectureAuthStatus === 'PENDING'
-                        ? '승인 대기'
-                        : '반려'}
+                  <Badge variant={l.canWriteReview ? 'default' : 'secondary'}>
+                    {l.canWriteReview ? '후기 작성 가능' : '작성 완료'}
                   </Badge>
                 </div>
-                <p className="mt-1 text-xs text-white/60">상태: {l.status}</p>
+                <p className="mt-1 text-xs text-white/60">기관: {l.organizationName}</p>
               </li>
             ))}
           </ul>
@@ -230,10 +210,11 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
           <DialogHeader>
             <DialogTitle>{openedLecture?.lectureName}</DialogTitle>
           </DialogHeader>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-muted-foreground text-sm">
             <p>강의 ID: {openedLecture?.lectureId}</p>
-            <p className="mt-1">상태: {openedLecture?.status}</p>
-            <p className="mt-1">등록일: {openedLecture ? new Date(openedLecture.createdAt).toLocaleString() : ''}</p>
+            <p className="mt-1">교육기관: {openedLecture?.organizationName}</p>
+            <p className="mt-1">수료일: {openedLecture ? formatDate(openedLecture.certifiedAt) : ''}</p>
+            <p className="mt-1">후기 작성: {openedLecture?.canWriteReview ? '가능' : '완료됨'}</p>
           </div>
         </DialogContent>
       </Dialog>
