@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1, // 최대 확대 배율 제한
-  userScalable: false, // 확대/축소 불가 설정
+  // maximumScale: 1, // 최대 확대 배율 제한
+  // userScalable: false, // 확대/축소 불가 설정
 }
 
 export default function RootLayout({

@@ -211,7 +211,7 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
     ]),
   },
   {
-    key: 'benifits',
+    key: 'benefits',
     title: '지원혜택',
     rows: centerRows([
       { key: 'stipend', label: '훈련수당', value: d => formatText(d?.support?.stipend) },

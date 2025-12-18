@@ -40,6 +40,4 @@ export function useRemoveFromCart() {
       return mutation.mutateAsync(lectureId, options)
     },
   }
-
-  return mutation
 }
