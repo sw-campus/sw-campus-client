@@ -158,7 +158,7 @@ export function useSignupOrganizationForm() {
 
       if (headerName) setLogin(headerName)
 
-      router.push('/')
+      router.push('/login')
     } catch (error) {
       console.error('Organization signup error:', error)
       toast.error('회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.')

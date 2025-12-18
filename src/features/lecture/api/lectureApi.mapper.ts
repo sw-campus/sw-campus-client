@@ -19,7 +19,7 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
     recruitType: api.recruitType,
     summary: generateSummary(api),
     schedule: {
-      recruitPeriod: formatDate(api.deadline),
+      recruitPeriod: formatDate(api.deadline ?? api.startAt),
       coursePeriod: { start: formatDate(api.startAt), end: formatDate(api.endAt) },
       days: sortDays(api.days)
         .map(day => dayKor(day))
@@ -30,8 +30,8 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
     },
     support: {
       tuition: api.lectureFee,
-      stipend: api.subsidy ? `월 ${api.subsidy.toLocaleString()}원` : undefined,
-      extraSupport: api.eduSubsidy ? `교육비 지원 ${api.eduSubsidy.toLocaleString()}원` : undefined,
+      stipend: api.subsidy ? `${api.subsidy.toLocaleString()}원` : undefined,
+      extraSupport: api.eduSubsidy ? `${api.eduSubsidy.toLocaleString()}원` : undefined,
     },
     location: api.location,
     recruitStatus: api.status === 'RECRUITING' ? 'RECRUITING' : 'FINISHED',
@@ -66,8 +66,31 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
           name: c.curriculum?.curriculumName || c.curriculumName || '',
         }))
       : [],
-    teachers: api.teachers
-      ? api.teachers.map(t => ({ name: t.teacherName, desc: t.teacherDescription, imageUrl: t.teacherImageUrl }))
+    teachers: Array.isArray(api.teachers)
+      ? api.teachers
+          .map(t => {
+            if (typeof t === 'string') {
+              return { name: t, desc: '', imageUrl: undefined }
+            }
+            const teacher = (t as any)?.teacher ?? t
+            const name = teacher?.teacherName ?? teacher?.name ?? (t as any)?.teacherName ?? (t as any)?.name ?? ''
+            const desc =
+              teacher?.teacherDescription ??
+              teacher?.teacherDesc ??
+              teacher?.desc ??
+              (t as any)?.teacherDescription ??
+              (t as any)?.teacherDesc ??
+              (t as any)?.desc ??
+              ''
+            const imageUrl =
+              teacher?.teacherImageUrl ??
+              teacher?.imageUrl ??
+              (t as any)?.teacherImageUrl ??
+              (t as any)?.imageUrl ??
+              undefined
+            return { name, desc, imageUrl }
+          })
+          .filter(t => Boolean(t.name))
       : [],
     quals: api.quals ? api.quals.map(q => ({ type: q.type, text: q.text })) : [],
   }

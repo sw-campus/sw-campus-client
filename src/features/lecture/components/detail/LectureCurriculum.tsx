@@ -13,15 +13,15 @@ export default function LectureCurriculum({ curriculum }: Props) {
       {curriculum.length > 0 ? (
         <div className="flex flex-col gap-3">
           {curriculum.map((item, idx) => {
-            let levelText = '기타'
-            let badgeColor = 'bg-gray-100 text-gray-600'
+            let levelText = '없음'
+            let badgeColor = 'bg-muted text-muted-foreground'
 
             if (item.level === 'BASIC') {
               levelText = '기본'
-              badgeColor = 'bg-blue-50 text-blue-700 border-blue-100'
+              badgeColor = 'bg-blue-100 text-blue-700 border-blue-200'
             } else if (item.level === 'ADVANCED') {
               levelText = '심화'
-              badgeColor = 'bg-purple-50 text-purple-700 border-purple-100'
+              badgeColor = 'bg-purple-100 text-purple-700 border-purple-200'
             }
 
             return (

@@ -15,7 +15,7 @@ export interface LectureQualCreateRequest {
   text: string
 }
 
-export type LectureStepType = 'DOCUMENT' | 'CODING_TEST' | 'INTERVIEW' | (string & {})
+export type LectureStepType = 'DOCUMENT' | 'CODING_TEST' | 'INTERVIEW' | 'PRE_TASK' | (string & {})
 
 export interface LectureStepCreateRequest {
   stepType: LectureStepType
@@ -69,7 +69,6 @@ export interface LectureCreateRequest {
   url?: string | null
   lectureImageUrl?: string | null
 
-
   projectNum?: number | null
   projectTime?: number | null
   projectTeam?: string | null
@@ -93,4 +92,3 @@ export interface LectureCreateRequest {
 export interface LectureCreateResponse {
   lectureId: number
 }
-

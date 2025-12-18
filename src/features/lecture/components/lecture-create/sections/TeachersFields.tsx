@@ -24,8 +24,10 @@ export function LectureCreateTeachersFields() {
 
   return (
     <Field>
-      <FieldLabel>강사</FieldLabel>
-      <FieldDescription>필요 시 강사 정보를 추가해 주세요.</FieldDescription>
+      <FieldLabel>
+        강사<span className="text-red-600">*</span>
+      </FieldLabel>
+      <FieldDescription>강사를 최소 1명 이상 등록해 주세요.</FieldDescription>
       <FieldContent>
         <div className="space-y-3">
           <Button
@@ -147,7 +149,9 @@ function TeacherItem({ control, index, totalCount, onMove, onRemove }: TeacherIt
               )}
               {!imageFile && <span className="text-muted-foreground text-sm">이미지 없음</span>}
             </div>
-            {fieldState.error && <FieldDescription className="text-red-600">{fieldState.error.message}</FieldDescription>}
+            {fieldState.error && (
+              <FieldDescription className="text-red-600">{fieldState.error.message}</FieldDescription>
+            )}
           </div>
         )}
       />

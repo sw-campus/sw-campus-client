@@ -84,7 +84,11 @@ export function LectureCreateOptionsFields() {
             control={control}
             name="goal"
             render={({ field }) => (
-              <Textarea placeholder="강의 목표를 입력해 주세요." {...field} value={field.value ?? ''} />
+              <Textarea
+                placeholder="1. ...&#10;2. ...&#10;형식으로 강의 목표를 작성해 주세요."
+                {...field}
+                value={field.value ?? ''}
+              />
             )}
           />
         </FieldContent>

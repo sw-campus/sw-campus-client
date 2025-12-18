@@ -15,11 +15,6 @@ import {
 } from '@/features/auth/authApi'
 import { useSignupStore } from '@/store/signupStore'
 
-type SubmitAddress = {
-  address: string | null
-  detailAddress: string | null
-}
-
 export function useSignupForm() {
   const {
     address,
@@ -182,7 +177,7 @@ export function useSignupForm() {
       await signup(result.data)
       reset()
       toast.success('회원가입이 완료되었습니다.')
-      router.push('/')
+      router.push('/login')
     } catch (error: any) {
       const message = error?.response?.data?.message ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.'
       toast.error(message)

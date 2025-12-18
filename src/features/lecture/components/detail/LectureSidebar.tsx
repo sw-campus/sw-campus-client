@@ -1,7 +1,11 @@
+'use client'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { AddToCartButton } from '@/features/cart'
 import { type LectureDetail } from '@/features/lecture/api/lectureApi'
+import { processApplicationSteps } from '@/features/lecture/utils/processApplicationSteps'
 
 import { formatDateDot, SideInfoRow } from './DetailShared'
 
@@ -26,9 +30,14 @@ export default function LectureSidebar({ lecture }: Props) {
             신청페이지 바로가기
           </Button>
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" size="lg" className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50">
+            <AddToCartButton
+              item={{ lectureId: String(lecture.id) }}
+              variant="outline"
+              size="lg"
+              className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50"
+            >
               장바구니
-            </Button>
+            </AddToCartButton>
             <Button variant="outline" size="lg" className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50">
               공유하기
             </Button>
@@ -39,12 +48,15 @@ export default function LectureSidebar({ lecture }: Props) {
 
         <div className="space-y-4">
           <SideInfoRow label="모집상태">
-            <Badge
-              className="rounded-full px-3"
-              variant={lecture.recruitStatus === 'RECRUITING' ? 'default' : 'secondary'}
+            <span
+              className={`rounded-full border px-3 py-1 text-xs font-medium ${
+                lecture.recruitStatus === 'RECRUITING'
+                  ? 'border-emerald-200/50 bg-emerald-500/10 text-emerald-600'
+                  : 'border-gray-200/50 bg-gray-500/10 text-gray-500'
+              }`}
             >
               {lecture.recruitStatus === 'RECRUITING' ? '모집중' : '마감'}
-            </Badge>
+            </span>
           </SideInfoRow>
           <SideInfoRow label="모집기간">~ {formatDateDot(lecture.schedule.recruitPeriod)}</SideInfoRow>
           <SideInfoRow label="수업기간">
@@ -58,22 +70,39 @@ export default function LectureSidebar({ lecture }: Props) {
         </div>
       </div>
 
-      <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-        <p className="flex items-center gap-2 text-base font-bold text-gray-900">
-          <span className="text-orange-500">🎁</span> 채용연계 혜택
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Badge variant="secondary" className="rounded-lg bg-gray-100 px-3 py-1.5 font-medium text-gray-600">
-            인재 추천
-          </Badge>
-          <Badge variant="secondary" className="rounded-lg bg-gray-100 px-3 py-1.5 font-medium text-gray-600">
-            인터십 진행
-          </Badge>
-          <Badge variant="secondary" className="rounded-lg bg-gray-100 px-3 py-1.5 font-medium text-gray-600">
-            협약 기업
-          </Badge>
-        </div>
-      </div>
+      {lecture.steps &&
+        lecture.steps.length > 0 &&
+        (() => {
+          const { applicationSteps, hasPreTask } = processApplicationSteps(lecture.steps)
+
+          return (
+            <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+              <p className="flex items-center gap-2 text-base font-bold text-gray-900">
+                <span className="text-orange-500">📋</span> 지원절차
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {applicationSteps.map((step, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="rounded-lg bg-orange-50 px-3 py-1.5 font-medium text-orange-700"
+                  >
+                    {index + 1}. {step}
+                  </Badge>
+                ))}
+              </div>
+
+              {/* 합격 후 사전과제 안내 */}
+              {hasPreTask && (
+                <div className="mt-4 rounded-lg bg-blue-50 px-3 py-2.5">
+                  <p className="flex items-center gap-2 text-sm font-medium text-blue-700">
+                    <span>✅</span> 합격 후: 사전과제 진행
+                  </p>
+                </div>
+              )}
+            </div>
+          )
+        })()}
     </div>
   )
 }
