@@ -67,8 +67,6 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
 
   const upsertSurvey = useMutation({
     mutationFn: async (payload: SurveyFormValues) => {
-      // Swagger 기준: PUT /api/v1/mypage/survey (키 이름이 Swagger와 동일)
-      // baseURL = NEXT_PUBLIC_API_URL (예: http://localhost:8080/api/v1)
       await api.put('/mypage/survey', payload)
     },
   })
@@ -98,7 +96,6 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
           affordableAmount: data.affordableAmount ?? 0,
         })
       } catch (e: any) {
-        // 저장된 설문이 없으면(404 등) 기본값 유지
       } finally {
         if (mounted) setIsLoading(false)
       }
@@ -221,7 +218,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
     <div className="mx-auto w-full">
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-gray-200 px-8 py-6">
-          <h2 className="text-xl font-semibold text-gray-900">개인 정보 수정</h2>
+          <h2 className="text-xl font-semibold text-gray-900">설문조사</h2>
           <button
             type="button"
             onClick={() => router.back()}

@@ -64,7 +64,7 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
 
-  const { address, detailAddress, setAddress, setDetailAddress } = useSignupStore()
+  const { setAddress, setDetailAddress } = useSignupStore()
   const [profileEmail, setProfileEmail] = useState<string>('')
   const [profileName, setProfileName] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)

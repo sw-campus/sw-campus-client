@@ -1,9 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { FiX } from 'react-icons/fi'
@@ -12,14 +11,11 @@ import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
+import { ImageUploadInput } from '@/components/ui/image-upload-input'
 import AddressInput from '@/features/auth/components/AddressInput'
 import { api } from '@/lib/axios'
 import { useSignupStore } from '@/store/signupStore'
 
-/**
- * ✅ Swagger: GET /api/v1/mypage/organization (기관 정보 조회)
- * - axios baseURL이 /api/v1 이면 프론트에서는 `/mypage/organization` 으로 호출
- */
 type MyOrganizationResponse = {
   organizationId: number
   organizationName: string
@@ -38,11 +34,6 @@ type MyOrganizationResponse = {
   homepage: string
 }
 
-/**
- * ✅ 수정 가능 필드만 form에 포함
- * - 수정 불가(기관ID, 승인상태)는 input이 아니라 텍스트 박스로 표시
- * - AddressInput은 store 기반이라 location은 optional 로만 유지
- */
 const orgInfoSchema = z.object({
   organizationName: z.string().min(1, '기관명을 입력해주세요.'),
   representativeName: z.string().min(1, '대표자명을 입력해주세요.'),
@@ -126,11 +117,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     formState: { isValid, errors },
     register,
   } = methods
-  const logoFileInputRef = useRef<HTMLInputElement | null>(null)
-  const facilityFileInputRef1 = useRef<HTMLInputElement | null>(null)
-  const facilityFileInputRef2 = useRef<HTMLInputElement | null>(null)
-  const facilityFileInputRef3 = useRef<HTMLInputElement | null>(null)
-  const facilityFileInputRef4 = useRef<HTMLInputElement | null>(null)
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [certificateFile, setCertificateFile] = useState<File | null>(null)
   const [facilityFile1, setFacilityFile1] = useState<File | null>(null)
@@ -142,7 +128,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     let mounted = true
 
     const load = async () => {
-      // ✅ AddressInput 검색 버튼 동작을 위해 스크립트 로드
       loadDaumPostcodeScript()
 
       setIsLoading(true)
@@ -227,12 +212,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     if (s === 'rejected') return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
     // pending 또는 기타 상태는 보류로 표시
     return { label: '승인 대기', dot: 'bg-amber-500', text: 'text-amber-700' }
-  }
-
-  const isImageUrl = (url: string | undefined | null) => {
-    if (!url) return false
-    if (url.startsWith('blob:')) return true
-    return /(\.png|\.jpg|\.jpeg|\.gif|\.webp|\.bmp|\.svg)$/i.test(url)
   }
 
   const formContent = (
@@ -352,47 +331,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                     control={methods.control}
                     name="logoUrl"
                     render={({ field }) => (
-                      <div className="flex items-center gap-3">
-                        <input
-                          ref={logoFileInputRef}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0] ?? null
-                            setLogoFile(file)
-                          }}
-                        />
-                        <Button type="button" onClick={() => logoFileInputRef.current?.click()}>
-                          업로드
-                        </Button>
-                        <div className="flex items-center gap-2">
-                          {logoFile ? (
-                            <Image
-                              src={URL.createObjectURL(logoFile)}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : field.value ? (
-                            <Image
-                              src={field.value}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded border bg-gray-50" />
-                          )}
-                          <span className="text-muted-foreground text-sm">
-                            {logoFile || field.value ? '미리보기' : '선택된 파일 없음'}
-                          </span>
-                        </div>
-                      </div>
+                      <ImageUploadInput currentUrl={field.value} file={logoFile} onFileChange={setLogoFile} />
                     )}
                   />
                 </div>
@@ -403,49 +342,11 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                     control={methods.control}
                     name="certificateUrl"
                     render={({ field }) => (
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0] ?? null
-                            setCertificateFile(file)
-                          }}
-                        />
-                        <Button
-                          type="button"
-                          onClick={e => (e.currentTarget.previousElementSibling as HTMLInputElement)?.click()}
-                        >
-                          업로드
-                        </Button>
-                        <div className="flex items-center gap-2">
-                          {certificateFile ? (
-                            <Image
-                              src={URL.createObjectURL(certificateFile)}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : isImageUrl(field.value) ? (
-                            <Image
-                              src={field.value as string}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded border bg-gray-50" />
-                          )}
-                          <span className="text-muted-foreground text-sm">
-                            {certificateFile || field.value ? '미리보기' : '선택된 파일 없음'}
-                          </span>
-                        </div>
-                      </div>
+                      <ImageUploadInput
+                        currentUrl={field.value}
+                        file={certificateFile}
+                        onFileChange={setCertificateFile}
+                      />
                     )}
                   />
                 </div>
@@ -469,47 +370,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                     control={methods.control}
                     name="facilityImageUrl1"
                     render={({ field }) => (
-                      <div className="flex items-center gap-3">
-                        <input
-                          ref={facilityFileInputRef1}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0] ?? null
-                            setFacilityFile1(file)
-                          }}
-                        />
-                        <Button type="button" onClick={() => facilityFileInputRef1.current?.click()}>
-                          업로드
-                        </Button>
-                        <div className="flex items-center gap-2">
-                          {facilityFile1 ? (
-                            <Image
-                              src={URL.createObjectURL(facilityFile1)}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : field.value ? (
-                            <Image
-                              src={field.value}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded border bg-gray-50" />
-                          )}
-                          <span className="text-muted-foreground text-sm">
-                            {facilityFile1 || field.value ? '미리보기' : '선택된 파일 없음'}
-                          </span>
-                        </div>
-                      </div>
+                      <ImageUploadInput currentUrl={field.value} file={facilityFile1} onFileChange={setFacilityFile1} />
                     )}
                   />
                 </div>
@@ -520,47 +381,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                     control={methods.control}
                     name="facilityImageUrl2"
                     render={({ field }) => (
-                      <div className="flex items-center gap-3">
-                        <input
-                          ref={facilityFileInputRef2}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0] ?? null
-                            setFacilityFile2(file)
-                          }}
-                        />
-                        <Button type="button" onClick={() => facilityFileInputRef2.current?.click()}>
-                          업로드
-                        </Button>
-                        <div className="flex items-center gap-2">
-                          {facilityFile2 ? (
-                            <Image
-                              src={URL.createObjectURL(facilityFile2)}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : field.value ? (
-                            <Image
-                              src={field.value}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded border bg-gray-50" />
-                          )}
-                          <span className="text-muted-foreground text-sm">
-                            {facilityFile2 || field.value ? '미리보기' : '선택된 파일 없음'}
-                          </span>
-                        </div>
-                      </div>
+                      <ImageUploadInput currentUrl={field.value} file={facilityFile2} onFileChange={setFacilityFile2} />
                     )}
                   />
                 </div>
@@ -571,47 +392,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                     control={methods.control}
                     name="facilityImageUrl3"
                     render={({ field }) => (
-                      <div className="flex items-center gap-3">
-                        <input
-                          ref={facilityFileInputRef3}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0] ?? null
-                            setFacilityFile3(file)
-                          }}
-                        />
-                        <Button type="button" onClick={() => facilityFileInputRef3.current?.click()}>
-                          업로드
-                        </Button>
-                        <div className="flex items-center gap-2">
-                          {facilityFile3 ? (
-                            <Image
-                              src={URL.createObjectURL(facilityFile3)}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : field.value ? (
-                            <Image
-                              src={field.value}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded border bg-gray-50" />
-                          )}
-                          <span className="text-muted-foreground text-sm">
-                            {facilityFile3 || field.value ? '미리보기' : '선택된 파일 없음'}
-                          </span>
-                        </div>
-                      </div>
+                      <ImageUploadInput currentUrl={field.value} file={facilityFile3} onFileChange={setFacilityFile3} />
                     )}
                   />
                 </div>
@@ -621,47 +402,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                     control={methods.control}
                     name="facilityImageUrl4"
                     render={({ field }) => (
-                      <div className="flex items-center gap-3">
-                        <input
-                          ref={facilityFileInputRef4}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0] ?? null
-                            setFacilityFile4(file)
-                          }}
-                        />
-                        <Button type="button" onClick={() => facilityFileInputRef4.current?.click()}>
-                          업로드
-                        </Button>
-                        <div className="flex items-center gap-2">
-                          {facilityFile4 ? (
-                            <Image
-                              src={URL.createObjectURL(facilityFile4)}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : field.value ? (
-                            <Image
-                              src={field.value}
-                              alt="미리보기"
-                              width={40}
-                              height={40}
-                              className="h-10 w-10 rounded border object-cover"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded border bg-gray-50" />
-                          )}
-                          <span className="text-muted-foreground text-sm">
-                            {facilityFile4 || field.value ? '미리보기' : '선택된 파일 없음'}
-                          </span>
-                        </div>
-                      </div>
+                      <ImageUploadInput currentUrl={field.value} file={facilityFile4} onFileChange={setFacilityFile4} />
                     )}
                   />
                 </div>
@@ -683,7 +424,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     </FormProvider>
   )
 
-  // ✅ 모달(DialogContent) 안에 들어갈 때: 카드/헤더를 한 번만 보이게
   if (embedded) {
     return (
       <div className="mx-auto w-full">
