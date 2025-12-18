@@ -9,15 +9,7 @@ import { BsCart4 } from 'react-icons/bs'
 import { FiLogIn, FiUser, FiMenu, FiLogOut } from 'react-icons/fi'
 
 import { HeaderIconAction } from '@/components/layout/header/HeaderIconAction'
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { LogoutDialog } from '@/components/layout/header/LogoutDialog'
 import { useLogout } from '@/features/auth/hooks/useLogout'
 import type { CategoryTreeNode } from '@/features/category'
 import { useAuthStore } from '@/store/authStore'
@@ -135,30 +127,12 @@ export default function Header({
         )}
       </div>
 
-      <Dialog open={logoutOpen} onOpenChange={setLogoutOpen}>
-        <DialogContent>
-          <DialogHeader className="gap-5">
-            <DialogTitle>로그아웃</DialogTitle>
-            <DialogDescription>장바구니에 있는 항목은 7일간 유지됩니다.</DialogDescription>
-          </DialogHeader>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setLogoutOpen(false)}>
-              취소
-            </Button>
-            <Button
-              type="button"
-              onClick={async () => {
-                await handleLogout()
-                setLogoutOpen(false)
-              }}
-              disabled={isPending}
-            >
-              확인
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <LogoutDialog
+        open={logoutOpen}
+        onOpenChange={setLogoutOpen}
+        onConfirm={handleLogout}
+        confirmDisabled={isPending}
+      />
     </header>
   )
 }
