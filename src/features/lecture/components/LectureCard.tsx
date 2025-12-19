@@ -1,17 +1,25 @@
+'use client'
+
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 
 import { AddToCartButton } from '@/features/cart'
-import { Lecture } from '@/features/lecture/types/lecture.type'
+import type { Lecture } from '@/features/lecture/types/lecture.type'
+
+const MotionLink = motion.create(Link)
 
 export function LectureCard({ lecture }: { lecture: Lecture }) {
-  const { id, title, organization, periodStart, periodEnd, tags, imageUrl, status, averageScore } = lecture
+  const { id, title, organization, periodStart, periodEnd, tags, status, averageScore } = lecture
+
+  const normalizedScore = averageScore ?? 0
+  const normalizedReviewCount = lecture.reviewCount ?? 0
 
   const getStatusBadge = (status?: string) => {
     switch (status) {
       case 'RECRUITING':
-        return { text: '모집중', className: 'bg-emerald-500/10 text-emerald-600 border-emerald-200/50' }
+        return { text: '모집중', className: 'bg-accent/10 text-orange-500 font-semibold border-accent/20' }
       case 'FINISHED':
-        return { text: '마감', className: 'bg-gray-500/10 text-gray-500 border-gray-200/50' }
+        return { text: '마감', className: 'bg-muted text-muted-foreground border-border/60' }
       default:
         return null
     }
@@ -20,54 +28,74 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
   const statusBadge = getStatusBadge(status)
 
   return (
-    <Link
+    <MotionLink
       href={`/lectures/${id}`}
-      className="group relative flex h-full flex-col overflow-hidden rounded-xl p-6 backdrop-blur-xl transition hover:scale-[1.01] active:scale-[0.99]"
+      className="group border-border/50 bg-card/40 text-card-foreground hover:border-accent hover:shadow-accent/10 relative flex h-full flex-col overflow-hidden rounded-xl border p-6 shadow-sm backdrop-blur-2xl transition-all duration-300 hover:shadow-2xl"
+      initial="rest"
+      whileHover="hover"
+      animate="rest"
     >
+      {/* Glass Shine Effect */}
+      <motion.div
+        className="pointer-events-none absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-linear-to-r from-transparent to-white opacity-40 blur-md"
+        variants={{
+          rest: { x: '-100%' },
+          hover: { x: '400%', transition: { duration: 0.8, ease: 'easeInOut' } },
+        }}
+        style={{ left: '-100%' }}
+      />
+
       <div className="relative z-10 flex h-full flex-col">
-        {/* 상단: 카테고리 & 상태 뱃지 */}
-        <div className="mb-2 flex items-center justify-between">
-          <p className="text-xs font-semibold tracking-widest">{tags[0]?.name ?? 'CATEGORY'}</p>
+        {/* 상단: 카테고리 & 상태 */}
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="text-muted-foreground truncate text-xs font-semibold tracking-widest">
+            {tags[0]?.name ?? 'CATEGORY'}
+          </p>
           {statusBadge && (
-            <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${statusBadge.className}`}>
+            <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusBadge.className}`}>
               {statusBadge.text}
             </span>
           )}
         </div>
-        <h3 className="mb-3 text-xl leading-tight font-bold">{title}</h3>
-        <p className="mb-2 text-sm">{organization}</p>
+
+        <div className="mb-4 h-19">
+          {/* 제목 */}
+          <h3 className="mb-2 line-clamp-2 text-2xl leading-7 font-extrabold tracking-tight">{title}</h3>
+
+          {/* 기관명 */}
+          <p className="text-muted-foregroundtruncate line-clamp-1 text-sm leading-5">{organization}</p>
+        </div>
+
         {/* 별점 */}
-        {/* 별점 (리뷰가 있을 때만 표시) */}
-        {averageScore !== undefined && averageScore !== null && averageScore > 0 && (
-          <div className="mb-2 flex items-center gap-1">
-            <span className="text-amber-500">★</span>
-            <span className="text-sm font-medium">{averageScore.toFixed(1)}</span>
-            {lecture.reviewCount !== undefined && (
-              <span className="text-muted-foreground text-xs">({lecture.reviewCount})</span>
-            )}
-          </div>
-        )}
-        <p className="mb-6 text-xs">
+        <div className="mb-3 flex items-center gap-1.5">
+          <span className={normalizedScore > 0 ? 'text-amber-500' : 'text-muted-foreground'}>★</span>
+          <span className="text-base font-semibold tabular-nums">{normalizedScore.toFixed(1)}</span>
+          <span className="text-muted-foreground text-sm tabular-nums">({normalizedReviewCount})</span>
+        </div>
+
+        <p className="text-muted-foreground mb-5 text-xs">
           {periodStart} ~ {periodEnd}
         </p>
+
         {/* 태그 */}
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="mb-6 flex h-5 flex-nowrap items-center gap-1.5 overflow-hidden whitespace-nowrap">
           {tags.slice(1).map(tag => (
             <span
               key={tag.id}
-              className="rounded-full bg-orange-300/20 px-3 py-1 text-xs text-black/70 backdrop-blur-sm"
+              className="text-muted-foreground border-border/60 bg-muted/50 truncate rounded-full border px-2 py-0.5 text-[10px] leading-none font-medium"
             >
               {tag.name}
             </span>
           ))}
         </div>
+
         {/* 장바구니 버튼 */}
         <div className="mt-auto">
-          <AddToCartButton item={{ lectureId: id }} className="w-full rounded-lg py-2 transition">
+          <AddToCartButton item={{ lectureId: id }} className="w-full rounded-lg py-2">
             Add to cart
           </AddToCartButton>
         </div>
       </div>
-    </Link>
+    </MotionLink>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
+import { AnimatePresence, motion } from 'framer-motion'
 import { createPortal } from 'react-dom'
 import { FiLoader } from 'react-icons/fi'
 
@@ -12,7 +13,7 @@ interface AiFloatingButtonProps {
   isLoading: boolean
   hasResult: boolean
   onAnalyze: () => void
-  onClear: () => void
+
   disabledReason?: string
 }
 
@@ -21,233 +22,299 @@ export function AiFloatingButton({
   isLoading,
   hasResult,
   onAnalyze,
-  onClear,
   disabledReason = '두 강의를 모두 선택해주세요',
 }: AiFloatingButtonProps) {
   const [mounted, setMounted] = useState(false)
+  const [showCelebration, setShowCelebration] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    const timer = setTimeout(() => {
+      setMounted(true)
+    }, 0)
+    return () => clearTimeout(timer)
   }, [])
 
-  const handleClick = () => {
+  // Trigger celebration when result appears
+  useEffect(() => {
     if (hasResult) {
-      onClear()
-    } else if (isEnabled && !isLoading) {
+      // Defer to avoid concurrent render warning
+      const t1 = setTimeout(() => setShowCelebration(true), 0)
+      const t2 = setTimeout(() => setShowCelebration(false), 2000)
+      return () => {
+        clearTimeout(t1)
+        clearTimeout(t2)
+      }
+    }
+  }, [hasResult])
+
+  const handleClick = () => {
+    if (isEnabled && !isLoading && !hasResult) {
       onAnalyze()
     }
   }
 
   if (!mounted) return null
 
-  return createPortal(
-    <button
-        type="button"
-        onClick={handleClick}
-        disabled={!isEnabled && !hasResult}
-        title={!isEnabled && !hasResult ? disabledReason : hasResult ? '분석 초기화' : 'AI 비교분석'}
-        className={cn(
-          // 고정 위치
-          'fixed right-10 bottom-10 z-[100]',
-          'flex flex-col items-center justify-center',
-          'h-[90px] w-[90px] rounded-full',
-          // 호버/클릭 효과
-          'transition-all duration-500 ease-out',
-          'hover:scale-110',
-          'active:scale-95',
-          // 비활성 상태
-          'disabled:pointer-events-none disabled:opacity-0',
-          isEnabled || hasResult ? 'opacity-100' : 'pointer-events-none opacity-0',
-        )}
-        style={{
-          animation:
-            isEnabled || hasResult ? 'float 3s ease-in-out infinite, magicPulse 2s ease-in-out infinite' : 'none',
-          // 오렌지 마법의 물방울 그라데이션
-          background: `
-            radial-gradient(
-              circle at 30% 20%,
-              rgba(255, 255, 255, 0.95) 0%,
-              rgba(255, 247, 237, 0.9) 15%,
-              rgba(254, 215, 170, 0.85) 30%,
-              rgba(253, 186, 116, 0.8) 45%,
-              rgba(251, 146, 60, 0.75) 60%,
-              rgba(249, 115, 22, 0.7) 75%,
-              rgba(234, 88, 12, 0.65) 90%,
-              rgba(194, 65, 12, 0.6) 100%
-            )
-          `,
-          // 테두리
-          border: '2px solid rgba(255, 255, 255, 0.5)',
-        }}
-      >
-        {/* 회전하는 외곽 글로우 링 */}
-        <span
-          className="pointer-events-none absolute -inset-2 rounded-full"
-          style={{
-            background:
-              'conic-gradient(from 0deg, transparent, rgba(251, 146, 60, 0.5), rgba(249, 115, 22, 0.5), rgba(253, 186, 116, 0.5), transparent)',
-            animation: 'rotateGlow 4s linear infinite',
-            filter: 'blur(8px)',
-            opacity: 0.6,
+  return (
+    <>
+      {createPortal(<AnimatePresence>{showCelebration && <CelebrationEffect />}</AnimatePresence>, document.body)}
+      {createPortal(
+        <motion.button
+          type="button"
+          onClick={handleClick}
+          disabled={(!isEnabled && !hasResult) || isLoading}
+          title={
+            isLoading ? 'AI 분석 중...' : hasResult ? '분석 완료' : isEnabled ? 'AI 비교분석 시작' : disabledReason
+          }
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{
+            opacity: isEnabled || hasResult || isLoading ? 1 : 0,
+            scale: isEnabled || hasResult || isLoading ? 1 : 0.8,
+            y: isEnabled || hasResult || isLoading ? [0, -8, 0] : 0,
           }}
-        />
-
-        {/* 상단 메인 하이라이트 */}
-        <span
-          className="pointer-events-none absolute"
-          style={{
-            top: '8px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '70%',
-            height: '40%',
-            borderRadius: '50%',
-            background: `linear-gradient(
-              to bottom,
-              rgba(255, 255, 255, 0.95) 0%,
-              rgba(255, 255, 255, 0.7) 30%,
-              rgba(255, 255, 255, 0.3) 60%,
-              transparent 100%
-            )`,
+          transition={{
+            opacity: { duration: 0.3 },
+            scale: { duration: 0.3 },
+            y: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
           }}
-        />
-
-        {/* 시머(shimmer) 효과 - 빛나는 줄무늬 */}
-        <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-full" style={{ opacity: 0.4 }}>
-          <span
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.8) 50%, transparent 70%)',
-              animation: 'shimmer 3s ease-in-out infinite',
-            }}
-          />
-        </span>
-
-        {/* 반짝이는 별 파티클들 */}
-        {[
-          { top: '15px', left: '18px', size: '6px', delay: '0s' },
-          { top: '25px', right: '20px', size: '4px', delay: '0.5s' },
-          { bottom: '30px', left: '22px', size: '5px', delay: '1s' },
-          { bottom: '25px', right: '25px', size: '4px', delay: '1.5s' },
-          { top: '45px', left: '12px', size: '3px', delay: '0.8s' },
-          { top: '50px', right: '15px', size: '3px', delay: '1.2s' },
-        ].map((particle, i) => (
-          <span
-            key={i}
-            className="pointer-events-none absolute"
-            style={{
-              top: particle.top,
-              bottom: particle.bottom,
-              left: particle.left,
-              right: particle.right,
-              width: particle.size,
-              height: particle.size,
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, #fff 0%, rgba(255,255,255,0.8) 40%, transparent 70%)',
-              boxShadow: '0 0 6px 2px rgba(255, 255, 255, 0.8)',
-              animation: `sparkle 2s ease-in-out ${particle.delay} infinite`,
-            }}
-          />
-        ))}
-
-        {/* 물방울 반사 효과 - 좌상단 */}
-        <span
-          className="pointer-events-none absolute"
-          style={{
-            top: '22px',
-            left: '22px',
-            width: '12px',
-            height: '8px',
-            borderRadius: '50%',
-            background: 'rgba(255, 255, 255, 0.9)',
-            filter: 'blur(1px)',
-          }}
-        />
-
-        {/* 하단 반사 (바닥 반사) */}
-        <span
-          className="pointer-events-none absolute"
-          style={{
-            bottom: '12px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '50%',
-            height: '18%',
-            borderRadius: '50%',
-            background: `linear-gradient(
-              to top,
-              rgba(251, 146, 60, 0.3) 0%,
-              rgba(253, 186, 116, 0.15) 50%,
-              transparent 100%
-            )`,
-          }}
-        />
-
-        {/* 가장자리 광택 링 */}
-        <span
-          className="pointer-events-none absolute inset-0 rounded-full"
-          style={{
-            border: '2px solid transparent',
-            borderTopColor: 'rgba(255, 255, 255, 0.7)',
-            borderLeftColor: 'rgba(255, 255, 255, 0.5)',
-          }}
-        />
-
-        {/* 내부 텍스트 */}
-        <div className="relative z-10 flex flex-col items-center">
-          {isLoading ? (
-            <>
-              <FiLoader className="size-7 animate-spin text-white drop-shadow-lg" />
-              <span
-                className="mt-1 text-[11px] font-bold text-white"
-                style={{ textShadow: '0 0 10px rgba(251, 146, 60, 0.8)' }}
-              >
-                분석중...
-              </span>
-            </>
-          ) : (
-            <>
-              <span
-                className="text-2xl font-black text-white"
-                style={{
-                  textShadow: '0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(251, 146, 60, 0.6)',
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className={cn(
+            // Position
+            'fixed right-10 bottom-10 z-100',
+            'flex flex-col items-center justify-center',
+            'h-[90px] w-[90px] rounded-full',
+            // Default Glass
+            !hasResult && 'border border-white/20 bg-white/10 backdrop-blur-md',
+            !hasResult && 'shadow-[0_8px_32px_0_rgba(251,146,60,0.3)]',
+            // Success (Radiant Gold)
+            hasResult && 'border border-orange-300/50 bg-linear-to-br from-orange-500 to-yellow-400',
+            hasResult && 'shadow-[0_0_50px_rgba(251,146,60,0.6)]',
+            // Interaction
+            'transition-all duration-500',
+            'disabled:pointer-events-none disabled:opacity-0',
+            (isEnabled || hasResult) && !isLoading ? 'cursor-pointer' : 'cursor-default',
+          )}
+        >
+          {/* 1. Loading State */}
+          {isLoading && (
+            <div className="absolute inset-0 overflow-hidden rounded-full">
+              <motion.div
+                className="absolute inset-0"
+                animate={{
+                  background: [
+                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(251, 146, 60, 0.8) 20%, transparent 60%)',
+                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(251, 146, 60, 0.8) 40%, transparent 70%)',
+                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(251, 146, 60, 0.8) 20%, transparent 60%)',
+                  ],
+                  scale: [1, 1.2, 1],
                 }}
-              >
-                AI
-              </span>
-              <span
-                className="text-xs font-bold text-white/90"
-                style={{ textShadow: '0 0 10px rgba(251, 146, 60, 0.6)' }}
-              >
-                {hasResult ? '초기화' : '비교분석'}
-              </span>
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+              <motion.div
+                className="absolute inset-0 opacity-50"
+                style={{
+                  background: 'conic-gradient(from 0deg, transparent, #fb923c, #f97316, transparent)',
+                }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              />
+            </div>
+          )}
+
+          {/* 2. Success State: Radiant Portal (Gold) */}
+          {hasResult && !isLoading && <RadiantPortal />}
+
+          {/* 3. Default State */}
+          {!hasResult && !isLoading && (
+            <>
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                animate={{
+                  background: [
+                    'radial-gradient(circle at 30% 30%, rgba(251, 146, 60, 0.4), transparent 70%)',
+                    'radial-gradient(circle at 70% 70%, rgba(251, 146, 60, 0.4), transparent 70%)',
+                    'radial-gradient(circle at 30% 30%, rgba(251, 146, 60, 0.4), transparent 70%)',
+                  ],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+              <motion.div
+                className="absolute inset-[2px] rounded-full border border-white/30 border-t-white/80 border-l-transparent"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+              />
+              <div className="absolute top-2 left-4 h-8 w-12 -rotate-45 rounded-full bg-linear-to-b from-white/40 to-transparent blur-[1px]" />
             </>
           )}
-        </div>
 
-        {/* 활성화 알림 점 - 더 화려하게 */}
-        {isEnabled && !isLoading && !hasResult && (
-          <span className="absolute -top-1 -right-1 flex h-5 w-5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-300 opacity-75" />
-            <span
-              className="relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-orange-400 text-[8px]"
-              style={{ boxShadow: '0 0 12px rgba(251, 191, 36, 0.8)' }}
-            >
-              ✨
+          {/* Content */}
+          <div className="relative z-10 flex flex-col items-center drop-shadow-md">
+            {isLoading ? (
+              <>
+                <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.5, repeat: Infinity, ease: 'linear' }}>
+                  <FiLoader className="size-6 text-white" />
+                </motion.div>
+                <span className="mt-1 text-[10px] font-medium text-white/90">분석중...</span>
+              </>
+            ) : (
+              <>
+                <span
+                  className={cn(
+                    'text-xl font-bold tracking-tight transition-colors duration-500',
+                    hasResult ? 'text-white' : 'text-white',
+                  )}
+                >
+                  AI
+                </span>
+                <span
+                  className={cn(
+                    'text-[10px] font-medium transition-colors duration-500',
+                    hasResult ? 'text-white/90' : 'text-white/80',
+                  )}
+                >
+                  {hasResult ? '완료' : '비교분석'}
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Notification Dot */}
+          {isEnabled && !isLoading && !hasResult && (
+            <span className="absolute top-1 right-2 flex h-4 w-4">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
+              <span className="relative inline-flex h-4 w-4 items-center justify-center rounded-full border border-white/20 bg-orange-500 text-[8px] text-white shadow-sm">
+                !
+              </span>
             </span>
-          </span>
-        )}
+          )}
 
-        {/* 완료 체크 - 더 화려하게 */}
-        {hasResult && (
-          <span
-            className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-green-500 text-xs font-bold text-white"
-            style={{ boxShadow: '0 0 15px rgba(16, 185, 129, 0.8)' }}
-          >
-            ✓
-          </span>
-        )}
-      </button>,
-    document.body,
+          {/* Success Check */}
+          {hasResult && (
+            <span className="absolute top-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-emerald-500 text-xs text-white shadow-[0_0_10px_rgba(255,255,255,0.8)] backdrop-blur-sm">
+              ✓
+            </span>
+          )}
+        </motion.button>,
+        document.body,
+      )}
+    </>
+  )
+}
+
+function RadiantPortal() {
+  const [rays, setRays] = useState<{ id: number; rotate: number; delay: number }[]>([])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setRays(
+        [...Array(8)].map((_, i) => ({
+          id: i,
+          rotate: i * 45,
+          delay: i * 0.1,
+        })),
+      )
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [])
+
+  return (
+    <div className="absolute inset-0 overflow-hidden rounded-full opacity-80 mix-blend-overlay">
+      {/* Repeating Rays */}
+      {rays.map(ray => (
+        <motion.div
+          key={ray.id}
+          className="absolute top-1/2 left-1/2 h-[120%] w-2 origin-top bg-linear-to-b from-white/40 to-transparent"
+          style={{ rotate: ray.rotate, x: '-50%', y: '-50%' }}
+          animate={{ rotate: ray.rotate + 360 }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+        />
+      ))}
+      <div className="absolute inset-2 rounded-full border-2 border-white/30" />
+    </div>
+  )
+}
+
+function CelebrationEffect() {
+  const [particles, setParticles] = useState<
+    { id: number; x: number; y: number; color: string; size: number; duration: number }[]
+  >([])
+
+  useEffect(() => {
+    // Avoid concurrent render
+    const timer = setTimeout(() => {
+      const colors = ['#f97316', '#fbbf24', '#ffffff', '#fb923c'] // Orange-500, Amber-400, White, Orange-400
+      setParticles(
+        [...Array(60)].map((_, i) => ({
+          id: i,
+          x: (Math.random() - 0.5) * window.innerWidth * 1.2, // Spread wider
+          y: (Math.random() - 0.5) * window.innerHeight * 1.2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: Math.random() * 6 + 2, // 2px to 8px
+          duration: Math.random() * 1 + 1, // 1s to 2s
+        })),
+      )
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (particles.length === 0) return null
+
+  return (
+    <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
+      {/* 1. Flash Shockwave */}
+      <motion.div
+        className="absolute inset-0 bg-white"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 0.8, 0] }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+      />
+
+      {/* 2. Expanding Ring Shockwave */}
+      <motion.div
+        className="absolute rounded-full border-4 border-orange-300"
+        initial={{ width: 0, height: 0, opacity: 1, borderWidth: 50 }}
+        animate={{
+          width: '150vw',
+          height: '150vw',
+          opacity: 0,
+          borderWidth: 0,
+        }}
+        transition={{ duration: 1.2, ease: 'easeOut' }}
+      />
+
+      {/* 3. Massive Particle Explosion */}
+      {particles.map(p => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full"
+          style={{
+            backgroundColor: p.color,
+            width: p.size,
+            height: p.size,
+            boxShadow: `0 0 ${p.size * 2}px ${p.color}`,
+          }}
+          initial={{ x: 0, y: 0, scale: 0 }}
+          animate={{
+            x: p.x,
+            y: p.y,
+            scale: [0, 1, 0], // Pop in then shrink out
+            opacity: [1, 1, 0],
+          }}
+          transition={{
+            duration: p.duration,
+            ease: [0.22, 1, 0.36, 1], // Custom cubic bezier for explosion physics
+          }}
+        />
+      ))}
+    </div>
   )
 }

@@ -16,30 +16,26 @@ export default function Footer() {
           <Link href="#" className="text-white/90 hover:text-white">
             개인정보처리방침
           </Link>
-          <span className="text-white/30">|</span>
-          <Link href="/mypage/organization" className="text-white/90 hover:text-white">
-            교육과정 등록
-          </Link>
         </nav>
       </div>
 
       {/* 회사 정보 */}
       <div className="mt-8 text-sm leading-relaxed text-white/80">
-        한국소프트웨어기술진흥협회
+        소프트웨어캠퍼스
         <br />
         서울특별시 종로구 우정국로 2길 21 대왕빌딩 7층
         <br />
-        Tel.031-606-9311 | E-mail.kosta@kosta.or.kr
+        E-mail. sw.campus2025@gmail.com
       </div>
 
       {/* 하단 설명 */}
       <div className="mt-6 text-xs leading-relaxed text-white/70">
         본 웹사이트 내의 교육과정 및 운영 정보, 디자인 및 화면의 구성, UI를 포함한 일체의 콘텐츠에 대한 <br />
         무단 복제, 배포, 가공, 크롤링, 스크래핑 등의 행위는 저작권법, 콘텐츠산업진흥법 및 부정경쟁방지법 등 관련 법령에
-        의하여 엄격히 금지됩니다.
+        의하여 금지됩니다.
       </div>
 
-      <div className="mt-10 text-xs text-white/50">Copyright © KOSTA</div>
+      <div className="mt-10 text-xs text-white/50">Copyright © Software Campus</div>
     </footer>
   )
 }
