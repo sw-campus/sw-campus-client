@@ -27,7 +27,7 @@ export default function Header({
 }) {
   const router = useRouter()
   const [logoutOpen, setLogoutOpen] = useState(false)
-  const { isLoggedIn, userName, userType } = useAuthStore()
+  const { isLoggedIn, nickname, userType } = useAuthStore()
   const { logout, isPending } = useLogout()
 
   const mypageHref = userType === 'ORGANIZATION' ? '/mypage/organization' : '/mypage/personal'
@@ -87,11 +87,9 @@ export default function Header({
 
       {/* 아이콘 */}
       <div className="flex items-center gap-6 text-xl text-white">
-        {/* 로그인 여부에 따라 UI 변경 */}
         {isLoggedIn ? (
           <>
-            {/* 로그인된 경우 */}
-            <span className="text-base font-medium">{userName ?? '사용자'} 님</span>
+            <span className="text-base font-medium">{nickname}님</span>
 
             <HeaderIconAction
               kind="button"

@@ -5,10 +5,9 @@ import { INPUT_BASE_CLASS } from '@/features/auth/inputBaseClass'
 type PhoneAuthInputProps = {
   value: string | null
   onChange: (value: string | null) => void
-  onClickAuth: () => void
 }
 
-export default function PhoneAuthInput({ value, onChange, onClickAuth }: PhoneAuthInputProps) {
+export default function PhoneAuthInput({ value, onChange }: PhoneAuthInputProps) {
   return (
     <div className="mb-4">
       <label className="mb-1 block text-neutral-700" htmlFor="signup-phone">
@@ -24,13 +23,6 @@ export default function PhoneAuthInput({ value, onChange, onClickAuth }: PhoneAu
           value={value ?? ''}
           onChange={e => onChange(e.target.value || null)}
         />
-        <button
-          type="button"
-          onClick={onClickAuth}
-          className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white"
-        >
-          인증
-        </button>
       </div>
     </div>
   )
