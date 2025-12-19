@@ -1,6 +1,6 @@
 'use client'
 
-import * as React from 'react'
+import React, { useState } from 'react'
 
 import {
   flexRender,
@@ -10,67 +10,42 @@ import {
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
-  type ColumnFiltersState,
   type SortingState,
-  type VisibilityState,
 } from '@tanstack/react-table'
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react'
+import { FaStar } from 'react-icons/fa'
+import { FiCheckCircle, FiFileText, FiGrid, FiSearch, FiFilter } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import { cn } from '@/lib/utils'
 
-const data: Payment[] = [
-  {
-    id: 'm5gr84i9',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '3u1reuv4',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: 'derv1ws0',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '5kma53ae',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: 'bhqecj4p',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-]
-
-export type Payment = {
+// --- Types ---
+export type Review = {
   id: string
-  amount: number
-  status: 'pending' | 'processing' | 'success' | 'failed'
-  email: string
+  title: string
+  description: string
+  rating: number
+  author: string
+  createdAt: string
+  status: 'pending' | 'approved' | 'rejected'
 }
 
-export const columns: ColumnDef<Payment>[] = [
+// --- Mock Data ---
+const data: Review[] = Array.from({ length: 15 }).map((_, i) => ({
+  id: `rev-${i}`,
+  title: `강의가 정말 도움이 많이 되었습니다 #${i + 1}`,
+  description:
+    '처음에는 어려울 줄 알았는데 강사님이 차근차근 설명해주셔서 이해하기 쉬웠습니다. 실무에 바로 적용할 수 있는 꿀팁들도 많아서 좋네요!',
+  rating: 5,
+  author: `user${i}@example.com`,
+  createdAt: '2024-03-15',
+  status: i % 3 === 0 ? 'pending' : 'approved',
+}))
+
+// --- Columns ---
+const columns: ColumnDef<Review>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -87,179 +62,183 @@ export const columns: ColumnDef<Payment>[] = [
         aria-label="Select row"
       />
     ),
-    enableSorting: false,
-    enableHiding: false,
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('status')}</div>,
-  },
-  {
-    accessorKey: 'email',
-    header: ({ column }) => {
-      return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          Email
-          <ArrowUpDown />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
-  },
-  {
-    accessorKey: 'amount',
-    header: () => <div className="text-right">Amount</div>,
+    accessorKey: 'content',
+    header: 'Review Content',
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount'))
-
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(amount)
-
-      return <div className="text-right font-medium">{formatted}</div>
+      const review = row.original
+      return (
+        <div className="flex flex-col gap-1 py-1">
+          <div className="flex items-center gap-2">
+            <FaStar className="size-4 text-yellow-400" />
+            <span className="font-bold text-gray-800">{review.title}</span>
+          </div>
+          <p className="line-clamp-1 text-sm text-gray-500">{review.description}</p>
+        </div>
+      )
     },
   },
   {
     id: 'actions',
-    enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original
-
+    cell: () => {
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex justify-end">
+          <Button size="sm" variant="secondary" className="bg-gray-800 text-white hover:bg-gray-700">
+            수정
+          </Button>
+        </div>
       )
     },
   },
 ]
 
+// --- Components ---
+
+function StatCard({
+  icon: Icon,
+  title,
+  count,
+  colorClass,
+}: {
+  icon: React.ElementType
+  title: string
+  count: number
+  colorClass: string
+}) {
+  return (
+    <div className="flex flex-1 items-center gap-4 rounded-xl border border-white/20 bg-white/40 p-6 shadow-sm backdrop-blur-md transition-transform hover:scale-[1.02]">
+      <div className={cn('flex h-12 w-12 items-center justify-center rounded-lg text-white shadow-md', colorClass)}>
+        <Icon size={24} />
+      </div>
+      <div className="flex flex-col">
+        <span className="text-sm font-medium text-gray-500">{title}</span>
+        <span className="text-2xl font-bold text-gray-800">{count}건</span>
+      </div>
+    </div>
+  )
+}
+
 export function ReviewTable() {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [rowSelection, setRowSelection] = useState({})
 
   const table = useReactTable({
     data,
     columns,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
-      columnFilters,
-      columnVisibility,
       rowSelection,
     },
   })
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-          onChange={event => table.getColumn('email')?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
+    <div className="flex w-full flex-col gap-8">
+      {/* Header */}
+      <div>
+        <h2 className="text-2xl font-bold text-gray-800">리뷰 관리</h2>
+        <p className="text-gray-500">수강생들의 소중한 리뷰를 관리해보세요.</p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="flex flex-wrap gap-4">
+        <StatCard icon={FiFileText} title="승인 대기 중인 리뷰" count={17} colorClass="bg-orange-400" />
+        <StatCard icon={FiCheckCircle} title="승인 완료된 리뷰" count={231} colorClass="bg-emerald-500" />
+        <StatCard icon={FiGrid} title="전체 리뷰" count={248} colorClass="bg-blue-500" />
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex flex-col rounded-2xl border border-white/20 bg-white/40 p-6 shadow-xl backdrop-blur-xl">
+        {/* Table Header / Toolbar */}
+        <div className="mb-6 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-gray-800">
+            리뷰 목록 <span className="ml-1 text-sm font-normal text-gray-500">({data.length})</span>
+          </h3>
+          <div className="flex gap-2">
+            <div className="relative">
+              <FiSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+              <Input placeholder="리뷰 검색..." className="w-[200px] border-white/30 bg-white/50 pl-9" />
+            </div>
+            <Button variant="outline" size="icon" className="bg-white/50">
+              <FiFilter />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter(column => column.getCanHide())
-              .map(column => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={value => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map(row => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                  {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
-          selected.
+          </div>
         </div>
-        <div className="space-x-2">
+
+        {/* Table */}
+        <div className="overflow-hidden rounded-xl bg-white/30">
+          <Table>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map(row => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                    className="border-b border-gray-100 transition-colors hover:bg-white/40"
+                  >
+                    {row.getVisibleCells().map(cell => (
+                      <TableCell key={cell.id} className="py-4">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    리뷰가 없습니다.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination */}
+        <div className="mt-6 flex items-center justify-center gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            className="text-gray-500 hover:text-gray-800"
           >
-            Previous
+            이전
           </Button>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            Next
+          <div className="flex items-center gap-1">
+            {/* Creating a simplified pagination look */}
+            <Button
+              size="sm"
+              variant={table.getState().pagination.pageIndex === 0 ? 'default' : 'ghost'}
+              className={table.getState().pagination.pageIndex === 0 ? 'bg-gray-800 text-white' : ''}
+            >
+              1
+            </Button>
+            <Button size="sm" variant="ghost">
+              2
+            </Button>
+            <Button size="sm" variant="ghost">
+              3
+            </Button>
+            <span className="px-1 text-gray-400">...</span>
+            <Button size="sm" variant="ghost">
+              68
+            </Button>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className="text-gray-500 hover:text-gray-800"
+          >
+            다음
           </Button>
         </div>
       </div>
