@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { toast } from 'sonner'
 
+import { useAuthStore } from '@/store/authStore'
+
 import { env } from './env'
 
 export const api = axios.create({
@@ -12,8 +14,18 @@ export const api = axios.create({
 // 요청 인터셉터
 api.interceptors.request.use(
   config => {
-    // const token = getAuthToken()
-    // if (token) config.headers.Authorization = `Bearer ${token}`
+    // If an access token exists in the client store, attach it.
+    try {
+      const token = useAuthStore.getState().accessToken
+      if (token) {
+        config.headers = {
+          ...(config.headers ?? {}),
+          Authorization: `Bearer ${token}`,
+        }
+      }
+    } catch {
+      // ignore: store may not be available in some environments
+    }
     return config
   },
   error => {
