@@ -105,7 +105,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
       <Section title="수강료 & 지원금">
         <InfoBox>
           {/* 내배카 */}
-          <InfoRow label="내배카">
+          <InfoRow label="내일배움카드 필요 여부">
             {lecture.recruitType === 'CARD_REQUIRED' ? (
               <span className="text-primary font-bold">필요함 💳</span>
             ) : (
