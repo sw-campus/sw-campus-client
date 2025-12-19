@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { toast } from 'sonner'
 
+import { useAuthStore } from '@/store/authStore'
+
 import { env } from './env'
 
 export const api = axios.create({
@@ -12,8 +14,18 @@ export const api = axios.create({
 // 요청 인터셉터
 api.interceptors.request.use(
   config => {
-    // const token = getAuthToken()
-    // if (token) config.headers.Authorization = `Bearer ${token}`
+    // If an access token exists in the client store, attach it.
+    try {
+      const token = useAuthStore.getState().accessToken
+      if (token) {
+        config.headers = {
+          ...(config.headers ?? {}),
+          Authorization: `Bearer ${token}`,
+        }
+      }
+    } catch {
+      // ignore: store may not be available in some environments
+    }
     return config
   },
   error => {
@@ -26,16 +38,28 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
-    const status = error.response?.status
-    const message = error.response?.data?.message
+    // ✅ 네트워크/타임아웃 등: response 자체가 없는 케이스
+    if (!error.response) {
+      const isTimeout =
+        error.code === 'ECONNABORTED' ||
+        String(error.message ?? '')
+          .toLowerCase()
+          .includes('timeout')
+      toast.error(isTimeout ? '요청 시간이 초과되었습니다' : '네트워크 오류가 발생했습니다')
+      return Promise.reject(error)
+    }
+
+    const status = error.response.status
+    const message = error.response.data?.message
 
     // 공통 에러 처리
     if (status === 400) toast.error(message ?? '잘못된 요청입니다')
-    if (status === 401) toast.error('로그인이 필요합니다')
-    if (status === 403) toast.error('접근 권한이 없습니다')
-    if (status === 404) toast.error('요청한 리소스를 찾을 수 없습니다')
+    if (status === 401) toast.error(message ?? '로그인이 필요합니다')
+    if (status === 403) toast.error(message ?? '접근 권한이 없습니다')
+    if (status === 404) toast.error(message ?? '요청한 리소스를 찾을 수 없습니다')
     if (status === 409) toast.error(message ?? '이미 처리된 요청입니다')
-    if (status >= 500) toast.error('서버 오류가 발생했습니다')
+    if (status === 429) toast.error(message ?? '요청이 너무 많습니다. 잠시 후 다시 시도해주세요')
+    if (status >= 500) toast.error(message ?? '서버 오류가 발생했습니다')
 
     return Promise.reject(error)
   },
