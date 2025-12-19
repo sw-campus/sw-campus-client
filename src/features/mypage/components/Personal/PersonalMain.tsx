@@ -95,7 +95,6 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
         if (!cancelled) setLecturesLoading(false)
       }
     }
-    // (이전 개인 후기 조회 useEffect는 사용하지 않아 정리)
     fetchLectures()
     return () => {
       cancelled = true
