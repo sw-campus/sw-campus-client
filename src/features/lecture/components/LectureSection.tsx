@@ -76,13 +76,13 @@ export default function LectureSection() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-100px' }}
-      > 
+      >
         {/* Background Decoration */}
-        <div className="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-accent-foreground/5 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -left-20 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
+        <div className="bg-accent-foreground/5 pointer-events-none absolute -top-20 -right-20 h-96 w-96 rounded-full blur-3xl" />
+        <div className="bg-accent/5 pointer-events-none absolute -bottom-20 -left-20 h-96 w-96 rounded-full blur-3xl" />
 
         {/* 제목 */}
-        <motion.h2 className="mb-6 text-2xl font-bold text-white relative z-10" variants={itemVariants}>
+        <motion.h2 className="relative z-10 mb-6 text-2xl font-bold text-white" variants={itemVariants}>
           분야별 부트캠프
         </motion.h2>
 
@@ -102,7 +102,7 @@ export default function LectureSection() {
                 exit={{ opacity: 0 }}
                 className="flex h-48 items-center justify-center"
               >
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent/30 border-t-accent-foreground" />
+                <div className="border-accent/30 border-t-accent-foreground h-8 w-8 animate-spin rounded-full border-4" />
               </motion.div>
             ) : lectures.length > 0 ? (
               <motion.div
@@ -120,9 +120,9 @@ export default function LectureSection() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="flex h-48 flex-col items-center justify-center gap-3 text-muted-foreground"
+                className="text-muted-foreground flex h-48 flex-col items-center justify-center gap-3"
               >
-                <div className="rounded-full bg-muted/50 p-4">
+                <div className="bg-muted/50 rounded-full p-4">
                   <span className="text-2xl">🔍</span>
                 </div>
                 <span>해당 분야의 강의가 없습니다.</span>
@@ -132,7 +132,7 @@ export default function LectureSection() {
         </motion.div>
 
         {/* 더보기 버튼 */}
-        <motion.div variants={itemVariants} className="mt-10 flex justify-center relative z-10">
+        <motion.div variants={itemVariants} className="relative z-10 mt-10 flex justify-center">
           <motion.button
             onClick={() => router.push(`/lectures/search?categoryIds=${resolvedCategoryId}`)}
             disabled={resolvedCategoryId === null}
@@ -140,18 +140,15 @@ export default function LectureSection() {
             whileTap={{ scale: 0.95 }}
             className={`group flex items-center gap-2 rounded-full px-8 py-3 text-sm font-medium transition-all ${
               resolvedCategoryId === null
-                ? 'cursor-not-allowed bg-muted text-muted-foreground'
-                : 'bg-gradient-to-r from-zinc-800 to-zinc-900 text-white shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-accent/10 hover:from-zinc-700 hover:to-zinc-800 ring-1 ring-white/10'
+                ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                : 'hover:shadow-accent/10 bg-linear-to-r from-zinc-800 to-zinc-900 text-white shadow-lg ring-1 shadow-black/20 ring-white/10 hover:from-zinc-700 hover:to-zinc-800 hover:shadow-xl'
             }`}
           >
-            <span className={resolvedCategoryId === null ? 'text-muted-foreground' : 'text-accent-foreground font-semibold'}>
+            <span className={resolvedCategoryId === null ? 'text-muted-foreground' : 'text-accent font-semibold'}>
               {selectedCategoryName || '카테고리'}
             </span>
             <span>프로그램 더 보기</span>
-            <motion.span
-              animate={{ x: [0, 4, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5, repeatDelay: 1 }}
-            >
+            <motion.span animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5, repeatDelay: 1 }}>
               <FiArrowRight size={16} />
             </motion.span>
           </motion.button>
