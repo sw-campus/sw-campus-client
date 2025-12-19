@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { formatDate } from '@/lib/date'
 import { cn } from '@/lib/utils'
 
 import {
@@ -11,6 +12,7 @@ import {
   LECTURE_AUTH_STATUS_LABEL,
   type LectureAuthStatus,
   type LectureSummary,
+  type MutationOptions,
 } from '../../types/lecture.type'
 
 interface LectureTableProps {
@@ -19,8 +21,8 @@ interface LectureTableProps {
   currentPage: number
   pageSize: number
   onViewDetail: (lecture: LectureSummary) => void
-  onApprove: (lectureId: number) => void
-  onReject: (lectureId: number) => void
+  onApprove: (lectureId: number, options?: MutationOptions) => void
+  onReject: (lectureId: number, options?: MutationOptions) => void
 }
 
 function StatusBadge({ status }: { status: LectureAuthStatus }) {
@@ -29,15 +31,6 @@ function StatusBadge({ status }: { status: LectureAuthStatus }) {
       {LECTURE_AUTH_STATUS_LABEL[status]}
     </Badge>
   )
-}
-
-function formatDate(dateString: string) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
 }
 
 export function LectureTable({

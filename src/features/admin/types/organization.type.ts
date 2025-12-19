@@ -1,40 +1,19 @@
-/**
- * Organization 승인 상태
- */
-export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+import {
+  APPROVAL_STATUS_COLOR,
+  APPROVAL_STATUS_FILTER_LABEL,
+  APPROVAL_STATUS_LABEL,
+  type ApprovalStatus,
+  type ApprovalStatusFilter,
+  type MutationOptions,
+  type PageInfo,
+  type PageResponse,
+} from './approval.type'
 
-/**
- * Organization 필터 상태 (전체 포함)
- */
-export type ApprovalStatusFilter = ApprovalStatus | 'ALL'
+// 공통 타입 재export (기존 import문 호환성 유지)
+export type { ApprovalStatus, ApprovalStatusFilter, MutationOptions, PageInfo, PageResponse }
 
-/**
- * 승인 상태 한국어 라벨
- */
-export const APPROVAL_STATUS_LABEL: Record<ApprovalStatus, string> = {
-  PENDING: '승인대기',
-  APPROVED: '승인완료',
-  REJECTED: '반려',
-}
-
-/**
- * 필터 상태 한국어 라벨 (전체 포함)
- */
-export const APPROVAL_STATUS_FILTER_LABEL: Record<ApprovalStatusFilter, string> = {
-  ALL: '전체',
-  PENDING: '승인대기',
-  APPROVED: '승인완료',
-  REJECTED: '반려',
-}
-
-/**
- * 승인 상태 배지 색상
- */
-export const APPROVAL_STATUS_COLOR: Record<ApprovalStatus, string> = {
-  PENDING: 'bg-chart-4 text-foreground',
-  APPROVED: 'bg-emerald-400 text-white',
-  REJECTED: 'bg-destructive text-destructive-foreground',
-}
+// 공통 상수 재export (기존 이름 유지)
+export { APPROVAL_STATUS_LABEL, APPROVAL_STATUS_FILTER_LABEL, APPROVAL_STATUS_COLOR }
 
 /**
  * Organization 요약 정보 (목록용)
@@ -58,24 +37,6 @@ export interface OrganizationDetail {
   homepage: string | null
   createdAt: string
   updatedAt: string
-}
-
-/**
- * Spring Data Page 응답 - PageInfo
- */
-export interface PageInfo {
-  size: number
-  number: number // 현재 페이지 (0-indexed)
-  totalElements: number
-  totalPages: number
-}
-
-/**
- * 페이지네이션 응답
- */
-export interface PageResponse<T> {
-  content: T[]
-  page: PageInfo
 }
 
 /**

@@ -4,12 +4,14 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { formatDate } from '@/lib/date'
 import { cn } from '@/lib/utils'
 
 import {
   APPROVAL_STATUS_COLOR,
   APPROVAL_STATUS_LABEL,
   type ApprovalStatus,
+  type MutationOptions,
   type OrganizationSummary,
 } from '../../types/organization.type'
 
@@ -19,8 +21,8 @@ interface OrganizationTableProps {
   currentPage: number
   pageSize: number
   onViewDetail: (organization: OrganizationSummary) => void
-  onApprove: (organizationId: number) => void
-  onReject: (organizationId: number) => void
+  onApprove: (organizationId: number, options?: MutationOptions) => void
+  onReject: (organizationId: number, options?: MutationOptions) => void
 }
 
 function StatusBadge({ status }: { status: ApprovalStatus }) {
@@ -29,15 +31,6 @@ function StatusBadge({ status }: { status: ApprovalStatus }) {
       {APPROVAL_STATUS_LABEL[status]}
     </Badge>
   )
-}
-
-function formatDate(dateString: string) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
 }
 
 export function OrganizationTable({

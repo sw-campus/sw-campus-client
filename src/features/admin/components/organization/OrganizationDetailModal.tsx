@@ -19,6 +19,7 @@ import {
   APPROVAL_STATUS_COLOR,
   APPROVAL_STATUS_LABEL,
   type ApprovalStatus,
+  type MutationOptions,
   type OrganizationSummary,
 } from '../../types/organization.type'
 
@@ -26,8 +27,8 @@ interface OrganizationDetailModalProps {
   organization: OrganizationSummary | null
   isOpen: boolean
   onClose: () => void
-  onApprove: (organizationId: number) => void
-  onReject: (organizationId: number) => void
+  onApprove: (organizationId: number, options?: MutationOptions) => void
+  onReject: (organizationId: number, options?: MutationOptions) => void
   isApproving: boolean
   isRejecting: boolean
 }
@@ -63,13 +64,11 @@ export function OrganizationDetailModal({
   if (!organization) return null
 
   const handleApprove = () => {
-    onApprove(organization.id)
-    onClose()
+    onApprove(organization.id, { onSuccess: onClose })
   }
 
   const handleReject = () => {
-    onReject(organization.id)
-    onClose()
+    onReject(organization.id, { onSuccess: onClose })
   }
 
   return (

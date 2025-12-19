@@ -1,7 +1,7 @@
 import { api } from '@/lib/axios'
+import type { PageResponse } from '@/types/api.type'
 
 import type { LectureAuthStatus, LectureDetail, LectureSummary } from '../types/lecture.type'
-import type { PageResponse } from '../types/organization.type'
 
 /**
  * Lecture 목록 조회 API (페이징)

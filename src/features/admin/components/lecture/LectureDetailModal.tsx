@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { formatDate, formatTimeRange } from '@/lib/date'
 import { cn } from '@/lib/utils'
 
 import { useLectureDetailQuery } from '../../hooks/useLectures'
@@ -19,14 +20,15 @@ import {
   LECTURE_AUTH_STATUS_LABEL,
   type LectureAuthStatus,
   type LectureSummary,
+  type MutationOptions,
 } from '../../types/lecture.type'
 
 interface LectureDetailModalProps {
   lecture: LectureSummary | null
   isOpen: boolean
   onClose: () => void
-  onApprove: (lectureId: number) => void
-  onReject: (lectureId: number) => void
+  onApprove: (lectureId: number, options?: MutationOptions) => void
+  onReject: (lectureId: number, options?: MutationOptions) => void
   isApproving: boolean
   isRejecting: boolean
 }
@@ -48,21 +50,6 @@ function DetailRow({ label, value }: { label: string; value: string | number | n
   )
 }
 
-function formatDate(dateString: string | null | undefined) {
-  if (!dateString) return '-'
-  const date = new Date(dateString)
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
-}
-
-function formatTime(timeString: string | null | undefined) {
-  if (!timeString) return '-'
-  return timeString.substring(0, 5) // HH:mm
-}
-
 export function LectureDetailModal({
   lecture,
   isOpen,
@@ -77,13 +64,11 @@ export function LectureDetailModal({
   if (!lecture) return null
 
   const handleApprove = () => {
-    onApprove(lecture.lectureId)
-    onClose()
+    onApprove(lecture.lectureId, { onSuccess: onClose })
   }
 
   const handleReject = () => {
-    onReject(lecture.lectureId)
-    onClose()
+    onReject(lecture.lectureId, { onSuccess: onClose })
   }
 
   return (
@@ -125,7 +110,7 @@ export function LectureDetailModal({
                 <DetailRow label="모집 마감일" value={formatDate(detail?.deadline)} />
                 <DetailRow
                   label="수업 시간"
-                  value={`${formatTime(detail?.startTime)} ~ ${formatTime(detail?.endTime)}`}
+                  value={formatTimeRange(detail?.startTime, detail?.endTime)}
                 />
                 <DetailRow label="총 교육일수" value={detail?.totalDays ? `${detail.totalDays}일` : null} />
                 <DetailRow label="총 교육시간" value={detail?.totalTimes ? `${detail.totalTimes}시간` : null} />

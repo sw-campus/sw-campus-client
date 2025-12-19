@@ -1,40 +1,39 @@
-/**
- * Lecture 승인 상태
- */
-export type LectureAuthStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+import {
+  APPROVAL_STATUS_COLOR,
+  APPROVAL_STATUS_FILTER_LABEL,
+  APPROVAL_STATUS_LABEL,
+  type ApprovalStatus,
+  type ApprovalStatusFilter,
+  type MutationOptions,
+} from './approval.type'
 
 /**
- * Lecture 필터 상태 (전체 포함)
+ * Lecture 승인 상태 (ApprovalStatus 별칭 - 호환성 유지)
  */
-export type LectureAuthStatusFilter = LectureAuthStatus | 'ALL'
+export type LectureAuthStatus = ApprovalStatus
 
 /**
- * 승인 상태 한국어 라벨
+ * Lecture 필터 상태 (ApprovalStatusFilter 별칭 - 호환성 유지)
  */
-export const LECTURE_AUTH_STATUS_LABEL: Record<LectureAuthStatus, string> = {
-  PENDING: '승인대기',
-  APPROVED: '승인완료',
-  REJECTED: '반려',
-}
+export type LectureAuthStatusFilter = ApprovalStatusFilter
+
+// MutationOptions 타입 re-export
+export type { MutationOptions }
 
 /**
- * 필터 상태 한국어 라벨 (전체 포함)
+ * 승인 상태 한국어 라벨 (공통 상수 재사용)
  */
-export const LECTURE_AUTH_STATUS_FILTER_LABEL: Record<LectureAuthStatusFilter, string> = {
-  ALL: '전체',
-  PENDING: '승인대기',
-  APPROVED: '승인완료',
-  REJECTED: '반려',
-}
+export const LECTURE_AUTH_STATUS_LABEL = APPROVAL_STATUS_LABEL
 
 /**
- * 승인 상태 배지 색상
+ * 필터 상태 한국어 라벨 (공통 상수 재사용)
  */
-export const LECTURE_AUTH_STATUS_COLOR: Record<LectureAuthStatus, string> = {
-  PENDING: 'bg-chart-4 text-foreground',
-  APPROVED: 'bg-emerald-400 text-white',
-  REJECTED: 'bg-destructive text-destructive-foreground',
-}
+export const LECTURE_AUTH_STATUS_FILTER_LABEL = APPROVAL_STATUS_FILTER_LABEL
+
+/**
+ * 승인 상태 배지 색상 (공통 상수 재사용)
+ */
+export const LECTURE_AUTH_STATUS_COLOR = APPROVAL_STATUS_COLOR
 
 /**
  * Lecture 요약 정보 (목록용)

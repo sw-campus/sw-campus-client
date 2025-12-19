@@ -1,6 +1,7 @@
 import { api } from '@/lib/axios'
+import type { PageResponse } from '@/types/api.type'
 
-import type { ApprovalStatus, OrganizationDetail, OrganizationSummary, PageResponse } from '../types/organization.type'
+import type { ApprovalStatus, OrganizationDetail, OrganizationSummary } from '../types/organization.type'
 
 /**
  * Organization 목록 조회 API (페이징)
