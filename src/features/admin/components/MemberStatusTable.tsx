@@ -1,7 +1,9 @@
+import { MemberStatusData } from '..'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
-const mockData = [
+const mockData: MemberStatusData[] = [
   { status: '전체회원', count: 2500, color: 'bg-foreground' },
   { status: '활동중', count: 1800, color: 'bg-chart-1' },
   { status: '신규가입', count: 320, color: 'bg-chart-2' },
@@ -27,8 +29,8 @@ export function MemberStatusTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockData.map((row, index) => (
-              <TableRow key={index}>
+            {mockData.map(row => (
+              <TableRow key={row.status}>
                 <TableCell className="text-foreground font-medium">{row.status}</TableCell>
                 <TableCell>
                   <div className="bg-muted h-4 w-full overflow-hidden rounded-full">

@@ -1,10 +1,11 @@
 'use client'
 
+import { VisitorData } from '..'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-const mockData = [
+const mockData: VisitorData[] = [
   { date: '월', visitors: 120 },
   { date: '화', visitors: 150 },
   { date: '수', visitors: 180 },

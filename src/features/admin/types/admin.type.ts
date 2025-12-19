@@ -26,3 +26,9 @@ export interface SidebarMenuItem {
   href: string
   icon?: React.ReactNode
 }
+
+export interface DonutChartData {
+  name: string
+  value: number
+  color: string
+}

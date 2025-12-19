@@ -1,11 +1,12 @@
 'use client'
 
+import { SidebarMenuItem } from '..'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { cn } from '@/lib/utils'
 
-const menuItems = [
+const menuItems: SidebarMenuItem[] = [
   { label: '대시보드', href: '/admin' },
   { label: '회원관리', href: '/admin/members' },
   { label: '강의관리', href: '/admin/lectures' },
@@ -24,7 +25,7 @@ export function AdminSidebar() {
 
       <nav className="flex flex-1 flex-col gap-1 p-4">
         {menuItems.map(item => {
-          const isActive = pathname === item.href
+          const isActive = item.href === '/admin' ? pathname === item.href : pathname.startsWith(item.href)
 
           return (
             <Link

@@ -8,4 +8,11 @@ export { MemberStatusTable } from './components/MemberStatusTable'
 export { AdminDashboard } from './components/AdminDashboard'
 
 // Types
-export type { StatCardData, VisitorData, MemberStatusData, FeatureCardData, SidebarMenuItem } from './types/admin.type'
+export type {
+  StatCardData,
+  VisitorData,
+  MemberStatusData,
+  FeatureCardData,
+  SidebarMenuItem,
+  DonutChartData,
+} from './types/admin.type'

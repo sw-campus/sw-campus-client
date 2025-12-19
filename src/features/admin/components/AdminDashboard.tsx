@@ -9,10 +9,10 @@ import { StatCard } from './StatCard'
 import { VisitorLineChart } from './VisitorLineChart'
 
 const stats = [
-  { title: '회원관리', value: 2500, icon: <LuUsers className="h-6 w-6" /> },
-  { title: '강의관리', value: 382, icon: <LuBookOpen className="h-6 w-6" /> },
-  { title: '수료증관리', value: 156, icon: <LuAward className="h-6 w-6" /> },
-  { title: '리뷰관리', value: 94, icon: <LuStar className="h-6 w-6" /> },
+  { title: '회원관리', value: 2500, icon: LuUsers },
+  { title: '강의관리', value: 382, icon: LuBookOpen },
+  { title: '수료증관리', value: 156, icon: LuAward },
+  { title: '리뷰관리', value: 94, icon: LuStar },
 ]
 
 const features = [
@@ -20,25 +20,25 @@ const features = [
     title: '회원관리',
     description:
       "Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.",
-    icon: <LuUsers className="h-5 w-5" />,
+    icon: LuUsers,
   },
   {
     title: '강의관리',
     description:
       "Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.",
-    icon: <LuBookOpen className="h-5 w-5" />,
+    icon: LuBookOpen,
   },
   {
     title: '수료증관리',
     description:
       "Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.",
-    icon: <LuAward className="h-5 w-5" />,
+    icon: LuAward,
   },
   {
     title: '리뷰관리',
     description:
       "Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.",
-    icon: <LuStar className="h-5 w-5" />,
+    icon: LuStar,
   },
 ]
 
@@ -50,8 +50,8 @@ export function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
-          <StatCard key={index} title={stat.title} value={stat.value} icon={stat.icon} />
+        {stats.map(stat => (
+          <StatCard key={stat.title} title={stat.title} value={stat.value} icon={stat.icon} />
         ))}
       </div>
 
@@ -63,8 +63,13 @@ export function AdminDashboard() {
 
       {/* Feature Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {features.map((feature, index) => (
-          <FeatureCard key={index} title={feature.title} description={feature.description} icon={feature.icon} />
+        {features.map(feature => (
+          <FeatureCard
+            key={feature.title}
+            title={feature.title}
+            description={feature.description}
+            icon={feature.icon}
+          />
         ))}
       </div>
 
