@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { LuCheck, LuChevronLeft, LuChevronRight, LuClock, LuX } from 'react-icons/lu'
+import { LuCheck, LuChevronLeft, LuChevronRight, LuClock, LuList, LuX } from 'react-icons/lu'
 
 import { Button } from '@/components/ui/button'
 
@@ -11,7 +11,7 @@ import {
   useOrganizationsQuery,
   useRejectOrganizationMutation,
 } from '../../hooks/useOrganizations'
-import type { ApprovalStatus, OrganizationSummary } from '../../types/organization.type'
+import type { ApprovalStatus, ApprovalStatusFilter, OrganizationSummary } from '../../types/organization.type'
 import { StatCard } from '../StatCard'
 import { OrganizationDetailModal } from './OrganizationDetailModal'
 import { OrganizationFilter } from './OrganizationFilter'
@@ -20,21 +20,27 @@ import { OrganizationTable } from './OrganizationTable'
 const PAGE_SIZE = 10
 
 export function OrganizationApprovalPage() {
-  const [statusFilter, setStatusFilter] = useState<ApprovalStatus>('PENDING')
+  const [statusFilter, setStatusFilter] = useState<ApprovalStatusFilter>('ALL')
+  const [keyword, setKeyword] = useState('')
   const [currentPage, setCurrentPage] = useState(0)
   const [selectedOrg, setSelectedOrg] = useState<OrganizationSummary | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const { data: pageData, isLoading } = useOrganizationsQuery(statusFilter, currentPage)
+  // 필터 상태를 API 호출용으로 변환 (ALL -> undefined)
+  const apiStatus: ApprovalStatus | undefined = statusFilter === 'ALL' ? undefined : statusFilter
+
+  const { data: pageData, isLoading } = useOrganizationsQuery(apiStatus, keyword, currentPage)
   const approveMutation = useApproveOrganizationMutation()
   const rejectMutation = useRejectOrganizationMutation()
 
   // 상태별 통계 - 각 상태별 데이터 조회
-  const { data: pendingData } = useOrganizationsQuery('PENDING')
-  const { data: approvedData } = useOrganizationsQuery('APPROVED')
-  const { data: rejectedData } = useOrganizationsQuery('REJECTED')
+  const { data: allData } = useOrganizationsQuery(undefined, '')
+  const { data: pendingData } = useOrganizationsQuery('PENDING', '')
+  const { data: approvedData } = useOrganizationsQuery('APPROVED', '')
+  const { data: rejectedData } = useOrganizationsQuery('REJECTED', '')
 
   const stats = [
+    { title: '전체', value: allData?.page?.totalElements ?? 0, icon: LuList },
     { title: '승인 대기', value: pendingData?.page?.totalElements ?? 0, icon: LuClock },
     { title: '승인 완료', value: approvedData?.page?.totalElements ?? 0, icon: LuCheck },
     { title: '반려', value: rejectedData?.page?.totalElements ?? 0, icon: LuX },
@@ -58,9 +64,14 @@ export function OrganizationApprovalPage() {
     setSelectedOrg(null)
   }
 
-  const handleStatusChange = (status: ApprovalStatus | undefined) => {
-    setStatusFilter(status ?? 'PENDING')
+  const handleStatusChange = (status: ApprovalStatusFilter) => {
+    setStatusFilter(status)
     setCurrentPage(0) // 필터 변경 시 첫 페이지로
+  }
+
+  const handleKeywordChange = (newKeyword: string) => {
+    setKeyword(newKeyword)
+    setCurrentPage(0) // 검색어 변경 시 첫 페이지로
   }
 
   const totalPages = pageData?.page?.totalPages ?? 0
@@ -71,14 +82,19 @@ export function OrganizationApprovalPage() {
       <h1 className="text-foreground text-2xl font-bold">기관 회원 승인</h1>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map(stat => (
           <StatCard key={stat.title} title={stat.title} value={stat.value} icon={stat.icon} />
         ))}
       </div>
 
       {/* Filter */}
-      <OrganizationFilter currentStatus={statusFilter} onStatusChange={handleStatusChange} />
+      <OrganizationFilter
+        currentStatus={statusFilter}
+        keyword={keyword}
+        onStatusChange={handleStatusChange}
+        onKeywordChange={handleKeywordChange}
+      />
 
       {/* Table */}
       <OrganizationTable

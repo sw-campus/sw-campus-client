@@ -11,13 +11,14 @@ import type { ApprovalStatus } from '../types/organization.type'
 
 /**
  * Organization 목록 조회 Query Hook
- * @param status - 승인 상태 필터 (기본값: PENDING)
+ * @param status - 승인 상태 필터 (undefined면 전체)
+ * @param keyword - 검색 키워드 (기관명)
  * @param page - 페이지 번호 (0-indexed, 기본값: 0)
  */
-export function useOrganizationsQuery(status: ApprovalStatus = 'PENDING', page: number = 0) {
+export function useOrganizationsQuery(status?: ApprovalStatus, keyword?: string, page: number = 0) {
   return useQuery({
-    queryKey: ['admin', 'organizations', status, page],
-    queryFn: () => fetchOrganizations(status, page),
+    queryKey: ['admin', 'organizations', status ?? 'ALL', keyword ?? '', page],
+    queryFn: () => fetchOrganizations(status, keyword, page),
     staleTime: 1000 * 60 * 5, // 5분간 fresh 유지
   })
 }

@@ -4,17 +4,24 @@ import type { ApprovalStatus, OrganizationDetail, OrganizationSummary, PageRespo
 
 /**
  * Organization 목록 조회 API (페이징)
- * @param status - 승인 상태 필터 (기본값: PENDING)
+ * @param status - 승인 상태 필터 (undefined면 전체)
+ * @param keyword - 검색 키워드 (기관명)
  * @param page - 페이지 번호 (0-indexed)
  * @param size - 페이지 크기
  */
 export async function fetchOrganizations(
-  status: ApprovalStatus = 'PENDING',
+  status?: ApprovalStatus,
+  keyword?: string,
   page: number = 0,
   size: number = 10,
 ): Promise<PageResponse<OrganizationSummary>> {
   const { data } = await api.get<PageResponse<OrganizationSummary>>('/admin/organizations', {
-    params: { status, page, size },
+    params: {
+      ...(status && { status }),
+      ...(keyword && { keyword }),
+      page,
+      size,
+    },
   })
   return data
 }

@@ -4,9 +4,24 @@
 export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
 /**
+ * Organization 필터 상태 (전체 포함)
+ */
+export type ApprovalStatusFilter = ApprovalStatus | 'ALL'
+
+/**
  * 승인 상태 한국어 라벨
  */
 export const APPROVAL_STATUS_LABEL: Record<ApprovalStatus, string> = {
+  PENDING: '승인대기',
+  APPROVED: '승인완료',
+  REJECTED: '반려',
+}
+
+/**
+ * 필터 상태 한국어 라벨 (전체 포함)
+ */
+export const APPROVAL_STATUS_FILTER_LABEL: Record<ApprovalStatusFilter, string> = {
+  ALL: '전체',
   PENDING: '승인대기',
   APPROVED: '승인완료',
   REJECTED: '반려',
