@@ -75,7 +75,7 @@ export function ReviewDetailModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             리뷰 상세 정보
-            <StatusBadge status={review.reviewApprovalStatus} />
+            <StatusBadge status={detail?.approvalStatus ?? review.reviewApprovalStatus} />
           </DialogTitle>
           <DialogDescription>리뷰 내용을 확인하고 승인/반려를 결정하세요.</DialogDescription>
         </DialogHeader>
@@ -106,14 +106,32 @@ export function ReviewDetailModal({
             <div className="border-border rounded-lg border p-4">
               <h3 className="text-foreground mb-3 font-semibold">리뷰 내용</h3>
               <div className="bg-muted min-h-[100px] rounded-md p-3 text-sm whitespace-pre-wrap">
-                {detail?.content || '내용이 없습니다.'}
+                {detail?.comment || '내용이 없습니다.'}
               </div>
             </div>
+
+            {/* 상세 평가 항목 */}
+            {detail?.detailScores && detail.detailScores.length > 0 && (
+              <div className="border-border rounded-lg border p-4">
+                <h3 className="text-foreground mb-3 font-semibold">상세 평가</h3>
+                <div className="space-y-3">
+                  {detail.detailScores.map((ds, index) => (
+                    <div key={index} className="bg-muted space-y-2 rounded-md p-3 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold">{ds.category}</span>
+                        <span className="font-bold text-emerald-500">{ds.score}점</span>
+                      </div>
+                      <p className="text-muted-foreground">{ds.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         <DialogFooter>
-          {review.reviewApprovalStatus === 'PENDING' && (
+          {(detail?.approvalStatus ?? review.reviewApprovalStatus) === 'PENDING' && (
             <>
               <Button variant="outline" onClick={onClose}>
                 닫기

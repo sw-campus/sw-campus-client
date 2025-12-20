@@ -40,9 +40,30 @@ export interface ReviewSummary {
   createdAt: string
 }
 
+/**
+ * 상세 평가 항목 정보
+ */
+export interface DetailScore {
+  category: string
+  score: number
+  comment: string
+}
+
 // Review 상세 정보
-export interface ReviewDetail extends ReviewSummary {
-  content: string
+export interface ReviewDetail {
+  reviewId: number
+  lectureId: number
+  lectureName: string
+  memberId: number
+  userName: string
+  nickname: string
+  comment: string
+  score: number
+  approvalStatus: ReviewAuthStatus
+  certificateId: number
+  certificateApprovalStatus: ReviewAuthStatus
+  detailScores: DetailScore[]
+  createdAt: string
 }
 
 /**
