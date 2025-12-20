@@ -13,13 +13,14 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { FaStar } from 'react-icons/fa'
-import { FiCheckCircle, FiFileText, FiGrid, FiSearch, FiFilter } from 'react-icons/fi'
+import { FiCheckCircle, FiFileText, FiGrid, FiSearch, FiFilter, FiXCircle } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
-import { cn } from '@/lib/utils'
+
+import { StatCard } from './StatCard'
 
 // --- Types ---
 export type Review = {
@@ -33,7 +34,7 @@ export type Review = {
 }
 
 // --- Mock Data ---
-const data: Review[] = Array.from({ length: 15 }).map((_, i) => ({
+const data: Review[] = Array.from({ length: 45 }).map((_, i) => ({
   id: `rev-${i}`,
   title: `강의가 정말 도움이 많이 되었습니다 #${i + 1}`,
   description:
@@ -41,7 +42,7 @@ const data: Review[] = Array.from({ length: 15 }).map((_, i) => ({
   rating: 5,
   author: `user${i}@example.com`,
   createdAt: '2024-03-15',
-  status: i % 3 === 0 ? 'pending' : 'approved',
+  status: i % 4 === 0 ? 'pending' : i % 4 === 1 ? 'approved' : i % 4 === 2 ? 'rejected' : 'approved',
 }))
 
 // --- Columns ---
@@ -95,36 +96,27 @@ const columns: ColumnDef<Review>[] = [
 
 // --- Components ---
 
-function StatCard({
-  icon: Icon,
-  title,
-  count,
-  colorClass,
-}: {
-  icon: React.ElementType
-  title: string
-  count: number
-  colorClass: string
-}) {
-  return (
-    <div className="flex flex-1 items-center gap-4 rounded-xl border border-white/20 bg-white/40 p-6 shadow-sm backdrop-blur-md transition-transform hover:scale-[1.02]">
-      <div className={cn('flex h-12 w-12 items-center justify-center rounded-lg text-white shadow-md', colorClass)}>
-        <Icon size={24} />
-      </div>
-      <div className="flex flex-col">
-        <span className="text-sm font-medium text-gray-500">{title}</span>
-        <span className="text-2xl font-bold text-gray-800">{count}건</span>
-      </div>
-    </div>
-  )
-}
-
 export function ReviewTable() {
   const [sorting, setSorting] = useState<SortingState>([])
   const [rowSelection, setRowSelection] = useState({})
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all')
+
+  const filteredData = React.useMemo(() => {
+    if (statusFilter === 'all') return data
+    return data.filter(item => item.status === statusFilter)
+  }, [statusFilter])
+
+  const stats = React.useMemo(() => {
+    return {
+      all: data.length,
+      pending: data.filter(r => r.status === 'pending').length,
+      approved: data.filter(r => r.status === 'approved').length,
+      rejected: data.filter(r => r.status === 'rejected').length,
+    }
+  }, [])
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -148,9 +140,38 @@ export function ReviewTable() {
 
       {/* Stats Cards */}
       <div className="flex flex-wrap gap-4">
-        <StatCard icon={FiFileText} title="승인 대기 중인 리뷰" count={17} colorClass="bg-orange-400" />
-        <StatCard icon={FiCheckCircle} title="승인 완료된 리뷰" count={231} colorClass="bg-emerald-500" />
-        <StatCard icon={FiGrid} title="전체 리뷰" count={248} colorClass="bg-blue-500" />
+        <StatCard
+          icon={FiGrid}
+          title="전체 리뷰"
+          count={stats.all}
+          color="blue"
+          active={statusFilter === 'all'}
+          onClick={() => setStatusFilter('all')}
+        />
+        <StatCard
+          icon={FiFileText}
+          title="승인 대기"
+          count={stats.pending}
+          color="orange"
+          active={statusFilter === 'pending'}
+          onClick={() => setStatusFilter('pending')}
+        />
+        <StatCard
+          icon={FiCheckCircle}
+          title="승인 완료"
+          count={stats.approved}
+          color="emerald"
+          active={statusFilter === 'approved'}
+          onClick={() => setStatusFilter('approved')}
+        />
+        <StatCard
+          icon={FiXCircle}
+          title="승인 거절"
+          count={stats.rejected}
+          color="rose"
+          active={statusFilter === 'rejected'}
+          onClick={() => setStatusFilter('rejected')}
+        />
       </div>
 
       {/* Main Content Area */}
@@ -158,7 +179,7 @@ export function ReviewTable() {
         {/* Table Header / Toolbar */}
         <div className="mb-6 flex items-center justify-between">
           <h3 className="text-lg font-bold text-gray-800">
-            리뷰 목록 <span className="ml-1 text-sm font-normal text-gray-500">({data.length})</span>
+            리뷰 목록 <span className="ml-1 text-sm font-normal text-gray-500">({filteredData.length})</span>
           </h3>
           <div className="flex gap-2">
             <div className="relative">
