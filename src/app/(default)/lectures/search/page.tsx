@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -33,7 +33,7 @@ import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLecture
 const filterSelectTriggerClass =
   'flex items-center justify-between gap-1 rounded-full border border-input bg-background px-3 py-1 text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
 
-export default function LectureSearchPage() {
+function SearchContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -491,5 +491,13 @@ export default function LectureSearchPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function LectureSearchPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+      <SearchContent />
+    </Suspense>
   )
 }

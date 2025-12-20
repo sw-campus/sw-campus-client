@@ -38,9 +38,8 @@ jobs:
 
       - name: Build and push image
         run: |
-          docker build \
-            -t ghcr.io/sw-campus/sw-campus-client:${{ steps.tag.outputs.tag }} \
-            -t ghcr.io/sw-campus/sw-campus-client:latest \
-            .
-          docker push ghcr.io/sw-campus/sw-campus-client:${{ steps.tag.outputs.tag }}
-          docker push ghcr.io/sw-campus/sw-campus-client:latest
+          IMAGE="ghcr.io/sw-campus/sw-campus-client"
+          TAG="${{ steps.tag.outputs.tag }}"
+
+          docker build -t $IMAGE:$TAG .
+          docker push $IMAGE:$TAG

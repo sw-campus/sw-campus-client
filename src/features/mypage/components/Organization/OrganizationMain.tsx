@@ -1,6 +1,13 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
+import Image from 'next/image'
+
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import ReviewListModal from '@/features/mypage/components/Organization/ReviewListModal'
+import { api } from '@/lib/axios'
 
 type OrganizationMainProps = {
   isOrgPasswordOpen: boolean
@@ -8,32 +15,72 @@ type OrganizationMainProps = {
   onOpenProductModal: () => void
 }
 
-const dashboardStats = [
-  { label: '등록 대기', value: '1개', note: '내부 승인 대기중' },
-  { label: '반려된 교육과정', value: '2개', note: '이번 분기 시작 예정' },
-  { label: '승인된 교육과정', value: '5개', note: '평균 수강률 86%' },
-]
-
 export default function OrganizationMain({
   isOrgPasswordOpen,
   openInfoModal,
   onOpenProductModal,
 }: OrganizationMainProps) {
+  type Lecture = {
+    lectureId: number
+    lectureName: string
+    lectureImageUrl?: string
+    lectureAuthStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
+    status: string
+    createdAt: string
+    updatedAt: string
+    canEdit: boolean
+  }
+
+  const [lectures, setLectures] = useState<Lecture[] | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [reviewModalOpen, setReviewModalOpen] = useState(false)
+  const [reviewLectureId, setReviewLectureId] = useState<number | null>(null)
+  const [reviewLectureName, setReviewLectureName] = useState<string | undefined>(undefined)
+
+  const totalCount = lectures?.length ?? 0
+  const approvedCount = lectures?.filter(l => l.lectureAuthStatus === 'APPROVED').length ?? 0
+  const rejectedCount = lectures?.filter(l => l.lectureAuthStatus === 'REJECTED').length ?? 0
+
+  useEffect(() => {
+    let cancelled = false
+    const fetchLectures = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const { data } = await api.get<Lecture[]>('/mypage/lectures')
+        if (!cancelled) setLectures(Array.isArray(data) ? data : [])
+      } catch {
+        if (!cancelled) setError('강의 목록을 불러오지 못했습니다.')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    fetchLectures()
+    return () => {
+      cancelled = true
+    }
+  }, [])
   if (isOrgPasswordOpen) {
     return (
-      <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-neutral-600/80 p-6 shadow-black/40">
-        <header>
-          <h3 className="text-2xl font-semibold text-white">비밀번호 확인</h3>
-          <p className="mt-1 text-sm text-white/70">기업 정보 수정을 위해 비밀번호를 입력해주세요.</p>
+      <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-white/60 p-6 shadow-black/40">
+        {/* Header Card */}
+        <header className="rounded-2xl bg-white/70 px-5 py-4 ring-1 ring-white/30 backdrop-blur-xl">
+          <h3 className="text-2xl font-semibold text-gray-900">비밀번호 확인</h3>
+          <p className="mt-1 text-sm text-gray-600">기업 정보 수정을 위해 비밀번호를 입력해주세요.</p>
         </header>
 
-        <div className="max-w-sm">
+        {/* Form Card */}
+        <div className="mx-auto max-w-sm rounded-2xl bg-white/70 p-5 ring-1 ring-white/30 backdrop-blur-xl">
           <input
             type="password"
             placeholder="비밀번호 입력"
-            className="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-white placeholder-white/40 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-orange-100"
           />
-          <Button className="mt-4 w-full" onClick={openInfoModal}>
+          <Button
+            className="mt-4 w-full rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
+            onClick={openInfoModal}
+          >
             확인
           </Button>
         </div>
@@ -42,26 +89,154 @@ export default function OrganizationMain({
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-neutral-600/80 p-6 shadow-black/40">
-      <header className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-white/80">조직 전용 교육과정 공간</p>
-          <h3 className="text-2xl font-semibold text-white">교육과정 관리</h3>
+    <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-white/60 p-6 shadow-black/40">
+      {/* Header Card */}
+      <header className="rounded-2xl bg-white/70 px-5 py-4 ring-1 ring-white/30 backdrop-blur-xl">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-600">조직 전용 교육과정 공간</p>
+            <h3 className="text-2xl font-semibold text-gray-900">교육과정 관리</h3>
+          </div>
+          <Button
+            className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
+            onClick={onOpenProductModal}
+          >
+            교육과정 등록
+          </Button>
         </div>
-        <Button onClick={onOpenProductModal}>교육과정 등록</Button>
       </header>
-
-      <section className="rounded-2xl bg-white/10 p-5 text-white/80">
+      {/* Stats cards */}
+      <section className="rounded-2xl bg-white/70 p-5 text-gray-700 ring-1 ring-white/30 backdrop-blur-xl">
         <div className="grid gap-4 sm:grid-cols-3">
-          {dashboardStats.map(stat => (
-            <article key={stat.label} className="rounded-xl bg-white/5 p-4">
-              <p className="text-xs text-white/60 uppercase">{stat.label}</p>
-              <p className="text-2xl font-semibold">{stat.value}</p>
-              <p className="mt-1 text-sm text-white/60">{stat.note}</p>
-            </article>
-          ))}
+          <article className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5">
+            <p className="text-xs text-gray-500 uppercase">총 강의</p>
+            <p className="text-2xl font-semibold text-gray-900">{totalCount}</p>
+          </article>
+          <article className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5">
+            <p className="text-xs text-gray-500 uppercase">승인됨</p>
+            <p className="text-2xl font-semibold text-gray-900">{approvedCount}</p>
+          </article>
+          <article className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5">
+            <p className="text-xs text-gray-500 uppercase">반려됨</p>
+            <p className="text-2xl font-semibold text-gray-900">{rejectedCount}</p>
+          </article>
         </div>
       </section>
+
+      <section className="rounded-2xl bg-white/70 p-5 text-gray-700 ring-1 ring-white/30 backdrop-blur-xl">
+        <header className="mb-3">
+          <h4 className="text-lg font-semibold text-gray-900">내 강의 목록</h4>
+        </header>
+        {loading && <p className="text-gray-600">불러오는 중...</p>}
+        {error && !loading && (
+          <div className="flex items-center gap-3 text-red-600">
+            <p>{error}</p>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={async () => {
+                try {
+                  setLoading(true)
+                  setError(null)
+                  const { data } = await api.get<Lecture[]>('/mypage/lectures')
+                  setLectures(Array.isArray(data) ? data : [])
+                } catch {
+                  setError('강의 목록을 불러오지 못했습니다.')
+                } finally {
+                  setLoading(false)
+                }
+              }}
+            >
+              다시 시도
+            </Button>
+          </div>
+        )}
+
+        {!loading && !error && (lectures?.length ?? 0) === 0 && (
+          <p className="text-gray-600">등록된 강의가 없습니다.</p>
+        )}
+
+        {!loading && !error && (lectures?.length ?? 0) > 0 && (
+          <ul className="space-y-3">
+            {lectures!.map(l => {
+              const statusMap: Record<
+                string,
+                { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+              > = {
+                APPROVED: { label: '승인 완료', variant: 'default' },
+                PENDING: { label: '승인 대기', variant: 'secondary' },
+                REJECTED: { label: '반려', variant: 'destructive' },
+              }
+              const status = statusMap[l.lectureAuthStatus] ?? {
+                label: l.lectureAuthStatus,
+                variant: 'outline' as const,
+              }
+              return (
+                <li
+                  key={l.lectureId}
+                  className="rounded-2xl border border-white/10 bg-white/90 p-4 text-neutral-900 shadow-sm ring-1 ring-black/5 sm:p-5"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-white">
+                        {l.lectureImageUrl ? (
+                          <Image src={l.lectureImageUrl} alt={l.lectureName} fill className="object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-gray-50 text-sm font-semibold text-gray-600">
+                            {l.lectureName.charAt(0)}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">코스</p>
+                        <p className="text-base font-semibold text-gray-900">{l.lectureName}</p>
+                        <p className="mt-0.5 text-xs text-gray-500">상태: {l.status}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                        {status.label}
+                      </Badge>
+                      {(() => {
+                        const isRejected = l.lectureAuthStatus === 'REJECTED'
+                        const isApproved = l.lectureAuthStatus === 'APPROVED'
+                        const canEdit = isRejected && l.canEdit
+                        const label = isRejected ? '강의 수정' : '리뷰 관리'
+                        const enabled = (isApproved && true) || canEdit
+                        return (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100 disabled:opacity-50"
+                            disabled={!enabled}
+                            onClick={() => {
+                              if (!enabled) return
+                              if (isApproved) {
+                                setReviewLectureId(l.lectureId)
+                                setReviewLectureName(l.lectureName)
+                                setReviewModalOpen(true)
+                                return
+                              }
+                            }}
+                          >
+                            {label}
+                          </Button>
+                        )
+                      })()}
+                    </div>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </section>
+      <ReviewListModal
+        open={reviewModalOpen}
+        onOpenChange={setReviewModalOpen}
+        lectureId={reviewLectureId}
+        lectureName={reviewLectureName}
+      />
     </main>
   )
 }

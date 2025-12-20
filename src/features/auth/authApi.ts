@@ -126,8 +126,9 @@ export const organizationSignupSchema = baseSignupSchema.extend({
 
 // OAuth 로그인 (Google / GitHub)
 export const oauthLogin = async (provider: 'google' | 'github', code: string): Promise<OAuthLoginResponse> => {
+  const safeCode = encodeURIComponent(code)
   const res = await api.post<OAuthLoginResponse>(`/auth/oauth/${provider}`, {
-    code,
+    code: safeCode,
   })
   return res.data
 }
