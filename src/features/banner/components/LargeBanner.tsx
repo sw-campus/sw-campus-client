@@ -4,23 +4,33 @@ import Image from 'next/image'
 import Link from 'next/link'
 import 'swiper/css'
 import 'swiper/css/pagination'
-import { Pagination, Autoplay } from 'swiper/modules'
+import { Autoplay, Pagination } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-const banners = [
-  { src: '/images/large-banner/banner-1.png', bg: '#B7DFFF', href: '/' },
-  { src: '/images/large-banner/banner-2.png', bg: '#000000', href: '/' },
-  { src: '/images/large-banner/banner-3.png', bg: '#FFFFFF', href: '/' },
-  { src: '/images/large-banner/banner-4.jpg', bg: '#EB6E44', href: '/' },
-]
+import { useBannersByTypeQuery } from '../hooks/useBannerQuery'
 
 export default function LargeBanner() {
+  const { data: banners, isLoading } = useBannersByTypeQuery('BIG')
+
+  // 로딩 중이거나 데이터 없으면 빈 상태 표시
+  if (isLoading) {
+    return (
+      <div className="mx-auto mt-6 flex h-[210px] w-full max-w-7xl items-center justify-center overflow-hidden rounded-3xl bg-muted">
+        <div className="text-muted-foreground">배너 로딩 중...</div>
+      </div>
+    )
+  }
+
+  if (!banners || banners.length === 0) {
+    return null
+  }
+
   return (
     <div className="mx-auto mt-6 w-full max-w-7xl overflow-hidden rounded-3xl">
       <Swiper
         modules={[Pagination, Autoplay]}
         slidesPerView={1}
-        loop
+        loop={banners.length > 1}
         pagination={{ clickable: true }}
         autoplay={{
           delay: 3000,
@@ -28,20 +38,23 @@ export default function LargeBanner() {
         }}
       >
         {banners.map((banner, index) => (
-          <SwiperSlide key={index}>
-            <Link href={banner.href}>
-              <div
-                className="relative flex w-full items-center justify-center sm:p-10"
-                style={{ backgroundColor: banner.bg }}
-              >
+          <SwiperSlide key={banner.id}>
+            <Link href={`/lectures/${banner.lectureId}`}>
+              <div className="relative flex w-full items-center justify-center bg-muted sm:p-10">
                 <div className="relative mx-auto h-[130px] w-full">
-                  <Image
-                    src={banner.src}
-                    alt={`banner-${index}`}
-                    fill
-                    className="object-contain"
-                    priority={index === 0}
-                  />
+                  {banner.imageUrl ? (
+                    <Image
+                      src={banner.imageUrl}
+                      alt={banner.lectureName}
+                      fill
+                      className="object-contain"
+                      priority={index === 0}
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <span className="text-xl font-bold">{banner.lectureName}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </Link>

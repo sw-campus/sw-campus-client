@@ -1,55 +1,138 @@
+'use client'
+
+import { useRef } from 'react'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import type { Swiper as SwiperType } from 'swiper'
+import 'swiper/css'
+import { Swiper, SwiperSlide } from 'swiper/react'
 
 import SmallBanner from '@/features/banner/components/SmallBanner'
 
-const data = [
-  {
-    academy: '멋쟁이사자처럼',
-    title: '유니티 게임 개발 7기',
-    desc: '상상하던 게임을 실제로 개발하는 부트캠프에 합류해요 🔥',
-    date: '12/30',
-    thumbnail: '/images/mid-banner/banner-unity.png',
-    href: '/',
-  },
-  {
-    academy: '내일배움캠프',
-    title: '콘텐츠 마케터 부트캠프 3기',
-    desc: '사람들의 마음을 움직이는 콘텐츠 마케터 커리어 시작!',
-    date: '12/29',
-    thumbnail: '/images/mid-banner/banner-marketing.png',
-    href: '/',
-  },
-]
+import { useBannersByTypeQuery } from '../hooks/useBannerQuery'
+
+/**
+ * 날짜 포맷팅 (MM/DD 형식)
+ */
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  return `${month}/${day}`
+}
+
+/**
+ * 모집 유형에 따른 태그 텍스트
+ */
+function getRecruitTag(recruitType: string): string {
+  switch (recruitType) {
+    case 'CARD_REQUIRED':
+      return '무료(내배카)'
+    case 'CARD_NOT_REQUIRED':
+      return '무료'
+    default:
+      return '무료'
+  }
+}
 
 export default function MidBanner() {
-  return (
-    <div className="custom-container">
-      <div className="custom-card">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {data.map((item, idx) => (
-            <Link href={item.href} key={idx} className="block">
-              <div className="flex h-[190px] items-center justify-between rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
-                <div className="flex min-w-0 flex-col">
-                  <div className="font-semibold text-orange-600">{item.academy}</div>
-                  <div>
-                    <div className="mt-1 truncate text-lg font-bold">{item.title}</div>
-                    <div className="mt-1 truncate rounded-xl bg-gray-100 px-3 py-2 pr-4 text-sm">{item.desc}</div>
-                  </div>
-                  <div className="mt-1 text-sm text-gray-600">{item.date} 개강 · 무료</div>
-                </div>
+  const swiperRef = useRef<SwiperType | null>(null)
+  const { data: banners, isLoading } = useBannersByTypeQuery('SMALL')
 
-                {/* 오른쪽 이미지 */}
-                <Image
-                  src={item.thumbnail}
-                  width={95}
-                  height={95}
-                  alt=""
-                  className="h-[95px] w-[95px] shrink-0 rounded-xl object-cover"
-                />
-              </div>
-            </Link>
-          ))}
+  if (isLoading) {
+    return (
+      <div className="custom-container">
+        <div className="custom-card">
+          <div className="flex gap-4 overflow-visible">
+            {[0, 1].map(i => (
+              <div
+                key={i}
+                className="flex h-[190px] w-[calc(50%-8px)] shrink-0 animate-pulse items-center justify-between rounded-2xl border border-gray-200 bg-muted p-8"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!banners || banners.length === 0) {
+    return null
+  }
+
+  return (
+    <div className="custom-container overflow-visible">
+      <div className="custom-card overflow-visible">
+        {/* 중형 배너 슬라이더 */}
+        <div className="relative">
+          <Swiper
+            onBeforeInit={swiper => {
+              swiperRef.current = swiper
+            }}
+            loop={banners.length > 2}
+            spaceBetween={16}
+            slidesPerView={2}
+            breakpoints={{
+              0: { slidesPerView: 1 },
+              768: { slidesPerView: 2 },
+              1024: { slidesPerView: 2 },
+            }}
+          >
+            {banners.map(banner => (
+              <SwiperSlide key={banner.id}>
+                <Link href={`/lectures/${banner.lectureId}`} className="block">
+                  <div className="flex h-[220px] items-center justify-between rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
+                    <div className="flex min-w-0 flex-col">
+                      {/* 기관명 - 주황색 */}
+                      <div className="font-semibold text-orange-600">{banner.orgName ?? ''}</div>
+
+                      {/* 강의명 */}
+                      <div className="mt-1 line-clamp-2 text-lg font-bold">{banner.lectureName}</div>
+
+                      {/* 설명 - 회색 배경 라운드 박스 */}
+                      <div className="mt-2 line-clamp-2 rounded-xl bg-gray-100 px-3 py-2 text-sm">
+                        {banner.content}
+                      </div>
+
+                      {/* 개강일 */}
+                      <div className="mt-2 text-sm text-gray-600">
+                        {formatDate(banner.lectureStartAt)} 개강 · {getRecruitTag(banner.recruitType)}
+                      </div>
+                    </div>
+
+                    {/* 오른쪽 이미지 */}
+                    {banner.imageUrl && (
+                      <Image
+                        src={banner.imageUrl}
+                        width={95}
+                        height={95}
+                        alt={banner.lectureName}
+                        className="h-[95px] w-[95px] shrink-0 rounded-xl object-cover"
+                      />
+                    )}
+                  </div>
+                </Link>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+          {/* 커스텀 네비게이션 버튼 */}
+          <button
+            onClick={() => swiperRef.current?.slidePrev()}
+            className="absolute top-1/2 left-0 z-10 -translate-x-4 -translate-y-1/2 rounded-full bg-white/80 p-2.5 shadow-lg transition-all hover:scale-110 hover:text-orange-400 active:scale-95"
+            aria-label="이전 슬라이드"
+          >
+            <FiChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => swiperRef.current?.slideNext()}
+            className="absolute top-1/2 right-0 z-10 translate-x-4 -translate-y-1/2 rounded-full bg-white/80 p-2.5 shadow-lg transition-all hover:scale-110 hover:text-orange-400 active:scale-95"
+            aria-label="다음 슬라이드"
+          >
+            <FiChevronRight className="h-5 w-5" />
+          </button>
         </div>
 
         {/* 작은 배너 */}
