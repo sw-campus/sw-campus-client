@@ -49,11 +49,11 @@ function formatDate(dateString: string): string {
 function getRecruitTag(recruitType: string): string {
   switch (recruitType) {
     case 'CARD_REQUIRED':
-      return '무료(내배카)'
-    case 'CARD_NOT_REQUIRED':
-      return '무료'
+      return '내배카 필요 O'
+    case 'GENERAL':
+      return '내배카 필요 X'
     default:
-      return '무료'
+      return ''
   }
 }
 
