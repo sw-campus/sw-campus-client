@@ -74,6 +74,15 @@ export interface ReviewListResponse {
   totalCount: number
 }
 
+/**
+ * Review 승인/반려 응답 형식
+ */
+export interface ReviewApprovalResponse {
+  reviewId: number
+  approvalStatus: ReviewAuthStatus
+  message: string
+}
+
 // Review 목록 조회 파라미터
 export interface ReviewListParams {
   status?: ReviewAuthStatus

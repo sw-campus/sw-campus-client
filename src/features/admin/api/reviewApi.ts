@@ -1,7 +1,12 @@
+import type {
+  ReviewApprovalResponse,
+  ReviewAuthStatus,
+  ReviewDetail,
+  ReviewListResponse,
+  ReviewSummary,
+} from '@/features/admin/types/review.type'
 import { api } from '@/lib/axios'
 import type { PageResponse } from '@/types/api.type'
-
-import type { ReviewAuthStatus, ReviewDetail, ReviewListResponse, ReviewSummary } from '../types/review.type'
 
 /**
  * Review 목록 조회 API (페이징)
@@ -44,13 +49,15 @@ export async function fetchReviewDetail(reviewId: number): Promise<ReviewDetail>
 /**
  * Review 승인 API
  */
-export async function approveReview(reviewId: number): Promise<void> {
-  await api.patch(`/admin/reviews/${reviewId}/approve`)
+export async function approveReview(reviewId: number): Promise<ReviewApprovalResponse> {
+  const { data } = await api.patch<ReviewApprovalResponse>(`/admin/reviews/${reviewId}/approve`)
+  return data
 }
 
 /**
  * Review 반려 API
  */
-export async function rejectReview(reviewId: number): Promise<void> {
-  await api.patch(`/admin/reviews/${reviewId}/reject`)
+export async function rejectReview(reviewId: number): Promise<ReviewApprovalResponse> {
+  const { data } = await api.patch<ReviewApprovalResponse>(`/admin/reviews/${reviewId}/reject`)
+  return data
 }

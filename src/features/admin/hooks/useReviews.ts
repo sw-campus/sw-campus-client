@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { approveReview, fetchReviewDetail, fetchReviews, rejectReview } from '../api/reviewApi'
-import type { ReviewAuthStatus } from '../types/review.type'
+import { approveReview, fetchReviewDetail, fetchReviews, rejectReview } from '@/features/admin/api/reviewApi'
+import type { ReviewAuthStatus } from '@/features/admin/types/review.type'
 
 // Review 목록 조회 Query Hook
 export function useReviewsQuery(status?: ReviewAuthStatus, keyword?: string, page: number = 0) {
@@ -29,9 +29,9 @@ export function useApproveReviewMutation() {
 
   return useMutation({
     mutationFn: approveReview,
-    onSuccess: () => {
+    onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
-      toast.success('리뷰가 승인되었습니다.')
+      toast.success(data.message)
     },
   })
 }
@@ -42,9 +42,9 @@ export function useRejectReviewMutation() {
 
   return useMutation({
     mutationFn: rejectReview,
-    onSuccess: () => {
+    onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
-      toast.success('리뷰가 반려되었습니다.')
+      toast.success(data.message)
     },
   })
 }

@@ -4,16 +4,15 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { formatDate } from '@/lib/date'
-import { cn } from '@/lib/utils'
-
 import {
   REVIEW_AUTH_STATUS_COLOR,
   REVIEW_AUTH_STATUS_LABEL,
   type MutationOptions,
   type ReviewAuthStatus,
   type ReviewSummary,
-} from '../../types/review.type'
+} from '@/features/admin/types/review.type'
+import { formatDate } from '@/lib/date'
+import { cn } from '@/lib/utils'
 
 interface ReviewTableProps {
   reviews: ReviewSummary[]

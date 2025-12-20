@@ -14,6 +14,7 @@ import { useReviewDetailQuery } from '@/features/admin/hooks/useReviews'
 import {
   REVIEW_AUTH_STATUS_COLOR,
   REVIEW_AUTH_STATUS_LABEL,
+  type DetailScore,
   type MutationOptions,
   type ReviewAuthStatus,
   type ReviewSummary,
@@ -115,7 +116,7 @@ export function ReviewDetailModal({
               <div className="border-border rounded-lg border p-4">
                 <h3 className="text-foreground mb-3 font-semibold">상세 평가</h3>
                 <div className="space-y-3">
-                  {detail.detailScores.map((ds, index) => (
+                  {detail.detailScores.map((ds: DetailScore, index: number) => (
                     <div key={index} className="bg-muted space-y-2 rounded-md p-3 text-sm">
                       <div className="flex items-center justify-between">
                         <span className="font-semibold">{ds.category}</span>
