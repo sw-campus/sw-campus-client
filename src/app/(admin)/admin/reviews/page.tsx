@@ -1,5 +1,5 @@
 import { AdminSidebar } from '@/features/admin'
-import { ReviewTable } from '@/features/review/components/ReviewTable'
+import { ReviewApprovalPage } from '@/features/admin/components/review/ReviewApprovalPage'
 
 export default function AdminReviewPage() {
   return (
@@ -7,7 +7,7 @@ export default function AdminReviewPage() {
       <div className="custom-container">
         <div className="custom-card flex gap-6">
           <AdminSidebar />
-          <ReviewTable />
+          <ReviewApprovalPage />
         </div>
       </div>
     </>
