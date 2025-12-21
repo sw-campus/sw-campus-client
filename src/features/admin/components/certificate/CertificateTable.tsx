@@ -3,47 +3,39 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  REVIEW_AUTH_STATUS_COLOR,
+  REVIEW_AUTH_STATUS_LABEL,
+  type ReviewAuthStatus,
+  type ReviewSummary,
+} from '@/features/admin/types/review.type'
 import { formatDate } from '@/lib/date'
 import { cn } from '@/lib/utils'
 
-import {
-  APPROVAL_STATUS_COLOR,
-  APPROVAL_STATUS_LABEL,
-  type ApprovalStatus,
-  type OrganizationSummary,
-} from '../../types/organization.type'
-
-interface OrganizationTableProps {
-  organizations: OrganizationSummary[]
+interface CertificateTableProps {
+  items: ReviewSummary[]
   isLoading: boolean
   currentPage: number
   pageSize: number
-  onViewDetail: (organization: OrganizationSummary) => void
+  onViewDetail: (item: ReviewSummary) => void
 }
 
-function StatusBadge({ status }: { status: ApprovalStatus }) {
+function StatusBadge({ status }: { status: ReviewAuthStatus }) {
   return (
-    <Badge variant="secondary" className={cn('font-medium', APPROVAL_STATUS_COLOR[status])}>
-      {APPROVAL_STATUS_LABEL[status]}
+    <Badge variant="secondary" className={cn('font-medium', REVIEW_AUTH_STATUS_COLOR[status])}>
+      {REVIEW_AUTH_STATUS_LABEL[status]}
     </Badge>
   )
 }
 
-export function OrganizationTable({
-  organizations,
-  isLoading,
-  currentPage,
-  pageSize,
-  onViewDetail,
-}: OrganizationTableProps) {
-  // 페이지 기반 NO 계산
+export function CertificateTable({ items, isLoading, currentPage, pageSize, onViewDetail }: CertificateTableProps) {
   const getRowNumber = (index: number) => currentPage * pageSize + index + 1
 
   if (isLoading) {
     return (
       <Card className="bg-card">
         <CardHeader>
-          <CardTitle className="text-foreground">기관 회원 목록</CardTitle>
+          <CardTitle className="text-foreground">수료증 목록</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex h-32 items-center justify-center">
@@ -54,15 +46,15 @@ export function OrganizationTable({
     )
   }
 
-  if (organizations.length === 0) {
+  if (items.length === 0) {
     return (
       <Card className="bg-card">
         <CardHeader>
-          <CardTitle className="text-foreground">기관 회원 목록</CardTitle>
+          <CardTitle className="text-foreground">수료증 목록</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex h-32 items-center justify-center">
-            <span className="text-muted-foreground">해당 조건의 기관 회원이 없습니다.</span>
+            <span className="text-muted-foreground">해당 조건의 수료증이 없습니다.</span>
           </div>
         </CardContent>
       </Card>
@@ -72,33 +64,37 @@ export function OrganizationTable({
   return (
     <Card className="bg-card">
       <CardHeader>
-        <CardTitle className="text-foreground">기관 회원 목록</CardTitle>
+        <CardTitle className="text-foreground">수료증 목록</CardTitle>
       </CardHeader>
       <CardContent>
         <Table className="table-fixed">
           <TableHeader>
             <TableRow>
               <TableHead className="w-[60px]">NO</TableHead>
-              <TableHead>기관명</TableHead>
+              <TableHead className="w-[200px]">작성자</TableHead>
+              <TableHead>강의명</TableHead>
               <TableHead className="w-[110px]">상태</TableHead>
-              <TableHead className="w-[120px]">신청일</TableHead>
+              <TableHead className="w-[120px]">작성일</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {organizations.map((org, index) => (
+            {items.map((item, index) => (
               <TableRow
-                key={org.id}
-                onClick={() => onViewDetail(org)}
+                key={item.reviewId}
+                onClick={() => onViewDetail(item)}
                 className="hover:bg-muted/50 cursor-pointer transition-colors"
               >
                 <TableCell className="text-muted-foreground">{getRowNumber(index)}</TableCell>
-                <TableCell className="text-foreground truncate font-medium" title={org.name}>
-                  {org.name}
+                <TableCell className="text-foreground truncate font-medium" title={item.nickname}>
+                  {item.nickname} ({item.userName})
+                </TableCell>
+                <TableCell className="text-muted-foreground truncate" title={item.lectureName}>
+                  {item.lectureName}
                 </TableCell>
                 <TableCell>
-                  <StatusBadge status={org.approvalStatus} />
+                  <StatusBadge status={item.certificateApprovalStatus} />
                 </TableCell>
-                <TableCell className="text-muted-foreground">{formatDate(org.createdAt)}</TableCell>
+                <TableCell className="text-muted-foreground">{formatDate(item.createdAt)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

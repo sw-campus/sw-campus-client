@@ -18,15 +18,13 @@ export function OrganizationApprovalPage() {
       useDataQuery={useOrganizationsQuery}
       useApproveMutation={useApproveOrganizationMutation}
       useRejectMutation={useRejectOrganizationMutation}
-      renderTable={({ items, isLoading, currentPage, pageSize, onViewDetail, onApprove, onReject }) => (
+      renderTable={({ items, isLoading, currentPage, pageSize, onViewDetail }) => (
         <OrganizationTable
           organizations={items}
           isLoading={isLoading}
           currentPage={currentPage}
           pageSize={pageSize}
           onViewDetail={onViewDetail}
-          onApprove={onApprove}
-          onReject={onReject}
         />
       )}
       renderModal={({ item, isOpen, onClose, onApprove, onReject, isApproving, isRejecting }) => (

@@ -1,7 +1,6 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatDate } from '@/lib/date'
@@ -12,7 +11,6 @@ import {
   LECTURE_AUTH_STATUS_LABEL,
   type LectureAuthStatus,
   type LectureSummary,
-  type MutationOptions,
 } from '../../types/lecture.type'
 
 interface LectureTableProps {
@@ -21,8 +19,6 @@ interface LectureTableProps {
   currentPage: number
   pageSize: number
   onViewDetail: (lecture: LectureSummary) => void
-  onApprove: (lectureId: number, options?: MutationOptions) => void
-  onReject: (lectureId: number, options?: MutationOptions) => void
 }
 
 function StatusBadge({ status }: { status: LectureAuthStatus }) {
@@ -33,15 +29,7 @@ function StatusBadge({ status }: { status: LectureAuthStatus }) {
   )
 }
 
-export function LectureTable({
-  lectures,
-  isLoading,
-  currentPage,
-  pageSize,
-  onViewDetail,
-  onApprove,
-  onReject,
-}: LectureTableProps) {
+export function LectureTable({ lectures, isLoading, currentPage, pageSize, onViewDetail }: LectureTableProps) {
   // 페이지 기반 NO 계산
   const getRowNumber = (index: number) => currentPage * pageSize + index + 1
 
@@ -84,50 +72,31 @@ export function LectureTable({
         <Table className="table-fixed">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px]">NO</TableHead>
-              <TableHead className="w-[35%]">강의명</TableHead>
-              <TableHead className="w-[15%]">기관명</TableHead>
-              <TableHead className="w-[80px]">상태</TableHead>
-              <TableHead className="w-[90px]">신청일</TableHead>
-              <TableHead className="w-[220px] text-right">액션</TableHead>
+              <TableHead className="w-[60px]">NO</TableHead>
+              <TableHead className="w-[200px]">기관명</TableHead>
+              <TableHead>강의명</TableHead>
+              <TableHead className="w-[110px]">상태</TableHead>
+              <TableHead className="w-[120px]">신청일</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {lectures.map((lecture, index) => (
-              <TableRow key={lecture.lectureId}>
+              <TableRow
+                key={lecture.lectureId}
+                onClick={() => onViewDetail(lecture)}
+                className="hover:bg-muted/50 cursor-pointer transition-colors"
+              >
                 <TableCell className="text-muted-foreground">{getRowNumber(index)}</TableCell>
-                <TableCell className="text-foreground max-w-0 truncate font-medium" title={lecture.lectureName}>
-                  {lecture.lectureName}
-                </TableCell>
-                <TableCell className="text-muted-foreground max-w-0 truncate" title={lecture.orgName}>
+                <TableCell className="text-muted-foreground truncate" title={lecture.orgName}>
                   {lecture.orgName}
+                </TableCell>
+                <TableCell className="text-foreground truncate font-medium" title={lecture.lectureName}>
+                  {lecture.lectureName}
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={lecture.lectureAuthStatus} />
                 </TableCell>
                 <TableCell className="text-muted-foreground">{formatDate(lecture.createdAt)}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm" onClick={() => onViewDetail(lecture)}>
-                      상세보기
-                    </Button>
-                    {lecture.lectureAuthStatus === 'PENDING' && (
-                      <>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => onApprove(lecture.lectureId)}
-                          className="bg-emerald-400 hover:bg-emerald-500"
-                        >
-                          승인
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={() => onReject(lecture.lectureId)}>
-                          반려
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>

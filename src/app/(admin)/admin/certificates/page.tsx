@@ -1,13 +1,12 @@
-import { AdminSidebar } from '@/features/admin'
-import { AdminDashboard } from '@/features/admin/components/AdminDashboard'
+import { AdminSidebar, CertificateApprovalPage } from '@/features/admin'
 
-export default function AdminCertificatePage() {
+export default function AdminCertificatesPage() {
   return (
     <>
       <div className="custom-container">
         <div className="custom-card flex gap-6">
           <AdminSidebar />
-          <AdminDashboard />
+          <CertificateApprovalPage />
         </div>
       </div>
     </>

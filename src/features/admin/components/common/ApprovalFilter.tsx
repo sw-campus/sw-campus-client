@@ -31,7 +31,7 @@ export function ApprovalFilter({
   keyword,
   onStatusChange,
   onKeywordChange,
-  searchPlaceholder = '검색...',
+  searchPlaceholder,
   filterOptions = DEFAULT_FILTER_OPTIONS,
 }: ApprovalFilterProps) {
   const [inputValue, setInputValue] = useState(keyword)
@@ -71,18 +71,20 @@ export function ApprovalFilter({
       </div>
 
       {/* Search Input */}
-      <div className="relative w-full sm:w-64">
-        <LuSearch className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-        <Input
-          type="text"
-          placeholder={searchPlaceholder}
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-          className="pl-9"
-        />
-      </div>
+      {searchPlaceholder && (
+        <div className="relative w-full sm:w-64">
+          <LuSearch className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+          <Input
+            type="text"
+            placeholder={searchPlaceholder}
+            value={inputValue}
+            onChange={e => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            className="pl-9"
+          />
+        </div>
+      )}
     </div>
   )
 }
