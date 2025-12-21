@@ -87,7 +87,21 @@ export default function LectureIntro({ lecture }: Props) {
                   {teacher.imageUrl ? (
                     <Image src={teacher.imageUrl} alt={teacher.name} fill className="object-cover" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-2xl">🧑‍🏫</div>
+                    <div className="flex h-full w-full items-center justify-center bg-gray-100">
+                      <svg
+                        className="h-8 w-8 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                        />
+                      </svg>
+                    </div>
                   )}
                 </div>
                 <div>
