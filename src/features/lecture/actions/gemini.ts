@@ -13,7 +13,7 @@ export async function generateGeminiSummary(lectureData: LectureDetail) {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite-preview-09-2025' })
 
     const prompt = `
       다음 강의 정보를 바탕으로 예비 수강생에게 이 강의의 핵심 정보를 전달하는 3줄 요약을 작성해줘.
@@ -140,7 +140,7 @@ export async function compareCoursesWithAI(
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite-preview-09-2025' })
 
     const formatLecture = (lecture: LectureDetail, label: string) => `
       [${label} 강의 정보]

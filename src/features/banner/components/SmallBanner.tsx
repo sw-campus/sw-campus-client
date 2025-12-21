@@ -13,7 +13,7 @@ import { useBannersByTypeQuery } from '../hooks/useBannerQuery'
 /**
  * D-day 계산 (마감일까지 남은 일수)
  */
-function calculateDday(deadlineString: string): { text: string; isEvent: boolean } {
+function calculateDday(deadlineString: string): { text: string; isClosed: boolean } {
   const deadline = new Date(deadlineString)
   const today = new Date()
 
@@ -25,11 +25,11 @@ function calculateDday(deadlineString: string): { text: string; isEvent: boolean
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
   if (diffDays < 0) {
-    return { text: 'EVENT', isEvent: true }
+    return { text: '마감', isClosed: true }
   } else if (diffDays === 0) {
-    return { text: 'D-Day', isEvent: false }
+    return { text: 'D-Day', isClosed: false }
   } else {
-    return { text: `D-${diffDays}`, isEvent: false }
+    return { text: `D-${diffDays}`, isClosed: false }
   }
 }
 
@@ -68,7 +68,7 @@ export default function SmallBanner() {
           {[0, 1, 2].map(i => (
             <div
               key={i}
-              className="h-[190px] w-[calc(33.33%-11px)] shrink-0 animate-pulse rounded-2xl border border-gray-200 bg-muted"
+              className="bg-muted h-[190px] w-[calc(33.33%-11px)] shrink-0 animate-pulse rounded-2xl border border-gray-200"
             />
           ))}
         </div>
@@ -96,36 +96,38 @@ export default function SmallBanner() {
         }}
       >
         {banners.map(banner => {
-          const { text: ddayText, isEvent } = calculateDday(banner.lectureDeadline)
+          const { text: ddayText, isClosed } = calculateDday(banner.lectureDeadline)
 
           return (
             <SwiperSlide key={banner.id}>
               <Link href={`/lectures/${banner.lectureId}`} className="block">
-                <div className="flex h-[220px] flex-col justify-between rounded-2xl border border-gray-200 bg-white/60 p-5 shadow">
-                  {/* 상단 기관명 + 배지 */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-gray-700">{banner.orgName ?? ''}</span>
-                    {/* D-day 배지: EVENT는 주황 배경, D-XX는 주황 텍스트 */}
-                    <span
-                      className={`rounded-md px-2 py-0.5 text-xs font-semibold ${isEvent
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-orange-100 text-orange-600'
+                <div className="flex h-[195px] flex-col rounded-2xl border border-gray-200 bg-white/60 p-5 shadow">
+                  {/* 상단 콘텐츠 그룹 */}
+                  <div>
+                    {/* 기관명 + 배지 */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-gray-700">{banner.orgName ?? ''}</span>
+                      {/* D-day 배지: 마감은 회색 배경, D-XX는 주황 텍스트 */}
+                      <span
+                        className={`rounded-md px-2 py-0.5 text-xs font-semibold ${
+                          isClosed ? 'bg-gray-400 text-white' : 'bg-orange-100 text-orange-600'
                         }`}
-                    >
-                      {ddayText}
-                    </span>
+                      >
+                        {ddayText}
+                      </span>
+                    </div>
+
+                    {/* 제목 */}
+                    <div className="mt-1 line-clamp-2 text-base font-bold">{banner.lectureName}</div>
+
+                    {/* 설명 - 회색 배경 라운드 박스 */}
+                    <div className="mt-2 line-clamp-2 rounded-xl bg-gray-100/70 px-3 py-2 text-sm">
+                      {banner.content}
+                    </div>
                   </div>
 
-                  {/* 제목 */}
-                  <div className="mt-1 line-clamp-2 text-base font-bold">{banner.lectureName}</div>
-
-                  {/* 설명 - 회색 배경 라운드 박스 */}
-                  <div className="mt-2 line-clamp-2 rounded-xl bg-gray-100/70 px-3 py-2 text-sm">
-                    {banner.content}
-                  </div>
-
-                  {/* 날짜 */}
-                  <div className="mt-3 text-sm text-gray-600">
+                  {/* 날짜 - mt-auto로 하단에 고정 */}
+                  <div className="mt-auto text-sm text-gray-600">
                     {formatDate(banner.lectureStartAt)} 개강 · {getRecruitTag(banner.recruitType)}
                   </div>
                 </div>

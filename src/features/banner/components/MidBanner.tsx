@@ -49,7 +49,7 @@ export default function MidBanner() {
             {[0, 1].map(i => (
               <div
                 key={i}
-                className="flex h-[190px] w-[calc(50%-8px)] shrink-0 animate-pulse items-center justify-between rounded-2xl border border-gray-200 bg-muted p-8"
+                className="bg-muted flex h-[190px] w-[calc(50%-8px)] shrink-0 animate-pulse items-center justify-between rounded-2xl border border-gray-200 p-8"
               />
             ))}
           </div>
@@ -83,7 +83,7 @@ export default function MidBanner() {
             {banners.map(banner => (
               <SwiperSlide key={banner.id}>
                 <Link href={`/lectures/${banner.lectureId}`} className="block">
-                  <div className="flex h-[220px] items-center justify-between rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
+                  <div className="flex h-[190px] items-center justify-between rounded-2xl border border-gray-200 bg-white px-8 py-5 shadow-lg">
                     <div className="flex min-w-0 flex-col">
                       {/* 기관명 - 주황색 */}
                       <div className="font-semibold text-orange-600">{banner.orgName ?? ''}</div>
@@ -92,9 +92,7 @@ export default function MidBanner() {
                       <div className="mt-1 line-clamp-2 text-lg font-bold">{banner.lectureName}</div>
 
                       {/* 설명 - 회색 배경 라운드 박스 */}
-                      <div className="mt-2 line-clamp-2 rounded-xl bg-gray-100 px-3 py-2 text-sm">
-                        {banner.content}
-                      </div>
+                      <div className="mt-2 line-clamp-2 rounded-xl bg-gray-100 px-3 py-2 text-sm">{banner.content}</div>
 
                       {/* 개강일 */}
                       <div className="mt-2 text-sm text-gray-600">
