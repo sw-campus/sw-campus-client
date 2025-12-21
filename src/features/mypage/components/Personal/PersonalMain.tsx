@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CATEGORY_LABELS, type ReviewCategory } from '@/features/lecture/api/reviewApi.types'
+import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
 import { api } from '@/lib/axios'
 
 type PersonalMainProps = {
@@ -17,11 +18,12 @@ type PersonalMainProps = {
   onOpenProductModal: () => void
 }
 
-const dashboardStats = [
-  { label: '등록 대기', value: '1개', note: '내부 승인 대기중' },
-  { label: '반려된 교육과정', value: '2개', note: '이번 분기 시작 예정' },
-  { label: '승인된 교육과정', value: '5개', note: '평균 수강률 86%' },
-]
+// 설문조사 단건 존재 여부 응답(스크린샷 기준)
+type MySurveyResponse = {
+  surveyId: number | null
+  exists?: boolean | null
+  [key: string]: unknown
+}
 
 export default function PersonalMain({ activeSection, openInfoModal, onOpenProductModal }: PersonalMainProps) {
   // (개인 후기 목록 상태는 현재 사용하지 않음)
@@ -59,26 +61,35 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     Array<{ category: ReviewCategory; score: number; comment?: string }>
   >([])
 
-  // useEffect(() => {
-  //   if (activeSection !== 'reviews') return
-  //   let cancelled = false
-  //   const fetchReviews = async () => {
-  //     try {
-  //       setLoading(true)
-  //       setError(null)
-  //       const { data } = await api.get<Review[]>('/mypage/reviews')
-  //       if (!cancelled) setReviews(Array.isArray(data) ? data : [])
-  //     } catch (e) {
-  //       if (!cancelled) setError('후기 데이터를 불러오지 못했습니다.')
-  //     } finally {
-  //       if (!cancelled) setLoading(false)
-  //     }
-  //   }
-  //   fetchReviews()
-  //   return () => {
-  //     cancelled = true
-  //   }
-  // }, [activeSection])
+  // 설문 존재 여부 상태 (surveyId가 null이 아니면 1, null이면 0)
+  const [surveyExists, setSurveyExists] = useState<boolean | null>(null)
+  const [surveyLoading, setSurveyLoading] = useState(false)
+  const [surveyError, setSurveyError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (activeSection !== 'survey') return
+    let cancelled = false
+    const fetchMySurvey = async () => {
+      try {
+        setSurveyLoading(true)
+        setSurveyError(null)
+        // 스펙: GET /api/v1/mypage/survey
+        // 프런트 베이스 URL에 /api/v1가 포함되어 있으므로 상대 경로 사용
+        const { data } = await api.get<MySurveyResponse>('/mypage/survey')
+        const id = (data as MySurveyResponse)?.surveyId
+        const exists = Boolean((data as MySurveyResponse)?.exists) || (id !== null && id !== undefined)
+        if (!cancelled) setSurveyExists(exists)
+      } catch {
+        if (!cancelled) setSurveyError('설문 정보를 불러오지 못했습니다.')
+      } finally {
+        if (!cancelled) setSurveyLoading(false)
+      }
+    }
+    fetchMySurvey()
+    return () => {
+      cancelled = true
+    }
+  }, [activeSection])
 
   useEffect(() => {
     if (activeSection !== 'reviews') return
@@ -153,25 +164,26 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
               className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
               onClick={onOpenProductModal}
             >
-              설문조사
+              {surveyExists ? '설문 수정' : '설문 작성'}
             </Button>
           </div>
         </header>
 
-        {/* Stats cards */}
+        {/* 단일 카드: 등록된 설문이 있는지 여부만 표시 */}
         <section className="rounded-2xl bg-white/70 p-5 text-gray-700 ring-1 ring-white/30 backdrop-blur-xl">
-          <div className="grid gap-4 sm:grid-cols-3">
-            {dashboardStats.map(stat => (
-              <article
-                key={stat.label}
-                className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5"
-              >
-                <p className="text-xs text-gray-500 uppercase">{stat.label}</p>
-                <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-                <p className="mt-1 text-sm text-gray-500">{stat.note}</p>
+          {surveyLoading && <p className="text-sm text-gray-500">불러오는 중...</p>}
+          {surveyError && !surveyLoading && <p className="text-sm text-red-600">{surveyError}</p>}
+          {!surveyLoading && !surveyError && (
+            <div className="grid gap-4 sm:grid-cols-3">
+              <article className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5">
+                <p className="text-xs text-gray-500 uppercase">등록된 설문</p>
+                <p className="text-2xl font-semibold text-gray-900">{(surveyExists ? 1 : 0).toLocaleString()}개</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  {surveyExists ? '작성됨 · 수정 가능' : '아직 작성되지 않음'}
+                </p>
               </article>
-            ))}
-          </div>
+            </div>
+          )}
         </section>
       </main>
     )
