@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { useRouter } from 'next/navigation'
@@ -36,7 +36,7 @@ export default function LectureSection() {
 
   // 카테고리 트리에서 첫 번째 대분류의 중분류(children)를 가져옴
   const { data: categoryTree } = useCategoryTree()
-  const subcategories = useMemo(() => categoryTree?.[0]?.children ?? [], [categoryTree])
+  const subcategories = categoryTree?.[0]?.children ?? []
 
   // 선택된 중분류 ID
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
@@ -44,11 +44,8 @@ export default function LectureSection() {
   // 선택값이 없으면 첫 번째 중분류를 자동 선택처럼 동작
   const resolvedCategoryId = selectedCategoryId ?? subcategories[0]?.categoryId ?? null
 
-  const categoryNameToId = useMemo(() => {
-    const map = new Map<string, number>()
-    for (const c of subcategories) map.set(c.categoryName, c.categoryId)
-    return map
-  }, [subcategories])
+  const categoryNameToId = new Map<string, number>()
+  for (const c of subcategories) categoryNameToId.set(c.categoryName, c.categoryId)
 
   // selectedCategoryId로부터 카테고리명 파생
   const selectedCategoryName = subcategories.find(c => c.categoryId === resolvedCategoryId)?.categoryName ?? ''

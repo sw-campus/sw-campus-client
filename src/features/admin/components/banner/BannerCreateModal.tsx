@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -29,17 +29,17 @@ export function BannerCreateModal({ trigger }: BannerCreateModalProps) {
    * 폼 상태를 초기화합니다.
    * formKey를 변경하여 BannerForm 컴포넌트를 새로 마운트시킵니다.
    */
-  const resetForm = useCallback(() => {
+  const resetForm = () => {
     setFormKey(prev => prev + 1)
-  }, [])
+  }
 
   /**
    * 모달을 닫고 폼을 초기화합니다.
    */
-  const closeAndReset = useCallback(() => {
+  const closeAndReset = () => {
     setOpen(false)
     resetForm()
-  }, [resetForm])
+  }
 
   const handleSubmit = (formData: BannerFormData, imageFile: File | null) => {
     createMutation.mutate(

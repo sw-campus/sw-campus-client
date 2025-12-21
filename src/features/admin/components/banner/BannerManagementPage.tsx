@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { LuCheck, LuClock, LuList, LuX } from 'react-icons/lu'
 
@@ -86,15 +86,12 @@ export function BannerManagementPage() {
   }
 
   // 통계 계산
-  const stats = useMemo(
-    () => [
-      { title: '전체', value: allData?.page?.totalElements ?? 0, icon: LuList },
-      { title: '예정', value: scheduledData?.page?.totalElements ?? 0, icon: LuClock },
-      { title: '진행중', value: activeData?.page?.totalElements ?? 0, icon: LuCheck },
-      { title: '진행완료', value: endedData?.page?.totalElements ?? 0, icon: LuX },
-    ],
-    [allData, scheduledData, activeData, endedData],
-  )
+  const stats = [
+    { title: '전체', value: allData?.page?.totalElements ?? 0, icon: LuList },
+    { title: '예정', value: scheduledData?.page?.totalElements ?? 0, icon: LuClock },
+    { title: '진행중', value: activeData?.page?.totalElements ?? 0, icon: LuCheck },
+    { title: '진행완료', value: endedData?.page?.totalElements ?? 0, icon: LuX },
+  ]
 
   const totalPages = pageData?.page?.totalPages ?? 0
 
