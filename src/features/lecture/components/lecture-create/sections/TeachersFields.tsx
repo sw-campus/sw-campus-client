@@ -10,8 +10,10 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import type { TeacherResponse } from '@/features/lecture/api/teacherApi'
 import { useSearchTeachersQuery } from '@/features/lecture/hooks/useSearchTeachersQuery'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
+import { useDebounce } from '@/hooks/useDebounce'
 import { cn } from '@/lib/utils'
 
 export function LectureCreateTeachersFields() {
@@ -32,12 +34,7 @@ export function LectureCreateTeachersFields() {
     .map(field => field.teacherId)
     .filter((id): id is number => id !== null && id !== undefined)
 
-  const handleSelectExistingTeacher = (teacher: {
-    teacherId: number
-    teacherName: string
-    teacherDescription: string | null
-    teacherImageUrl: string | null
-  }) => {
+  const handleSelectExistingTeacher = (teacher: TeacherResponse) => {
     // 중복 체크
     if (existingTeacherIds.includes(teacher.teacherId)) {
       toast.error('이미 추가된 강사입니다.')
@@ -255,31 +252,14 @@ function TeacherItem({ control, index, totalCount, onMove, onRemove }: TeacherIt
 
 // 강사 검색 모달 컴포넌트
 type TeacherSearchModalProps = {
-  onSelect: (teacher: {
-    teacherId: number
-    teacherName: string
-    teacherDescription: string | null
-    teacherImageUrl: string | null
-  }) => void
+  onSelect: (teacher: TeacherResponse) => void
   onClose: () => void
   existingTeacherIds: number[]
 }
 
 function TeacherSearchModal({ onSelect, onClose, existingTeacherIds }: TeacherSearchModalProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [debouncedQuery, setDebouncedQuery] = useState('')
-
-  // 디바운스 처리
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value)
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current)
-    }
-    debounceTimeoutRef.current = setTimeout(() => {
-      setDebouncedQuery(value)
-    }, 300)
-  }
+  const debouncedQuery = useDebounce(searchQuery, 300)
 
   const { data: teachers, isLoading } = useSearchTeachersQuery(debouncedQuery)
 
@@ -297,7 +277,7 @@ function TeacherSearchModal({ onSelect, onClose, existingTeacherIds }: TeacherSe
           <Input
             placeholder="강사 이름으로 검색..."
             value={searchQuery}
-            onChange={e => handleSearchChange(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             autoFocus
           />
         </div>

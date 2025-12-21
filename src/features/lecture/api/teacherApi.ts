@@ -8,11 +8,14 @@ export interface TeacherResponse {
 }
 
 export const searchTeachers = async (name: string): Promise<TeacherResponse[]> => {
-  if (!name.trim()) {
+  const trimmedName = name.trim()
+
+  if (!trimmedName) {
     return []
   }
+
   const { data } = await api.get<TeacherResponse[]>('/teachers', {
-    params: { name: name.trim() },
+    params: { name: trimmedName },
   })
   return data
 }
