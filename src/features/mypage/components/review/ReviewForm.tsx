@@ -57,10 +57,13 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
     const load = async () => {
       setLoading(true)
       try {
-        if (reviewId) {
-          const res = await api.get<ReviewResponse>(`/reviews/${reviewId}`)
+        // 스웨거(첨부 이미지) 기준: lectureId 기반으로 상세 조회
+        // - 개인 마이페이지에서 "리뷰 수정" 클릭 시 lectureId가 항상 있으므로 이 경로를 우선 사용
+        if (lectureId) {
+          // 스웨거(첨부 이미지): GET /api/v1/mypage/completed-lectures/{lectureId}/review
+          const res = await api.get<CompletedLectureReviewResponse>(`/mypage/completed-lectures/${lectureId}/review`)
           if (!mounted) return
-          setResolvedReviewId(res.data?.reviewId ?? reviewId)
+          setResolvedReviewId(res.data?.reviewId ?? null)
           setComment(res.data?.comment ?? '')
           setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === 'APPROVED')
 
@@ -75,11 +78,10 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
           return
         }
 
-        if (lectureId) {
-          // 스웨거(첨부 이미지): GET /api/v1/mypage/completed-lectures/{lectureId}/review
-          const res = await api.get<CompletedLectureReviewResponse>(`/mypage/completed-lectures/${lectureId}/review`)
+        if (reviewId) {
+          const res = await api.get<ReviewResponse>(`/reviews/${reviewId}`)
           if (!mounted) return
-          setResolvedReviewId(res.data?.reviewId ?? null)
+          setResolvedReviewId(res.data?.reviewId ?? reviewId)
           setComment(res.data?.comment ?? '')
           setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === 'APPROVED')
 
@@ -118,7 +120,7 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
         detailScores: detailScores.map(d => ({
           category: d.category,
           score: d.score,
-          comment: d.comment,
+          comment: d.comment ?? '',
         })),
       }
 
@@ -138,7 +140,7 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
     if (effectiveReadOnly) return
     try {
       await saveMutation.mutateAsync()
-      toast.success(reviewId ? '리뷰가 수정되었습니다.' : '리뷰가 저장되었습니다.')
+      toast.success((resolvedReviewId ?? reviewId) ? '리뷰가 수정되었습니다.' : '리뷰가 저장되었습니다.')
     } catch (e) {
       const message = e instanceof Error ? e.message : '리뷰 저장에 실패했습니다.'
       toast.error(message)
