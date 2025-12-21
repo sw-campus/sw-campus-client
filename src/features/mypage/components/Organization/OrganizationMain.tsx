@@ -1,5 +1,6 @@
 'use client'
 
+import { isAxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 
 import Image from 'next/image'
@@ -38,6 +39,11 @@ export default function OrganizationMain({
   const [reviewLectureId, setReviewLectureId] = useState<number | null>(null)
   const [reviewLectureName, setReviewLectureName] = useState<string | undefined>(undefined)
 
+  // 비밀번호 검증
+  const [passwordInput, setPasswordInput] = useState<string>('')
+  const [passwordVerifying, setPasswordVerifying] = useState(false)
+  const [passwordVerifyError, setPasswordVerifyError] = useState<string | null>(null)
+
   const totalCount = lectures?.length ?? 0
   const approvedCount = lectures?.filter(l => l.lectureAuthStatus === 'APPROVED').length ?? 0
   const rejectedCount = lectures?.filter(l => l.lectureAuthStatus === 'REJECTED').length ?? 0
@@ -61,6 +67,68 @@ export default function OrganizationMain({
       cancelled = true
     }
   }, [])
+
+  const verifyPasswordAndOpen = async () => {
+    try {
+      setPasswordVerifying(true)
+      setPasswordVerifyError(null)
+
+      const password = passwordInput.trim()
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[mypage.verify-password] request', {
+          hasPassword: password.length > 0,
+          passwordLength: password.length,
+        })
+      }
+
+      const { data } = await api.post<unknown>('/mypage/verify-password', { password })
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[mypage.verify-password] response', data)
+      }
+
+      const verified =
+        typeof data === 'boolean'
+          ? data
+          : typeof (data as { verified?: unknown })?.verified === 'boolean'
+            ? Boolean((data as { verified?: unknown }).verified)
+            : typeof (data as { isValid?: unknown })?.isValid === 'boolean'
+              ? Boolean((data as { isValid?: unknown }).isValid)
+              : typeof (data as { success?: unknown })?.success === 'boolean'
+                ? Boolean((data as { success?: unknown }).success)
+                : typeof (data as { result?: unknown })?.result === 'boolean'
+                  ? Boolean((data as { result?: unknown }).result)
+                  : false
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[mypage.verify-password] parsed', { verified })
+      }
+
+      if (!verified) {
+        setPasswordVerifyError('비밀번호가 일치하지 않습니다.')
+        return
+      }
+
+      openInfoModal()
+    } catch (err: unknown) {
+      if (process.env.NODE_ENV !== 'production') {
+        if (isAxiosError(err)) {
+          console.error('[mypage.verify-password] error', {
+            status: err.response?.status,
+            data: err.response?.data,
+            message: err.message,
+          })
+        } else {
+          console.error('[mypage.verify-password] error', err)
+        }
+      }
+      setPasswordVerifyError('비밀번호 검증에 실패했습니다. 잠시 후 다시 시도해주세요.')
+    } finally {
+      setPasswordVerifying(false)
+    }
+  }
+
   if (isOrgPasswordOpen) {
     return (
       <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-white/60 p-6 shadow-black/40">
@@ -76,12 +144,25 @@ export default function OrganizationMain({
             type="password"
             placeholder="비밀번호 입력"
             className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-orange-100"
+            value={passwordInput}
+            onChange={e => {
+              setPasswordInput(e.target.value)
+              if (passwordVerifyError) setPasswordVerifyError(null)
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                void verifyPasswordAndOpen()
+              }
+            }}
           />
+          {passwordVerifyError && <p className="mt-2 text-sm text-red-600">{passwordVerifyError}</p>}
           <Button
             className="mt-4 w-full rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
-            onClick={openInfoModal}
+            onClick={() => void verifyPasswordAndOpen()}
+            disabled={passwordVerifying || passwordInput.trim().length === 0}
           >
-            확인
+            {passwordVerifying ? '확인 중...' : '확인'}
           </Button>
         </div>
       </main>

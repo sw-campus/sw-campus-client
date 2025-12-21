@@ -103,7 +103,9 @@ export default function CartCompareSection() {
     }
 
     if (!survey.exists) {
-      toast.warning('설문조사를 먼저 작성해주세요. 더 정확한 추천을 받을 수 있습니다.')
+      toast.warning('설문조사를 먼저 작성해주세요. 마이페이지에서 설문조사를 완료한 후 다시 시도해주세요.')
+      setIsAiLoading(false)
+      return
     }
 
     // 3단계: AI 비교 분석 실행

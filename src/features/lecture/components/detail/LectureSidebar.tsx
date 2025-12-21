@@ -1,5 +1,7 @@
 'use client'
 
+import { toast } from 'sonner'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -14,6 +16,15 @@ interface Props {
 }
 
 export default function LectureSidebar({ lecture }: Props) {
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      toast.success('링크가 복사되었습니다!')
+    } catch {
+      toast.error('링크 복사에 실패했습니다.')
+    }
+  }
+
   return (
     <div className="sticky top-20 space-y-6">
       <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
@@ -38,7 +49,12 @@ export default function LectureSidebar({ lecture }: Props) {
             >
               장바구니
             </AddToCartButton>
-            <Button variant="outline" size="lg" className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50">
+            <Button
+              variant="outline"
+              size="lg"
+              className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50"
+              onClick={handleShare}
+            >
               공유하기
             </Button>
           </div>

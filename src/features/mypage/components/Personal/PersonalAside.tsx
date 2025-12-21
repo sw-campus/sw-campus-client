@@ -1,14 +1,14 @@
 'use client'
 
 type PersonalAsideProps = {
-  onClickOrgInfo: () => void
-  onClickLectureManage: () => void
+  onClickPersonInfo: () => void
+  onClickSurveyManage: () => void
   onClickReviewManage: () => void
 }
 
 export default function PersonalAside({
-  onClickOrgInfo,
-  onClickLectureManage,
+  onClickPersonInfo,
+  onClickSurveyManage,
   onClickReviewManage,
 }: PersonalAsideProps) {
   return (
@@ -17,14 +17,14 @@ export default function PersonalAside({
 
       <nav className="space-y-2 text-sm leading-relaxed">
         <button
-          onClick={onClickOrgInfo}
+          onClick={onClickPersonInfo}
           className="block w-full rounded-lg px-3 py-2 text-left font-medium transition hover:bg-neutral-100"
         >
           개인정보 관리
         </button>
 
         <button
-          onClick={onClickLectureManage}
+          onClick={onClickSurveyManage}
           className="block w-full rounded-lg px-3 py-2 text-left text-neutral-700 transition hover:bg-neutral-100"
         >
           설문 조사

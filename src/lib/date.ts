@@ -1,3 +1,8 @@
+// ============================================
+// OffsetDateTime 변환 유틸리티 (date-fns 사용)
+// ============================================
+import { parse, format, isValid } from 'date-fns'
+
 /**
  * 날짜 문자열을 한국 날짜 형식(YYYY. MM. DD.)으로 변환합니다.
  * @param dateString - 날짜 문자열 (ISO 8601 등) 혹은 Date 객체
@@ -69,4 +74,35 @@ export function formatTimeRange(startTime: string | null | undefined, endTime: s
   // 하나만 있는 경우
   if (startTime) return `${formattedStart} ~`
   return `~ ${formattedEnd}`
+}
+
+/** 한국 표준시 오프셋 */
+const KST_OFFSET = '+09:00'
+
+/**
+ * 날짜 문자열(YYYY-MM-DD)을 해당 날짜의 시작 시간(00:00:00)을 포함한 OffsetDateTime 형식으로 변환합니다.
+ * @param dateString - 'YYYY-MM-DD' 형식의 날짜 문자열
+ * @returns ISO 8601 OffsetDateTime 형식 (예: '2024-01-01T00:00:00+09:00')
+ * @throws 유효하지 않은 날짜 형식일 경우 에러
+ */
+export function toStartOfDayISO(dateString: string): string {
+  const parsed = parse(dateString, 'yyyy-MM-dd', new Date())
+  if (!isValid(parsed)) {
+    throw new Error(`Invalid date string: ${dateString}`)
+  }
+  return `${format(parsed, 'yyyy-MM-dd')}T00:00:00${KST_OFFSET}`
+}
+
+/**
+ * 날짜 문자열(YYYY-MM-DD)을 해당 날짜의 종료 시간(23:59:59)을 포함한 OffsetDateTime 형식으로 변환합니다.
+ * @param dateString - 'YYYY-MM-DD' 형식의 날짜 문자열
+ * @returns ISO 8601 OffsetDateTime 형식 (예: '2024-01-01T23:59:59+09:00')
+ * @throws 유효하지 않은 날짜 형식일 경우 에러
+ */
+export function toEndOfDayISO(dateString: string): string {
+  const parsed = parse(dateString, 'yyyy-MM-dd', new Date())
+  if (!isValid(parsed)) {
+    throw new Error(`Invalid date string: ${dateString}`)
+  }
+  return `${format(parsed, 'yyyy-MM-dd')}T23:59:59${KST_OFFSET}`
 }

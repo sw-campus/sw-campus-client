@@ -10,6 +10,8 @@ const menuItems: SidebarMenuItem[] = [
   { label: '대시보드', href: '/admin' },
   { label: '회원관리', href: '/admin/members' },
   { label: '강의관리', href: '/admin/lectures' },
+  { label: '배너관리', href: '/admin/banners' },
+  { label: '수료증관리', href: '/admin/certificates' },
   { label: '리뷰관리', href: '/admin/reviews' },
 ]
 

@@ -33,7 +33,7 @@ export default function AddressInput() {
       <div className="mb-2 flex gap-2">
         <input
           type="text"
-          placeholder="address"
+          placeholder="주소"
           className={`${INPUT_BASE_CLASS} w-full flex-1`}
           value={address ?? ''}
           readOnly

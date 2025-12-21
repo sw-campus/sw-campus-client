@@ -8,7 +8,7 @@ export default function SignupPersonalPage() {
   return (
     <div className="flex flex-col gap-4">
       <Script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" strategy="lazyOnload" />
-      <section className="relative flex min-h-[540px] w-full items-center justify-center rounded-3xl px-8 py-10">
+      <section className="relative flex min-h-135 w-full items-center justify-center rounded-3xl px-8 py-10">
         <div className="relative z-10 flex w-full items-center justify-center">
           <Suspense fallback={null}>
             <SignupForm />
