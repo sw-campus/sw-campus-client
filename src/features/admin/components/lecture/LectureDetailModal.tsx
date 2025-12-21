@@ -108,10 +108,7 @@ export function LectureDetailModal({
                 <DetailRow label="교육 시작일" value={formatDate(detail?.startAt)} />
                 <DetailRow label="교육 종료일" value={formatDate(detail?.endAt)} />
                 <DetailRow label="모집 마감일" value={formatDate(detail?.deadline)} />
-                <DetailRow
-                  label="수업 시간"
-                  value={formatTimeRange(detail?.startTime, detail?.endTime)}
-                />
+                <DetailRow label="수업 시간" value={formatTimeRange(detail?.startTime, detail?.endTime)} />
                 <DetailRow label="총 교육일수" value={detail?.totalDays ? `${detail.totalDays}일` : null} />
                 <DetailRow label="총 교육시간" value={detail?.totalTimes ? `${detail.totalTimes}시간` : null} />
               </div>
@@ -174,21 +171,17 @@ export function LectureDetailModal({
         <DialogFooter>
           {lecture.lectureAuthStatus === 'PENDING' && (
             <>
-              <Button variant="outline" onClick={onClose}>
-                닫기
+              <Button
+                onClick={handleApprove}
+                disabled={isApproving}
+                className="bg-emerald-400 text-white hover:bg-emerald-500"
+              >
+                {isApproving ? '처리 중...' : '승인'}
               </Button>
               <Button variant="destructive" onClick={handleReject} disabled={isRejecting}>
                 {isRejecting ? '처리 중...' : '반려'}
               </Button>
-              <Button onClick={handleApprove} disabled={isApproving} className="bg-emerald-400 hover:bg-emerald-500">
-                {isApproving ? '처리 중...' : '승인'}
-              </Button>
             </>
-          )}
-          {lecture.lectureAuthStatus !== 'PENDING' && (
-            <Button variant="outline" onClick={onClose}>
-              닫기
-            </Button>
           )}
         </DialogFooter>
       </DialogContent>

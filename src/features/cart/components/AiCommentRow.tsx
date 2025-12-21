@@ -35,7 +35,7 @@ export function AiCommentRow({
               <span className="text-sm font-bold text-orange-700">{sectionTitle} 분석</span>
               <AdvantageIndicator advantage={advantage} leftTitle={leftTitle} rightTitle={rightTitle} />
             </div>
-            <p className="text-base leading-relaxed font-medium text-gray-900">{comment}</p>
+            <p className="whitespace-normal break-words text-base leading-relaxed font-medium text-gray-900">{comment}</p>
           </div>
         </div>
       </TableCell>

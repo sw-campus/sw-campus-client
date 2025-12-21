@@ -13,7 +13,7 @@ interface AiFloatingButtonProps {
   isLoading: boolean
   hasResult: boolean
   onAnalyze: () => void
-
+  onClear?: () => void
   disabledReason?: string
 }
 
@@ -22,6 +22,7 @@ export function AiFloatingButton({
   isLoading,
   hasResult,
   onAnalyze,
+  onClear,
   disabledReason = '두 강의를 모두 선택해주세요',
 }: AiFloatingButtonProps) {
   const [mounted, setMounted] = useState(false)
@@ -48,7 +49,14 @@ export function AiFloatingButton({
   }, [hasResult])
 
   const handleClick = () => {
-    if (isEnabled && !isLoading && !hasResult) {
+    if (isLoading) return
+
+    if (hasResult && onClear) {
+      onClear()
+      return
+    }
+
+    if (isEnabled && !hasResult) {
       onAnalyze()
     }
   }

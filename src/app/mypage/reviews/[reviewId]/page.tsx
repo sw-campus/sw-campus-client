@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Star } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
@@ -26,7 +26,7 @@ type ReviewDetail = {
 export default function ReviewEditPage() {
   const params = useParams<{ reviewId: string }>()
   const router = useRouter()
-  const reviewId = useMemo(() => Number(params?.reviewId), [params])
+  const reviewId = Number(params?.reviewId)
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

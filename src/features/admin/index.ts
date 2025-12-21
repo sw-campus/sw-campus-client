@@ -15,8 +15,17 @@ export {
   OrganizationTable,
 } from './components/organization'
 
+// Certificate Components
+export { CertificateApprovalPage, CertificateDetailModal, CertificateTable } from './components/certificate'
+
 // Lecture Components
 export { LectureApprovalPage, LectureDetailModal, LectureFilter, LectureTable } from './components/lecture'
+
+// Banner Components
+export { BannerCreateModal, BannerManagementPage, BannerTable } from './components/banner'
+
+// Review Components
+export { ReviewApprovalPage, ReviewDetailModal, ReviewTable } from './components/review'
 
 // Hooks
 export {
@@ -32,6 +41,15 @@ export {
   useApproveLectureMutation,
   useRejectLectureMutation,
 } from './hooks/useLectures'
+
+export {
+  useReviewsQuery,
+  useReviewDetailQuery,
+  useApproveReviewMutation,
+  useRejectReviewMutation,
+} from './hooks/useReviews'
+
+export { useBannersQuery, useCreateBannerMutation, useToggleBannerActiveMutation } from './hooks/useBanners'
 
 // Types
 export type {
@@ -68,3 +86,21 @@ export {
   LECTURE_AUTH_STATUS_COLOR,
   CURRICULUM_LEVEL_LABEL,
 } from './types/lecture.type'
+
+export type { Banner, BannerType, CreateBannerRequest } from './types/banner.type'
+export { BANNER_TYPE_LABEL } from './types/banner.type'
+
+export type {
+  ReviewAuthStatus,
+  ReviewAuthStatusFilter,
+  ReviewSummary,
+  ReviewDetail,
+  ReviewListResponse,
+  DetailScore,
+} from './types/review.type'
+
+export {
+  REVIEW_AUTH_STATUS_LABEL,
+  REVIEW_AUTH_STATUS_FILTER_LABEL,
+  REVIEW_AUTH_STATUS_COLOR,
+} from './types/review.type'
