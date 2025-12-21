@@ -14,15 +14,13 @@ export function LectureApprovalPage() {
       useDataQuery={useLecturesQuery}
       useApproveMutation={useApproveLectureMutation}
       useRejectMutation={useRejectLectureMutation}
-      renderTable={({ items, isLoading, currentPage, pageSize, onViewDetail, onApprove, onReject }) => (
+      renderTable={({ items, isLoading, currentPage, pageSize, onViewDetail }) => (
         <LectureTable
           lectures={items}
           isLoading={isLoading}
           currentPage={currentPage}
           pageSize={pageSize}
           onViewDetail={onViewDetail}
-          onApprove={onApprove}
-          onReject={onReject}
         />
       )}
       renderModal={({ item, isOpen, onClose, onApprove, onReject, isApproving, isRejecting }) => (

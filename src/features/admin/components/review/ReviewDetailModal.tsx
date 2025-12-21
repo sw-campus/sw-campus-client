@@ -95,10 +95,6 @@ export function ReviewDetailModal({
                 <DetailRow label="작성자(이름)" value={detail?.userName ?? review.userName} />
                 <DetailRow label="작성자(닉네임)" value={detail?.nickname ?? review.nickname} />
                 <DetailRow label="평점" value={detail?.score ? `${detail.score}점` : `${review.score}점`} />
-                <DetailRow
-                  label="수료증 상태"
-                  value={detail?.certificateApprovalStatus ?? review.certificateApprovalStatus}
-                />
                 <DetailRow label="작성일" value={formatDate(detail?.createdAt ?? review.createdAt)} />
               </div>
             </div>
@@ -134,38 +130,28 @@ export function ReviewDetailModal({
         <DialogFooter>
           {(detail?.approvalStatus ?? review.reviewApprovalStatus) === 'PENDING' && (
             <>
-              {(detail?.certificateApprovalStatus ?? review.certificateApprovalStatus) === 'APPROVED' ? (
+              {(detail?.certificateApprovalStatus ?? review.certificateApprovalStatus) === 'APPROVED' && (
                 <>
-                  <Button variant="outline" onClick={onClose}>
-                    닫기
+                  <Button
+                    onClick={handleApprove}
+                    disabled={isApproving}
+                    className="bg-emerald-400 text-white hover:bg-emerald-500"
+                  >
+                    {isApproving ? '처리 중...' : '승인'}
                   </Button>
                   <Button variant="destructive" onClick={handleReject} disabled={isRejecting}>
                     {isRejecting ? '처리 중...' : '반려'}
                   </Button>
-                  <Button
-                    onClick={handleApprove}
-                    disabled={isApproving}
-                    className="bg-emerald-400 hover:bg-emerald-500"
-                  >
-                    {isApproving ? '처리 중...' : '승인'}
-                  </Button>
                 </>
-              ) : (
-                <div className="flex w-full items-center justify-between">
+              )}
+              {(detail?.certificateApprovalStatus ?? review.certificateApprovalStatus) !== 'APPROVED' && (
+                <div className="flex w-full items-center justify-start">
                   <span className="text-muted-foreground text-sm italic">
                     수료증이 승인된 후에만 리뷰를 승인할 수 있습니다.
                   </span>
-                  <Button variant="outline" onClick={onClose}>
-                    닫기
-                  </Button>
                 </div>
               )}
             </>
-          )}
-          {review.reviewApprovalStatus !== 'PENDING' && (
-            <Button variant="outline" onClick={onClose}>
-              닫기
-            </Button>
           )}
         </DialogFooter>
       </DialogContent>

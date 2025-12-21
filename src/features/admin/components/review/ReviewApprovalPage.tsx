@@ -10,7 +10,7 @@ export function ReviewApprovalPage() {
   return (
     <ApprovalPage<ReviewSummary>
       title="리뷰 승인 관리"
-      searchPlaceholder="리뷰 검색..."
+      searchPlaceholder="강의 검색..."
       useDataQuery={useReviewsQuery}
       useApproveMutation={useApproveReviewMutation}
       useRejectMutation={useRejectReviewMutation}

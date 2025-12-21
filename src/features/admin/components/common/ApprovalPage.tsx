@@ -41,16 +41,16 @@ interface ModalProps<TItem> {
 /**
  * 공통 ApprovalPage Props
  */
-interface ApprovalPageProps<TItem, TDetail = TItem> {
+interface ApprovalPageProps<TItem> {
   /**
    * 페이지 제목
    */
   title: string
 
   /**
-   * 검색 placeholder
+   * 검색 placeholder (생략 시 검색바 숨김)
    */
-  searchPlaceholder: string
+  searchPlaceholder?: string
 
   /**
    * 데이터 조회 훅
@@ -82,7 +82,7 @@ interface ApprovalPageProps<TItem, TDetail = TItem> {
   renderModal: (props: ModalProps<TItem>) => ReactNode
 }
 
-export function ApprovalPage<TItem, TDetail = TItem>({
+export function ApprovalPage<TItem>({
   title,
   searchPlaceholder,
   useDataQuery,
@@ -90,7 +90,7 @@ export function ApprovalPage<TItem, TDetail = TItem>({
   useRejectMutation,
   renderTable,
   renderModal,
-}: ApprovalPageProps<TItem, TDetail>) {
+}: ApprovalPageProps<TItem>) {
   const [statusFilter, setStatusFilter] = useState<ApprovalStatusFilter>('ALL')
   const [keyword, setKeyword] = useState('')
   const [currentPage, setCurrentPage] = useState(0)

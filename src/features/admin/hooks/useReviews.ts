@@ -37,8 +37,9 @@ export function useApproveReviewMutation() {
 
   return useMutation({
     mutationFn: approveReview,
-    onSuccess: data => {
+    onSuccess: (data, reviewId) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'review', reviewId] })
       toast.success(data.message)
     },
   })
@@ -50,8 +51,9 @@ export function useRejectReviewMutation() {
 
   return useMutation({
     mutationFn: rejectReview,
-    onSuccess: data => {
+    onSuccess: (data, reviewId) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'review', reviewId] })
       toast.success(data.message)
     },
   })
@@ -73,8 +75,9 @@ export function useApproveCertificateMutation() {
 
   return useMutation({
     mutationFn: approveCertificate,
-    onSuccess: (data: any) => {
+    onSuccess: (data: { message?: string }, certificateId) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'certificate', certificateId] })
       toast.success(data.message || '수료증이 승인되었습니다.')
     },
   })
@@ -86,8 +89,9 @@ export function useRejectCertificateMutation() {
 
   return useMutation({
     mutationFn: rejectCertificate,
-    onSuccess: (data: any) => {
+    onSuccess: (data: { message?: string }, certificateId) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'certificate', certificateId] })
       toast.success(data.message || '수료증이 반려되었습니다.')
     },
   })

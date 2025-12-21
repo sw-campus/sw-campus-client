@@ -1,7 +1,6 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -79,12 +78,11 @@ export function BannerTable({ banners, isLoading, isToggling, onViewDetail, onTo
           <TableHeader>
             <TableRow>
               <TableHead className="w-[60px]">NO</TableHead>
-              <TableHead className="w-[80px]">타입</TableHead>
-              <TableHead>강의명</TableHead>
+              <TableHead className="w-[100px]">타입</TableHead>
+              <TableHead className="w-[30%]">강의명</TableHead>
               <TableHead className="w-[200px]">기간</TableHead>
-              <TableHead className="w-[80px] text-center">기간상태</TableHead>
-              <TableHead className="w-[80px] text-center">활성화</TableHead>
-              <TableHead className="w-[100px] text-center">액션</TableHead>
+              <TableHead className="w-[110px] text-center">기간상태</TableHead>
+              <TableHead className="w-[90px] text-center">활성화</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -93,15 +91,19 @@ export function BannerTable({ banners, isLoading, isToggling, onViewDetail, onTo
               .map(banner => {
                 const periodStatus = getBannerPeriodStatus(banner.startDate, banner.endDate)
                 return (
-                  <TableRow key={banner.id}>
+                  <TableRow
+                    key={banner.id}
+                    onClick={() => onViewDetail(banner)}
+                    className="hover:bg-muted/50 cursor-pointer transition-colors"
+                  >
                     <TableCell className="text-muted-foreground">{banner.id}</TableCell>
                     <TableCell>
                       <TypeBadge type={banner.type} />
                     </TableCell>
-                    <TableCell className="text-foreground max-w-0 truncate font-medium" title={banner.lectureName}>
+                    <TableCell className="text-foreground truncate font-medium" title={banner.lectureName}>
                       {banner.lectureName}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="text-muted-foreground truncate">
                       {formatDate(banner.startDate)} ~ {formatDate(banner.endDate)}
                     </TableCell>
                     <TableCell className="text-center">
@@ -113,16 +115,13 @@ export function BannerTable({ banners, isLoading, isToggling, onViewDetail, onTo
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center">
-                      <Switch
-                        checked={banner.isActive}
-                        disabled={isToggling}
-                        onCheckedChange={checked => onToggle(banner.id, checked)}
-                      />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Button variant="outline" size="sm" onClick={() => onViewDetail(banner)}>
-                        상세보기
-                      </Button>
+                      <div onClick={e => e.stopPropagation()}>
+                        <Switch
+                          checked={banner.isActive}
+                          disabled={isToggling}
+                          onCheckedChange={checked => onToggle(banner.id, checked)}
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 )

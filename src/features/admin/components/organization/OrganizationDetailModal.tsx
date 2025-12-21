@@ -102,7 +102,7 @@ export function OrganizationDetailModal({
             <div className="border-border rounded-lg border p-4">
               <h3 className="text-foreground mb-3 font-semibold">재직증명서</h3>
               {detail?.certificateUrl ? (
-                <div className="bg-muted relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                <div className="bg-muted relative aspect-4/3 w-full overflow-hidden rounded-lg">
                   <Image src={detail.certificateUrl} alt="재직증명서" fill className="object-contain" unoptimized />
                 </div>
               ) : (
@@ -117,21 +117,17 @@ export function OrganizationDetailModal({
         <DialogFooter>
           {organization.approvalStatus === 'PENDING' && (
             <>
-              <Button variant="outline" onClick={onClose}>
-                닫기
+              <Button
+                onClick={handleApprove}
+                disabled={isApproving}
+                className="bg-emerald-400 text-white hover:bg-emerald-500"
+              >
+                {isApproving ? '처리 중...' : '승인'}
               </Button>
               <Button variant="destructive" onClick={handleReject} disabled={isRejecting}>
                 {isRejecting ? '처리 중...' : '반려'}
               </Button>
-              <Button onClick={handleApprove} disabled={isApproving} className="bg-emerald-400 hover:bg-emerald-500">
-                {isApproving ? '처리 중...' : '승인'}
-              </Button>
             </>
-          )}
-          {organization.approvalStatus !== 'PENDING' && (
-            <Button variant="outline" onClick={onClose}>
-              닫기
-            </Button>
           )}
         </DialogFooter>
       </DialogContent>

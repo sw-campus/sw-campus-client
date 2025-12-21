@@ -120,21 +120,17 @@ export function CertificateDetailModal({
         <DialogFooter>
           {(detail?.approvalStatus ?? review.certificateApprovalStatus) === 'PENDING' && (
             <>
-              <Button variant="outline" onClick={onClose}>
-                닫기
+              <Button
+                onClick={handleApprove}
+                disabled={isApproving}
+                className="bg-emerald-400 text-white hover:bg-emerald-500"
+              >
+                {isApproving ? '처리 중...' : '승인'}
               </Button>
               <Button variant="destructive" onClick={handleReject} disabled={isRejecting}>
                 {isRejecting ? '처리 중...' : '반려'}
               </Button>
-              <Button onClick={handleApprove} disabled={isApproving} className="bg-emerald-400 hover:bg-emerald-500">
-                {isApproving ? '처리 중...' : '승인'}
-              </Button>
             </>
-          )}
-          {(detail?.approvalStatus ?? review.certificateApprovalStatus) !== 'PENDING' && (
-            <Button variant="outline" onClick={onClose}>
-              닫기
-            </Button>
           )}
         </DialogFooter>
       </DialogContent>
