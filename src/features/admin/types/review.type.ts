@@ -93,3 +93,25 @@ export interface ReviewListParams {
   page?: number
   size?: number
 }
+
+/**
+ * 수료증 상세 정보
+ */
+export interface CertificateDetail {
+  certificateId: number
+  lectureName: string
+  userName: string
+  nickname: string
+  imageUrl: string
+  approvalStatus: ReviewAuthStatus
+  createdAt: string
+}
+
+/**
+ * 수료증 승인/반려 응답 형식
+ */
+export interface CertificateApprovalResponse {
+  certificateId: number
+  approvalStatus: ReviewAuthStatus
+  message: string
+}

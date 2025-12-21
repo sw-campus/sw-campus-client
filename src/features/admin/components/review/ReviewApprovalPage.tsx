@@ -1,8 +1,8 @@
 'use client'
 
 import { ApprovalPage } from '@/features/admin/components/common'
-import { ReviewDetailModal } from '@/features/admin/components/review'
-import { ReviewTable } from '@/features/admin/components/review'
+import { ReviewDetailModal } from '@/features/admin/components/review/ReviewDetailModal'
+import { ReviewTable } from '@/features/admin/components/review/ReviewTable'
 import { useApproveReviewMutation, useReviewsQuery, useRejectReviewMutation } from '@/features/admin/hooks/useReviews'
 import type { ReviewSummary } from '@/features/admin/types/review.type'
 
@@ -14,15 +14,13 @@ export function ReviewApprovalPage() {
       useDataQuery={useReviewsQuery}
       useApproveMutation={useApproveReviewMutation}
       useRejectMutation={useRejectReviewMutation}
-      renderTable={({ items, isLoading, currentPage, pageSize, onViewDetail, onApprove, onReject }) => (
+      renderTable={({ items, isLoading, currentPage, pageSize, onViewDetail }) => (
         <ReviewTable
           reviews={items}
           isLoading={isLoading}
           currentPage={currentPage}
           pageSize={pageSize}
           onViewDetail={onViewDetail}
-          onApprove={onApprove}
-          onReject={onReject}
         />
       )}
       renderModal={({ item, isOpen, onClose, onApprove, onReject, isApproving, isRejecting }) => (

@@ -4,6 +4,8 @@ import type {
   ReviewDetail,
   ReviewListResponse,
   ReviewSummary,
+  CertificateDetail,
+  CertificateApprovalResponse,
 } from '@/features/admin/types/review.type'
 import { api } from '@/lib/axios'
 import type { PageResponse } from '@/types/api.type'
@@ -65,23 +67,23 @@ export async function rejectReview(reviewId: number): Promise<ReviewApprovalResp
 /**
  * 수료증 상세 조회 API
  */
-export async function fetchCertificateDetail(certificateId: number) {
-  const { data } = await api.get(`/admin/certificates/${certificateId}`)
+export async function fetchCertificateDetail(certificateId: number): Promise<CertificateDetail> {
+  const { data } = await api.get<CertificateDetail>(`/admin/certificates/${certificateId}`)
   return data
 }
 
 /**
  * 수료증 승인 API
  */
-export async function approveCertificate(certificateId: number) {
-  const { data } = await api.patch(`/admin/certificates/${certificateId}/approve`)
+export async function approveCertificate(certificateId: number): Promise<CertificateApprovalResponse> {
+  const { data } = await api.patch<CertificateApprovalResponse>(`/admin/certificates/${certificateId}/approve`)
   return data
 }
 
 /**
  * 수료증 반려 API
  */
-export async function rejectCertificate(certificateId: number) {
-  const { data } = await api.patch(`/admin/certificates/${certificateId}/reject`)
+export async function rejectCertificate(certificateId: number): Promise<CertificateApprovalResponse> {
+  const { data } = await api.patch<CertificateApprovalResponse>(`/admin/certificates/${certificateId}/reject`)
   return data
 }

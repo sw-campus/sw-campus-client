@@ -10,7 +10,7 @@ import {
   rejectCertificate,
   rejectReview,
 } from '@/features/admin/api/reviewApi'
-import type { ReviewAuthStatus } from '@/features/admin/types/review.type'
+import type { CertificateApprovalResponse, ReviewAuthStatus } from '@/features/admin/types/review.type'
 
 // Review 목록 조회 Query Hook
 export function useReviewsQuery(status?: ReviewAuthStatus, keyword?: string, page: number = 0) {
@@ -75,7 +75,7 @@ export function useApproveCertificateMutation() {
 
   return useMutation({
     mutationFn: approveCertificate,
-    onSuccess: (data: { message?: string }, certificateId) => {
+    onSuccess: (data: CertificateApprovalResponse, certificateId) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
       queryClient.invalidateQueries({ queryKey: ['admin', 'certificate', certificateId] })
       toast.success(data.message || '수료증이 승인되었습니다.')
@@ -89,7 +89,7 @@ export function useRejectCertificateMutation() {
 
   return useMutation({
     mutationFn: rejectCertificate,
-    onSuccess: (data: { message?: string }, certificateId) => {
+    onSuccess: (data: CertificateApprovalResponse, certificateId) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
       queryClient.invalidateQueries({ queryKey: ['admin', 'certificate', certificateId] })
       toast.success(data.message || '수료증이 반려되었습니다.')
