@@ -67,11 +67,14 @@ export interface ReviewDetail {
 }
 
 /**
- * Review API 응답 형식 (사용자 제공 형식)
+ * Review API 응답 형식 (Spring Data Page)
  */
 export interface ReviewListResponse {
-  reviews: ReviewSummary[]
-  totalCount: number
+  content: ReviewSummary[]
+  size: number
+  number: number
+  totalElements: number
+  totalPages: number
 }
 
 /**

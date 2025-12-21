@@ -17,7 +17,7 @@ export async function fetchReviews(
   page: number = 0,
   size: number = 10,
 ): Promise<PageResponse<ReviewSummary>> {
-  const { data } = await api.get<ReviewListResponse>('/admin/reviews', {
+  const { data } = await api.get<ReviewListResponse>('/admin/reviews/all', {
     params: {
       ...(status && { status }),
       ...(keyword && { keyword }),
@@ -26,14 +26,14 @@ export async function fetchReviews(
     },
   })
 
-  // ApprovalPage 공통 컴포넌트 호환을 위해 PageResponse 형식으로 변환
+  // Spring Data Page 응답을 ApprovalPage 공통 컴포넌트 호환 형식으로 변환
   return {
-    content: data.reviews,
+    content: data.content,
     page: {
-      size,
-      number: page,
-      totalElements: data.totalCount,
-      totalPages: Math.ceil(data.totalCount / size),
+      size: data.size,
+      number: data.number,
+      totalElements: data.totalElements,
+      totalPages: data.totalPages,
     },
   }
 }
@@ -59,5 +59,29 @@ export async function approveReview(reviewId: number): Promise<ReviewApprovalRes
  */
 export async function rejectReview(reviewId: number): Promise<ReviewApprovalResponse> {
   const { data } = await api.patch<ReviewApprovalResponse>(`/admin/reviews/${reviewId}/reject`)
+  return data
+}
+
+/**
+ * 수료증 상세 조회 API
+ */
+export async function fetchCertificateDetail(certificateId: number) {
+  const { data } = await api.get(`/admin/certificates/${certificateId}`)
+  return data
+}
+
+/**
+ * 수료증 승인 API
+ */
+export async function approveCertificate(certificateId: number) {
+  const { data } = await api.patch(`/admin/certificates/${certificateId}/approve`)
+  return data
+}
+
+/**
+ * 수료증 반려 API
+ */
+export async function rejectCertificate(certificateId: number) {
+  const { data } = await api.patch(`/admin/certificates/${certificateId}/reject`)
   return data
 }

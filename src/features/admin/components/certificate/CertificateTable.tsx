@@ -14,14 +14,14 @@ import {
 import { formatDate } from '@/lib/date'
 import { cn } from '@/lib/utils'
 
-interface ReviewTableProps {
-  reviews: ReviewSummary[]
+interface CertificateTableProps {
+  items: ReviewSummary[]
   isLoading: boolean
   currentPage: number
   pageSize: number
-  onViewDetail: (review: ReviewSummary) => void
-  onApprove: (reviewId: number, options?: MutationOptions) => void
-  onReject: (reviewId: number, options?: MutationOptions) => void
+  onViewDetail: (item: ReviewSummary) => void
+  onApprove: (id: number, options?: MutationOptions) => void
+  onReject: (id: number, options?: MutationOptions) => void
 }
 
 function StatusBadge({ status }: { status: ReviewAuthStatus }) {
@@ -32,22 +32,22 @@ function StatusBadge({ status }: { status: ReviewAuthStatus }) {
   )
 }
 
-export function ReviewTable({
-  reviews,
+export function CertificateTable({
+  items,
   isLoading,
   currentPage,
   pageSize,
   onViewDetail,
   onApprove,
   onReject,
-}: ReviewTableProps) {
+}: CertificateTableProps) {
   const getRowNumber = (index: number) => currentPage * pageSize + index + 1
 
   if (isLoading) {
     return (
       <Card className="bg-card">
         <CardHeader>
-          <CardTitle className="text-foreground">리뷰 목록</CardTitle>
+          <CardTitle className="text-foreground">수료증 목록</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex h-32 items-center justify-center">
@@ -58,15 +58,15 @@ export function ReviewTable({
     )
   }
 
-  if (reviews.length === 0) {
+  if (items.length === 0) {
     return (
       <Card className="bg-card">
         <CardHeader>
-          <CardTitle className="text-foreground">리뷰 목록</CardTitle>
+          <CardTitle className="text-foreground">수료증 목록</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex h-32 items-center justify-center">
-            <span className="text-muted-foreground">해당 조건의 리뷰가 없습니다.</span>
+            <span className="text-muted-foreground">해당 조건의 수료증이 없습니다.</span>
           </div>
         </CardContent>
       </Card>
@@ -76,62 +76,53 @@ export function ReviewTable({
   return (
     <Card className="bg-card">
       <CardHeader>
-        <CardTitle className="text-foreground">리뷰 목록</CardTitle>
+        <CardTitle className="text-foreground">수료증 목록</CardTitle>
       </CardHeader>
       <CardContent>
         <Table className="table-fixed">
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">NO</TableHead>
-              <TableHead className="w-[20%]">강의명</TableHead>
+              <TableHead className="w-[30%]">강의명</TableHead>
               <TableHead className="w-[15%]">작성자</TableHead>
-              <TableHead className="w-[80px]">평점</TableHead>
               <TableHead className="w-[120px]">수료증 상태</TableHead>
-              <TableHead className="w-[100px]">리뷰 상태</TableHead>
-              <TableHead className="w-[120px]">작성일</TableHead>
-              <TableHead className="w-[220px] text-right">액션</TableHead>
+              <TableHead className="w-[120px]">신청일</TableHead>
+              <TableHead className="w-[200px] text-right">액션</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {reviews.map((review, index) => (
-              <TableRow key={review.reviewId}>
+            {items.map((item, index) => (
+              <TableRow key={item.reviewId}>
                 <TableCell className="text-muted-foreground">{getRowNumber(index)}</TableCell>
-                <TableCell className="text-foreground max-w-0 truncate font-medium" title={review.lectureName}>
-                  {review.lectureName}
+                <TableCell className="text-foreground max-w-0 truncate font-medium" title={item.lectureName}>
+                  {item.lectureName}
                 </TableCell>
-                <TableCell className="text-muted-foreground truncate" title={`${review.userName} (${review.nickname})`}>
-                  {review.nickname}
-                </TableCell>
-                <TableCell className="text-muted-foreground">{review.score}점</TableCell>
-                <TableCell>
-                  <StatusBadge status={review.certificateApprovalStatus} />
+                <TableCell className="text-muted-foreground max-w-0 truncate" title={item.nickname}>
+                  {item.nickname} ({item.userName})
                 </TableCell>
                 <TableCell>
-                  <StatusBadge status={review.reviewApprovalStatus} />
+                  <StatusBadge status={item.certificateApprovalStatus} />
                 </TableCell>
-                <TableCell className="text-muted-foreground">{formatDate(review.createdAt)}</TableCell>
+                <TableCell className="text-muted-foreground">{formatDate(item.createdAt)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm" onClick={() => onViewDetail(review)}>
-                      상세보기
+                    <Button variant="outline" size="sm" onClick={() => onViewDetail(item)}>
+                      수료증 확인
                     </Button>
-                    {review.reviewApprovalStatus === 'PENDING' && review.certificateApprovalStatus === 'APPROVED' && (
+                    {item.certificateApprovalStatus === 'PENDING' && (
                       <>
                         <Button
                           variant="default"
                           size="sm"
-                          onClick={() => onApprove(review.reviewId)}
+                          onClick={() => onApprove(item.certificateId)}
                           className="bg-emerald-400 hover:bg-emerald-500"
                         >
                           승인
                         </Button>
-                        <Button variant="destructive" size="sm" onClick={() => onReject(review.reviewId)}>
+                        <Button variant="destructive" size="sm" onClick={() => onReject(item.certificateId)}>
                           반려
                         </Button>
                       </>
-                    )}
-                    {review.reviewApprovalStatus === 'PENDING' && review.certificateApprovalStatus !== 'APPROVED' && (
-                      <span className="text-muted-foreground text-xs italic">수료증 승인 대기</span>
                     )}
                   </div>
                 </TableCell>

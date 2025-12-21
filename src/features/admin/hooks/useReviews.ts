@@ -1,7 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { approveReview, fetchReviewDetail, fetchReviews, rejectReview } from '@/features/admin/api/reviewApi'
+import {
+  approveCertificate,
+  approveReview,
+  fetchCertificateDetail,
+  fetchReviewDetail,
+  fetchReviews,
+  rejectCertificate,
+  rejectReview,
+} from '@/features/admin/api/reviewApi'
 import type { ReviewAuthStatus } from '@/features/admin/types/review.type'
 
 // Review 목록 조회 Query Hook
@@ -45,6 +53,42 @@ export function useRejectReviewMutation() {
     onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
       toast.success(data.message)
+    },
+  })
+}
+
+// Certificate 상세 조회 Query Hook
+export function useCertificateDetailQuery(certificateId: number) {
+  return useQuery({
+    queryKey: ['admin', 'certificate', certificateId],
+    queryFn: () => fetchCertificateDetail(certificateId),
+    staleTime: 1000 * 60 * 5,
+    enabled: !!certificateId,
+  })
+}
+
+// Certificate 승인 Mutation Hook
+export function useApproveCertificateMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: approveCertificate,
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
+      toast.success(data.message || '수료증이 승인되었습니다.')
+    },
+  })
+}
+
+// Certificate 반려 Mutation Hook
+export function useRejectCertificateMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: rejectCertificate,
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'reviews'] })
+      toast.success(data.message || '수료증이 반려되었습니다.')
     },
   })
 }
