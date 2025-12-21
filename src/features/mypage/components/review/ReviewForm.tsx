@@ -12,6 +12,9 @@ import { api } from '@/lib/axios'
 type ReviewFormProps = {
   embedded?: boolean
   reviewId?: number
+  lectureId?: number
+  readOnly?: boolean
+  onClose?: () => void
 }
 
 const reviewSchema = z.object({
@@ -21,22 +24,74 @@ const reviewSchema = z.object({
 type ReviewResponse = {
   reviewId: number
   comment: string | null
+  detailScores?: Array<{ category: string; score: number; comment?: string | null }> | null
+  status?: string | null
+  reviewStatus?: string | null
+  approvalStatus?: string | null
 }
 
-export function ReviewForm({ embedded = false, reviewId }: ReviewFormProps) {
-  const [loading, setLoading] = useState<boolean>(!!reviewId)
+type CompletedLectureReviewResponse = {
+  reviewId: number
+  lectureId: number
+  memberId?: number
+  nickname?: string
+  comment: string | null
+  score?: number
+  detailScores?: Array<{ category: string; score: number; comment?: string | null }> | null
+  approvalStatus?: string | null
+}
+
+export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = false, onClose }: ReviewFormProps) {
+  const [loading, setLoading] = useState<boolean>(!!reviewId || !!lectureId)
+  const [resolvedReviewId, setResolvedReviewId] = useState<number | null>(reviewId ?? null)
   const [comment, setComment] = useState<string>('')
+  const [detailScores, setDetailScores] = useState<Array<{ category: string; score: number; comment?: string }>>([])
+  const [serverApproved, setServerApproved] = useState(false)
+
+  const effectiveReadOnly = readOnly || serverApproved
 
   useEffect(() => {
-    if (!reviewId) return
+    if (!reviewId && !lectureId) return
     let mounted = true
 
     const load = async () => {
       setLoading(true)
       try {
-        const res = await api.get<ReviewResponse>(`/reviews/${reviewId}`)
-        if (!mounted) return
-        setComment(res.data?.comment ?? '')
+        if (reviewId) {
+          const res = await api.get<ReviewResponse>(`/reviews/${reviewId}`)
+          if (!mounted) return
+          setResolvedReviewId(res.data?.reviewId ?? reviewId)
+          setComment(res.data?.comment ?? '')
+          setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === 'APPROVED')
+
+          const details = Array.isArray(res.data?.detailScores) ? res.data.detailScores : []
+          setDetailScores(
+            details.map(d => ({
+              category: String(d.category),
+              score: typeof d.score === 'number' ? d.score : Number(d.score) || 0,
+              comment: d.comment ?? '',
+            })),
+          )
+          return
+        }
+
+        if (lectureId) {
+          // 스웨거(첨부 이미지): GET /api/v1/mypage/completed-lectures/{lectureId}/review
+          const res = await api.get<CompletedLectureReviewResponse>(`/mypage/completed-lectures/${lectureId}/review`)
+          if (!mounted) return
+          setResolvedReviewId(res.data?.reviewId ?? null)
+          setComment(res.data?.comment ?? '')
+          setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === 'APPROVED')
+
+          const details = Array.isArray(res.data?.detailScores) ? res.data.detailScores : []
+          setDetailScores(
+            details.map(d => ({
+              category: String(d.category),
+              score: typeof d.score === 'number' ? d.score : Number(d.score) || 0,
+              comment: d.comment ?? '',
+            })),
+          )
+        }
       } catch {
         // 조회 실패 시에도 수정 UI는 열리게 둠
       } finally {
@@ -48,28 +103,39 @@ export function ReviewForm({ embedded = false, reviewId }: ReviewFormProps) {
     return () => {
       mounted = false
     }
-  }, [reviewId])
+  }, [reviewId, lectureId])
 
   const saveMutation = useMutation({
     mutationFn: async () => {
+      if (effectiveReadOnly) return
       const parsed = reviewSchema.safeParse({ comment })
       if (!parsed.success) {
         throw new Error(parsed.error.issues[0]?.message ?? '입력값을 확인해주세요')
       }
 
-      const payload = { comment: parsed.data.comment ?? '' }
+      const payload = {
+        comment: parsed.data.comment ?? '',
+        detailScores: detailScores.map(d => ({
+          category: d.category,
+          score: d.score,
+          comment: d.comment,
+        })),
+      }
 
-      if (reviewId) {
-        await api.put(`/reviews/${reviewId}`, payload)
+      const targetReviewId = resolvedReviewId ?? reviewId ?? null
+
+      if (targetReviewId) {
+        await api.put(`/reviews/${targetReviewId}`, payload)
         return
       }
 
-      // 생성은 보통 lectureId/detailScores 등이 필요할 수 있어, 현재 스펙 미확정이면 실패 처리
-      await api.post(`/reviews`, payload)
+      // 생성은 이 폼에서 사용하지 않음(생성은 상위에서 lectureId/detailScores 포함해 처리)
+      throw new Error('리뷰 ID를 찾을 수 없습니다.')
     },
   })
 
   const onSave = async () => {
+    if (effectiveReadOnly) return
     try {
       await saveMutation.mutateAsync()
       toast.success(reviewId ? '리뷰가 수정되었습니다.' : '리뷰가 저장되었습니다.')
@@ -89,24 +155,61 @@ export function ReviewForm({ embedded = false, reviewId }: ReviewFormProps) {
           rows={4}
           className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
           placeholder="후기를 입력하세요"
-          disabled={loading || saveMutation.isPending}
+          disabled={effectiveReadOnly || loading || saveMutation.isPending}
         />
       </div>
 
+      {detailScores.length > 0 && (
+        <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          {detailScores.map((d, idx) => (
+            <div key={`${d.category}-${idx}`} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-gray-800">{d.category}</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={5}
+                  step={0.5}
+                  value={d.score}
+                  onChange={e => {
+                    const v = Number(e.target.value)
+                    setDetailScores(prev => prev.map((x, i) => (i === idx ? { ...x, score: v } : x)))
+                  }}
+                  className="w-20 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm"
+                  disabled={effectiveReadOnly || loading || saveMutation.isPending}
+                />
+              </div>
+              <textarea
+                value={d.comment ?? ''}
+                onChange={e =>
+                  setDetailScores(prev => prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)))
+                }
+                rows={2}
+                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
+                placeholder="세부 의견을 입력하세요"
+                disabled={effectiveReadOnly || loading || saveMutation.isPending}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
       <Button
         type="button"
-        onClick={onSave}
-        disabled={loading || saveMutation.isPending}
+        onClick={() => {
+          if (effectiveReadOnly) {
+            onClose?.()
+            return
+          }
+          void onSave()
+        }}
+        disabled={loading || (!effectiveReadOnly && saveMutation.isPending)}
         className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
       >
-        {loading ? '불러오는 중...' : saveMutation.isPending ? '저장 중...' : '저장'}
+        {loading ? '불러오는 중...' : effectiveReadOnly ? '닫기' : saveMutation.isPending ? '저장 중...' : '저장'}
       </Button>
 
-      {!reviewId && (
-        <p className="text-xs text-gray-500">
-          참고: 생성 API가 `lectureId`/`detailScores`를 필수로 요구하는 경우, 이 폼은 추후 스펙에 맞춰 확장해야 합니다.
-        </p>
-      )}
+      {!reviewId && <p className="text-xs text-gray-500"></p>}
     </div>
   )
 
