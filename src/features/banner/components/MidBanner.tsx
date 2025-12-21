@@ -12,30 +12,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import SmallBanner from '@/features/banner/components/SmallBanner'
 
 import { useBannersByTypeQuery } from '../hooks/useBannerQuery'
-
-/**
- * 날짜 포맷팅 (MM/DD 형식)
- */
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  return `${month}/${day}`
-}
-
-/**
- * 모집 유형에 따른 태그 텍스트
- */
-function getRecruitTag(recruitType: string): string {
-  switch (recruitType) {
-    case 'CARD_REQUIRED':
-      return '내배카 필요 O'
-    case 'GENERAL':
-      return '내배카 필요 X'
-    default:
-      return ''
-  }
-}
+import { formatDate, getRecruitTag } from '../utils/bannerUtils'
 
 export default function MidBanner() {
   const swiperRef = useRef<SwiperType | null>(null)

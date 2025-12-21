@@ -30,20 +30,44 @@ function useImageColors(imageUrls: string[]) {
   useEffect(() => {
     if (!fac.current || imageUrls.length === 0) return
 
-    imageUrls.forEach(async url => {
-      if (!url || colors[url]) return
+    const fetchMissingColors = async () => {
+      // 아직 색상이 추출되지 않은 URL만 필터링
+      const urlsToProcess = imageUrls.filter(url => url && !colors[url])
+      if (urlsToProcess.length === 0) return
 
-      try {
-        const color = await fac.current!.getColorAsync(url)
-        setColors(prev => ({
-          ...prev,
-          [url]: color.rgba,
-        }))
-      } catch (error) {
-        console.error('Failed to extract color from image:', url, error)
+      // 모든 색상 추출을 병렬로 처리
+      const colorPromises = urlsToProcess.map(url =>
+        fac
+          .current!.getColorAsync(url)
+          .then(color => ({ url, rgba: color.rgba }))
+          .catch(error => {
+            console.error('Failed to extract color from image:', url, error)
+            return null
+          }),
+      )
+
+      const results = await Promise.all(colorPromises)
+
+      // 성공한 결과만 필터링하여 새 색상 객체 생성
+      const newColors = results.reduce(
+        (acc, result) => {
+          if (result) {
+            acc[result.url] = result.rgba
+          }
+          return acc
+        },
+        {} as Record<string, string>,
+      )
+
+      // 새로운 색상이 있을 때만 상태 업데이트
+      if (Object.keys(newColors).length > 0) {
+        setColors(prev => ({ ...prev, ...newColors }))
       }
-    })
-  }, [imageUrls, colors])
+    }
+
+    fetchMissingColors()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imageUrls])
 
   return colors
 }
