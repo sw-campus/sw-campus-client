@@ -130,27 +130,16 @@ export function ReviewDetailModal({
         <DialogFooter>
           {(detail?.approvalStatus ?? review.reviewApprovalStatus) === 'PENDING' && (
             <>
-              {(detail?.certificateApprovalStatus ?? review.certificateApprovalStatus) === 'APPROVED' && (
-                <>
-                  <Button
-                    onClick={handleApprove}
-                    disabled={isApproving}
-                    className="bg-emerald-400 text-white hover:bg-emerald-500"
-                  >
-                    {isApproving ? '처리 중...' : '승인'}
-                  </Button>
-                  <Button variant="destructive" onClick={handleReject} disabled={isRejecting}>
-                    {isRejecting ? '처리 중...' : '반려'}
-                  </Button>
-                </>
-              )}
-              {(detail?.certificateApprovalStatus ?? review.certificateApprovalStatus) !== 'APPROVED' && (
-                <div className="flex w-full items-center justify-start">
-                  <span className="text-muted-foreground text-sm italic">
-                    수료증이 승인된 후에만 리뷰를 승인할 수 있습니다.
-                  </span>
-                </div>
-              )}
+              <Button
+                onClick={handleApprove}
+                disabled={isApproving}
+                className="bg-emerald-400 text-white hover:bg-emerald-500"
+              >
+                {isApproving ? '처리 중...' : '승인'}
+              </Button>
+              <Button variant="destructive" onClick={handleReject} disabled={isRejecting}>
+                {isRejecting ? '처리 중...' : '반려'}
+              </Button>
             </>
           )}
         </DialogFooter>
