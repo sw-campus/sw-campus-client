@@ -153,11 +153,11 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
           facilityImageUrl2: data.facilityImageUrl2 ?? '',
           facilityImageUrl3: data.facilityImageUrl3 ?? '',
           facilityImageUrl4: data.facilityImageUrl4 ?? '',
-          location: data.location ?? '',
+          location: '',
         })
 
-        // AddressInput(store) 값 세팅
-        setAddress(data.location ?? '')
+        // 주소는 사용자에게 다시 입력받도록 비워둠
+        setAddress('')
         setDetailAddress('')
       } catch {
         toast.error('기관 정보 조회에 실패했습니다.')
@@ -178,6 +178,10 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     try {
       // AddressInput은 store 기반이므로 여기서 location 조합
       const _nextLocation = detailAddress?.trim() ? `${address ?? ''} ${detailAddress}`.trim() : (address ?? '').trim()
+      if (!_nextLocation) {
+        toast.error('주소를 입력해주세요.')
+        return
+      }
       const fd = new FormData()
       // 텍스트 필드 (Swagger 스펙 기반)
       fd.append('organizationName', methods.getValues('organizationName') ?? '')

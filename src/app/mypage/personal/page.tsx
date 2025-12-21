@@ -15,8 +15,8 @@ export default function MyPage() {
   const { userType } = useAuthStore()
 
   if (userType === 'PERSONAL') {
-    const handleOpenOrgInfo = () => setActiveSection('password')
-    const handleOpenLectureManage = () => setActiveSection('survey')
+    const handleOpenPersonInfo = () => setActiveSection('password')
+    const handleOpenSurveyManage = () => setActiveSection('survey')
     const handleOpenReviewManage = () => setActiveSection('reviews')
 
     const openInfoModal = () => {
@@ -33,8 +33,8 @@ export default function MyPage() {
           {/* 실제 내용 영역 */}
           <div className="relative z-10 flex w-full gap-6">
             <PersonalAside
-              onClickOrgInfo={handleOpenOrgInfo}
-              onClickLectureManage={handleOpenLectureManage}
+              onClickPersonInfo={handleOpenPersonInfo}
+              onClickSurveyManage={handleOpenSurveyManage}
               onClickReviewManage={handleOpenReviewManage}
             />
             <PersonalMain

@@ -6,11 +6,12 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { login as loginApi } from '@/features/auth/authApi'
+import { getProfile } from '@/features/mypage/api/survey.api'
 import { useAuthStore } from '@/store/authStore'
 
 export function useLoginForm() {
   const router = useRouter()
-  const { login: setLogin, setUserType: setAuthUserType } = useAuthStore()
+  const { login: setLogin, setUserType: setAuthUserType, setNickname } = useAuthStore()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -49,6 +50,19 @@ export function useLoginForm() {
       setAuthUserType(userType)
 
       setLogin(userName)
+
+      // 닉네임 설정: 응답에 있으면 사용, 없으면 프로필 조회
+      try {
+        const nickFromResponse = (data as any)?.nickname
+        if (typeof nickFromResponse === 'string' && nickFromResponse.length > 0) {
+          setNickname(nickFromResponse)
+        } else {
+          const profile = await getProfile()
+          if (profile?.nickname) setNickname(profile.nickname)
+        }
+      } catch {
+        // ignore nickname fetch errors
+      }
       router.push('/')
     } catch (error) {
       console.error(error)

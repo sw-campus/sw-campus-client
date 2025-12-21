@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,6 +12,7 @@ import { HeaderIconAction } from '@/components/layout/header/HeaderIconAction'
 import { LogoutDialog } from '@/components/layout/header/LogoutDialog'
 import { useLogout } from '@/features/auth/hooks/useLogout'
 import type { CategoryTreeNode } from '@/features/category'
+import { ensureSessionActive } from '@/lib/axios'
 import { useAuthStore } from '@/store/authStore'
 
 export default function Header({
@@ -27,10 +28,33 @@ export default function Header({
 }) {
   const router = useRouter()
   const [logoutOpen, setLogoutOpen] = useState(false)
-  const { isLoggedIn, userName, userType } = useAuthStore()
+  const { isLoggedIn, nickname, userType } = useAuthStore()
   const { logout, isPending } = useLogout()
 
   const mypageHref = userType === 'ORGANIZATION' ? '/mypage/organization' : '/mypage/personal'
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const check = () => {
+      // 세션 만료 시 store 초기화 → 헤더에서 닉네임/로그인 UI 즉시 반영
+      void ensureSessionActive()
+    }
+
+    check()
+
+    const onFocus = () => check()
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') check()
+    }
+
+    window.addEventListener('focus', onFocus)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      window.removeEventListener('focus', onFocus)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [isLoggedIn])
 
   // 로그아웃
   const handleLogout = async () => {
@@ -87,11 +111,9 @@ export default function Header({
 
       {/* 아이콘 */}
       <div className="flex items-center gap-6 text-xl text-white">
-        {/* 로그인 여부에 따라 UI 변경 */}
         {isLoggedIn ? (
           <>
-            {/* 로그인된 경우 */}
-            <span className="text-base font-medium">{userName ?? '사용자'} 님</span>
+            <span className="text-base font-medium">{nickname}님</span>
 
             <HeaderIconAction
               kind="button"

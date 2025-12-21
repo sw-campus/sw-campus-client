@@ -6,6 +6,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { oauthLogin } from '@/features/auth/authApi'
+import { getProfile } from '@/features/mypage/api/survey.api'
 import { useAuthStore } from '@/store/authStore'
 
 export default function OAuthCallbackPage() {
@@ -13,7 +14,7 @@ export default function OAuthCallbackPage() {
   const search = useSearchParams()
   const params = useParams<{ provider: string }>()
 
-  const { login: setLogin, setUserType } = useAuthStore()
+  const { login: setLogin, setUserType, setNickname } = useAuthStore()
 
   useEffect(() => {
     const run = async () => {
@@ -70,6 +71,19 @@ export default function OAuthCallbackPage() {
 
         setUserType(userType)
         setLogin(userName)
+
+        // 닉네임 설정: 응답에 있으면 사용, 없으면 프로필 조회
+        try {
+          const nickFromResponse = (data as any)?.nickname
+          if (typeof nickFromResponse === 'string' && nickFromResponse.length > 0) {
+            setNickname(nickFromResponse)
+          } else {
+            const profile = await getProfile()
+            if (profile?.nickname) setNickname(profile.nickname)
+          }
+        } catch {
+          // ignore nickname fetch errors
+        }
 
         toast.success('로그인되었습니다.')
         router.replace('/')
