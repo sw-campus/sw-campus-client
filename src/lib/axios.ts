@@ -87,9 +87,16 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
-function handleSessionExpired() {
+type ClearAuthOptions = {
+  notify?: boolean
+  redirectToLogin?: boolean
+}
+
+function clearAuthState(options: ClearAuthOptions = {}) {
   if (isHandlingUnauthorized) return
   isHandlingUnauthorized = true
+
+  const { notify = true, redirectToLogin = true } = options
 
   try {
     // ✅ 1) Zustand 인증 상태 초기화
@@ -125,14 +132,62 @@ function handleSessionExpired() {
         // ignore
       }
 
-      // ✅ 3) 사용자 안내 + 로그인 이동
-      toast.error('세션이 만료되어 로그아웃되었습니다')
-      // 기본 로그인 경로. 필요 시 환경/라우팅에 맞게 조정
-      window.location.replace('/login')
+      // ✅ 3) 사용자 안내 + (선택) 로그인 이동
+      if (notify) toast.error('세션이 만료되어 로그아웃되었습니다')
+      if (redirectToLogin) {
+        // 기본 로그인 경로. 필요 시 환경/라우팅에 맞게 조정
+        window.location.replace('/login')
+      }
     }
   } finally {
     // replace로 이동되지만, 테스트/특수 환경에서는 finally가 의미가 있어 유지
     isHandlingUnauthorized = false
+  }
+}
+
+// Header 등에서 사용: 포커스/탭 복귀 시 세션을 조용히 점검
+// - 세션 유효: 유지(+가능하면 nickname/userType 보정)
+// - 세션 만료/무효: 인증 상태만 초기화(리다이렉트/토스트 없음)
+export async function ensureSessionActive(): Promise<boolean> {
+  try {
+    const { isLoggedIn } = useAuthStore.getState()
+    if (!isLoggedIn) return true
+
+    // NOTE: 현재 서버 인증은 쿠키 기반(accessToken/refreshToken HttpOnly)일 수 있어
+    // refresh 호출 실패만으로 로그아웃 처리하면(특히 로컬 http 환경에서 Secure 쿠키 미저장) 오탐이 발생할 수 있음.
+    // 따라서 세션 확인은 실제 인증이 필요한 엔드포인트로 검증한다.
+    type ProfileResponse = {
+      nickname?: string | null
+      role?: string | null
+      userType?: string | null
+    }
+
+    const res = await refreshClient.get<ProfileResponse>('/mypage/profile')
+    const profile = res?.data
+
+    // 가능한 범위에서 헤더 표시용 값 보정
+    try {
+      const state = useAuthStore.getState()
+
+      const nickname = typeof profile?.nickname === 'string' && profile.nickname.length > 0 ? profile.nickname : null
+      if (!state.nickname && nickname) state.setNickname(nickname)
+
+      const roleOrType = (profile?.userType ?? profile?.role ?? '')
+      if (roleOrType === 'ORGANIZATION' || roleOrType === 'organization') state.setUserType('ORGANIZATION')
+      else if (roleOrType) state.setUserType('PERSONAL')
+    } catch {
+      // ignore
+    }
+
+    return true
+  } catch (err) {
+    const status = (err as { response?: { status?: number } })?.response?.status
+    if (status === 401 || status === 419 || status === 440 || status === 498) {
+      clearAuthState({ notify: false, redirectToLogin: false })
+      return false
+    }
+    // 네트워크/일시적 오류는 로그인 UI를 유지
+    return true
   }
 }
 
@@ -143,27 +198,14 @@ api.interceptors.request.use(
     try {
       const token = useAuthStore.getState().accessToken
       if (token) {
-        if (config.headers) {
-          const headersMaybe = config.headers as unknown as { set?: (k: string, v: string) => void }
-          if (typeof headersMaybe.set === 'function') {
-            ;(config.headers as unknown as AxiosHeaders).set('Authorization', `Bearer ${token}`)
-          } else {
-            config.headers = {
-              ...(config.headers as Record<string, string>),
-              Authorization: `Bearer ${token}`,
-            }
-          }
-        } else {
-          config.headers = { Authorization: `Bearer ${token}` }
-        }
+        const headers = AxiosHeaders.from(config.headers ?? {})
+        headers.set('Authorization', `Bearer ${token}`)
+        config.headers = headers
       } else if (config.headers) {
         // ensure no stale header is sent
-        const headersMaybe = config.headers as unknown as { delete?: (k: string) => void }
-        if (typeof headersMaybe.delete === 'function') {
-          ;(config.headers as unknown as AxiosHeaders).delete('Authorization')
-        } else {
-          delete (config.headers as Record<string, unknown>).Authorization
-        }
+        const headers = AxiosHeaders.from(config.headers)
+        headers.delete('Authorization')
+        config.headers = headers
       }
     } catch {
       // ignore: store may not be available in some environments
@@ -211,7 +253,7 @@ api.interceptors.response.use(
       return (refreshPromise as Promise<string | null>)
         .then(newToken => {
           if (!newToken) {
-            handleSessionExpired()
+            clearAuthState({ notify: true, redirectToLogin: true })
             return Promise.reject(error)
           }
           // 새 토큰으로 원 요청 재시도
@@ -231,7 +273,7 @@ api.interceptors.response.use(
           return api.request(originalRequest)
         })
         .catch(err => {
-          handleSessionExpired()
+          clearAuthState({ notify: true, redirectToLogin: true })
           return Promise.reject(err)
         })
     }

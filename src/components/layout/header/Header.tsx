@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,6 +12,7 @@ import { HeaderIconAction } from '@/components/layout/header/HeaderIconAction'
 import { LogoutDialog } from '@/components/layout/header/LogoutDialog'
 import { useLogout } from '@/features/auth/hooks/useLogout'
 import type { CategoryTreeNode } from '@/features/category'
+import { ensureSessionActive } from '@/lib/axios'
 import { useAuthStore } from '@/store/authStore'
 
 export default function Header({
@@ -31,6 +32,29 @@ export default function Header({
   const { logout, isPending } = useLogout()
 
   const mypageHref = userType === 'ORGANIZATION' ? '/mypage/organization' : '/mypage/personal'
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const check = () => {
+      // 세션 만료 시 store 초기화 → 헤더에서 닉네임/로그인 UI 즉시 반영
+      void ensureSessionActive()
+    }
+
+    check()
+
+    const onFocus = () => check()
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') check()
+    }
+
+    window.addEventListener('focus', onFocus)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      window.removeEventListener('focus', onFocus)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [isLoggedIn])
 
   // 로그아웃
   const handleLogout = async () => {
