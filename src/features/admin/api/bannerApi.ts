@@ -52,18 +52,30 @@ export async function fetchBanners(params?: BannerSearchParams): Promise<BannerP
 }
 
 /**
- * 배너 생성 API (이미지 파일 업로드 지원)
- * @param request - 배너 생성 요청
+ * 배너 요청 데이터와 이미지 파일을 FormData로 빌드하는 헬퍼 함수
+ * @param request - 배너 생성/수정 요청
  * @param imageFile - 배너 이미지 파일 (선택)
- * @returns 생성된 배너 정보
+ * @returns FormData 객체
  */
-export async function createBanner(request: CreateBannerRequest, imageFile?: File): Promise<Banner> {
+function buildBannerFormData(request: CreateBannerRequest, imageFile?: File): FormData {
   const formData = new FormData()
   formData.append('request', new Blob([JSON.stringify(request)], { type: 'application/json' }))
 
   if (imageFile) {
     formData.append('image', imageFile)
   }
+
+  return formData
+}
+
+/**
+ * 배너 생성 API (이미지 파일 업로드 지원)
+ * @param request - 배너 생성 요청
+ * @param imageFile - 배너 이미지 파일 (선택)
+ * @returns 생성된 배너 정보
+ */
+export async function createBanner(request: CreateBannerRequest, imageFile?: File): Promise<Banner> {
+  const formData = buildBannerFormData(request, imageFile)
 
   const { data } = await api.post<Banner>('/admin/banners', formData, {
     headers: {
@@ -92,12 +104,7 @@ export async function toggleBannerActive(id: number, isActive: boolean): Promise
  * @returns 수정된 배너 정보
  */
 export async function updateBanner(id: number, request: CreateBannerRequest, imageFile?: File): Promise<Banner> {
-  const formData = new FormData()
-  formData.append('request', new Blob([JSON.stringify(request)], { type: 'application/json' }))
-
-  if (imageFile) {
-    formData.append('image', imageFile)
-  }
+  const formData = buildBannerFormData(request, imageFile)
 
   const { data } = await api.put<Banner>(`/admin/banners/${id}`, formData, {
     headers: {

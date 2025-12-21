@@ -11,7 +11,7 @@ export interface Banner {
   lectureId: number
   lectureName: string
   type: BannerType
-  url: string
+  url: string | null
   imageUrl: string
   startDate: string
   endDate: string
