@@ -70,9 +70,11 @@ export const lectureFormSchema = z
     teachers: z
       .array(
         z.object({
+          teacherId: z.number().optional().nullable(), // 기존 강사 선택 시 ID
           teacherName: z.string().trim().min(1, '강사명을 입력해 주세요.'),
           teacherDescription: z.string().trim().optional().nullable(),
           teacherImageFile: z.any().optional().nullable(), // File | null
+          teacherImageUrl: z.string().optional().nullable(), // 기존 강사 이미지 URL
         }),
       )
       .min(1, '강사를 최소 1명 이상 등록해 주세요.'),

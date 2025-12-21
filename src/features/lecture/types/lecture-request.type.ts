@@ -23,6 +23,7 @@ export interface LectureStepCreateRequest {
 }
 
 export interface LectureTeacherCreateRequest {
+  teacherId?: number | null // 기존 강사 선택 시 ID
   teacherName: string
   teacherDescription?: string | null
   teacherImageUrl?: string | null

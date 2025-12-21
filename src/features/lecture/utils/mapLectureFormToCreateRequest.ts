@@ -58,9 +58,10 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     quals: values.quals?.length ? values.quals : undefined,
     teachers: values.teachers?.length
       ? values.teachers.map(t => ({
+          teacherId: t.teacherId ?? null,
           teacherName: t.teacherName,
           teacherDescription: t.teacherDescription ?? null,
-          teacherImageUrl: t.teacherImageFile?.name ?? null,
+          teacherImageUrl: t.teacherId ? null : (t.teacherImageFile?.name ?? null), // 기존 강사는 이미지 업로드 불필요
         }))
       : undefined,
     adds: values.adds?.length ? values.adds : undefined,
