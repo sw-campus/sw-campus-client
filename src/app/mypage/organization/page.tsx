@@ -11,7 +11,7 @@ import { useAuthStore } from '@/store/authStore'
 export default function MyPage() {
   const router = useRouter()
   const { userType } = useAuthStore()
-  const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(false)
+  const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(true)
 
   // 기관 마이페이지
   if (userType === 'ORGANIZATION') {
@@ -35,7 +35,11 @@ export default function MyPage() {
       <div className="custom-container">
         <div className="custom-card">
           <div className="relative z-10 flex w-full gap-6">
-            <OrganizationAside onClickOrgInfo={handleOpenOrgInfo} onClickLectureManage={handleOpenLectureManage} />
+            <OrganizationAside
+              active={isOrgPasswordOpen ? 'orgInfo' : 'lectureManage'}
+              onClickOrgInfo={handleOpenOrgInfo}
+              onClickLectureManage={handleOpenLectureManage}
+            />
             <OrganizationMain
               isOrgPasswordOpen={isOrgPasswordOpen}
               openInfoModal={openInfoModal}

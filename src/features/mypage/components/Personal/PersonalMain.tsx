@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
+import { isAxiosError } from 'axios'
 import { Star } from 'lucide-react'
 import Image from 'next/image'
 
@@ -9,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CATEGORY_LABELS, type ReviewCategory } from '@/features/lecture/api/reviewApi.types'
+import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
 import { api } from '@/lib/axios'
 
 type PersonalMainProps = {
@@ -17,14 +19,20 @@ type PersonalMainProps = {
   onOpenProductModal: () => void
 }
 
-const dashboardStats = [
-  { label: '등록 대기', value: '1개', note: '내부 승인 대기중' },
-  { label: '반려된 교육과정', value: '2개', note: '이번 분기 시작 예정' },
-  { label: '승인된 교육과정', value: '5개', note: '평균 수강률 86%' },
-]
+// 설문조사 단건 존재 여부 응답(스크린샷 기준)
+type MySurveyResponse = {
+  surveyId: number | null
+  exists?: boolean | null
+  [key: string]: unknown
+}
 
 export default function PersonalMain({ activeSection, openInfoModal, onOpenProductModal }: PersonalMainProps) {
   // (개인 후기 목록 상태는 현재 사용하지 않음)
+
+  // 비밀번호 검증
+  const [passwordInput, setPasswordInput] = useState<string>('')
+  const [passwordVerifying, setPasswordVerifying] = useState(false)
+  const [passwordVerifyError, setPasswordVerifyError] = useState<string | null>(null)
 
   // Lectures for survey tab
   // 수료 인증된 강의 목록 (후기 작성 가능 여부 포함)
@@ -46,6 +54,11 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
   const [editOpen, setEditOpen] = useState(false)
   // ReviewForm modal state
   const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null)
+  const [selectedLectureId, setSelectedLectureId] = useState<number | null>(null)
+  const [selectedReviewReadOnly, setSelectedReviewReadOnly] = useState(false)
+
+  // lectureId별 승인(버튼 라벨 전환용)
+  const [approvedLectureIds, setApprovedLectureIds] = useState<Set<number>>(new Set())
 
   // Create review modal state
   const [createOpen, setCreateOpen] = useState(false)
@@ -59,26 +72,42 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     Array<{ category: ReviewCategory; score: number; comment?: string }>
   >([])
 
-  // useEffect(() => {
-  //   if (activeSection !== 'reviews') return
-  //   let cancelled = false
-  //   const fetchReviews = async () => {
-  //     try {
-  //       setLoading(true)
-  //       setError(null)
-  //       const { data } = await api.get<Review[]>('/mypage/reviews')
-  //       if (!cancelled) setReviews(Array.isArray(data) ? data : [])
-  //     } catch (e) {
-  //       if (!cancelled) setError('후기 데이터를 불러오지 못했습니다.')
-  //     } finally {
-  //       if (!cancelled) setLoading(false)
-  //     }
-  //   }
-  //   fetchReviews()
-  //   return () => {
-  //     cancelled = true
-  //   }
-  // }, [activeSection])
+  const defaultReviewDetails = (
+    initialScore = 0,
+  ): Array<{ category: ReviewCategory; score: number; comment?: string }> => {
+    const categories = Object.keys(CATEGORY_LABELS) as ReviewCategory[]
+    return categories.map(category => ({ category, score: initialScore, comment: '' }))
+  }
+
+  // 설문 존재 여부 상태 (surveyId가 null이 아니면 1, null이면 0)
+  const [surveyExists, setSurveyExists] = useState<boolean | null>(null)
+  const [surveyLoading, setSurveyLoading] = useState(false)
+  const [surveyError, setSurveyError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (activeSection !== 'survey') return
+    let cancelled = false
+    const fetchMySurvey = async () => {
+      try {
+        setSurveyLoading(true)
+        setSurveyError(null)
+        // 스펙: GET /api/v1/mypage/survey
+        // 프런트 베이스 URL에 /api/v1가 포함되어 있으므로 상대 경로 사용
+        const { data } = await api.get<MySurveyResponse>('/mypage/survey')
+        const id = (data as MySurveyResponse)?.surveyId
+        const exists = Boolean((data as MySurveyResponse)?.exists) || (id !== null && id !== undefined)
+        if (!cancelled) setSurveyExists(exists)
+      } catch {
+        if (!cancelled) setSurveyError('설문 정보를 불러오지 못했습니다.')
+      } finally {
+        if (!cancelled) setSurveyLoading(false)
+      }
+    }
+    fetchMySurvey()
+    return () => {
+      cancelled = true
+    }
+  }, [activeSection])
 
   useEffect(() => {
     if (activeSection !== 'reviews') return
@@ -87,6 +116,8 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
       try {
         setLecturesLoading(true)
         setLecturesError(null)
+        // 스펙: GET /api/v1/mypage/completed_lectures
+        // 프런트 베이스 URL에 /api/v1가 포함되어 있으므로 상대 경로 사용
         const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
         if (!cancelled) setLectures(Array.isArray(data) ? data : [])
       } catch {
@@ -102,6 +133,70 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     }
   }, [activeSection])
 
+  useEffect(() => {
+    if (activeSection !== 'reviews') return
+    if (!lectures || lectures.length === 0) return
+
+    let cancelled = false
+
+    const parseApproved = (data: unknown): boolean => {
+      const approvalStatus = (data as { approvalStatus?: unknown })?.approvalStatus
+      if (typeof approvalStatus === 'string') {
+        return approvalStatus.toUpperCase() === 'APPROVED'
+      }
+
+      const status =
+        (data as { status?: unknown; reviewStatus?: unknown })?.status ??
+        (data as { reviewStatus?: unknown })?.reviewStatus
+      const statusStr = typeof status === 'string' ? status : ''
+
+      const isApprovedBool =
+        (data as { isApproved?: unknown })?.isApproved === true || (data as { approved?: unknown })?.approved === true
+
+      return isApprovedBool || statusStr.toUpperCase() === 'APPROVED'
+    }
+
+    const hydrateApproved = async () => {
+      const targetLectures = lectures.filter(l => !l.canWriteReview)
+      if (targetLectures.length === 0) return
+
+      try {
+        const results = await Promise.all(
+          targetLectures.map(async l => {
+            try {
+              const { data } = await api.get<unknown>(`/mypage/completed-lectures/${l.lectureId}/review`)
+              const rid = (data as { reviewId?: unknown })?.reviewId
+              return {
+                lectureId: l.lectureId,
+                reviewId: typeof rid === 'number' ? rid : Number(rid),
+                approved: parseApproved(data),
+              }
+            } catch {
+              return { lectureId: l.lectureId, reviewId: NaN, approved: false }
+            }
+          }),
+        )
+
+        if (cancelled) return
+        setApprovedLectureIds(prev => {
+          const next = new Set(prev)
+          for (const r of results) {
+            if (r.approved) next.add(r.lectureId)
+            else next.delete(r.lectureId)
+          }
+          return next
+        })
+      } catch {
+        // ignore
+      }
+    }
+
+    hydrateApproved()
+    return () => {
+      cancelled = true
+    }
+  }, [activeSection, lectures])
+
   const formatDate = (iso?: string) => {
     if (!iso) return ''
     try {
@@ -109,6 +204,69 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
       return d.toLocaleDateString()
     } catch {
       return iso
+    }
+  }
+
+  const verifyPasswordAndOpen = async () => {
+    try {
+      setPasswordVerifying(true)
+      setPasswordVerifyError(null)
+
+      const password = passwordInput.trim()
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[mypage.verify-password] request', {
+          hasPassword: password.length > 0,
+          passwordLength: password.length,
+        })
+      }
+
+      const { data } = await api.post<unknown>('/mypage/verify-password', {
+        password,
+      })
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[mypage.verify-password] response', data)
+      }
+
+      const verified =
+        typeof data === 'boolean'
+          ? data
+          : typeof (data as { verified?: unknown })?.verified === 'boolean'
+            ? Boolean((data as { verified?: unknown }).verified)
+            : typeof (data as { isValid?: unknown })?.isValid === 'boolean'
+              ? Boolean((data as { isValid?: unknown }).isValid)
+              : typeof (data as { success?: unknown })?.success === 'boolean'
+                ? Boolean((data as { success?: unknown }).success)
+                : typeof (data as { result?: unknown })?.result === 'boolean'
+                  ? Boolean((data as { result?: unknown }).result)
+                  : false
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[mypage.verify-password] parsed', { verified })
+      }
+
+      if (!verified) {
+        setPasswordVerifyError('비밀번호가 일치하지 않습니다.')
+        return
+      }
+
+      openInfoModal()
+    } catch (err: unknown) {
+      if (process.env.NODE_ENV !== 'production') {
+        if (isAxiosError(err)) {
+          console.error('[mypage.verify-password] error', {
+            status: err.response?.status,
+            data: err.response?.data,
+            message: err.message,
+          })
+        } else {
+          console.error('[mypage.verify-password] error', err)
+        }
+      }
+      setPasswordVerifyError('비밀번호 검증에 실패했습니다. 잠시 후 다시 시도해주세요.')
+    } finally {
+      setPasswordVerifying(false)
     }
   }
 
@@ -127,12 +285,25 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
             type="password"
             placeholder="비밀번호 입력"
             className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-orange-100"
+            value={passwordInput}
+            onChange={e => {
+              setPasswordInput(e.target.value)
+              if (passwordVerifyError) setPasswordVerifyError(null)
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                void verifyPasswordAndOpen()
+              }
+            }}
           />
+          {passwordVerifyError && <p className="mt-2 text-sm text-red-600">{passwordVerifyError}</p>}
           <Button
             className="mt-4 w-full rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
-            onClick={openInfoModal}
+            onClick={() => void verifyPasswordAndOpen()}
+            disabled={passwordVerifying || passwordInput.trim().length === 0}
           >
-            확인
+            {passwordVerifying ? '확인 중...' : '확인'}
           </Button>
         </div>
       </main>
@@ -153,25 +324,26 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
               className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
               onClick={onOpenProductModal}
             >
-              설문조사
+              {surveyExists ? '설문 수정' : '설문 작성'}
             </Button>
           </div>
         </header>
 
-        {/* Stats cards */}
+        {/* 단일 카드: 등록된 설문이 있는지 여부만 표시 */}
         <section className="rounded-2xl bg-white/70 p-5 text-gray-700 ring-1 ring-white/30 backdrop-blur-xl">
-          <div className="grid gap-4 sm:grid-cols-3">
-            {dashboardStats.map(stat => (
-              <article
-                key={stat.label}
-                className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5"
-              >
-                <p className="text-xs text-gray-500 uppercase">{stat.label}</p>
-                <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-                <p className="mt-1 text-sm text-gray-500">{stat.note}</p>
+          {surveyLoading && <p className="text-sm text-gray-500">불러오는 중...</p>}
+          {surveyError && !surveyLoading && <p className="text-sm text-red-600">{surveyError}</p>}
+          {!surveyLoading && !surveyError && (
+            <div className="grid gap-4 sm:grid-cols-3">
+              <article className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5">
+                <p className="text-xs text-gray-500 uppercase">등록된 설문</p>
+                <p className="text-2xl font-semibold text-gray-900">{(surveyExists ? 1 : 0).toLocaleString()}개</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  {surveyExists ? '작성됨 · 수정 가능' : '아직 작성되지 않음'}
+                </p>
               </article>
-            ))}
-          </div>
+            </div>
+          )}
         </section>
       </main>
     )
@@ -267,7 +439,8 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                           setCreateLectureName(l.lectureName)
                           setCreateScore(0)
                           setCreateComment('')
-                          setCreateDetails([])
+                          // 스펙: POST /api/v1/reviews 는 detailScores를 받으므로 기본 항목을 준비
+                          setCreateDetails(defaultReviewDetails(0))
                           setCreateOpen(true)
                         }}
                       >
@@ -281,10 +454,12 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                         onClick={() => {
                           // Always open modal; show fallback message inside when reviewId is missing
                           setSelectedReviewId(l.reviewId ?? null)
+                          setSelectedLectureId(l.lectureId)
+                          setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
                           setEditOpen(true)
                         }}
                       >
-                        리뷰 수정
+                        {approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
                       </Button>
                     )}
                   </div>
@@ -316,10 +491,18 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
       <Dialog open={editOpen} onOpenChange={open => setEditOpen(open)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-foreground text-2xl font-bold">리뷰 수정</DialogTitle>
+            <DialogTitle className="text-foreground text-2xl font-bold">
+              {selectedReviewReadOnly ? '리뷰 조회' : '리뷰 수정'}
+            </DialogTitle>
           </DialogHeader>
-          {selectedReviewId ? (
-            <ReviewForm embedded reviewId={selectedReviewId} />
+          {selectedLectureId ? (
+            <ReviewForm
+              embedded
+              reviewId={selectedReviewId ?? undefined}
+              lectureId={selectedLectureId}
+              readOnly={selectedReviewReadOnly}
+              onClose={() => setEditOpen(false)}
+            />
           ) : (
             <p className="text-muted-foreground text-sm">리뷰 정보를 찾을 수 없습니다.</p>
           )}
@@ -417,26 +600,18 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                   try {
                     setCreateSaving(true)
                     setCreateError(null)
-                    // Try several payload/endpoints to match backend
-                    const payloadA = { score: createScore, comment: createComment, detailScores: createDetails }
-                    const payloadB = { score: createScore, content: createComment, items: createDetails }
-                    const payloadC = { lectureId: createLectureId, ...payloadA }
-                    const payloadD = { lectureId: createLectureId, ...payloadB }
+                    // 스펙: POST /api/v1/reviews
+                    // 프런트 베이스 URL에 /api/v1가 포함되어 있으므로 상대 경로 사용
+                    await api.post('/reviews', {
+                      lectureId: createLectureId,
+                      comment: createComment,
+                      detailScores: createDetails.map(d => ({
+                        category: d.category,
+                        score: d.score,
+                        comment: d.comment,
+                      })),
+                    })
 
-                    // Preferred: lecture-scoped endpoint
-                    try {
-                      await api.post(`/lectures/${createLectureId}/reviews`, payloadA)
-                    } catch {
-                      try {
-                        await api.post(`/lectures/${createLectureId}/reviews`, payloadB)
-                      } catch {
-                        try {
-                          await api.post(`/reviews`, payloadC)
-                        } catch {
-                          await api.post(`/reviews`, payloadD)
-                        }
-                      }
-                    }
                     setCreateOpen(false)
                     // refresh list to reflect canWriteReview change
                     try {

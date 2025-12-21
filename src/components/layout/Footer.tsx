@@ -1,6 +1,16 @@
+'use client'
+
+import { useState } from 'react'
+
 import Link from 'next/link'
 
+import PrivacyContent from '@/components/legal/PrivacyContent'
+import TermsContent from '@/components/legal/TermsContent'
+import Modal from '@/components/ui/Modal'
+
 export default function Footer() {
+  const [openTerms, setOpenTerms] = useState(false)
+  const [openPrivacy, setOpenPrivacy] = useState(false)
   return (
     <footer className="mx-auto mb-10 w-full max-w-7xl rounded-3xl border border-white/15 bg-white/10 p-10 pb-10 text-white shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-xl">
       {/* 상단 영역 */}
@@ -9,11 +19,25 @@ export default function Footer() {
 
         {/* 메뉴 */}
         <nav className="flex flex-wrap gap-6 text-sm font-medium">
-          <Link href="#" className="text-white/90 hover:text-white">
+          <Link
+            href="#"
+            onClick={e => {
+              e.preventDefault()
+              setOpenTerms(true)
+            }}
+            className="text-white/90 hover:text-white"
+          >
             서비스 이용약관
           </Link>
           <span className="text-white/30">|</span>
-          <Link href="#" className="text-white/90 hover:text-white">
+          <Link
+            href="#"
+            onClick={e => {
+              e.preventDefault()
+              setOpenPrivacy(true)
+            }}
+            className="text-white/90 hover:text-white"
+          >
             개인정보처리방침
           </Link>
         </nav>
@@ -36,6 +60,18 @@ export default function Footer() {
       </div>
 
       <div className="mt-10 text-xs text-white/50">Copyright © Software Campus</div>
+      {/* Modals */}
+      <Modal isOpen={openTerms} onClose={() => setOpenTerms(false)} title="이용약관" maxWidthClass="max-w-2xl">
+        <TermsContent />
+      </Modal>
+      <Modal
+        isOpen={openPrivacy}
+        onClose={() => setOpenPrivacy(false)}
+        title="개인정보처리방침"
+        maxWidthClass="max-w-2xl"
+      >
+        <PrivacyContent />
+      </Modal>
     </footer>
   )
 }

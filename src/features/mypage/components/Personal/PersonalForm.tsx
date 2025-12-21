@@ -46,7 +46,7 @@ const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
 const loadDaumPostcodeScript = () => {
   if (typeof window === 'undefined') return
 
-  const w = window as any
+  const w = window as unknown as { daum?: { Postcode?: unknown } }
   // 이미 로드되어 있으면 종료
   if (w.daum?.Postcode) return
 
@@ -64,7 +64,7 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
 
-  const { setAddress, setDetailAddress } = useSignupStore()
+  const { setAddress, setDetailAddress, address, detailAddress } = useSignupStore()
   const [profileEmail, setProfileEmail] = useState<string>('')
   const [profileName, setProfileName] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
@@ -103,13 +103,13 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
         methods.reset({
           nickname: data.nickname ?? '',
           phone: data.phone ?? '',
-          location: data.location ?? '',
+          location: '',
         })
 
-        // AddressInput(store) 값 세팅
-        setAddress(data.location ?? '')
+        // 주소는 사용자에게 다시 입력받도록 비워둠
+        setAddress('')
         setDetailAddress('')
-      } catch (e) {
+      } catch {
         toast.error('내 정보 조회에 실패했습니다.')
       } finally {
         if (mounted) setIsLoading(false)
@@ -126,9 +126,22 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const onSubmit = async (values: ProfileFormValues) => {
     setIsPending(true)
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
+      const location = [address, detailAddress].filter(Boolean).join(' ').trim()
+      if (!location) {
+        toast.error('주소를 입력해주세요.')
+        return
+      }
+
+      await api.patch('/mypage/profile', {
+        nickname: values.nickname,
+        phone: values.phone,
+        location,
+      })
       toast.success('저장되었습니다.')
       router.back()
+      router.refresh()
+    } catch {
+      toast.error('저장에 실패했습니다.')
     } finally {
       setIsPending(false)
     }

@@ -13,7 +13,7 @@ export default function SignupCards() {
         title="개인회원 가입"
         imageSrc="/images/signup/signup_person.png"
         imageAlt="개인회원 가입 이미지"
-        onClick={() => router.push('/signup/personal')}
+        onClick={() => router.push('/signup/personal/agreements')}
       >
         <SocialIcons />
       </SignupCard>
@@ -22,7 +22,7 @@ export default function SignupCards() {
         title="기업회원 가입"
         imageSrc="/images/signup/signup_org.png"
         imageAlt="기업회원 가입 이미지"
-        onClick={() => router.push('/signup/organization')}
+        onClick={() => router.push('/signup/organization/agreements')}
       >
         <p className="mt-4 text-neutral-600">• 부트캠프를 홍보하려는 사업체 직원</p>
       </SignupCard>

@@ -22,7 +22,7 @@ export default function ReviewCreatePage() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-[700px]">
+      <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-175">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>후기 작성</DialogTitle>
         </DialogHeader>
