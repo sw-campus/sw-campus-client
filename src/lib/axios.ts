@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosHeaders } from 'axios'
 import { toast } from 'sonner'
 
 import { useAuthStore } from '@/store/authStore'
@@ -11,6 +11,131 @@ export const api = axios.create({
   timeout: 10_000,
 })
 
+// A lightweight client without interceptors for refresh calls
+const refreshClient = axios.create({
+  baseURL: env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
+  timeout: 10_000,
+})
+
+// 401/토큰만료 시 중복 로그아웃/토스트/리다이렉트를 막기 위한 플래그
+let isHandlingUnauthorized = false
+let isRefreshing = false
+let refreshPromise: Promise<string | null> | null = null
+
+function isAuthExpired(status?: number, errorCode?: string) {
+  const normalized = String(errorCode ?? '').toUpperCase()
+  return (
+    status === 401 ||
+    status === 419 ||
+    status === 440 ||
+    status === 498 ||
+    normalized === 'AUTH_TOKEN_EXPIRED' ||
+    normalized === 'TOKEN_EXPIRED' ||
+    normalized === 'AUTH_EXPIRED' ||
+    normalized === 'INVALID_TOKEN'
+  )
+}
+
+function extractAccessToken(data: unknown): string | null {
+  const get = (obj: unknown, path: string[]): unknown => {
+    let cur: unknown = obj
+    for (const key of path) {
+      if (cur && typeof cur === 'object' && key in (cur as Record<string, unknown>)) {
+        cur = (cur as Record<string, unknown>)[key]
+      } else return undefined
+    }
+    return cur
+  }
+
+  const candidates = [
+    get(data, ['accessToken']),
+    get(data, ['access_token']),
+    get(data, ['token']),
+    get(data, ['data', 'accessToken']),
+  ]
+  const found = candidates.find(v => typeof v === 'string' && v.length > 0)
+  return (found as string) ?? null
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  try {
+    // 서버가 HttpOnly refresh cookie를 사용하는 전제
+    const res = await refreshClient.post('/auth/refresh', {})
+    const newToken = extractAccessToken(res.data)
+    if (newToken) {
+      try {
+        const state = useAuthStore.getState()
+        state.setAuth(newToken, state.userType)
+      } catch {
+        // ignore
+      }
+
+      // Update default Authorization header using AxiosHeaders API when available
+      try {
+        const common = api.defaults?.headers?.common as unknown as AxiosHeaders | undefined
+        if (common && typeof common.set === 'function') common.set('Authorization', `Bearer ${newToken}`)
+      } catch {
+        // ignore
+      }
+
+      return newToken
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+function handleSessionExpired() {
+  if (isHandlingUnauthorized) return
+  isHandlingUnauthorized = true
+
+  try {
+    // ✅ 1) Zustand 인증 상태 초기화
+    let store = undefined as ReturnType<typeof useAuthStore.getState> | undefined
+    try {
+      store = useAuthStore.getState()
+    } catch {
+      // ignore: store may be unavailable in non-browser contexts
+    }
+
+    if (store) {
+      if (typeof store.resetAuth === 'function') store.resetAuth()
+      else if (typeof store.logout === 'function') store.logout()
+    }
+
+    // Ensure axios instance stops sending stale Authorization header
+    try {
+      const common = api.defaults?.headers?.common as unknown as AxiosHeaders | undefined
+      common?.delete?.('Authorization')
+    } catch {
+      // ignore
+    }
+
+    // ✅ 2) persist 사용 시 로컬 저장소 정리(키가 다를 수 있어 후보 제거)
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.removeItem('auth-storage')
+        window.localStorage.removeItem('authStore')
+        window.localStorage.removeItem('auth')
+        // cross-tab broadcast (optional)
+        window.localStorage.setItem('__auth_logout__', String(Date.now()))
+      } catch {
+        // ignore
+      }
+
+      // ✅ 3) 사용자 안내 + 로그인 이동
+      toast.error('세션이 만료되어 로그아웃되었습니다')
+      // 기본 로그인 경로. 필요 시 환경/라우팅에 맞게 조정
+      window.location.replace('/login')
+    }
+  } finally {
+    // replace로 이동되지만, 테스트/특수 환경에서는 finally가 의미가 있어 유지
+    isHandlingUnauthorized = false
+  }
+}
+
 // 요청 인터셉터
 api.interceptors.request.use(
   config => {
@@ -18,9 +143,26 @@ api.interceptors.request.use(
     try {
       const token = useAuthStore.getState().accessToken
       if (token) {
-        config.headers = {
-          ...(config.headers ?? {}),
-          Authorization: `Bearer ${token}`,
+        if (config.headers) {
+          const headersMaybe = config.headers as unknown as { set?: (k: string, v: string) => void }
+          if (typeof headersMaybe.set === 'function') {
+            ;(config.headers as unknown as AxiosHeaders).set('Authorization', `Bearer ${token}`)
+          } else {
+            config.headers = {
+              ...(config.headers as Record<string, string>),
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        } else {
+          config.headers = { Authorization: `Bearer ${token}` }
+        }
+      } else if (config.headers) {
+        // ensure no stale header is sent
+        const headersMaybe = config.headers as unknown as { delete?: (k: string) => void }
+        if (typeof headersMaybe.delete === 'function') {
+          ;(config.headers as unknown as AxiosHeaders).delete('Authorization')
+        } else {
+          delete (config.headers as Record<string, unknown>).Authorization
         }
       }
     } catch {
@@ -51,10 +193,51 @@ api.interceptors.response.use(
 
     const status = error.response.status
     const message = error.response.data?.message
+    const errorCode = error.response.data?.code
+    const requestUrl: string = error.config?.url ?? ''
+
+    // ✅ 토큰 만료/인증 실패 → 자동 로그아웃 (확장된 상태/에러코드)
+    // refresh/login/logout 호출 중에는 무시하여 루프 방지
+    if (isAuthExpired(status, errorCode) && !/auth\/(refresh|logout|login)/i.test(requestUrl)) {
+      const originalRequest = error.config || {}
+
+      if (!isRefreshing) {
+        isRefreshing = true
+        refreshPromise = refreshAccessToken().finally(() => {
+          isRefreshing = false
+        })
+      }
+
+      return (refreshPromise as Promise<string | null>)
+        .then(newToken => {
+          if (!newToken) {
+            handleSessionExpired()
+            return Promise.reject(error)
+          }
+          // 새 토큰으로 원 요청 재시도
+          if (originalRequest.headers) {
+            const headersMaybe = originalRequest.headers as unknown as { set?: (k: string, v: string) => void }
+            if (typeof headersMaybe.set === 'function') {
+              ;(originalRequest.headers as unknown as AxiosHeaders).set('Authorization', `Bearer ${newToken}`)
+            } else {
+              originalRequest.headers = {
+                ...(originalRequest.headers as Record<string, string>),
+                Authorization: `Bearer ${newToken}`,
+              }
+            }
+          } else {
+            originalRequest.headers = { Authorization: `Bearer ${newToken}` }
+          }
+          return api.request(originalRequest)
+        })
+        .catch(err => {
+          handleSessionExpired()
+          return Promise.reject(err)
+        })
+    }
 
     // 공통 에러 처리
     if (status === 400) toast.error(message ?? '잘못된 요청입니다')
-    if (status === 401) toast.error(message ?? '로그인이 필요합니다')
     if (status === 403) toast.error(message ?? '접근 권한이 없습니다')
     if (status === 404) toast.error(message ?? '요청한 리소스를 찾을 수 없습니다')
     if (status === 409) toast.error(message ?? '이미 처리된 요청입니다')
