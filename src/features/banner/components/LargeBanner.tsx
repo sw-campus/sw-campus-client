@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 
-import { FastAverageColor } from 'fast-average-color'
 import Image from 'next/image'
 import Link from 'next/link'
 import 'swiper/css'
@@ -13,78 +12,22 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { useBannersByTypeQuery } from '../hooks/useBannerQuery'
 
 /**
- * 각 슬라이드별 배경색을 관리하는 커스텀 훅
+ * 배너 링크 URL을 반환하는 함수
+ * url이 있으면 해당 URL로, 없으면 강의 상세 페이지로 이동
  */
-function useImageColors(imageUrls: string[]) {
-  const [colors, setColors] = useState<Record<string, string>>({})
-  const fac = useRef<FastAverageColor | null>(null)
+function getBannerLink(banner: { url: string | null; lectureId: number }): string {
+  return banner.url || `/lectures/${banner.lectureId}`
+}
 
-  useEffect(() => {
-    fac.current = new FastAverageColor()
-
-    return () => {
-      fac.current?.destroy()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!fac.current || imageUrls.length === 0) return
-
-    const fetchMissingColors = async () => {
-      // 아직 색상이 추출되지 않은 URL만 필터링
-      const urlsToProcess = imageUrls.filter(url => url && !colors[url])
-      if (urlsToProcess.length === 0) return
-
-      // 모든 색상 추출을 병렬로 처리
-      const colorPromises = urlsToProcess.map(url =>
-        fac
-          .current!.getColorAsync(url)
-          .then(color => ({ url, rgba: color.rgba }))
-          .catch(error => {
-            console.error('Failed to extract color from image:', url, error)
-            return null
-          }),
-      )
-
-      const results = await Promise.all(colorPromises)
-
-      // 성공한 결과만 필터링하여 새 색상 객체 생성
-      const newColors = results.reduce(
-        (acc, result) => {
-          if (result) {
-            acc[result.url] = result.rgba
-          }
-          return acc
-        },
-        {} as Record<string, string>,
-      )
-
-      // 새로운 색상이 있을 때만 상태 업데이트
-      if (Object.keys(newColors).length > 0) {
-        setColors(prev => ({ ...prev, ...newColors }))
-      }
-    }
-
-    fetchMissingColors()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imageUrls])
-
-  return colors
+/**
+ * 외부 링크 여부 확인
+ */
+function isExternalLink(url: string): boolean {
+  return url.startsWith('http://') || url.startsWith('https://')
 }
 
 export default function LargeBanner() {
   const { data: banners, isLoading } = useBannersByTypeQuery('BIG')
-  const [activeIndex, setActiveIndex] = useState(0)
-
-  // 배너 이미지 URL 목록
-  const imageUrls = banners?.map(b => b.imageUrl).filter((url): url is string => !!url) ?? []
-
-  // 이미지에서 색상 추출
-  const imageColors = useImageColors(imageUrls)
-
-  // 현재 활성화된 슬라이드의 배경색
-  const currentBanner = banners?.[activeIndex]
-  const currentBgColor = currentBanner?.imageUrl ? imageColors[currentBanner.imageUrl] : undefined
 
   // 로딩 중이거나 데이터 없으면 빈 상태 표시
   if (isLoading) {
@@ -100,10 +43,7 @@ export default function LargeBanner() {
   }
 
   return (
-    <div
-      className="mx-auto mt-6 w-full max-w-7xl overflow-hidden rounded-3xl transition-colors duration-500"
-      style={{ backgroundColor: currentBgColor ?? undefined }}
-    >
+    <div className="mx-auto mt-6 w-full max-w-7xl overflow-hidden rounded-3xl">
       <Swiper
         modules={[Pagination, Autoplay]}
         slidesPerView={1}
@@ -113,35 +53,41 @@ export default function LargeBanner() {
           delay: 3000,
           disableOnInteraction: false,
         }}
-        onSlideChange={swiper => {
-          // loop 모드에서는 realIndex 사용
-          setActiveIndex(swiper.realIndex)
-        }}
       >
-        {banners.map((banner, index) => (
-          <SwiperSlide key={banner.id}>
-            <Link href={`/lectures/${banner.lectureId}`}>
-              <div className="relative flex w-full items-center justify-center sm:p-10">
-                <div className="relative mx-auto h-[130px] w-full">
-                  {banner.imageUrl ? (
-                    <Image
-                      src={banner.imageUrl}
-                      alt={banner.lectureName}
-                      fill
-                      className="object-contain"
-                      priority={index === 0}
-                      crossOrigin="anonymous"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center">
-                      <span className="text-xl font-bold">{banner.lectureName}</span>
-                    </div>
-                  )}
+        {banners.map((banner, index) => {
+          const href = getBannerLink(banner)
+          const external = isExternalLink(href)
+
+          const content = (
+            <div className="relative h-[210px] w-full overflow-hidden">
+              {banner.imageUrl ? (
+                <Image
+                  src={banner.imageUrl}
+                  alt={banner.lectureName}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center bg-gray-100">
+                  <span className="text-xl font-bold">{banner.lectureName}</span>
                 </div>
-              </div>
-            </Link>
-          </SwiperSlide>
-        ))}
+              )}
+            </div>
+          )
+
+          return (
+            <SwiperSlide key={banner.id}>
+              {external ? (
+                <a href={href} target="_blank" rel="noopener noreferrer">
+                  {content}
+                </a>
+              ) : (
+                <Link href={href}>{content}</Link>
+              )}
+            </SwiperSlide>
+          )
+        })}
       </Swiper>
     </div>
   )

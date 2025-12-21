@@ -20,12 +20,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'boottent.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
         hostname: 'cdn.sayun.studio',
         port: '',
         pathname: '/**',
@@ -39,6 +33,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 's3-oneday.s3.ap-northeast-2.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'sw-campus-public-prod-b67b2103.s3.ap-northeast-2.amazonaws.com',
         port: '',
         pathname: '/**',
       },

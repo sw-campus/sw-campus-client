@@ -12,11 +12,25 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import SmallBanner from '@/features/banner/components/SmallBanner'
 
 import { useBannersByTypeQuery } from '../hooks/useBannerQuery'
-import { formatDate, getRecruitTag } from '../utils/bannerUtils'
+
+/**
+ * 배너 링크 URL을 반환하는 함수
+ * url이 있으면 해당 URL로, 없으면 강의 상세 페이지로 이동
+ */
+function getBannerLink(banner: { url: string | null; lectureId: number }): string {
+  return banner.url || `/lectures/${banner.lectureId}`
+}
+
+/**
+ * 외부 링크 여부 확인
+ */
+function isExternalLink(url: string): boolean {
+  return url.startsWith('http://') || url.startsWith('https://')
+}
 
 export default function MidBanner() {
   const swiperRef = useRef<SwiperType | null>(null)
-  const { data: banners, isLoading } = useBannersByTypeQuery('SMALL')
+  const { data: banners, isLoading } = useBannersByTypeQuery('MIDDLE')
 
   if (isLoading) {
     return (
@@ -26,7 +40,7 @@ export default function MidBanner() {
             {[0, 1].map(i => (
               <div
                 key={i}
-                className="bg-muted flex h-[190px] w-[calc(50%-8px)] shrink-0 animate-pulse items-center justify-between rounded-2xl border border-gray-200 p-8"
+                className="bg-muted flex h-[190px] w-[calc(50%-8px)] shrink-0 animate-pulse items-center justify-between rounded-2xl border border-gray-200"
               />
             ))}
           </div>
@@ -57,40 +71,36 @@ export default function MidBanner() {
               1024: { slidesPerView: 2 },
             }}
           >
-            {banners.map(banner => (
-              <SwiperSlide key={banner.id}>
-                <Link href={`/lectures/${banner.lectureId}`} className="block">
-                  <div className="flex h-[190px] items-center justify-between rounded-2xl border border-gray-200 bg-white px-8 py-5 shadow-lg">
-                    <div className="flex min-w-0 flex-col">
-                      {/* 기관명 - 주황색 */}
-                      <div className="font-semibold text-orange-600">{banner.orgName ?? ''}</div>
+            {banners.map(banner => {
+              const href = getBannerLink(banner)
+              const external = isExternalLink(href)
 
-                      {/* 강의명 */}
-                      <div className="mt-1 line-clamp-2 text-lg font-bold">{banner.lectureName}</div>
-
-                      {/* 설명 - 회색 배경 라운드 박스 */}
-                      <div className="mt-2 line-clamp-2 rounded-xl bg-gray-100 px-3 py-2 text-sm">{banner.content}</div>
-
-                      {/* 개강일 */}
-                      <div className="mt-2 text-sm text-gray-600">
-                        {formatDate(banner.lectureStartAt)} 개강 · {getRecruitTag(banner.recruitType)}
-                      </div>
+              const content = (
+                <div className="relative h-[190px] w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+                  {banner.imageUrl ? (
+                    <Image src={banner.imageUrl} alt={banner.lectureName} fill className="object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <span className="text-xl font-bold">{banner.lectureName}</span>
                     </div>
+                  )}
+                </div>
+              )
 
-                    {/* 오른쪽 이미지 */}
-                    {banner.imageUrl && (
-                      <Image
-                        src={banner.imageUrl}
-                        width={95}
-                        height={95}
-                        alt={banner.lectureName}
-                        className="h-[95px] w-[95px] shrink-0 rounded-xl object-cover"
-                      />
-                    )}
-                  </div>
-                </Link>
-              </SwiperSlide>
-            ))}
+              return (
+                <SwiperSlide key={banner.id}>
+                  {external ? (
+                    <a href={href} target="_blank" rel="noopener noreferrer" className="block">
+                      {content}
+                    </a>
+                  ) : (
+                    <Link href={href} className="block">
+                      {content}
+                    </Link>
+                  )}
+                </SwiperSlide>
+              )
+            })}
           </Swiper>
 
           {/* 커스텀 네비게이션 버튼 */}

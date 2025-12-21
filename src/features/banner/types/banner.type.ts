@@ -2,7 +2,7 @@
  * 배너 타입 정의
  * 백엔드 BannerType enum과 동일
  */
-export type BannerType = 'BIG' | 'SMALL' | 'TEXT'
+export type BannerType = 'BIG' | 'MIDDLE' | 'SMALL'
 
 /**
  * 모집 유형
@@ -18,7 +18,7 @@ export interface Banner {
   id: number
   lectureId: number
   type: BannerType
-  content: string
+  url: string | null
   imageUrl: string | null
   startDate: string
   endDate: string
