@@ -145,6 +145,18 @@ function clearAuthState(options: ClearAuthOptions = {}) {
   }
 }
 
+function isAuthPublicFlowRequest(url: string): boolean {
+  // 회원가입/인증/중복검사 등: 로그인 상태가 없어도 호출되는 엔드포인트
+  // - 여기서 401이 나더라도 "세션 만료"로 간주해 /login으로 보내면 UX가 깨짐
+  return /\/auth\/(email|signup|oauth)/i.test(url) || /\/members\/nickname\/check/i.test(url)
+}
+
+function isOnAuthPublicPage(): boolean {
+  if (typeof window === 'undefined') return false
+  const path = window.location?.pathname ?? ''
+  return path.startsWith('/signup') || path.startsWith('/login')
+}
+
 // Header 등에서 사용: 포커스/탭 복귀 시 세션을 조용히 점검
 // - 세션 유효: 유지(+가능하면 nickname/userType 보정)
 // - 세션 만료/무효: 인증 상태만 초기화(리다이렉트/토스트 없음)
@@ -238,9 +250,14 @@ api.interceptors.response.use(
     const errorCode = error.response.data?.code
     const requestUrl: string = error.config?.url ?? ''
 
+    const suppressUnauthorizedRedirect = isOnAuthPublicPage() || isAuthPublicFlowRequest(requestUrl)
+
     // ✅ 토큰 만료/인증 실패 → 자동 로그아웃 (확장된 상태/에러코드)
     // refresh/login/logout 호출 중에는 무시하여 루프 방지
     if (isAuthExpired(status, errorCode) && !/auth\/(refresh|logout|login)/i.test(requestUrl)) {
+      // 회원가입/인증 플로우에서는 401이 나도 로그인으로 보내지 않는다.
+      if (suppressUnauthorizedRedirect) return Promise.reject(error)
+
       const originalRequest = error.config || {}
 
       if (!isRefreshing) {

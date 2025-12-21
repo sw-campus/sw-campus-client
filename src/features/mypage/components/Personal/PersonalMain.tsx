@@ -34,6 +34,13 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
   const [passwordVerifying, setPasswordVerifying] = useState(false)
   const [passwordVerifyError, setPasswordVerifyError] = useState<string | null>(null)
 
+  useEffect(() => {
+    if (activeSection !== 'password') return
+    setPasswordInput('')
+    setPasswordVerifyError(null)
+    setPasswordVerifying(false)
+  }, [activeSection])
+
   // Lectures for survey tab
   // 수료 인증된 강의 목록 (후기 작성 가능 여부 포함)
   type CompletedLecture = {
@@ -266,6 +273,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
       }
       setPasswordVerifyError('비밀번호 검증에 실패했습니다. 잠시 후 다시 시도해주세요.')
     } finally {
+      setPasswordInput('')
       setPasswordVerifying(false)
     }
   }

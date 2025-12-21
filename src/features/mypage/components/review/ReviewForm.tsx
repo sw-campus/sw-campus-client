@@ -21,6 +21,25 @@ const reviewSchema = z.object({
   comment: z.string().max(500, '총평은 최대 500자입니다').optional().or(z.literal('')),
 })
 
+const allowedCategories = ['TEACHER', 'CURRICULUM', 'MANAGEMENT', 'FACILITY', 'PROJECT'] as const
+type AllowedCategory = (typeof allowedCategories)[number]
+
+const detailScoreSchema = z.object({
+  category: z
+    .string()
+    .transform(v => v.trim().toUpperCase())
+    .refine((v): v is AllowedCategory => (allowedCategories as readonly string[]).includes(v), {
+      message: '카테고리 값이 올바르지 않습니다.',
+    }),
+  score: z.number().min(1, '점수는 1.0 이상이어야 합니다').max(5, '점수는 5.0 이하여야 합니다'),
+  comment: z.string().trim().min(20, '세부 의견은 20자 이상이어야 합니다').max(500, '세부 의견은 최대 500자입니다'),
+})
+
+const updateReviewSchema = z.object({
+  comment: reviewSchema.shape.comment,
+  detailScores: z.array(detailScoreSchema).length(5, '상세 점수는 5개 카테고리 모두 필요합니다'),
+})
+
 type ReviewResponse = {
   reviewId: number
   comment: string | null
@@ -110,17 +129,26 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (effectiveReadOnly) return
-      const parsed = reviewSchema.safeParse({ comment })
+
+      const parsed = updateReviewSchema.safeParse({
+        comment,
+        detailScores: detailScores.map(d => ({
+          category: d.category,
+          score: d.score,
+          comment: d.comment ?? '',
+        })),
+      })
+
       if (!parsed.success) {
         throw new Error(parsed.error.issues[0]?.message ?? '입력값을 확인해주세요')
       }
 
       const payload = {
         comment: parsed.data.comment ?? '',
-        detailScores: detailScores.map(d => ({
+        detailScores: parsed.data.detailScores.map(d => ({
           category: d.category,
           score: d.score,
-          comment: d.comment ?? '',
+          comment: d.comment,
         })),
       }
 
@@ -169,7 +197,7 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
                 <span className="text-sm font-semibold text-gray-800">{d.category}</span>
                 <input
                   type="number"
-                  min={0}
+                  min={1}
                   max={5}
                   step={0.5}
                   value={d.score}

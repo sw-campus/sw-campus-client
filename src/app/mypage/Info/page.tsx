@@ -25,7 +25,7 @@ export default function OrgInfoPage() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-[700px]">
+      <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-175">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>{userType === 'ORGANIZATION' ? '기업 정보 수정' : '개인 정보 수정'}</DialogTitle>
         </DialogHeader>

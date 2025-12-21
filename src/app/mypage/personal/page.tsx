@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/authStore'
 
 export default function MyPage() {
   type Section = 'password' | 'survey' | 'reviews'
-  const [activeSection, setActiveSection] = useState<Section>('survey')
+  const [activeSection, setActiveSection] = useState<Section>('password')
   const router = useRouter()
   const { userType } = useAuthStore()
 
@@ -33,6 +33,7 @@ export default function MyPage() {
           {/* 실제 내용 영역 */}
           <div className="relative z-10 flex w-full gap-6">
             <PersonalAside
+              active={activeSection}
               onClickPersonInfo={handleOpenPersonInfo}
               onClickSurveyManage={handleOpenSurveyManage}
               onClickReviewManage={handleOpenReviewManage}

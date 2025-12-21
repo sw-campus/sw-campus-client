@@ -1,8 +1,8 @@
 'use client'
 
-import { isAxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 
+import { isAxiosError } from 'axios'
 import Image from 'next/image'
 
 import { Badge } from '@/components/ui/badge'
@@ -43,6 +43,13 @@ export default function OrganizationMain({
   const [passwordInput, setPasswordInput] = useState<string>('')
   const [passwordVerifying, setPasswordVerifying] = useState(false)
   const [passwordVerifyError, setPasswordVerifyError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!isOrgPasswordOpen) return
+    setPasswordInput('')
+    setPasswordVerifyError(null)
+    setPasswordVerifying(false)
+  }, [isOrgPasswordOpen])
 
   const totalCount = lectures?.length ?? 0
   const approvedCount = lectures?.filter(l => l.lectureAuthStatus === 'APPROVED').length ?? 0
@@ -125,6 +132,7 @@ export default function OrganizationMain({
       }
       setPasswordVerifyError('비밀번호 검증에 실패했습니다. 잠시 후 다시 시도해주세요.')
     } finally {
+      setPasswordInput('')
       setPasswordVerifying(false)
     }
   }

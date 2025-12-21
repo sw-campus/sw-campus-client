@@ -63,6 +63,7 @@ const loadDaumPostcodeScript = () => {
 export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
+  const [isCheckingNickname, setIsCheckingNickname] = useState(false)
 
   const { setAddress, setDetailAddress, address, detailAddress } = useSignupStore()
   const [profileEmail, setProfileEmail] = useState<string>('')
@@ -84,6 +85,31 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
     formState: { isValid, errors },
     register,
   } = methods
+
+  const onCheckNickname = async () => {
+    try {
+      const nickname = (methods.getValues('nickname') || '').trim()
+      if (!nickname) {
+        toast.error('닉네임을 입력해주세요.')
+        return
+      }
+      setIsCheckingNickname(true)
+      const res = await api.get('/members/nickname/check', { params: { nickname } })
+      const data = res?.data as unknown as { available?: boolean; exists?: boolean }
+      const available =
+        typeof data?.available === 'boolean' ? data.available : typeof data?.exists === 'boolean' ? !data.exists : true // 명확한 필드가 없으면 200 응답 기준으로 사용 가능 처리
+
+      if (available) {
+        toast.success('사용 가능한 닉네임입니다.')
+      } else {
+        toast.error('이미 사용 중인 닉네임입니다.')
+      }
+    } catch {
+      toast.error('닉네임 확인에 실패했습니다.')
+    } finally {
+      setIsCheckingNickname(false)
+    }
+  }
 
   useEffect(() => {
     let mounted = true
@@ -170,13 +196,23 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
               <label htmlFor="nickname" className="mb-1 block text-sm font-medium text-gray-800">
                 닉네임
               </label>
-              <input
-                id="nickname"
-                type="text"
-                placeholder="예) dev master"
-                {...register('nickname')}
-                className={INPUT_CLASS}
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  id="nickname"
+                  type="text"
+                  placeholder="예) dev master"
+                  {...register('nickname')}
+                  className={INPUT_CLASS}
+                />
+                <button
+                  type="button"
+                  onClick={onCheckNickname}
+                  disabled={isCheckingNickname || isLoading}
+                  className="h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+                >
+                  {isCheckingNickname ? '확인 중...' : '인증'}
+                </button>
+              </div>
               {errors.nickname && <p className="mt-1 text-xs text-red-600">{errors.nickname.message}</p>}
             </div>
 
