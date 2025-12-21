@@ -91,6 +91,19 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
   const [surveyLoading, setSurveyLoading] = useState(false)
   const [surveyError, setSurveyError] = useState<string | null>(null)
 
+  // 설문 저장 이벤트 수신 시 즉시 메인 상태 반영
+  useEffect(() => {
+    const handleSurveySaved = () => {
+      setSurveyExists(true)
+      setSurveyError(null)
+      setSurveyLoading(false)
+    }
+    window.addEventListener('survey:saved', handleSurveySaved)
+    return () => {
+      window.removeEventListener('survey:saved', handleSurveySaved)
+    }
+  }, [])
+
   useEffect(() => {
     if (activeSection !== 'survey') return
     let cancelled = false

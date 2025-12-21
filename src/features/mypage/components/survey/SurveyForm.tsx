@@ -112,6 +112,10 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
     setIsPending(true)
     try {
       await upsertSurvey.mutateAsync(values)
+      // notify other parts of the app that survey is saved
+      try {
+        window.dispatchEvent(new Event('survey:saved'))
+      } catch {}
       toast.success('설문조사가 저장되었습니다.')
       router.back()
     } catch (error) {
