@@ -32,7 +32,7 @@ export interface OrganizationDetail {
   id: number
   name: string
   description: string | null
-  certificateUrl: string | null
+  certificateKey: string | null
   approvalStatus: ApprovalStatus
   homepage: string | null
   createdAt: string

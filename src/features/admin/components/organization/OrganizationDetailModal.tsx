@@ -1,7 +1,5 @@
 'use client'
 
-import Image from 'next/image'
-
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { S3Image } from '@/features/storage'
 import { cn } from '@/lib/utils'
 
 import { useOrganizationDetailQuery } from '../../hooks/useOrganizations'
@@ -101,15 +100,19 @@ export function OrganizationDetailModal({
             {/* 재직증명서 */}
             <div className="border-border rounded-lg border p-4">
               <h3 className="text-foreground mb-3 font-semibold">재직증명서</h3>
-              {detail?.certificateUrl ? (
-                <div className="bg-muted relative aspect-4/3 w-full overflow-hidden rounded-lg">
-                  <Image src={detail.certificateUrl} alt="재직증명서" fill className="object-contain" unoptimized />
-                </div>
-              ) : (
-                <div className="bg-muted flex h-40 items-center justify-center rounded-lg">
-                  <span className="text-muted-foreground">재직증명서가 업로드되지 않았습니다.</span>
-                </div>
-              )}
+              <div className="bg-muted relative aspect-4/3 w-full overflow-hidden rounded-lg">
+                <S3Image
+                  s3Key={detail?.certificateKey}
+                  alt="재직증명서"
+                  fill
+                  className="object-contain"
+                  fallback={
+                    <div className="bg-muted flex h-40 items-center justify-center rounded-lg">
+                      <span className="text-muted-foreground">재직증명서가 업로드되지 않았습니다.</span>
+                    </div>
+                  }
+                />
+              </div>
             </div>
           </div>
         )}

@@ -1,7 +1,5 @@
 'use client'
 
-import Image from 'next/image'
-
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -20,6 +18,7 @@ import {
   type ReviewAuthStatus,
   type ReviewSummary,
 } from '@/features/admin/types/review.type'
+import { S3Image } from '@/features/storage'
 import { formatDate } from '@/lib/date'
 import { cn } from '@/lib/utils'
 
@@ -94,13 +93,17 @@ export function CertificateDetailModal({
                 <span className="text-muted-foreground text-xs font-medium">CERTIFICATE IMAGE</span>
               </div>
               <div className="relative aspect-[1.414/1] w-full bg-white">
-                {detail?.imageUrl ? (
-                  <Image src={detail.imageUrl} alt="Certificate" fill className="object-contain" priority />
-                ) : (
-                  <div className="text-muted-foreground flex h-full w-full items-center justify-center">
-                    이미지를 불러올 수 없습니다.
-                  </div>
-                )}
+                <S3Image
+                  s3Key={detail?.imageKey}
+                  alt="Certificate"
+                  fill
+                  className="object-contain"
+                  fallback={
+                    <div className="text-muted-foreground flex h-full w-full items-center justify-center">
+                      이미지를 불러올 수 없습니다.
+                    </div>
+                  }
+                />
               </div>
             </div>
 

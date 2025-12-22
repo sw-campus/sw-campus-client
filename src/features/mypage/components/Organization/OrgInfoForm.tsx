@@ -24,7 +24,7 @@ type MyOrganizationResponse = {
   phone: string
   location: string
   approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
-  certificateUrl: string
+  certificateKey: string
   govAuth: string
   facilityImageUrl1: string
   facilityImageUrl2: string
@@ -41,7 +41,7 @@ const orgInfoSchema = z.object({
   description: z.string().optional(),
   homepage: z.string().optional(),
   logoUrl: z.string().optional(),
-  certificateUrl: z.string().optional(),
+  certificateKey: z.string().optional(),
   govAuth: z.string().optional(),
   facilityImageUrl1: z.string().optional(),
   facilityImageUrl2: z.string().optional(),
@@ -101,7 +101,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
       description: '',
       homepage: '',
       logoUrl: '',
-      certificateUrl: '',
+      certificateKey: '',
       govAuth: '',
       facilityImageUrl1: '',
       facilityImageUrl2: '',
@@ -146,7 +146,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
           description: data.description ?? '',
           homepage: data.homepage ?? '',
           logoUrl: data.logoUrl ?? '',
-          certificateUrl: data.certificateUrl ?? '',
+          certificateKey: data.certificateKey ?? '',
           govAuth: data.govAuth ?? '',
           facilityImageUrl1: data.facilityImageUrl1 ?? '',
           facilityImageUrl2: data.facilityImageUrl2 ?? '',
@@ -359,15 +359,16 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                   <label className="mb-1 block text-sm font-medium text-gray-800">재직증명서</label>
                   <Controller
                     control={methods.control}
-                    name="certificateUrl"
-                    render={({ field }) => (
+                    name="certificateKey"
+                    render={() => (
                       <ImageUploadInput
-                        currentUrl={field.value}
+                        currentUrl={undefined}
                         file={certificateFile}
                         onFileChange={setCertificateFile}
                       />
                     )}
                   />
+                  {/* 재직증명서는 S3 private bucket에 저장되어 직접 URL로 조회 불가 */}
                 </div>
 
                 <div>
