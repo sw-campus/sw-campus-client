@@ -12,21 +12,85 @@ import type { LectureFormValues } from '@/features/lecture/validation/lectureFor
 
 type Props = {
   selectTriggerClassName?: string
+  categoryTree?: CategoryTreeNode[]
+  categoryId?: number | null // prop으로 받음
 }
 
-export function LectureCreateCategoryFields({ selectTriggerClassName = 'h-10' }: Props) {
+/**
+ * 카테고리 트리에서 특정 categoryId의 경로(대/중/소)를 찾는 함수
+ */
+function findCategoryPath(categoryId: number, tree: CategoryTreeNode[], path: number[] = []): number[] | null {
+  for (const node of tree) {
+    if (node.categoryId === categoryId) {
+      return [...path, node.categoryId]
+    }
+    if (node.children?.length) {
+      const found = findCategoryPath(categoryId, node.children, [...path, node.categoryId])
+      if (found) return found
+    }
+  }
+  return null
+}
+
+export function LectureCreateCategoryFields({
+  selectTriggerClassName = 'h-10',
+  categoryTree: externalCategoryTree,
+  categoryId: propCategoryId, // prop 받기
+}: Props) {
   const {
     control,
     setValue,
     formState: { errors },
   } = useFormContext<LectureFormValues>()
 
-  const { data: categoryTree, isLoading } = useCategoryTree()
+  const { data: fetchedCategoryTree, isLoading: isTreeLoading } = useCategoryTree()
+  const categoryTree = externalCategoryTree ?? fetchedCategoryTree
+  const isLoading = !externalCategoryTree && isTreeLoading
 
   // 대분류, 중분류, 소분류 선택 상태
   const [level1Id, setLevel1Id] = useState<number | null>(null)
   const [level2Id, setLevel2Id] = useState<number | null>(null)
   const [level3Id, setLevel3Id] = useState<number | null>(null)
+
+  // prop으로 받은 categoryId 사용
+  const categoryId = propCategoryId
+
+  // categoryId가 변경되면 대/중/소 분류 복원 (외부에서 변경된 경우에만)
+  useEffect(() => {
+    // 카테고리 트리나 ID가 없으면 패스
+    if (!categoryTree || !categoryId) return
+
+    // 현재 선택된 최종 ID 계산
+    let currentSelectedId: number | null = null
+    if (level3Id) currentSelectedId = level3Id
+    else if (level2Id) {
+      // 자식이 없는 중분류의 경우
+      const parent = categoryTree.flatMap(c => c.children ?? []).find(c => c.categoryId === level2Id)
+      if (parent && (!parent.children || parent.children.length === 0)) {
+        currentSelectedId = level2Id
+      }
+    }
+
+    // 현재 선택된 값과 폼의 값이 같으면 복원 로직 스킵 (무한 루프 방지)
+    if (currentSelectedId === categoryId) {
+      return
+    }
+
+    const path = findCategoryPath(categoryId, categoryTree)
+
+    if (path) {
+      // 상태 업데이트를 한 번에 처리하기보다는 필요한 부분만 업데이트
+      if (path[0] !== level1Id) {
+        setLevel1Id(path[0] ?? null)
+      }
+      if (path[1] !== level2Id) {
+        setLevel2Id(path[1] ?? null)
+      }
+      if (path[2] !== level3Id) {
+        setLevel3Id(path[2] ?? null)
+      }
+    }
+  }, [categoryId, categoryTree, level1Id, level2Id, level3Id])
 
   // 대분류 목록
   const level1Categories = categoryTree ?? []
@@ -45,35 +109,47 @@ export function LectureCreateCategoryFields({ selectTriggerClassName = 'h-10' }:
     return parent?.children ?? []
   })()
 
-  // 대분류 변경 시 중분류/소분류 초기화
-  useEffect(() => {
-    if (level1Id !== null) {
-      setLevel2Id(null)
-      setLevel3Id(null)
-      setValue('categoryId', null)
-    }
-  }, [level1Id, setValue])
+  // 대분류 선택 핸들러
+  const handleLevel1Change = (val: string) => {
+    if (!val) return
+    const id = Number(val)
+    if (isNaN(id) || id === 0) return
 
-  // 중분류 변경 시 소분류 초기화
-  useEffect(() => {
-    if (level2Id !== null) {
-      setLevel3Id(null)
-      // 중분류에 자식이 없으면 중분류 ID를 categoryId로 설정
-      const hasChildren = level2Categories.find(c => c.categoryId === level2Id)?.children?.length ?? 0
-      if (hasChildren === 0) {
-        setValue('categoryId', level2Id)
-      } else {
-        setValue('categoryId', null)
-      }
-    }
-  }, [level2Id, level2Categories, setValue])
+    setLevel1Id(id)
+    setLevel2Id(null)
+    setLevel3Id(null)
+    setValue('categoryId', null, { shouldDirty: true })
+  }
 
-  // 소분류 변경 시 categoryId 설정
-  useEffect(() => {
-    if (level3Id !== null) {
-      setValue('categoryId', level3Id)
+  // 중분류 선택 핸들러
+  const handleLevel2Change = (val: string) => {
+    if (!val) return
+    const id = Number(val)
+    if (isNaN(id) || id === 0) return
+
+    setLevel2Id(id)
+    setLevel3Id(null)
+
+    // 자식 카테고리가 없는지 확인
+    const category = level2Categories.find(c => c.categoryId === id)
+    const hasChildren = category?.children && category.children.length > 0
+
+    if (!hasChildren) {
+      setValue('categoryId', id, { shouldDirty: true })
+    } else {
+      setValue('categoryId', null, { shouldDirty: true })
     }
-  }, [level3Id, setValue])
+  }
+
+  // 소분류 선택 핸들러
+  const handleLevel3Change = (val: string) => {
+    if (!val) return
+    const id = Number(val)
+    if (isNaN(id) || id === 0) return
+
+    setLevel3Id(id)
+    setValue('categoryId', id, { shouldDirty: true })
+  }
 
   if (isLoading) {
     return (
@@ -95,7 +171,7 @@ export function LectureCreateCategoryFields({ selectTriggerClassName = 'h-10' }:
       <FieldContent>
         <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
           {/* 대분류 */}
-          <Select value={level1Id?.toString() ?? ''} onValueChange={v => setLevel1Id(v ? Number(v) : null)}>
+          <Select value={level1Id?.toString() ?? ''} onValueChange={handleLevel1Change}>
             <SelectTrigger className={`${selectTriggerClassName} w-full`}>
               <SelectValue placeholder="대분류 선택" />
             </SelectTrigger>
@@ -113,7 +189,7 @@ export function LectureCreateCategoryFields({ selectTriggerClassName = 'h-10' }:
           {/* 중분류 */}
           <Select
             value={level2Id?.toString() ?? ''}
-            onValueChange={v => setLevel2Id(v ? Number(v) : null)}
+            onValueChange={handleLevel2Change}
             disabled={!level1Id || level2Categories.length === 0}
           >
             <SelectTrigger className={`${selectTriggerClassName} w-full`}>
@@ -133,7 +209,7 @@ export function LectureCreateCategoryFields({ selectTriggerClassName = 'h-10' }:
           {/* 소분류 */}
           <Select
             value={level3Id?.toString() ?? ''}
-            onValueChange={v => setLevel3Id(v ? Number(v) : null)}
+            onValueChange={handleLevel3Change}
             disabled={!level2Id || level3Categories.length === 0}
           >
             <SelectTrigger className={`${selectTriggerClassName} w-full`}>

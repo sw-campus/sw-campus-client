@@ -23,6 +23,7 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     : undefined
 
   return {
+    orgId: values.orgId,
     lectureName: values.lectureName,
     days: values.days,
     startTime: toLocalTimeString(values.startTime),

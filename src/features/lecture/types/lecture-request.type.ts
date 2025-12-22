@@ -41,6 +41,7 @@ export interface LectureCurriculumRequest {
 }
 
 export interface LectureCreateRequest {
+  orgId: number // 기관 ID (수정 시 필수)
   lectureName: string
   days: LectureDay[]
   startTime: LocalTimeString

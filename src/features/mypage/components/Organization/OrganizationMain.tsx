@@ -1,12 +1,13 @@
 'use client'
 
-import { isAxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 
+import { isAxiosError } from 'axios'
 import Image from 'next/image'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import LectureEditModal from '@/features/mypage/components/Organization/LectureEditModal'
 import ReviewListModal from '@/features/mypage/components/Organization/ReviewListModal'
 import { api } from '@/lib/axios'
 
@@ -38,6 +39,10 @@ export default function OrganizationMain({
   const [reviewModalOpen, setReviewModalOpen] = useState(false)
   const [reviewLectureId, setReviewLectureId] = useState<number | null>(null)
   const [reviewLectureName, setReviewLectureName] = useState<string | undefined>(undefined)
+
+  // 강의 수정 모달 상태
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editLectureId, setEditLectureId] = useState<number | null>(null)
 
   // 비밀번호 검증
   const [passwordInput, setPasswordInput] = useState<string>('')
@@ -278,32 +283,32 @@ export default function OrganizationMain({
                       <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
                         {status.label}
                       </Badge>
-                      {(() => {
-                        const isRejected = l.lectureAuthStatus === 'REJECTED'
-                        const isApproved = l.lectureAuthStatus === 'APPROVED'
-                        const canEdit = isRejected && l.canEdit
-                        const label = isRejected ? '강의 수정' : '리뷰 관리'
-                        const enabled = (isApproved && true) || canEdit
-                        return (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100 disabled:opacity-50"
-                            disabled={!enabled}
-                            onClick={() => {
-                              if (!enabled) return
-                              if (isApproved) {
-                                setReviewLectureId(l.lectureId)
-                                setReviewLectureName(l.lectureName)
-                                setReviewModalOpen(true)
-                                return
-                              }
-                            }}
-                          >
-                            {label}
-                          </Button>
-                        )
-                      })()}
+                      {/* 리뷰 관리 버튼 - 승인된 강의만 활성화 */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100 disabled:opacity-50"
+                        disabled={l.lectureAuthStatus !== 'APPROVED'}
+                        onClick={() => {
+                          setReviewLectureId(l.lectureId)
+                          setReviewLectureName(l.lectureName)
+                          setReviewModalOpen(true)
+                        }}
+                      >
+                        리뷰 관리
+                      </Button>
+                      {/* 강의 수정 버튼 */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100 disabled:opacity-50"
+                        onClick={() => {
+                          setEditLectureId(l.lectureId)
+                          setEditModalOpen(true)
+                        }}
+                      >
+                        강의 수정
+                      </Button>
                     </div>
                   </div>
                 </li>
@@ -317,6 +322,20 @@ export default function OrganizationMain({
         onOpenChange={setReviewModalOpen}
         lectureId={reviewLectureId}
         lectureName={reviewLectureName}
+      />
+      <LectureEditModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        lectureId={editLectureId}
+        onSuccess={async () => {
+          // 강의 목록 새로고침
+          try {
+            const { data } = await api.get<Lecture[]>('/mypage/lectures')
+            setLectures(Array.isArray(data) ? data : [])
+          } catch {
+            // 에러 무시
+          }
+        }}
       />
     </main>
   )
