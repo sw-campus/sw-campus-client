@@ -1,15 +1,27 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
+import { useQuery } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { LuCheck, LuClock, LuList, LuPencil, LuStar, LuX } from 'react-icons/lu'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { StatCard } from '@/features/admin/components/StatCard'
+import { ApprovalFilter } from '@/features/admin/components/common/ApprovalFilter'
+import { ApprovalPagination } from '@/features/admin/components/common/ApprovalPagination'
+import { APPROVAL_STATUS_COLOR, APPROVAL_STATUS_LABEL } from '@/features/admin/types/approval.type'
+import type { ApprovalStatus, ApprovalStatusFilter } from '@/features/admin/types/approval.type'
 import LectureEditModal from '@/features/mypage/components/Organization/LectureEditModal'
 import ReviewListModal from '@/features/mypage/components/Organization/ReviewListModal'
 import { api } from '@/lib/axios'
+import { formatDate } from '@/lib/date'
+import { cn } from '@/lib/utils'
 
 type OrganizationMainProps = {
   isOrgPasswordOpen: boolean
@@ -17,61 +29,97 @@ type OrganizationMainProps = {
   onOpenProductModal: () => void
 }
 
+type Lecture = {
+  lectureId: number
+  lectureName: string
+  lectureImageUrl?: string
+  lectureAuthStatus: 'PENDING' | 'APPROVED' | 'REJECTED'
+  status: string
+  createdAt: string
+  updatedAt: string
+  canEdit: boolean
+}
+
+const PAGE_SIZE = 10
+
+function StatusBadge({ status }: { status: ApprovalStatus }) {
+  return (
+    <Badge variant="secondary" className={cn('font-medium', APPROVAL_STATUS_COLOR[status])}>
+      {APPROVAL_STATUS_LABEL[status]}
+    </Badge>
+  )
+}
+
 export default function OrganizationMain({
   isOrgPasswordOpen,
   openInfoModal,
   onOpenProductModal,
 }: OrganizationMainProps) {
-  type Lecture = {
-    lectureId: number
-    lectureName: string
-    lectureImageUrl?: string
-    lectureAuthStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
-    status: string
-    createdAt: string
-    updatedAt: string
-    canEdit: boolean
-  }
-
-  const [lectures, setLectures] = useState<Lecture[] | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [reviewModalOpen, setReviewModalOpen] = useState(false)
-  const [reviewLectureId, setReviewLectureId] = useState<number | null>(null)
-  const [reviewLectureName, setReviewLectureName] = useState<string | undefined>(undefined)
-
-  // 강의 수정 모달 상태
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [editLectureId, setEditLectureId] = useState<number | null>(null)
+  const router = useRouter()
 
   // 비밀번호 검증
   const [passwordInput, setPasswordInput] = useState<string>('')
   const [passwordVerifying, setPasswordVerifying] = useState(false)
   const [passwordVerifyError, setPasswordVerifyError] = useState<string | null>(null)
 
-  const totalCount = lectures?.length ?? 0
-  const approvedCount = lectures?.filter(l => l.lectureAuthStatus === 'APPROVED').length ?? 0
-  const rejectedCount = lectures?.filter(l => l.lectureAuthStatus === 'REJECTED').length ?? 0
+  // 필터 및 페이지네이션 상태
+  const [statusFilter, setStatusFilter] = useState<ApprovalStatusFilter>('ALL')
+  const [currentPage, setCurrentPage] = useState(0)
 
-  useEffect(() => {
-    let cancelled = false
-    const fetchLectures = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const { data } = await api.get<Lecture[]>('/mypage/lectures')
-        if (!cancelled) setLectures(Array.isArray(data) ? data : [])
-      } catch {
-        if (!cancelled) setError('강의 목록을 불러오지 못했습니다.')
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    fetchLectures()
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  // 모달 상태
+  const [reviewModalOpen, setReviewModalOpen] = useState(false)
+  const [reviewLectureId, setReviewLectureId] = useState<number | null>(null)
+  const [reviewLectureName, setReviewLectureName] = useState<string | undefined>(undefined)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editLectureId, setEditLectureId] = useState<number | null>(null)
+
+  // TanStack Query로 강의 목록 조회
+  const {
+    data: lectures = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['mypage', 'lectures'],
+    queryFn: async () => {
+      const { data } = await api.get<Lecture[]>('/mypage/lectures')
+      return Array.isArray(data) ? data : []
+    },
+  })
+
+  // 필터링된 강의 목록
+  const filteredLectures = lectures.filter(lecture => {
+    return statusFilter === 'ALL' || lecture.lectureAuthStatus === statusFilter
+  })
+
+  // 페이지네이션 적용
+  const totalElements = filteredLectures.length
+  const totalPages = Math.ceil(totalElements / PAGE_SIZE)
+  const paginatedLectures = filteredLectures.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE)
+
+  // 통계 계산
+  const totalCount = lectures.length
+  const approvedCount = lectures.filter(l => l.lectureAuthStatus === 'APPROVED').length
+  const pendingCount = lectures.filter(l => l.lectureAuthStatus === 'PENDING').length
+  const rejectedCount = lectures.filter(l => l.lectureAuthStatus === 'REJECTED').length
+
+  const stats = [
+    { title: '전체', value: totalCount, icon: LuList },
+    { title: '승인 대기', value: pendingCount, icon: LuClock },
+    { title: '승인 완료', value: approvedCount, icon: LuCheck },
+    { title: '반려', value: rejectedCount, icon: LuX },
+  ]
+
+  const handleStatusChange = (status: ApprovalStatusFilter) => {
+    setStatusFilter(status)
+    setCurrentPage(0)
+  }
+
+  const handleRowClick = (lectureId: number) => {
+    router.push(`/lectures/${lectureId}`)
+  }
+
+  const getRowNumber = (index: number) => currentPage * PAGE_SIZE + index + 1
 
   const verifyPasswordAndOpen = async () => {
     try {
@@ -175,148 +223,136 @@ export default function OrganizationMain({
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-6 rounded-3xl bg-white/60 p-6 shadow-black/40">
-      {/* Header Card */}
-      <header className="rounded-2xl bg-white/70 px-5 py-4 ring-1 ring-white/30 backdrop-blur-xl">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-600">조직 전용 교육과정 공간</p>
-            <h3 className="text-2xl font-semibold text-gray-900">교육과정 관리</h3>
-          </div>
-          <Button
-            className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
-            onClick={onOpenProductModal}
-          >
-            교육과정 등록
-          </Button>
-        </div>
-      </header>
-      {/* Stats cards */}
-      <section className="rounded-2xl bg-white/70 p-5 text-gray-700 ring-1 ring-white/30 backdrop-blur-xl">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <article className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5">
-            <p className="text-xs text-gray-500 uppercase">총 강의</p>
-            <p className="text-2xl font-semibold text-gray-900">{totalCount}</p>
-          </article>
-          <article className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5">
-            <p className="text-xs text-gray-500 uppercase">승인됨</p>
-            <p className="text-2xl font-semibold text-gray-900">{approvedCount}</p>
-          </article>
-          <article className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5">
-            <p className="text-xs text-gray-500 uppercase">반려됨</p>
-            <p className="text-2xl font-semibold text-gray-900">{rejectedCount}</p>
-          </article>
-        </div>
-      </section>
+    <div className="flex flex-1 flex-col gap-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-foreground text-2xl font-bold">교육과정 관리</h1>
+        <Button onClick={onOpenProductModal}>교육과정 등록</Button>
+      </div>
 
-      <section className="rounded-2xl bg-white/70 p-5 text-gray-700 ring-1 ring-white/30 backdrop-blur-xl">
-        <header className="mb-3">
-          <h4 className="text-lg font-semibold text-gray-900">내 강의 목록</h4>
-        </header>
-        {loading && <p className="text-gray-600">불러오는 중...</p>}
-        {error && !loading && (
-          <div className="flex items-center gap-3 text-red-600">
-            <p>{error}</p>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={async () => {
-                try {
-                  setLoading(true)
-                  setError(null)
-                  const { data } = await api.get<Lecture[]>('/mypage/lectures')
-                  setLectures(Array.isArray(data) ? data : [])
-                } catch {
-                  setError('강의 목록을 불러오지 못했습니다.')
-                } finally {
-                  setLoading(false)
-                }
-              }}
-            >
-              다시 시도
-            </Button>
-          </div>
-        )}
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {stats.map(stat => (
+          <StatCard key={stat.title} title={stat.title} value={stat.value} icon={stat.icon} />
+        ))}
+      </div>
 
-        {!loading && !error && (lectures?.length ?? 0) === 0 && (
-          <p className="text-gray-600">등록된 강의가 없습니다.</p>
-        )}
+      {/* Filter - 검색창 없이 상태 필터만 */}
+      <ApprovalFilter
+        currentStatus={statusFilter}
+        keyword=""
+        onStatusChange={handleStatusChange}
+        onKeywordChange={() => {}}
+      />
 
-        {!loading && !error && (lectures?.length ?? 0) > 0 && (
-          <ul className="space-y-3">
-            {lectures!.map(l => {
-              const statusMap: Record<
-                string,
-                { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
-              > = {
-                APPROVED: { label: '승인 완료', variant: 'default' },
-                PENDING: { label: '승인 대기', variant: 'secondary' },
-                REJECTED: { label: '반려', variant: 'destructive' },
-              }
-              const status = statusMap[l.lectureAuthStatus] ?? {
-                label: l.lectureAuthStatus,
-                variant: 'outline' as const,
-              }
-              return (
-                <li
-                  key={l.lectureId}
-                  className="rounded-2xl border border-white/10 bg-white/90 p-4 text-neutral-900 shadow-sm ring-1 ring-black/5 sm:p-5"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-white">
-                        {l.lectureImageUrl ? (
-                          <Image src={l.lectureImageUrl} alt={l.lectureName} fill className="object-cover" />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-gray-50 text-sm font-semibold text-gray-600">
-                            {l.lectureName.charAt(0)}
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">코스</p>
-                        <p className="text-base font-semibold text-gray-900">{l.lectureName}</p>
-                        <p className="mt-0.5 text-xs text-gray-500">상태: {l.status}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                        {status.label}
-                      </Badge>
-                      {/* 리뷰 관리 버튼 - 승인된 강의만 활성화 */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100 disabled:opacity-50"
-                        disabled={l.lectureAuthStatus !== 'APPROVED'}
-                        onClick={() => {
-                          setReviewLectureId(l.lectureId)
-                          setReviewLectureName(l.lectureName)
-                          setReviewModalOpen(true)
-                        }}
-                      >
-                        리뷰 관리
-                      </Button>
-                      {/* 강의 수정 버튼 */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100 disabled:opacity-50"
-                        onClick={() => {
-                          setEditLectureId(l.lectureId)
-                          setEditModalOpen(true)
-                        }}
-                      >
-                        강의 수정
-                      </Button>
-                    </div>
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        )}
-      </section>
+      {/* Table */}
+      <Card className="bg-card">
+        <CardHeader>
+          <CardTitle className="text-foreground">강의 목록</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex h-32 items-center justify-center">
+              <span className="text-muted-foreground">로딩 중...</span>
+            </div>
+          ) : error ? (
+            <div className="flex h-32 flex-col items-center justify-center gap-3">
+              <span className="text-destructive">강의 목록을 불러오지 못했습니다.</span>
+              <Button variant="secondary" size="sm" onClick={() => void refetch()}>
+                다시 시도
+              </Button>
+            </div>
+          ) : paginatedLectures.length === 0 ? (
+            <div className="flex h-32 items-center justify-center">
+              <span className="text-muted-foreground">
+                {lectures.length === 0 ? '등록된 강의가 없습니다.' : '해당 조건의 강의가 없습니다.'}
+              </span>
+            </div>
+          ) : (
+            <TooltipProvider>
+              <Table className="table-fixed">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[60px]">NO</TableHead>
+                    <TableHead>강의명</TableHead>
+                    <TableHead className="w-[110px]">상태</TableHead>
+                    <TableHead className="w-[120px]">등록일</TableHead>
+                    <TableHead className="w-[100px] text-center">관리</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedLectures.map((lecture, index) => (
+                    <TableRow
+                      key={lecture.lectureId}
+                      onClick={() => handleRowClick(lecture.lectureId)}
+                      className="hover:bg-muted/50 cursor-pointer transition-colors"
+                    >
+                      <TableCell className="text-muted-foreground">{getRowNumber(index)}</TableCell>
+                      <TableCell className="text-foreground truncate font-medium" title={lecture.lectureName}>
+                        {lecture.lectureName}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={lecture.lectureAuthStatus} />
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{formatDate(lecture.createdAt)}</TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex justify-center gap-1" onClick={e => e.stopPropagation()}>
+                          {/* 리뷰 관리 */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                disabled={lecture.lectureAuthStatus !== 'APPROVED'}
+                                onClick={() => {
+                                  setReviewLectureId(lecture.lectureId)
+                                  setReviewLectureName(lecture.lectureName)
+                                  setReviewModalOpen(true)
+                                }}
+                              >
+                                <LuStar className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {lecture.lectureAuthStatus === 'APPROVED' ? '리뷰 관리' : '승인 후 리뷰 관리 가능'}
+                            </TooltipContent>
+                          </Tooltip>
+
+                          {/* 강의 수정 */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => {
+                                  setEditLectureId(lecture.lectureId)
+                                  setEditModalOpen(true)
+                                }}
+                              >
+                                <LuPencil className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>강의 수정</TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TooltipProvider>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <ApprovalPagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+      )}
+
+      {/* Modals */}
       <ReviewListModal
         open={reviewModalOpen}
         onOpenChange={setReviewModalOpen}
@@ -327,16 +363,8 @@ export default function OrganizationMain({
         open={editModalOpen}
         onOpenChange={setEditModalOpen}
         lectureId={editLectureId}
-        onSuccess={async () => {
-          // 강의 목록 새로고침
-          try {
-            const { data } = await api.get<Lecture[]>('/mypage/lectures')
-            setLectures(Array.isArray(data) ? data : [])
-          } catch {
-            // 에러 무시
-          }
-        }}
+        onSuccess={() => void refetch()}
       />
-    </main>
+    </div>
   )
 }
