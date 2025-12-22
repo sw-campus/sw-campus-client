@@ -22,7 +22,9 @@ export function LectureCreateLocationFields({ selectTriggerClassName }: Props) {
 
   return (
     <Field>
-      <FieldLabel>강의 장소</FieldLabel>
+      <FieldLabel>
+        강의 장소<span className="ml-1 text-xl font-bold text-red-600">*</span>
+      </FieldLabel>
       <FieldDescription>오프라인/병행 강의인 경우 오프라인 장소를 입력해 주세요.</FieldDescription>
       <FieldContent>
         <div className="grid grid-cols-3 gap-2">

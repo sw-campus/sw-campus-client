@@ -25,7 +25,9 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
   return (
     <>
       <Field>
-        <FieldLabel>강의명</FieldLabel>
+        <FieldLabel>
+          강의명<span className="ml-1 text-xl font-bold text-red-600">*</span>
+        </FieldLabel>
         <FieldContent>
           <Controller
             control={control}

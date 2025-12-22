@@ -4,6 +4,7 @@ import { LECTURE_DAYS } from '@/features/lecture/types/lecture.type'
 
 export const lectureFormSchema = z
   .object({
+    orgId: z.number(), // 기관 ID (수정 시 필수)
     lectureName: z.string().trim().min(1, '강의명은 필수입니다.'),
     lectureLoc: z.enum(['ONLINE', 'OFFLINE', 'MIXED']),
     location: z.string().trim().optional().nullable(),
@@ -18,7 +19,7 @@ export const lectureFormSchema = z
           type: z.enum(['DOCUMENT', 'CODING_TEST', 'INTERVIEW', 'PRE_TASK']),
         }),
       )
-      .min(1, '선발 절차를 1개 이상 추가해 주세요.'),
+      .optional(),
 
     // backend: RecruitType
     recruitType: z.enum(['GENERAL', 'CARD_REQUIRED']),
@@ -44,8 +45,8 @@ export const lectureFormSchema = z
     lectureImageFile: z.any().optional().nullable(), // File | null
 
     // 강의 기간은 날짜로만 입력(전송 시 LocalDateTime으로 변환)
-    startAtDate: z.date().refine(d => d instanceof Date && !Number.isNaN(d.getTime()), '강의 시작일은 필수입니다.'),
-    endAtDate: z.date().refine(d => d instanceof Date && !Number.isNaN(d.getTime()), '강의 종료일은 필수입니다.'),
+    startAtDate: z.date().optional().nullable(),
+    endAtDate: z.date().optional().nullable(),
 
     deadlineDate: z.date().optional().nullable(),
 
