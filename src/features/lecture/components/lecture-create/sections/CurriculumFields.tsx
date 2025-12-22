@@ -51,7 +51,6 @@ export function LectureCreateCurriculumFields({ selectTriggerClassName = 'h-10' 
       // fields에는 id 등 내부 속성이 있으므로 필요한 값만 비교
       const currentValues = fields.map(({ curriculumId, level }) => ({ curriculumId, level }))
       if (JSON.stringify(merged) !== JSON.stringify(currentValues)) {
-        console.log('[CurriculumFields] Merging curriculums. Merged:', merged)
         replace(merged)
       }
     }

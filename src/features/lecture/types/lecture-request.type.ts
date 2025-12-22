@@ -77,8 +77,8 @@ export interface LectureCreateRequest {
   projectTool?: string | null
   projectMentor?: boolean | null
 
-  startAt: LocalDateString
-  endAt: LocalDateString
+  startAt?: LocalDateString | null
+  endAt?: LocalDateString | null
   deadline?: LocalDateString | null
 
   totalDays: number

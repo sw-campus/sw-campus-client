@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
 import { LuCheck, LuClock, LuList, LuPencil, LuStar, LuX } from 'react-icons/lu'
+import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -116,6 +117,14 @@ export default function OrganizationMain({
   }
 
   const handleRowClick = (lectureId: number) => {
+    const lecture = lectures.find(l => l.lectureId === lectureId)
+    if (!lecture) return
+
+    if (lecture.lectureAuthStatus === 'PENDING' || lecture.lectureAuthStatus === 'REJECTED') {
+      toast.info('승인된 강의만 상세 페이지를 확인할 수 있습니다.')
+      return
+    }
+
     router.push(`/lectures/${lectureId}`)
   }
 

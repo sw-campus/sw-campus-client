@@ -77,8 +77,7 @@ export default function LectureEditModal({ open, onOpenChange, lectureId, onSucc
         console.error('Failed to fetch lecture:', error)
         toast.error('강의 정보를 불러오는데 실패했습니다.')
       } finally {
-        // 폼이 리셋된 후 약간의 지연을 주어 CategoryFields가 올바르게 초기화되도록 함
-        setTimeout(() => setIsLoading(false), 50)
+        setIsLoading(false)
       }
     }
 

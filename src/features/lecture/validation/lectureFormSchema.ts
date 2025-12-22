@@ -45,8 +45,8 @@ export const lectureFormSchema = z
     lectureImageFile: z.any().optional().nullable(), // File | null
 
     // 강의 기간은 날짜로만 입력(전송 시 LocalDateTime으로 변환)
-    startAtDate: z.date().refine(d => d instanceof Date && !Number.isNaN(d.getTime()), '강의 시작일은 필수입니다.'),
-    endAtDate: z.date().refine(d => d instanceof Date && !Number.isNaN(d.getTime()), '강의 종료일은 필수입니다.'),
+    startAtDate: z.date().optional().nullable(),
+    endAtDate: z.date().optional().nullable(),
 
     deadlineDate: z.date().optional().nullable(),
 

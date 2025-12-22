@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Controller, useFormContext } from 'react-hook-form'
 
@@ -56,41 +56,29 @@ export function LectureCreateCategoryFields({
   const categoryId = propCategoryId
 
   // categoryId가 변경되면 대/중/소 분류 복원 (외부에서 변경된 경우에만)
-  useEffect(() => {
-    // 카테고리 트리나 ID가 없으면 패스
-    if (!categoryTree || !categoryId) return
-
-    // 현재 선택된 최종 ID 계산
-    let currentSelectedId: number | null = null
-    if (level3Id) currentSelectedId = level3Id
-    else if (level2Id) {
+  // Render-phase state update to avoid flash/race conditions
+  const currentSelectedId = (() => {
+    if (level3Id) return level3Id
+    if (level2Id) {
       // 자식이 없는 중분류의 경우
-      const parent = categoryTree.flatMap(c => c.children ?? []).find(c => c.categoryId === level2Id)
+      const parent = categoryTree?.flatMap(c => c.children ?? []).find(c => c.categoryId === level2Id)
       if (parent && (!parent.children || parent.children.length === 0)) {
-        currentSelectedId = level2Id
+        return level2Id
       }
     }
+    return null
+  })()
 
-    // 현재 선택된 값과 폼의 값이 같으면 복원 로직 스킵 (무한 루프 방지)
-    if (currentSelectedId === categoryId) {
-      return
-    }
-
+  if (categoryTree && categoryId && currentSelectedId !== categoryId) {
     const path = findCategoryPath(categoryId, categoryTree)
-
     if (path) {
-      // 상태 업데이트를 한 번에 처리하기보다는 필요한 부분만 업데이트
-      if (path[0] !== level1Id) {
+      if (path[0] !== level1Id || path[1] !== level2Id || path[2] !== level3Id) {
         setLevel1Id(path[0] ?? null)
-      }
-      if (path[1] !== level2Id) {
         setLevel2Id(path[1] ?? null)
-      }
-      if (path[2] !== level3Id) {
         setLevel3Id(path[2] ?? null)
       }
     }
-  }, [categoryId, categoryTree, level1Id, level2Id, level3Id])
+  }
 
   // 대분류 목록
   const level1Categories = categoryTree ?? []
