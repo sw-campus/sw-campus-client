@@ -21,13 +21,13 @@ export async function generateGeminiSummary(lectureData: LectureDetail) {
       
       형식:
       [위치]에서 [온/오프라인, 시간]으로 진행되는
-      [국비지원유형] [카테고리] [과정유형] 입니다.
-      채용 관련 [주요혜택] 혜택이 있으며, 선발절차에 코딩테스트는 [유/무].
+      [국비지원유형] [카테고리] 과정입니다.
+      주요 서비스로 [주요서비스] 등을 제공하며, 선발절차에 코딩테스트는 [유/무].
 
       예시:
       [KR 서울]에서 [오프라인, 풀타임]으로 진행되는
-      [내일배움카드(KDT)] [웹 풀스택] [부트캠프] 입니다.
-      채용 관련 [인재추천] 혜택이 있으며, 선발절차에 코딩테스트는 [없습니다].
+      [내일배움카드(KDT)] [웹 풀스택] 과정입니다.
+      주요 서비스로 [이력서첨삭, 모의면접] 등을 제공하며, 선발절차에 코딩테스트는 [없습니다].
 
       [강의 정보]
       제목: ${lectureData.title}
@@ -36,8 +36,7 @@ export async function generateGeminiSummary(lectureData: LectureDetail) {
       위치: ${lectureData.location} (${lectureData.lectureLoc})
       교육시간: ${lectureData.schedule.time} (${lectureData.schedule.totalHours}시간)
       교육기간: ${lectureData.schedule.coursePeriod.start} ~ ${lectureData.schedule.coursePeriod.end}
-      모집 유형: ${lectureData.tags.join(', ')}
-      국비지원 여부: ${lectureData.recruitType === 'CARD_REQUIRED' ? '내일배움카드 필요(KDT)' : '일반'}
+      국비지원 여부: ${lectureData.recruitType === 'CARD_REQUIRED' ? '내일배움카드 필요(KDT)' : '내일배움카드 필요 X'}
       선발 절차: ${lectureData.steps && lectureData.steps.length > 0 ? lectureData.steps.join(', ') : '없음'}
       
       [핵심 내용]
@@ -52,7 +51,7 @@ export async function generateGeminiSummary(lectureData: LectureDetail) {
         lectureData.services.books ? '교재제공' : '',
         lectureData.services.resume ? '이력서첨삭' : '',
         lectureData.services.mockInterview ? '모의면접' : '',
-        lectureData.services.employmentHelp ? '취업연계' : '',
+        lectureData.services.employmentHelp ? '취업지원' : '',
         lectureData.services.afterCompletion ? '사후관리' : '',
       ]
         .filter(Boolean)
@@ -60,7 +59,7 @@ export async function generateGeminiSummary(lectureData: LectureDetail) {
       
       [기타]
       지원 자격: ${lectureData.quals.map(q => q.text).join(', ')}
-      채용 혜택: ${lectureData.benefits.join(', ')}
+      채용 혜택: ${lectureData.benefits.length > 0 ? lectureData.benefits.join(', ') : '없음'}
     `
 
     const result = await model.generateContent(prompt)
