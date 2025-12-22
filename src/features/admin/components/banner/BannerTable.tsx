@@ -88,7 +88,7 @@ export function BannerTable({ banners, isLoading, isToggling, onViewDetail, onTo
           <TableBody>
             {[...banners]
               .sort((a, b) => a.id - b.id)
-              .map(banner => {
+              .map((banner, index) => {
                 const periodStatus = getBannerPeriodStatus(banner.startDate, banner.endDate)
                 return (
                   <TableRow
@@ -96,7 +96,7 @@ export function BannerTable({ banners, isLoading, isToggling, onViewDetail, onTo
                     onClick={() => onViewDetail(banner)}
                     className="hover:bg-muted/50 cursor-pointer transition-colors"
                   >
-                    <TableCell className="text-muted-foreground">{banner.id}</TableCell>
+                    <TableCell className="text-muted-foreground">{index + 1}</TableCell>
                     <TableCell>
                       <TypeBadge type={banner.type} />
                     </TableCell>

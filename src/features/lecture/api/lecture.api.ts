@@ -32,6 +32,37 @@ export const createLecture = async ({
   return res.data
 }
 
+export type UpdateLectureParams = {
+  lectureId: number
+  payload: LectureCreateRequest
+  lectureImageFile?: File | null
+  teacherImageFiles?: File[]
+}
+
+export const updateLecture = async ({
+  lectureId,
+  payload,
+  lectureImageFile,
+  teacherImageFiles,
+}: UpdateLectureParams): Promise<LectureCreateResponse> => {
+  const formData = new FormData()
+  const payloadJson = JSON.stringify(payload)
+  formData.append('lecture', new Blob([payloadJson], { type: 'application/json' }))
+
+  if (lectureImageFile) {
+    formData.append('image', lectureImageFile)
+  }
+
+  if (teacherImageFiles && teacherImageFiles.length > 0) {
+    teacherImageFiles.forEach(file => {
+      formData.append('teacherImages', file)
+    })
+  }
+
+  const res = await api.put(`/lectures/${lectureId}`, formData)
+  return res.data
+}
+
 export const getLectureSearch = async (queryString: string): Promise<PageResponse<LectureResponseDto>> => {
   const path = queryString ? `/lectures/search?${queryString}` : '/lectures/search'
   const res = await api.get(path)

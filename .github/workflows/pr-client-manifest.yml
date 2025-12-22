@@ -54,13 +54,17 @@ jobs:
           token: ${{ secrets.MANIFEST_REPO_TOKEN }}
           path: manifest
 
-      # 5️⃣ client deployment 이미지 태그 변경
-      - name: Update client deployment image
+      # 5️⃣ client 이미지 태그 변경
+      - name: Update client image tag
         run: |
           cd manifest
-          sed -i \
-            "s|image: ghcr.io/sw-campus/sw-campus-client:.*|image: ghcr.io/sw-campus/sw-campus-client:${{ steps.tag.outputs.tag }}|g" \
-            k8s/client/deployment.yaml
+          # develop 브랜치면 develop 환경 values.yaml 업데이트
+          if [ "${{ steps.target.outputs.branch }}" == "develop" ]; then
+            VALUES_FILE="k8s/environments/develop/values.yaml"
+          else
+            VALUES_FILE="k8s/environments/release/values.yaml"
+          fi
+          sed -i '/repository: ghcr.io\/sw-campus\/sw-campus-client$/,/pullPolicy:/ s|tag: ".*"|tag: "${{ steps.tag.outputs.tag }}"|' "$VALUES_FILE"
 
       # 6️⃣ PR 생성
       - name: Create PR to manifest repo
@@ -77,4 +81,5 @@ jobs:
             - Environment: ${{ steps.target.outputs.env }}
             - Image tag: `${{ steps.tag.outputs.tag }}`
           add-paths: |
-            k8s/client/deployment.yaml
+            k8s/environments/develop/values.yaml
+            k8s/environments/release/values.yaml

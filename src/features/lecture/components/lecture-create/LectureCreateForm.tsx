@@ -124,7 +124,7 @@ export function LectureCreateForm() {
             <LectureCreateAddsFields />
 
             <div className="pt-4">
-              <Button type="submit" disabled={isSubmitting || isPending}>
+              <Button type="submit" disabled={!methods.formState.isValid || isSubmitting || isPending}>
                 {isSubmitting || isPending ? '등록 중...' : '등록'}
               </Button>
             </div>

@@ -23,6 +23,7 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     : undefined
 
   return {
+    orgId: values.orgId,
     lectureName: values.lectureName,
     days: values.days,
     startTime: toLocalTimeString(values.startTime),
@@ -49,8 +50,8 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     projectTeam: values.projectTeam?.trim() ? values.projectTeam.trim() : null,
     projectTool: values.projectTool?.trim() ? values.projectTool.trim() : null,
     projectMentor: values.projectMentor ?? null,
-    startAt: toLocalDateString(values.startAtDate),
-    endAt: toLocalDateString(values.endAtDate),
+    startAt: values.startAtDate ? toLocalDateString(values.startAtDate) : null,
+    endAt: values.endAtDate ? toLocalDateString(values.endAtDate) : null,
     deadline: values.deadlineDate ? toLocalDateString(values.deadlineDate) : null,
     totalDays: values.totalDays,
     totalTimes: values.totalTimes,
