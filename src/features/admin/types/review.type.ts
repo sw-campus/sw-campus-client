@@ -102,7 +102,7 @@ export interface CertificateDetail {
   lectureName: string
   userName: string
   nickname: string
-  imageUrl: string
+  imageKey: string
   approvalStatus: ReviewAuthStatus
   createdAt: string
 }

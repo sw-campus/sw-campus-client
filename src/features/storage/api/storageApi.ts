@@ -7,6 +7,9 @@ import {
   MultipartInitResponse,
   MultipartPartRequest,
   MultipartPartResponse,
+  PresignedGetUrlBatchRequest,
+  PresignedGetUrlBatchResponse,
+  PresignedGetUrlResponse,
   PresignedUrlRequest,
   PresignedUrlResponse,
 } from '@/features/storage/types/storage.type'
@@ -56,5 +59,20 @@ export const storageApi = {
       },
     })
     return response.headers.etag as string
+  },
+
+  // Presigned GET URL 발급 (단일)
+  getPresignedGetUrl: async (key: string): Promise<PresignedGetUrlResponse> => {
+    const { data } = await api.get<PresignedGetUrlResponse>('/storage/presigned-urls', {
+      params: { key },
+    })
+    return data
+  },
+
+  // Presigned GET URL 발급 (배치)
+  getPresignedGetUrls: async (keys: string[]): Promise<PresignedGetUrlBatchResponse> => {
+    const request: PresignedGetUrlBatchRequest = { keys }
+    const { data } = await api.post<PresignedGetUrlBatchResponse>('/storage/presigned-urls/batch', request)
+    return data
   },
 }

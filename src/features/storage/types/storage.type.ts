@@ -62,3 +62,15 @@ export interface FileUploadResult {
   url: string
   fileName: string
 }
+
+// Presigned GET URL 타입
+export interface PresignedGetUrlResponse {
+  url: string
+  expiresIn: number
+}
+
+export interface PresignedGetUrlBatchRequest {
+  keys: string[]
+}
+
+export type PresignedGetUrlBatchResponse = Record<string, string | null>
