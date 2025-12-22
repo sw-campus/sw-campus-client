@@ -153,7 +153,7 @@ export function LectureCreateCategoryFields({
   return (
     <Field>
       <FieldLabel>
-        카테고리<span className="ml-1 text-lg font-bold text-red-600">*</span>
+        카테고리<span className="ml-1 text-xl font-bold text-red-600">*</span>
       </FieldLabel>
       <FieldDescription>대분류 → 중분류 → 소분류 순서로 선택해 주세요.</FieldDescription>
       <FieldContent>

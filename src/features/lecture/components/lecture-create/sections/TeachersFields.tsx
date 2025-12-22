@@ -54,7 +54,7 @@ export function LectureCreateTeachersFields() {
   return (
     <Field>
       <FieldLabel>
-        강사<span className="ml-1 text-lg font-bold text-red-600">*</span>
+        강사<span className="ml-1 text-xl font-bold text-red-600">*</span>
       </FieldLabel>
       <FieldDescription>
         강사를 최소 1명 이상 등록해 주세요. 기존 강사를 검색하거나 새로 등록할 수 있습니다.

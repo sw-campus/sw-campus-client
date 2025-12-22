@@ -22,7 +22,7 @@ export function LectureCreateScheduleFields() {
     <>
       <Field>
         <FieldLabel>
-          운영 요일<span className="ml-1 text-lg font-bold text-red-600">*</span>
+          운영 요일<span className="ml-1 text-xl font-bold text-red-600">*</span>
         </FieldLabel>
         <FieldContent>
           <Controller
@@ -148,7 +148,7 @@ export function LectureCreateScheduleFields() {
 
       <Field>
         <FieldLabel>
-          강의 기간<span className="ml-1 text-lg font-bold text-red-600">*</span>
+          강의 기간<span className="ml-1 text-xl font-bold text-red-600">*</span>
         </FieldLabel>
         <FieldContent>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -191,7 +191,7 @@ export function LectureCreateScheduleFields() {
 
       <Field>
         <FieldLabel>
-          수업 시간<span className="ml-1 text-lg font-bold text-red-600">*</span>
+          수업 시간<span className="ml-1 text-xl font-bold text-red-600">*</span>
         </FieldLabel>
         <FieldContent>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
