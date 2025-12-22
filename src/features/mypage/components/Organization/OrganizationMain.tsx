@@ -63,22 +63,9 @@ export default function OrganizationMain({
   const [passwordVerifying, setPasswordVerifying] = useState(false)
   const [passwordVerifyError, setPasswordVerifyError] = useState<string | null>(null)
 
-<<<<<<< HEAD
-  useEffect(() => {
-    if (!isOrgPasswordOpen) return
-    setPasswordInput('')
-    setPasswordVerifyError(null)
-    setPasswordVerifying(false)
-  }, [isOrgPasswordOpen])
-
-  const totalCount = lectures?.length ?? 0
-  const approvedCount = lectures?.filter(l => l.lectureAuthStatus === 'APPROVED').length ?? 0
-  const rejectedCount = lectures?.filter(l => l.lectureAuthStatus === 'REJECTED').length ?? 0
-=======
   // 필터 및 페이지네이션 상태
   const [statusFilter, setStatusFilter] = useState<ApprovalStatusFilter>('ALL')
   const [currentPage, setCurrentPage] = useState(0)
->>>>>>> develop
 
   // 모달 상태
   const [reviewModalOpen, setReviewModalOpen] = useState(false)
