@@ -88,9 +88,8 @@ export function LectureCreateForm() {
     console.log('Lecture image file:', values.lectureImageFile)
 
     const payload = mapLectureFormToCreateRequest(values)
-    // 신규 강사(teacherId가 없는 경우)만 이미지 파일 수집
     const teacherImageFiles = (values.teachers ?? [])
-      .filter(t => !t.teacherId) // 기존 강사는 이미지 업로드 불필요
+      .filter(t => !t.teacherId)
       .map(t => t.teacherImageFile)
       .filter((f): f is File => !!f)
 

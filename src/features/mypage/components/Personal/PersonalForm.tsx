@@ -64,6 +64,7 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
   const [isCheckingNickname, setIsCheckingNickname] = useState(false)
+  const [showAddressEditor, setShowAddressEditor] = useState(false)
 
   const { setAddress, setDetailAddress, address, detailAddress } = useSignupStore()
   const [profileEmail, setProfileEmail] = useState<string>('')
@@ -132,8 +133,9 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
           location: '',
         })
 
-        // 주소는 사용자에게 다시 입력받도록 비워둠
-        setAddress('')
+        // 주소는 백엔드 값으로 초기 세팅 (수정 시 AddressInput 노출)
+        const loc = (data.location ?? '').trim()
+        setAddress(loc)
         setDetailAddress('')
       } catch {
         toast.error('내 정보 조회에 실패했습니다.')
@@ -231,7 +233,22 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
             </div>
 
             <div>
-              <AddressInput />
+              {!showAddressEditor ? (
+                <div className="flex items-center gap-2">
+                  <div className={`${INPUT_CLASS} flex flex-1 items-center bg-gray-50`}>
+                    <span className="truncate">{address || '주소를 입력해주세요.'}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddressEditor(true)}
+                    className="h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+                  >
+                    수정
+                  </button>
+                </div>
+              ) : (
+                <AddressInput autoOpen />
+              )}
             </div>
           </FieldGroup>
 

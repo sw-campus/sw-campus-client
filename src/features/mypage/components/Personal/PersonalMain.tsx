@@ -460,7 +460,6 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                           setCreateLectureName(l.lectureName)
                           setCreateScore(0)
                           setCreateComment('')
-                          // 스펙: POST /api/v1/reviews 는 detailScores를 받으므로 기본 항목을 준비
                           setCreateDetails(defaultReviewDetails(0))
                           setCreateOpen(true)
                         }}
@@ -470,10 +469,8 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                     ) : (
                       <Button
                         size="sm"
-                        variant="outline"
                         className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
                         onClick={() => {
-                          // Always open modal; show fallback message inside when reviewId is missing
                           setSelectedReviewId(l.reviewId ?? null)
                           setSelectedLectureId(l.lectureId)
                           setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
@@ -486,20 +483,12 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                   </div>
                 </div>
 
-                {/* Inline details in horizontal layout */}
                 <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-                  <span className="text-muted-foreground">
-                    강의 ID: <span className="text-foreground font-medium">{l.lectureId}</span>
-                  </span>
                   <span className="text-muted-foreground">
                     교육기관: <span className="text-foreground font-medium">{l.organizationName}</span>
                   </span>
                   <span className="text-muted-foreground">
                     수료일: <span className="text-foreground font-medium">{formatDate(l.certifiedAt)}</span>
-                  </span>
-                  <span className="text-muted-foreground">
-                    후기 작성:{' '}
-                    <span className="text-foreground font-medium">{l.canWriteReview ? '가능' : '완료됨'}</span>
                   </span>
                 </div>
               </li>

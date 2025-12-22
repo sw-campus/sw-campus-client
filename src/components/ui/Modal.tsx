@@ -51,14 +51,14 @@ export default function Modal({ isOpen, onClose, title, maxWidthClass = 'max-w-2
     >
       <div
         ref={panelRef}
-        className={`mx-4 w-full ${maxWidthClass} rounded-2xl bg-white shadow-[0_20px_48px_rgba(0,0,0,0.35)]`}
+        className={`mx-4 w-full ${maxWidthClass} rounded-2xl border border-gray-200 bg-white shadow-[0_20px_48px_rgba(0,0,0,0.35)]`}
         onMouseDown={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
-          <h3 className="text-base font-semibold text-neutral-900">{title}</h3>
+        <div className="flex items-center justify-between border-b border-gray-200 px-8 py-6">
+          <h3 className="text-xl font-semibold text-neutral-900">{title}</h3>
           <button
             aria-label="Close"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-neutral-600 hover:bg-gray-100 hover:text-neutral-900"
             onClick={onClose}
           >
             {/* X icon */}
@@ -71,7 +71,7 @@ export default function Modal({ isOpen, onClose, title, maxWidthClass = 'max-w-2
             </svg>
           </button>
         </div>
-        <div className="max-h-[70vh] overflow-y-auto px-5 py-4">{children}</div>
+        <div className="max-h-[70vh] overflow-y-auto px-8 py-6">{children}</div>
       </div>
     </div>,
     document.body,

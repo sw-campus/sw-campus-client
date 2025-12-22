@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+
 import { toast } from 'sonner'
 
 import { useSignupStore } from '@/store/signupStore'
@@ -7,7 +9,11 @@ import { useSignupStore } from '@/store/signupStore'
 const INPUT_BASE_CLASS =
   'h-9 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white'
 
-export default function AddressInput() {
+type AddressInputProps = {
+  autoOpen?: boolean
+}
+
+export default function AddressInput({ autoOpen = false }: AddressInputProps) {
   const { address, detailAddress, setDetailAddress } = useSignupStore()
 
   const handleSearchAddress = () => {
@@ -26,6 +32,30 @@ export default function AddressInput() {
       },
     }).open()
   }
+
+  // 수정 버튼으로 전환되자마자 모달 자동 오픈
+  useEffect(() => {
+    if (!autoOpen) return
+
+    const tryOpen = () => {
+      if (typeof window === 'undefined') return false
+      const { daum } = window as any
+      if (!daum || !daum.Postcode) return false
+      handleSearchAddress()
+      return true
+    }
+
+    // 즉시 시도 후, 스크립트 로딩 지연 대비하여 짧게 재시도
+    if (tryOpen()) return
+    let attempts = 0
+    const id = setInterval(() => {
+      attempts += 1
+      if (tryOpen() || attempts >= 10) {
+        clearInterval(id)
+      }
+    }, 150)
+    return () => clearInterval(id)
+  }, [autoOpen])
 
   return (
     <div className="mb-3">

@@ -84,12 +84,11 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
   const [isPending, setIsPending] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [showAddressEditor, setShowAddressEditor] = useState(false)
 
-  // ✅ 수정 불가 정보는 텍스트로 노출
   const [organizationId, setOrganizationId] = useState<number | null>(null)
   const [approvalStatus, setApprovalStatus] = useState<string>('')
 
-  // ✅ AddressInput(store)
   const { address, detailAddress, setAddress, setDetailAddress } = useSignupStore()
 
   const methods = useForm<OrgInfoFormValues>({
@@ -156,8 +155,9 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
           location: '',
         })
 
-        // 주소는 사용자에게 다시 입력받도록 비워둠
-        setAddress('')
+        // 주소는 백엔드 값으로 초기 세팅 (수정 시 AddressInput 노출)
+        const loc = (data.location ?? '').trim()
+        setAddress(loc)
         setDetailAddress('')
       } catch {
         toast.error('기관 정보 조회에 실패했습니다.')
@@ -203,13 +203,13 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       toast.success('저장되었습니다.')
-      router.back()
+      router.push('/')
+      router.refresh()
     } finally {
       setIsPending(false)
     }
   }
 
-  // 상태 표시용 UI 설정 (색상/라벨)
   const getApprovalStatusUI = (status: string) => {
     const s = (status || '').toLowerCase()
     if (s === 'approved') return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
@@ -306,9 +306,24 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
               />
             </div>
 
-            {/* 주소(검색 버튼 포함) */}
+            {/* 주소(수정 버튼 가로 배치, 수정 시 자동 검색) */}
             <div>
-              <AddressInput />
+              {!showAddressEditor ? (
+                <div className="flex items-center gap-2">
+                  <div className={`${INPUT_CLASS} flex flex-1 items-center bg-gray-50`}>
+                    <span className="truncate">{address || '주소를 입력해주세요.'}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddressEditor(true)}
+                    className="h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+                  >
+                    수정
+                  </button>
+                </div>
+              ) : (
+                <AddressInput autoOpen />
+              )}
             </div>
 
             <div>

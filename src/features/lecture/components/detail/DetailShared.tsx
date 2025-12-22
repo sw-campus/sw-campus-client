@@ -61,13 +61,16 @@ export function StarRating({
   )
 }
 
-export function Section({ title, children }: { title: string; children: ReactNode }) {
+export function Section({ title, children, action }: { title: string; children: ReactNode; action?: ReactNode }) {
   return (
     <div className="space-y-4 pt-2">
-      <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900">
-        <span className="block h-4 w-1 rounded-full bg-orange-400" />
-        {title}
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900">
+          <span className="block h-4 w-1 rounded-full bg-orange-400" />
+          {title}
+        </h3>
+        {action ? <div className="pl-3">{action}</div> : null}
+      </div>
       <div className="pl-3">{children}</div>
     </div>
   )
