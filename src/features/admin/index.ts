@@ -57,6 +57,9 @@ export { useBannersQuery, useCreateBannerMutation, useToggleBannerActiveMutation
 
 export { useMembersQuery } from './hooks/useMembers'
 
+export { useDashboardStats } from './hooks/useDashboardStats'
+export type { DashboardStats, MemberDistribution, PendingCounts } from './hooks/useDashboardStats'
+
 // Types
 export type {
   StatCardData,

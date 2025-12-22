@@ -21,6 +21,28 @@ export function useReviewsQuery(status?: ReviewAuthStatus, keyword?: string, pag
   })
 }
 
+/**
+ * 리뷰 통계 조회 훅 (수료증 승인된 리뷰만, reviewApprovalStatus 기준)
+ */
+export function useReviewStats() {
+  return useQuery({
+    queryKey: ['admin', 'reviews', 'stats'],
+    queryFn: async () => {
+      const data = await fetchReviews(undefined, '', 0, 1000)
+      // 수료증이 승인된 리뷰만 필터링 (리뷰 관리는 수료증 승인 후에 진행)
+      const reviewsWithApprovedCert = data.content.filter(r => r.certificateApprovalStatus === 'APPROVED')
+
+      return {
+        all: reviewsWithApprovedCert.length,
+        pending: reviewsWithApprovedCert.filter(r => r.reviewApprovalStatus === 'PENDING').length,
+        approved: reviewsWithApprovedCert.filter(r => r.reviewApprovalStatus === 'APPROVED').length,
+        rejected: reviewsWithApprovedCert.filter(r => r.reviewApprovalStatus === 'REJECTED').length,
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+  })
+}
+
 // Review 상세 조회 Query Hook
 export function useReviewDetailQuery(reviewId: number) {
   return useQuery({
