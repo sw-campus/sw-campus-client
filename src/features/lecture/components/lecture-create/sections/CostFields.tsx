@@ -22,7 +22,7 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
     <>
       <Field>
         <FieldLabel>
-          내일배움카드<span className="text-red-600">*</span>
+          내일배움카드<span className="ml-1 text-lg font-bold text-red-600">*</span>
         </FieldLabel>
         <FieldDescription>내일배움카드 필요 여부를 선택해 주세요.</FieldDescription>
         <FieldContent>

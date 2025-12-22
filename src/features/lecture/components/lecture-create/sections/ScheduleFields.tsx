@@ -22,7 +22,7 @@ export function LectureCreateScheduleFields() {
     <>
       <Field>
         <FieldLabel>
-          운영 요일<span className="text-red-600">*</span>
+          운영 요일<span className="ml-1 text-lg font-bold text-red-600">*</span>
         </FieldLabel>
         <FieldContent>
           <Controller
@@ -103,9 +103,7 @@ export function LectureCreateScheduleFields() {
       </Field>
 
       <Field>
-        <FieldLabel>
-          정원<span className="text-red-600">*</span>
-        </FieldLabel>
+        <FieldLabel>정원</FieldLabel>
         <FieldDescription>모집 정원을 입력해 주세요.</FieldDescription>
         <FieldContent>
           <Controller
@@ -150,7 +148,7 @@ export function LectureCreateScheduleFields() {
 
       <Field>
         <FieldLabel>
-          강의 기간<span className="text-red-600">*</span>
+          강의 기간<span className="ml-1 text-lg font-bold text-red-600">*</span>
         </FieldLabel>
         <FieldContent>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -160,7 +158,7 @@ export function LectureCreateScheduleFields() {
               render={({ field }) => (
                 <DatePicker
                   label="시작일"
-                  value={field.value}
+                  value={field.value ?? undefined}
                   onSelect={date => {
                     field.onChange(date)
                     trigger(['startAtDate', 'endAtDate'])
@@ -174,7 +172,7 @@ export function LectureCreateScheduleFields() {
               render={({ field }) => (
                 <DatePicker
                   label="종료일"
-                  value={field.value}
+                  value={field.value ?? undefined}
                   onSelect={date => {
                     field.onChange(date)
                     trigger(['startAtDate', 'endAtDate'])
@@ -192,7 +190,9 @@ export function LectureCreateScheduleFields() {
       </Field>
 
       <Field>
-        <FieldLabel>수업 시간</FieldLabel>
+        <FieldLabel>
+          수업 시간<span className="ml-1 text-lg font-bold text-red-600">*</span>
+        </FieldLabel>
         <FieldContent>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Controller

@@ -182,7 +182,7 @@ export default function LectureEditModal({ open, onOpenChange, lectureId, onSucc
                   <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                     취소
                   </Button>
-                  <Button type="submit" disabled={isSubmitting || isPending}>
+                  <Button type="submit" disabled={!methods.formState.isValid || isSubmitting || isPending}>
                     {isSubmitting || isPending ? '수정 중...' : '수정'}
                   </Button>
                 </div>
