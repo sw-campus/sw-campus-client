@@ -27,6 +27,10 @@ export { BannerCreateModal, BannerManagementPage, BannerTable } from './componen
 // Review Components
 export { ReviewApprovalPage, ReviewDetailModal, ReviewTable } from './components/review'
 
+// Member Components
+export { MemberPage } from './components/member/MemberPage'
+export { MemberTable } from './components/member/MemberTable'
+
 // Hooks
 export {
   useOrganizationsQuery,
@@ -50,6 +54,8 @@ export {
 } from './hooks/useReviews'
 
 export { useBannersQuery, useCreateBannerMutation, useToggleBannerActiveMutation } from './hooks/useBanners'
+
+export { useMembersQuery } from './hooks/useMembers'
 
 // Types
 export type {
@@ -104,3 +110,5 @@ export {
   REVIEW_AUTH_STATUS_FILTER_LABEL,
   REVIEW_AUTH_STATUS_COLOR,
 } from './types/review.type'
+
+export type { MemberSummary } from './types/member.type'
