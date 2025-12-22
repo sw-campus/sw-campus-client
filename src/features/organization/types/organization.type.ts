@@ -19,7 +19,7 @@ export interface OrganizationDetail {
   userId: number
   name: string
   description: string | null
-  certificateUrl: string | null
+  certificateKey: string | null
   govAuth: string | null
   facilityImageUrl: string | null
   facilityImageUrl2: string | null
