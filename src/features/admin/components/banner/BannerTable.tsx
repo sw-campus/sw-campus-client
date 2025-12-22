@@ -86,46 +86,41 @@ export function BannerTable({ banners, isLoading, isToggling, onViewDetail, onTo
             </TableRow>
           </TableHeader>
           <TableBody>
-            {[...banners]
-              .sort((a, b) => a.id - b.id)
-              .map((banner, index) => {
-                const periodStatus = getBannerPeriodStatus(banner.startDate, banner.endDate)
-                return (
-                  <TableRow
-                    key={banner.id}
-                    onClick={() => onViewDetail(banner)}
-                    className="hover:bg-muted/50 cursor-pointer transition-colors"
-                  >
-                    <TableCell className="text-muted-foreground">{index + 1}</TableCell>
-                    <TableCell>
-                      <TypeBadge type={banner.type} />
-                    </TableCell>
-                    <TableCell className="text-foreground truncate font-medium" title={banner.lectureName}>
-                      {banner.lectureName}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground truncate">
-                      {formatDate(banner.startDate)} ~ {formatDate(banner.endDate)}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge
-                        variant="secondary"
-                        className={cn('font-medium', BANNER_PERIOD_STATUS_COLOR[periodStatus])}
-                      >
-                        {BANNER_PERIOD_STATUS_LABEL[periodStatus]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div onClick={e => e.stopPropagation()}>
-                        <Switch
-                          checked={banner.isActive}
-                          disabled={isToggling}
-                          onCheckedChange={checked => onToggle(banner.id, checked)}
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
+            {banners.map((banner, index) => {
+              const periodStatus = getBannerPeriodStatus(banner.startDate, banner.endDate)
+              return (
+                <TableRow
+                  key={banner.id}
+                  onClick={() => onViewDetail(banner)}
+                  className="hover:bg-muted/50 cursor-pointer transition-colors"
+                >
+                  <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                  <TableCell>
+                    <TypeBadge type={banner.type} />
+                  </TableCell>
+                  <TableCell className="text-foreground truncate font-medium" title={banner.lectureName}>
+                    {banner.lectureName}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground truncate">
+                    {formatDate(banner.startDate)} ~ {formatDate(banner.endDate)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="secondary" className={cn('font-medium', BANNER_PERIOD_STATUS_COLOR[periodStatus])}>
+                      {BANNER_PERIOD_STATUS_LABEL[periodStatus]}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div onClick={e => e.stopPropagation()}>
+                      <Switch
+                        checked={banner.isActive}
+                        disabled={isToggling}
+                        onCheckedChange={checked => onToggle(banner.id, checked)}
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </CardContent>
