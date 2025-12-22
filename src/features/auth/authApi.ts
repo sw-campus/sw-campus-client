@@ -112,13 +112,19 @@ const baseSignupSchema = z.object({
 // 개인 회원가입 유효성 검증 스키마
 export const signupSchema = baseSignupSchema.extend({
   // 개인 회원은 전화번호/주소를 선택 입력으로 허용
-  phone: z.string().nullable(),
+  phone: z
+    .string()
+    .nullable()
+    .refine(val => !val || /^\d{11}$/.test(val), '전화번호는 11자리 숫자여야 합니다.'),
   location: z.string().nullable(),
 })
 
 // 기관 회원가입 유효성 검증 스키마
 export const organizationSignupSchema = baseSignupSchema.extend({
-  phone: z.string().nullable(),
+  phone: z
+    .string()
+    .nullable()
+    .refine(val => !val || /^\d{11}$/.test(val), '전화번호는 11자리 숫자여야 합니다.'),
   location: z.string().nullable(),
   organizationName: z.string().trim().min(1, '기관명은 필수 입력값입니다.'),
   certificateImage: z.instanceof(File, { message: '재직증명서는 필수입니다.' }),

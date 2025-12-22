@@ -21,7 +21,12 @@ export default function PhoneAuthInput({ value, onChange }: PhoneAuthInputProps)
           placeholder="phone"
           className={`${INPUT_BASE_CLASS} w-full flex-1`}
           value={value ?? ''}
-          onChange={e => onChange(e.target.value || null)}
+          maxLength={11}
+          onChange={e => {
+            const val = e.target.value.replace(/[^0-9]/g, '')
+            if (val.length > 11) return
+            onChange(val || null)
+          }}
         />
       </div>
     </div>
