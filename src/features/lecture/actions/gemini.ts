@@ -34,6 +34,8 @@ export async function generateGeminiSummary(lectureData: LectureDetail) {
       기관: ${lectureData.orgName}
       카테고리: ${lectureData.categoryName}
       위치: ${lectureData.location} (${lectureData.lectureLoc})
+      교육시간: ${lectureData.schedule.time} (${lectureData.schedule.totalHours}시간)
+      교육기간: ${lectureData.schedule.coursePeriod.start} ~ ${lectureData.schedule.coursePeriod.end}
       모집 유형: ${lectureData.tags.join(', ')}
       국비지원 여부: ${lectureData.recruitType === 'CARD_REQUIRED' ? '내일배움카드 필요(KDT)' : '일반'}
       선발 절차: ${lectureData.steps && lectureData.steps.length > 0 ? lectureData.steps.join(', ') : '없음'}
