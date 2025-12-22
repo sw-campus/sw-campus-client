@@ -63,7 +63,14 @@ export function useLoginForm() {
       } catch {
         // ignore nickname fetch errors
       }
-      router.push('/')
+
+      // 관리자인 경우 /admin 페이지로, 그 외에는 홈으로 리다이렉트
+      const role = (data as any)?.role
+      if (role === 'ADMIN') {
+        router.push('/admin')
+      } else {
+        router.push('/')
+      }
     } catch (error) {
       console.error(error)
       toast.error('이메일 또는 비밀번호를 다시 확인해주세요.')

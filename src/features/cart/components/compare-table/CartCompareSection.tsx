@@ -2,9 +2,19 @@
 
 import { useState } from 'react'
 
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { AiFinalRecommendation } from '@/features/cart/components/AiFinalRecommendation'
 import { AiFloatingButton } from '@/features/cart/components/AiFloatingButton'
 import { CartItemSidebar } from '@/features/cart/components/compare-table/CartItemSidebar'
@@ -20,8 +30,10 @@ const LABEL_COL_GRID_CLASS = 'md:grid-cols-[13.75rem_1fr_1px_1fr]'
 const LABEL_COL_TABLE_CLASS = 'w-[13.75rem]'
 
 export default function CartCompareSection() {
+  const router = useRouter()
   const [isLeftOver, setIsLeftOver] = useState(false)
   const [isRightOver, setIsRightOver] = useState(false)
+  const [isSurveyDialogOpen, setIsSurveyDialogOpen] = useState(false)
 
   // AI 분석 상태
   const [aiResult, setAiResult] = useState<ComparisonResult | null>(null)
@@ -103,7 +115,7 @@ export default function CartCompareSection() {
     }
 
     if (!survey.exists) {
-      toast.warning('설문조사를 먼저 작성해주세요. 마이페이지에서 설문조사를 완료한 후 다시 시도해주세요.')
+      setIsSurveyDialogOpen(true)
       setIsAiLoading(false)
       return
     }
@@ -268,6 +280,25 @@ export default function CartCompareSection() {
         onClear={handleClearAi}
         disabledReason={getDisabledReason()}
       />
+
+      <Dialog open={isSurveyDialogOpen} onOpenChange={setIsSurveyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>설문조사가 필요합니다</DialogTitle>
+            <DialogDescription>
+              AI 비교 분석을 위해서는 설문조사 결과가 필요합니다.
+              <br />
+              마이페이지에서 설문조사를 진행하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSurveyDialogOpen(false)}>
+              취소
+            </Button>
+            <Button onClick={() => router.push('/mypage/survey')}>확인</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

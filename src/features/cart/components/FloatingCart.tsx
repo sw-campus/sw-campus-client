@@ -29,7 +29,7 @@ export default function FloatingCart() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 120 }}
-          className="fixed bottom-6 left-1/2 z-999 flex w-[95%] -translate-x-1/2 items-center gap-4 overflow-x-auto rounded-full border border-white/40 bg-white/40 px-6 py-4 shadow-xl backdrop-blur-xl md:w-175"
+          className="fixed bottom-6 left-1/2 z-999 flex w-[95%] -translate-x-1/2 items-center gap-4 overflow-x-auto rounded-full border border-white/40 bg-white/40 px-6 py-4 shadow-xl backdrop-blur-xl md:w-auto md:max-w-[90%] md:min-w-[43.75rem]"
         >
           <div className="flex items-center gap-4">
             {items.map(item => (
@@ -62,9 +62,9 @@ export default function FloatingCart() {
           {/* 우측 화살표 */}
           <button
             onClick={() => router.push('/cart/compare')}
-            className="ml-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/30 text-white backdrop-blur-lg"
+            className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black shadow-lg transition-transform hover:scale-105 active:scale-95"
           >
-            <ArrowUpRight />
+            <ArrowUpRight strokeWidth={2} />
           </button>
         </motion.div>
       )}

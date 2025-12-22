@@ -15,15 +15,18 @@ type Props = {
   onOpenChange: (open: boolean) => void
   onConfirm: () => Promise<void> | void
   confirmDisabled?: boolean
+  hasCartItems?: boolean
 }
 
-export function LogoutDialog({ open, onOpenChange, onConfirm, confirmDisabled }: Props) {
+export function LogoutDialog({ open, onOpenChange, onConfirm, confirmDisabled, hasCartItems }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader className="gap-5">
           <DialogTitle>로그아웃</DialogTitle>
-          <DialogDescription>장바구니에 있는 항목은 7일간 유지됩니다.</DialogDescription>
+          <DialogDescription>
+            {hasCartItems ? '장바구니에 있는 항목은 7일간 유지됩니다.' : '로그아웃 하시겠습니까?'}
+          </DialogDescription>
         </DialogHeader>
 
         <DialogFooter>

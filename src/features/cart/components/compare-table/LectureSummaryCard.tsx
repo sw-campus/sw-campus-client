@@ -76,9 +76,7 @@ export function LectureSummaryCard({
           >
             {hasSelection ? title : '미선택'}
           </div>
-          <div className={cn('text-muted-foreground text-sm', !hasSelection && 'opacity-60')}>
-            {hasSelection ? (orgName ?? '-') : '강의를 선택해 주세요'}
-          </div>
+          {!hasSelection && <div className="text-muted-foreground text-sm opacity-60">강의를 선택해 주세요</div>}
         </div>
 
         {hasSelection ? (

@@ -11,6 +11,7 @@ import { FiLogIn, FiUser, FiMenu, FiLogOut } from 'react-icons/fi'
 import { HeaderIconAction } from '@/components/layout/header/HeaderIconAction'
 import { LogoutDialog } from '@/components/layout/header/LogoutDialog'
 import { useLogout } from '@/features/auth/hooks/useLogout'
+import { useCartLecturesQuery } from '@/features/cart/hooks/useCartLecturesQuery'
 import type { CategoryTreeNode } from '@/features/category'
 import { ensureSessionActive } from '@/lib/axios'
 import { useAuthStore } from '@/store/authStore'
@@ -30,6 +31,8 @@ export default function Header({
   const [logoutOpen, setLogoutOpen] = useState(false)
   const { isLoggedIn, nickname, userType } = useAuthStore()
   const { logout, isPending } = useLogout()
+  const { data: cartItems } = useCartLecturesQuery()
+  const hasCartItems = (cartItems?.length ?? 0) > 0
 
   const mypageHref = userType === 'ORGANIZATION' ? '/mypage/organization' : '/mypage/personal'
 
@@ -154,6 +157,7 @@ export default function Header({
         onOpenChange={setLogoutOpen}
         onConfirm={handleLogout}
         confirmDisabled={isPending}
+        hasCartItems={hasCartItems}
       />
     </header>
   )

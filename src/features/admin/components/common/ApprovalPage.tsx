@@ -111,10 +111,14 @@ export function ApprovalPage<TItem>({
   const { data: rejectedData } = useDataQuery('REJECTED', '')
 
   const stats = [
-    { title: '전체', value: allData?.page?.totalElements ?? 0, icon: LuList },
-    { title: '승인 대기', value: pendingData?.page?.totalElements ?? 0, icon: LuClock },
-    { title: '승인 완료', value: approvedData?.page?.totalElements ?? 0, icon: LuCheck },
-    { title: '반려', value: rejectedData?.page?.totalElements ?? 0, icon: LuX },
+    { title: '전체', value: allData?.page?.totalElements ?? allData?.content?.length ?? 0, icon: LuList },
+    { title: '승인 대기', value: pendingData?.page?.totalElements ?? pendingData?.content?.length ?? 0, icon: LuClock },
+    {
+      title: '승인 완료',
+      value: approvedData?.page?.totalElements ?? approvedData?.content?.length ?? 0,
+      icon: LuCheck,
+    },
+    { title: '반려', value: rejectedData?.page?.totalElements ?? rejectedData?.content?.length ?? 0, icon: LuX },
   ]
 
   const handleViewDetail = (item: TItem) => {

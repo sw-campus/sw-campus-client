@@ -1,17 +1,37 @@
 'use client'
 
-import { DonutChartData } from '..'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-const mockData: DonutChartData[] = [
-  { name: '활성', value: 2017, color: 'hsl(var(--chart-1))' },
-  { name: '대기', value: 420, color: 'hsl(var(--chart-2))' },
-  { name: '비활성', value: 180, color: 'hsl(var(--chart-3))' },
-]
+export interface DonutChartDataItem {
+  name: string
+  value: number
+  color: string
+  [key: string]: string | number
+}
 
-export function DistributionDonutChart() {
+interface DistributionDonutChartProps {
+  data: DonutChartDataItem[]
+  isLoading?: boolean
+}
+
+export function DistributionDonutChart({ data, isLoading }: DistributionDonutChartProps) {
+  const totalValue = data.reduce((sum, item) => sum + item.value, 0)
+
+  if (isLoading || totalValue === 0) {
+    return (
+      <Card className="bg-card">
+        <CardHeader>
+          <CardTitle className="text-foreground">회원 분포</CardTitle>
+        </CardHeader>
+        <CardContent className="flex h-[200px] items-center justify-center">
+          <span className="text-muted-foreground text-sm">{isLoading ? '로딩 중...' : '데이터가 없습니다'}</span>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card className="bg-card">
       <CardHeader>
@@ -20,8 +40,8 @@ export function DistributionDonutChart() {
       <CardContent className="flex items-center justify-center">
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
-            <Pie data={mockData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={2} dataKey="value">
-              {mockData.map(entry => (
+            <Pie data={data} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={2} dataKey="value">
+              {data.map(entry => (
                 <Cell key={entry.name} fill={entry.color} />
               ))}
             </Pie>
@@ -35,7 +55,7 @@ export function DistributionDonutChart() {
           </PieChart>
         </ResponsiveContainer>
         <div className="flex flex-col gap-2">
-          {mockData.map(item => (
+          {data.map(item => (
             <div key={item.name} className="flex items-center gap-2">
               <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
               <span className="text-muted-foreground text-sm">
