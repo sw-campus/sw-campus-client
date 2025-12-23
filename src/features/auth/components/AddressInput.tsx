@@ -45,16 +45,21 @@ export default function AddressInput({ autoOpen = false }: AddressInputProps) {
       return true
     }
 
-    // 즉시 시도 후, 스크립트 로딩 지연 대비하여 짧게 재시도
     if (tryOpen()) return
     let attempts = 0
+    const maxAttempts = 10
+    const intervalMs = 150
     const id = setInterval(() => {
       attempts += 1
-      if (tryOpen() || attempts >= 10) {
+      if (tryOpen()) {
         clearInterval(id)
+        return
       }
-    }, 150)
-    return () => clearInterval(id)
+      if (attempts >= maxAttempts) {
+        clearInterval(id)
+        toast.error('주소 검색 도구를 불러오지 못했어요. 네트워크 상태를 확인한 뒤 잠시 후 다시 시도해 주세요.')
+      }
+    }, intervalMs)
   }, [autoOpen])
 
   return (

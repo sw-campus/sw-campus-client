@@ -115,7 +115,9 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
       // notify other parts of the app that survey is saved
       try {
         window.dispatchEvent(new Event('survey:saved'))
-      } catch {}
+      } catch (error) {
+        console.error(error)
+      }
       toast.success('설문조사가 저장되었습니다.')
       router.back()
     } catch (error) {

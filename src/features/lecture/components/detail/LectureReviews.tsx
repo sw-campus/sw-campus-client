@@ -306,36 +306,35 @@ export default function LectureReviews({ lectureId }: Props) {
             className="rounded-full"
             onClick={async () => {
               try {
-                // 스펙 검증: 5개 카테고리 모두 점수(1~5)와 20자 이상 코멘트
                 for (const cat of categories) {
                   const s = detailScores[cat].score
                   const c = (detailScores[cat].comment || '').trim()
+                  const label = CATEGORY_LABELS[cat] ?? cat
                   if (s < 1 || s > 5) {
-                    toast.error(`${CATEGORY_LABELS[cat]} 점수를 선택해 주세요.`)
+                    toast.error(`${label} 점수를 선택해 주세요.`)
                     return
                   }
-                  if (c.length < 20) {
-                    toast.error(`${CATEGORY_LABELS[cat]} 의견을 20자 이상 작성해 주세요.`)
-                    return
-                  }
-                }
 
-                const payload = {
-                  comment: overallComment.trim(),
-                  detail_scores: categories.map(cat => ({
-                    category: cat,
-                    score: detailScores[cat].score,
-                    comment: detailScores[cat].comment.trim(),
-                  })),
+                  if (c.length < 20) {
+                    toast.error(`${label} 의견을 20자 이상 작성해 주세요.`)
+                    return
+                  }
+
+                  const payload = {
+                    comment: overallComment.trim(),
+                    detail_scores: categories.map(cat => ({
+                      category: cat,
+                      score: detailScores[cat].score,
+                      comment: detailScores[cat].comment.trim(),
+                    })),
+                  }
+                  await createReview(lectureId, payload)
+                  toast.success('리뷰가 등록되었습니다.')
+                  queryClient.invalidateQueries({ queryKey: ['lectureReviews', lectureId] })
+                  setOpenWrite(false)
+                  setOpenComplete(true)
                 }
-                // 스펙: POST /reviews (lecture_id 포함)
-                await createReview(lectureId, payload)
-                toast.success('리뷰가 등록되었습니다.')
-                // 목록 갱신
-                queryClient.invalidateQueries({ queryKey: ['lectureReviews', lectureId] })
-                setOpenWrite(false)
-                setOpenComplete(true)
-              } catch {
+              } catch (error) {
                 toast.error('리뷰 등록에 실패했습니다. 잠시 후 다시 시도해 주세요.')
               }
             }}
@@ -349,12 +348,7 @@ export default function LectureReviews({ lectureId }: Props) {
 
   // 리뷰 완료 모달
   const completeModal = (
-    <Modal
-      isOpen={openComplete}
-      onClose={() => setOpenComplete(false)}
-      title="모달·리뷰 대기 안내"
-      maxWidthClass="max-w-lg"
-    >
+    <Modal isOpen={openComplete} onClose={() => setOpenComplete(false)} title="리뷰 등록 완료" maxWidthClass="max-w-lg">
       <div className="flex items-center justify-center rounded-2xl border border-gray-200 bg-white p-8 text-center">
         <div className="space-y-3">
           <div className="mx-auto h-16 w-16 rounded-full border border-gray-200 p-3">

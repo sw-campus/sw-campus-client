@@ -51,25 +51,20 @@ const orgInfoSchema = z.object({
 })
 
 type OrgInfoFormValues = z.infer<typeof orgInfoSchema>
-
-// ✅ PersonalForm과 동일한 인풋 톤
 const INPUT_CLASS =
   'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
 
 const TEXTAREA_CLASS =
   'w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
 
-// ✅ AddressInput(daum.Postcode)이 동작하려면 postcode 스크립트가 필요합니다.
 const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
 
 const loadDaumPostcodeScript = () => {
   if (typeof window === 'undefined') return
 
   const w = window as unknown as { daum?: { Postcode?: unknown } }
-  // 이미 로드되어 있으면 종료
   if (w.daum?.Postcode) return
 
-  // 이미 스크립트 태그가 있으면 종료
   if (document.getElementById(DAUM_POSTCODE_SCRIPT_ID)) return
 
   const script = document.createElement('script')
@@ -204,7 +199,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
       })
       toast.success('저장되었습니다.')
       router.push('/')
-      router.refresh()
     } finally {
       setIsPending(false)
     }
@@ -214,7 +208,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     const s = (status || '').toLowerCase()
     if (s === 'approved') return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
     if (s === 'rejected') return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
-    // pending 또는 기타 상태는 보류로 표시
     return { label: '승인 대기', dot: 'bg-amber-500', text: 'text-amber-700' }
   }
 

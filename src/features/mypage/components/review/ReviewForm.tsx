@@ -141,7 +141,14 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
       })
 
       if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? '입력값을 확인해주세요')
+        const issues = parsed.error.issues
+        const detailedMessage = issues
+          .map(issue => {
+            const path = issue.path && issue.path.length > 0 ? issue.path.join('.') : ''
+            return path ? `${path}: ${issue.message}` : issue.message
+          })
+          .join('\n')
+        throw new Error(detailedMessage || '입력값을 확인해주세요')
       }
 
       // 백엔드 스펙: PUT /reviews/{reviewId} with camelCase (detailScores)

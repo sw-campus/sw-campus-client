@@ -67,12 +67,8 @@ export function useSignupOrganizationForm() {
 
   const extractErrorMessage = (error: unknown): string | null => {
     if (!error || typeof error !== 'object') return null
-    const response = (error as Record<string, unknown>).response
-    if (!response || typeof response !== 'object') return null
-    const data = (response as Record<string, unknown>).data
-    if (!data || typeof data !== 'object') return null
-    const message = (data as Record<string, unknown>).message
-    return typeof message === 'string' ? message : null
+    const maybeMessage = (error as { response?: { data?: { message?: unknown } } }).response?.data?.message
+    return typeof maybeMessage === 'string' ? maybeMessage : null
   }
 
   useEffect(() => {
