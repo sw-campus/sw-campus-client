@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, Loader2, Star } from 'lucide-react'
 import Image from 'next/image'
+import { FaUser } from 'react-icons/fa'
 import { toast } from 'sonner'
 
 import Modal from '@/components/ui/Modal'
@@ -27,14 +28,15 @@ function ReviewCard({ review }: { review: Review }) {
       {/* Header */}
       <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <Image
+          {/* <Image
             src={'/images/common/default_user.jpeg'}
             alt={`${review.nickname} 프로필 이미지`}
             width={40}
             height={40}
             className="h-10 w-10 rounded-full object-cover"
             priority={false}
-          />
+          /> */}
+          <FaUser />
           <div>
             <p className="text-foreground text-sm font-semibold">{review.nickname}</p>
             <p className="text-muted-foreground text-xs">{formatDate(review.createdAt)}</p>
