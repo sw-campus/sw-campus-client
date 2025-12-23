@@ -1,16 +1,54 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
+import { LuBuilding, LuShield, LuUser } from 'react-icons/lu'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { cn } from '@/lib/utils'
 
-import type { MemberSummary } from '../../types/member.type'
+import type { MemberRole, MemberSummary } from '../../types/member.type'
 
 interface MemberTableProps {
   members: MemberSummary[]
   isLoading: boolean
   currentPage: number
   pageSize: number
+}
+
+// 역할별 스타일 및 라벨 정의 (통계 카드와 동일한 색상 체계)
+const ROLE_CONFIG: Record<MemberRole, { label: string; icon: React.ElementType; className: string }> = {
+  USER: {
+    label: '일반회원',
+    icon: LuUser,
+    className: 'bg-blue-500 text-white',
+  },
+  ORGANIZATION: {
+    label: '기관회원',
+    icon: LuBuilding,
+    className: 'bg-emerald-500 text-white',
+  },
+  ADMIN: {
+    label: '관리자',
+    icon: LuShield,
+    className: 'bg-amber-500 text-white',
+  },
+}
+
+function RoleBadge({ role }: { role: MemberRole }) {
+  const config = ROLE_CONFIG[role]
+  const Icon = config.icon
+
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm',
+        config.className,
+      )}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {config.label}
+    </span>
+  )
 }
 
 export function MemberTable({ members, isLoading, currentPage, pageSize }: MemberTableProps) {
@@ -54,31 +92,25 @@ export function MemberTable({ members, isLoading, currentPage, pageSize }: Membe
       <CardContent>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[60px]">NO</TableHead>
-              <TableHead>이메일</TableHead>
-              <TableHead>이름</TableHead>
-              <TableHead>닉네임</TableHead>
-              <TableHead>전화번호</TableHead>
-              <TableHead className="w-[100px]">역할</TableHead>
+            <TableRow className="border-b-2">
+              <TableHead className="w-[60px] font-semibold">NO</TableHead>
+              <TableHead className="font-semibold">이메일</TableHead>
+              <TableHead className="font-semibold">이름</TableHead>
+              <TableHead className="font-semibold">닉네임</TableHead>
+              <TableHead className="font-semibold">전화번호</TableHead>
+              <TableHead className="w-[120px] text-center font-semibold">역할</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {members.map((member, index) => (
               <TableRow key={member.id} className="hover:bg-muted/50 transition-colors">
-                <TableCell className="text-muted-foreground">{getRowNumber(index)}</TableCell>
-                <TableCell>{member.email}</TableCell>
+                <TableCell className="text-muted-foreground font-medium">{getRowNumber(index)}</TableCell>
+                <TableCell className="font-medium">{member.email}</TableCell>
                 <TableCell>{member.name}</TableCell>
-                <TableCell>{member.nickname}</TableCell>
-                <TableCell>{member.phone}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      member.role === 'ADMIN' ? 'destructive' : member.role === 'ORGANIZATION' ? 'default' : 'secondary'
-                    }
-                  >
-                    {member.role}
-                  </Badge>
+                <TableCell className="text-muted-foreground">{member.nickname}</TableCell>
+                <TableCell className="text-muted-foreground">{member.phone || '-'}</TableCell>
+                <TableCell className="text-center">
+                  <RoleBadge role={member.role} />
                 </TableCell>
               </TableRow>
             ))}

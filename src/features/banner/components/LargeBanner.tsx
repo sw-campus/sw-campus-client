@@ -65,6 +65,7 @@ export default function LargeBanner() {
                   src={banner.imageUrl}
                   alt={banner.lectureName}
                   fill
+                  sizes="(max-width: 1280px) 100vw, 1280px"
                   className="object-cover"
                   priority={index === 0}
                 />

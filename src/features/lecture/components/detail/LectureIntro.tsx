@@ -85,7 +85,7 @@ export default function LectureIntro({ lecture }: Props) {
               >
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-gray-50">
                   {teacher.imageUrl ? (
-                    <Image src={teacher.imageUrl} alt={teacher.name} fill className="object-cover" />
+                    <Image src={teacher.imageUrl} alt={teacher.name} fill sizes="64px" className="object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gray-100">
                       <svg

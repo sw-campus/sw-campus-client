@@ -10,6 +10,17 @@ export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 export type ApprovalStatusFilter = ApprovalStatus | 'ALL'
 
 /**
+ * 승인 통계 데이터
+ * Organization, Lecture, Review 등 여러 도메인에서 공유
+ */
+export interface ApprovalStats {
+  total: number
+  pending: number
+  approved: number
+  rejected: number
+}
+
+/**
  * 승인 상태 한국어 라벨
  */
 export const APPROVAL_STATUS_LABEL: Record<ApprovalStatus, string> = {
@@ -29,12 +40,12 @@ export const APPROVAL_STATUS_FILTER_LABEL: Record<ApprovalStatusFilter, string> 
 }
 
 /**
- * 승인 상태 배지 색상
+ * 승인 상태 배지 색상 (통계 카드와 동일한 색상 체계)
  */
 export const APPROVAL_STATUS_COLOR: Record<ApprovalStatus, string> = {
-  PENDING: 'bg-chart-4 text-foreground',
-  APPROVED: 'bg-emerald-400 text-white',
-  REJECTED: 'bg-destructive text-destructive-foreground',
+  PENDING: 'bg-amber-500 text-white',
+  APPROVED: 'bg-emerald-500 text-white',
+  REJECTED: 'bg-rose-500 text-white',
 }
 
 /**

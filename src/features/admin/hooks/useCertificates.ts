@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { fetchReviews } from '../api/reviewApi'
+import { fetchCertificateStats, fetchReviews } from '../api/reviewApi'
 import type { ReviewAuthStatus, ReviewSummary } from '../types/review.type'
 
 /**
@@ -51,27 +51,12 @@ export function useCertificatesQuery(
 }
 
 /**
- * 수료증 통계 조회 훅
- * 전체/승인대기/승인완료/반려 개수 반환
+ * 수료증 통계 조회 훅 (서버 API 사용)
  */
 export function useCertificateStats() {
-  const query = useQuery({
+  return useQuery({
     queryKey: ['admin', 'certificates', 'stats'],
-    queryFn: async () => {
-      // 전체 리뷰 데이터 조회
-      const data = await fetchReviews(undefined, '', 0, 1000)
-      const allReviews = data.content
-
-      // 수료증 상태별 개수 계산 (모든 리뷰 행 기준)
-      return {
-        all: allReviews.length,
-        pending: allReviews.filter(c => c.certificateApprovalStatus === 'PENDING').length,
-        approved: allReviews.filter(c => c.certificateApprovalStatus === 'APPROVED').length,
-        rejected: allReviews.filter(c => c.certificateApprovalStatus === 'REJECTED').length,
-      }
-    },
+    queryFn: fetchCertificateStats,
     staleTime: 1000 * 60 * 5,
   })
-
-  return query
 }

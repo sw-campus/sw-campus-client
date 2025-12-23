@@ -106,7 +106,14 @@ export default function LectureDetailPage({ lectureId }: Props) {
           <div className="w-full overflow-hidden rounded-3xl bg-white/60 ring-1 ring-white/30 backdrop-blur-xl">
             <div className="relative aspect-16/6 w-full bg-white/30">
               {lecture.thumbnailUrl ? (
-                <Image src={lecture.thumbnailUrl} alt="대표 이미지" fill className="object-cover" priority />
+                <Image
+                  src={lecture.thumbnailUrl}
+                  alt="대표 이미지"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 1152px"
+                  className="object-cover"
+                  priority
+                />
               ) : (
                 <div className="text-muted-foreground flex h-full items-center justify-center text-sm">대표 이미지</div>
               )}

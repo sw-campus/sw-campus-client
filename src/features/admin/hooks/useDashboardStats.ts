@@ -1,7 +1,8 @@
-import { useLecturesQuery } from './useLectures'
-import { useMembersQuery } from './useMembers'
-import { useOrganizationsQuery } from './useOrganizations'
-import { useReviewsQuery } from './useReviews'
+import { useCertificateStats } from './useCertificates'
+import { useLectureStatsQuery } from './useLectures'
+import { useMemberStatsQuery } from './useMembers'
+import { useOrganizationStatsQuery } from './useOrganizations'
+import { useReviewStats } from './useReviews'
 
 export interface DashboardStats {
   members: number
@@ -25,68 +26,53 @@ export interface MemberDistribution {
 
 /**
  * 대시보드 통계 조회 Hook
- * 회원/강의/리뷰 총 개수, 승인 대기 건수, 회원 역할별 분포 반환
+ * 서버 API를 사용하여 각 통계를 조회
  */
 export function useDashboardStats() {
-  // 회원 - 역할 분포 계산을 위해 전체 조회
-  const membersQuery = useMembersQuery('', 0, 1000)
+  // 회원 통계 (서버 API)
+  const memberStatsQuery = useMemberStatsQuery()
 
-  // 강의 - 전체
-  const lecturesQuery = useLecturesQuery(undefined, undefined, 0)
-  // 강의 - 승인 대기
-  const lecturesPendingQuery = useLecturesQuery('PENDING', undefined, 0)
+  // 강의 통계 (서버 API)
+  const lectureStatsQuery = useLectureStatsQuery()
 
-  // 리뷰 - 전체 (수료증 카운트도 여기서 추출)
-  const reviewsQuery = useReviewsQuery(undefined, undefined, 0)
-  // 리뷰 - 승인 대기
-  const reviewsPendingQuery = useReviewsQuery('PENDING', undefined, 0)
+  // 기관 통계 (서버 API)
+  const organizationStatsQuery = useOrganizationStatsQuery()
 
-  // 기관 - 승인 대기
-  const organizationsPendingQuery = useOrganizationsQuery('PENDING', undefined, 0)
+  // 수료증 통계 (서버 API)
+  const certificateStatsQuery = useCertificateStats()
 
-  const members = membersQuery.data?.content ?? []
-  const memberCount = members.length
-  const lectureCount = lecturesQuery.data?.page?.totalElements ?? 0
+  // 리뷰 통계 (서버 API)
+  const reviewStatsQuery = useReviewStats()
 
-  // 수료증 카운트 - 모든 리뷰 행 기준
-  const reviews = reviewsQuery.data?.content ?? []
-  const certificateCount = reviews.length
-  const certificatePendingCount = reviews.filter(r => r.certificateApprovalStatus === 'PENDING').length
-
-  // 리뷰 카운트 - 수료증 승인된 리뷰만 (리뷰 관리는 수료증 승인 후에 진행)
-  const reviewsWithApprovedCert = reviews.filter(r => r.certificateApprovalStatus === 'APPROVED')
-  const reviewCount = reviewsWithApprovedCert.length
-  const reviewPendingCount = reviewsWithApprovedCert.filter(r => r.reviewApprovalStatus === 'PENDING').length
+  // 총 개수
+  const stats: DashboardStats = {
+    members: memberStatsQuery.data?.total ?? 0,
+    lectures: lectureStatsQuery.data?.total ?? 0,
+    certificates: certificateStatsQuery.data?.total ?? 0,
+    reviews: reviewStatsQuery.data?.total ?? 0,
+  }
 
   // 승인 대기 건수
   const pendingCounts: PendingCounts = {
-    organizations: organizationsPendingQuery.data?.page?.totalElements ?? 0,
-    lectures: lecturesPendingQuery.data?.page?.totalElements ?? 0,
-    certificates: certificatePendingCount,
-    reviews: reviewPendingCount,
+    organizations: organizationStatsQuery.data?.pending ?? 0,
+    lectures: lectureStatsQuery.data?.pending ?? 0,
+    certificates: certificateStatsQuery.data?.pending ?? 0,
+    reviews: reviewStatsQuery.data?.pending ?? 0,
   }
 
-  // 회원 역할별 분포 계산
+  // 회원 역할별 분포
   const memberDistribution: MemberDistribution = {
-    user: members.filter(m => m.role === 'USER').length,
-    organization: members.filter(m => m.role === 'ORGANIZATION').length,
-    admin: members.filter(m => m.role === 'ADMIN').length,
-  }
-
-  const stats: DashboardStats = {
-    members: memberCount,
-    lectures: lectureCount,
-    certificates: certificateCount,
-    reviews: reviewCount,
+    user: memberStatsQuery.data?.user ?? 0,
+    organization: memberStatsQuery.data?.organization ?? 0,
+    admin: memberStatsQuery.data?.admin ?? 0,
   }
 
   const isLoading =
-    membersQuery.isLoading ||
-    lecturesQuery.isLoading ||
-    reviewsQuery.isLoading ||
-    lecturesPendingQuery.isLoading ||
-    reviewsPendingQuery.isLoading ||
-    organizationsPendingQuery.isLoading
+    memberStatsQuery.isLoading ||
+    lectureStatsQuery.isLoading ||
+    organizationStatsQuery.isLoading ||
+    certificateStatsQuery.isLoading ||
+    reviewStatsQuery.isLoading
 
   return {
     stats,
