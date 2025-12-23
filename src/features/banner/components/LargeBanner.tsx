@@ -9,6 +9,8 @@ import 'swiper/css/pagination'
 import { Autoplay, Pagination } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
+import { trackBannerClick } from '@/lib/analytics'
+
 import { useBannersByTypeQuery } from '../hooks/useBannerQuery'
 
 /**
@@ -40,6 +42,16 @@ export default function LargeBanner() {
 
   if (!banners || banners.length === 0) {
     return null
+  }
+
+  const handleBannerClick = (banner: (typeof banners)[0]) => {
+    trackBannerClick({
+      bannerId: banner.id,
+      bannerType: 'BIG',
+      bannerName: banner.lectureName,
+      lectureId: banner.lectureId,
+      url: banner.url,
+    })
   }
 
   return (
@@ -80,11 +92,13 @@ export default function LargeBanner() {
           return (
             <SwiperSlide key={banner.id}>
               {external ? (
-                <a href={href} target="_blank" rel="noopener noreferrer">
+                <a href={href} target="_blank" rel="noopener noreferrer" onClick={() => handleBannerClick(banner)}>
                   {content}
                 </a>
               ) : (
-                <Link href={href}>{content}</Link>
+                <Link href={href} onClick={() => handleBannerClick(banner)}>
+                  {content}
+                </Link>
               )}
             </SwiperSlide>
           )
