@@ -29,6 +29,14 @@ export const getVerifiedEmail = async () => {
   return res.data
 }
 
+// 닉네임 중복 검사
+export const checkNicknameAvailability = async (nickname: string) => {
+  const res = await api.get('/members/nickname/check', {
+    params: { nickname },
+  })
+  return res.data as { available: boolean }
+}
+
 // 개인 회원가입
 export const signup = async (payload: {
   email: string
@@ -48,8 +56,8 @@ export const signupOrganization = async (payload: {
   password: string
   name: string
   nickname: string
-  phone: string
-  location: string
+  phone: string | null
+  location: string | null
   organizationName: string
   certificateImage: File
 }) => {
@@ -62,8 +70,9 @@ export const signupOrganization = async (payload: {
   formData.append('nickname', payload.nickname)
 
   // 기관 회원 필수/선택 필드
-  if (payload.phone) formData.append('phone', payload.phone)
-  if (payload.location) formData.append('location', payload.location)
+  // 백엔드 스펙: phone/location은 필수
+  formData.append('phone', (payload.phone ?? '').toString())
+  formData.append('location', (payload.location ?? '').toString())
   formData.append('organizationName', payload.organizationName)
 
   // 재직증명서 (필수)

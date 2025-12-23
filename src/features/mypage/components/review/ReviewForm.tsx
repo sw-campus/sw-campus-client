@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { useMutation } from '@tanstack/react-query'
+import { Star } from 'lucide-react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -19,6 +20,25 @@ type ReviewFormProps = {
 
 const reviewSchema = z.object({
   comment: z.string().max(500, '총평은 최대 500자입니다').optional().or(z.literal('')),
+})
+
+const allowedCategories = ['TEACHER', 'CURRICULUM', 'MANAGEMENT', 'FACILITY', 'PROJECT'] as const
+type AllowedCategory = (typeof allowedCategories)[number]
+
+const detailScoreSchema = z.object({
+  category: z
+    .string()
+    .transform(v => v.trim().toUpperCase())
+    .refine((v): v is AllowedCategory => (allowedCategories as readonly string[]).includes(v), {
+      message: '카테고리 값이 올바르지 않습니다.',
+    }),
+  score: z.number().int().min(1, '점수는 1점 이상이어야 합니다').max(5, '점수는 5점 이하여야 합니다'),
+  comment: z.string().trim().min(20, '세부 의견은 20자 이상이어야 합니다').max(500, '세부 의견은 최대 500자입니다'),
+})
+
+const updateReviewSchema = z.object({
+  comment: reviewSchema.shape.comment,
+  detailScores: z.array(detailScoreSchema).length(5, '상세 점수는 5개 카테고리 모두 필요합니다'),
 })
 
 type ReviewResponse = {
@@ -110,17 +130,34 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (effectiveReadOnly) return
-      const parsed = reviewSchema.safeParse({ comment })
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? '입력값을 확인해주세요')
-      }
 
-      const payload = {
-        comment: parsed.data.comment ?? '',
+      const parsed = updateReviewSchema.safeParse({
+        comment,
         detailScores: detailScores.map(d => ({
           category: d.category,
           score: d.score,
           comment: d.comment ?? '',
+        })),
+      })
+
+      if (!parsed.success) {
+        const issues = parsed.error.issues
+        const detailedMessage = issues
+          .map(issue => {
+            const path = issue.path && issue.path.length > 0 ? issue.path.join('.') : ''
+            return path ? `${path}: ${issue.message}` : issue.message
+          })
+          .join('\n')
+        throw new Error(detailedMessage || '입력값을 확인해주세요')
+      }
+
+      // 백엔드 스펙: PUT /reviews/{reviewId} with camelCase (detailScores)
+      const payload = {
+        comment: parsed.data.comment ?? '',
+        detailScores: parsed.data.detailScores.map(d => ({
+          category: d.category,
+          score: d.score,
+          comment: d.comment,
         })),
       }
 
@@ -131,7 +168,6 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
         return
       }
 
-      // 생성은 이 폼에서 사용하지 않음(생성은 상위에서 lectureId/detailScores 포함해 처리)
       throw new Error('리뷰 ID를 찾을 수 없습니다.')
     },
   })
@@ -141,6 +177,7 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
     try {
       await saveMutation.mutateAsync()
       toast.success((resolvedReviewId ?? reviewId) ? '리뷰가 수정되었습니다.' : '리뷰가 저장되었습니다.')
+      onClose?.()
     } catch (e) {
       const message = e instanceof Error ? e.message : '리뷰 저장에 실패했습니다.'
       toast.error(message)
@@ -148,49 +185,64 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
   }
 
   const content = (
-    <div className="space-y-4">
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-800">총평</label>
-        <textarea
-          value={comment}
-          onChange={e => setComment(e.target.value)}
-          rows={4}
-          className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
-          placeholder="후기를 입력하세요"
-          disabled={effectiveReadOnly || loading || saveMutation.isPending}
-        />
+    <div className="space-y-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      {/* 총평: 버블 스타일 */}
+      <div className="space-y-1.5">
+        <label className="mb-1 block text-sm font-semibold text-gray-900">총평</label>
+        <div className="rounded-xl border border-gray-100 bg-gray-50 p-2">
+          <textarea
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            rows={2}
+            className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
+            placeholder="후기를 입력하세요"
+            disabled={effectiveReadOnly || loading || saveMutation.isPending}
+          />
+        </div>
       </div>
 
+      {/* 카테고리 카드 */}
       {detailScores.length > 0 && (
-        <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="space-y-2.5">
           {detailScores.map((d, idx) => (
-            <div key={`${d.category}-${idx}`} className="space-y-2">
+            <div key={`${d.category}-${idx}`} className="rounded-xl border border-gray-100 bg-white p-2.5 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-800">{d.category}</span>
-                <input
-                  type="number"
-                  min={0}
-                  max={5}
-                  step={0.5}
-                  value={d.score}
-                  onChange={e => {
-                    const v = Number(e.target.value)
-                    setDetailScores(prev => prev.map((x, i) => (i === idx ? { ...x, score: v } : x)))
-                  }}
-                  className="w-20 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm"
+                <span className="text-sm font-semibold text-gray-900">{d.category}</span>
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => {
+                    const selected = d.score >= i + 1
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        aria-label={`${d.category} ${i + 1}점 선택`}
+                        onClick={() => {
+                          if (effectiveReadOnly || loading || saveMutation.isPending) return
+                          const v = i + 1
+                          setDetailScores(prev => prev.map((x, j) => (j === idx ? { ...x, score: v } : x)))
+                        }}
+                        className="p-0.5 text-yellow-500 disabled:opacity-50"
+                        disabled={effectiveReadOnly || loading || saveMutation.isPending}
+                      >
+                        <Star className={`h-4 w-4 ${selected ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                      </button>
+                    )
+                  })}
+                  <span className="ml-2 min-w-6 text-right text-sm font-bold text-yellow-600">{d.score || 0}</span>
+                </div>
+              </div>
+              <div className="mt-1.5 rounded-xl border border-gray-100 bg-gray-50 p-2">
+                <textarea
+                  value={d.comment ?? ''}
+                  onChange={e =>
+                    setDetailScores(prev => prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)))
+                  }
+                  rows={2}
+                  className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-800 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
+                  placeholder="세부 의견을 입력하세요"
                   disabled={effectiveReadOnly || loading || saveMutation.isPending}
                 />
               </div>
-              <textarea
-                value={d.comment ?? ''}
-                onChange={e =>
-                  setDetailScores(prev => prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)))
-                }
-                rows={2}
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
-                placeholder="세부 의견을 입력하세요"
-                disabled={effectiveReadOnly || loading || saveMutation.isPending}
-              />
             </div>
           ))}
         </div>

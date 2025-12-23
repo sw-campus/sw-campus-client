@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -9,11 +9,7 @@ import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
 
 export default function ReviewCreatePage() {
   const router = useRouter()
-  const [open, setOpen] = useState(false)
-
-  useEffect(() => {
-    setOpen(true)
-  }, [])
+  const [open, setOpen] = useState(true)
 
   const handleOpenChange = (next: boolean) => {
     if (!next) router.back()
@@ -22,12 +18,12 @@ export default function ReviewCreatePage() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-175">
-        <DialogHeader className="px-6 pt-6">
+      <DialogContent className="max-w-2xl">
+        <DialogHeader className="px-6 pt-3">
           <DialogTitle>후기 작성</DialogTitle>
         </DialogHeader>
 
-        <div className="max-h-[75vh] overflow-y-auto px-6 pb-6">
+        <div className="max-h-[34vh] overflow-y-auto overscroll-contain px-6 pb-4 md:max-h-[30vh]">
           <ReviewForm embedded />
         </div>
       </DialogContent>
