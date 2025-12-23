@@ -163,7 +163,7 @@ export default function LectureDetailPage({ lectureId }: Props) {
                   <Separator />
 
                   {/* 후기 */}
-                  <div id="review" className="min-h-[300px] scroll-mt-28">
+                  <div id="review" className="min-h-75 scroll-mt-28">
                     <LectureReviews lectureId={lectureId} />
                   </div>
                 </CardContent>

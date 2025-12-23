@@ -98,7 +98,6 @@ export default function LectureReviews({ lectureId }: Props) {
   const [verifyStep, setVerifyStep] = useState<'select' | 'processing'>('select')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
-  // 리뷰 작성 폼 상태
   const categories: ReviewCategory[] = useMemo(() => ['TEACHER', 'CURRICULUM', 'MANAGEMENT', 'FACILITY', 'PROJECT'], [])
   const [detailScores, setDetailScores] = useState<Record<ReviewCategory, { score: number; comment: string }>>({
     TEACHER: { score: 0, comment: '' },
@@ -124,13 +123,11 @@ export default function LectureReviews({ lectureId }: Props) {
       className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
       size="sm"
       onClick={async () => {
-        // 이미 인증된 상태면 바로 작성 모달
         const verified = await isCertificateVerified(lectureId)
         if (verified) {
           setOpenWrite(true)
           return
         }
-        // 미인증이면 인증 모달 초기화 후 오픈
         setError(null)
         setFile(null)
         if (previewUrl) URL.revokeObjectURL(previewUrl)
@@ -148,15 +145,6 @@ export default function LectureReviews({ lectureId }: Props) {
       {verifyStep === 'select' ? (
         <div className="space-y-4">
           <p className="text-sm text-gray-600">수료증 이미지를 업로드하여 인증해 주세요.</p>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-800">강의 ID</label>
-            <input
-              type="text"
-              readOnly
-              value={lectureId}
-              className="h-10 w-full rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-900"
-            />
-          </div>
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-800">수료증 이미지</label>
             <input

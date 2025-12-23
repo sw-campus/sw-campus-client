@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react'
 
 import { isAxiosError } from 'axios'
 import { Star } from 'lucide-react'
-import Image from 'next/image'
+import { LuStar, LuPencil } from 'react-icons/lu'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { CATEGORY_LABELS, type ReviewCategory } from '@/features/lecture/api/reviewApi.types'
 import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
 import { api } from '@/lib/axios'
@@ -393,15 +395,17 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
           <CardTitle className="text-foreground">내 강의 목록</CardTitle>
         </CardHeader>
         <CardContent>
-          {lecturesLoading && <p className="text-muted-foreground">불러오는 중...</p>}
-          {lecturesError && !lecturesLoading && (
-            <div className="text-destructive-foreground flex items-center gap-3">
-              <p>{lecturesError}</p>
+          {lecturesLoading ? (
+            <div className="flex h-32 items-center justify-center">
+              <span className="text-muted-foreground">로딩 중...</span>
+            </div>
+          ) : lecturesError ? (
+            <div className="flex h-32 flex-col items-center justify-center gap-3">
+              <span className="text-destructive">강의 목록을 불러오지 못했습니다.</span>
               <Button
-                size="sm"
                 variant="secondary"
+                size="sm"
                 onClick={() => {
-                  // simple retry
                   ;(async () => {
                     try {
                       setLecturesLoading(true)
@@ -419,88 +423,94 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                 다시 시도
               </Button>
             </div>
-          )}
-          {!lecturesLoading && !lecturesError && (lectures?.length ?? 0) === 0 && (
-            <p className="text-muted-foreground">등록된 강의가 없습니다.</p>
-          )}
-          {!lecturesLoading && !lecturesError && (lectures?.length ?? 0) > 0 && (
-            <ul className="space-y-3">
-              {lectures!.map(l => (
-                <li
-                  key={l.certificateId}
-                  className="bg-card/40 text-foreground rounded-2xl p-5 shadow-sm backdrop-blur-xl transition hover:shadow-md"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-white">
-                        {l.lectureImageUrl ? (
-                          <Image src={l.lectureImageUrl} alt={l.lectureName} fill className="object-cover" />
+          ) : (lectures?.length ?? 0) === 0 ? (
+            <div className="flex h-32 items-center justify-center">
+              <span className="text-muted-foreground">등록된 강의가 없습니다.</span>
+            </div>
+          ) : (
+            <TooltipProvider>
+              <Table className="table-fixed">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-15">NO</TableHead>
+                    <TableHead>강의명</TableHead>
+                    <TableHead className="w-27.5">상태</TableHead>
+                    <TableHead className="w-30">수료일</TableHead>
+                    <TableHead className="w-25 text-center">관리</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {lectures!.map((l, index) => (
+                    <TableRow key={l.certificateId} className="hover:bg-muted/50 transition-colors">
+                      <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                      <TableCell className="text-foreground truncate font-medium" title={l.lectureName}>
+                        {l.lectureName}
+                      </TableCell>
+                      <TableCell>
+                        {l.canWriteReview ? (
+                          <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                            작성 가능
+                          </Badge>
                         ) : (
-                          <div className="text-muted-foreground flex h-full w-full items-center justify-center bg-gray-50 text-sm font-semibold">
-                            {l.lectureName.charAt(0)}
-                          </div>
+                          <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                            {approvedLectureIds.has(l.lectureId) ? '승인됨' : '작성완료'}
+                          </Badge>
                         )}
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground text-xs">코스</p>
-                        <p className="text-foreground text-base font-semibold">{l.lectureName}</p>
-                        <p className="text-muted-foreground mt-0.5 text-xs">기관: {l.organizationName}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {l.canWriteReview ? (
-                        <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                          작성 가능
-                        </Badge>
-                      ) : (
-                        <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                          작성완료
-                        </Badge>
-                      )}
-                      {l.canWriteReview ? (
-                        <Button
-                          size="sm"
-                          className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
-                          onClick={() => {
-                            setCreateError(null)
-                            setCreateLectureId(l.lectureId)
-                            setCreateLectureName(l.lectureName)
-                            setCreateScore(0)
-                            setCreateComment('')
-                            setCreateDetails(defaultReviewDetails(0))
-                            setCreateOpen(true)
-                          }}
-                        >
-                          후기 작성
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
-                          onClick={() => {
-                            setSelectedReviewId(l.reviewId ?? null)
-                            setSelectedLectureId(l.lectureId)
-                            setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
-                            setEditOpen(true)
-                          }}
-                        >
-                          {approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-                    <span className="text-muted-foreground">
-                      교육기관: <span className="text-foreground font-medium">{l.organizationName}</span>
-                    </span>
-                    <span className="text-muted-foreground">
-                      수료일: <span className="text-foreground font-medium">{formatDate(l.certifiedAt)}</span>
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{formatDate(l.certifiedAt)}</TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex justify-center gap-1">
+                          {l.canWriteReview ? (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    setCreateError(null)
+                                    setCreateLectureId(l.lectureId)
+                                    setCreateLectureName(l.lectureName)
+                                    setCreateScore(0)
+                                    setCreateComment('')
+                                    setCreateDetails(defaultReviewDetails(0))
+                                    setCreateOpen(true)
+                                  }}
+                                >
+                                  <LuStar className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>후기 작성</TooltipContent>
+                            </Tooltip>
+                          ) : (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    setSelectedReviewId(l.reviewId ?? null)
+                                    setSelectedLectureId(l.lectureId)
+                                    setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
+                                    setEditOpen(true)
+                                  }}
+                                >
+                                  <LuPencil className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TooltipProvider>
           )}
         </CardContent>
       </Card>
@@ -541,7 +551,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
               <div>
                 <p className="text-muted-foreground text-xs">강의</p>
                 <p className="text-foreground text-sm font-semibold">{createLectureName}</p>
-                {createLectureId && <p className="text-muted-foreground text-xs">강의 ID: {createLectureId}</p>}
+                {createLectureId && <p className="text-muted-foreground text-xs"></p>}
               </div>
               {/* 총점: ReviewForm 스타일에 맞춘 별 선택 UI */}
               <div className="flex items-center gap-1">
