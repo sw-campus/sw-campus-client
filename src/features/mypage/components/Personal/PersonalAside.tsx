@@ -29,22 +29,73 @@ export default function PersonalAside({
       : 'block w-full rounded-lg px-3 py-2 text-left text-neutral-700 transition hover:bg-neutral-100'
 
   return (
-    <aside className="w-56 self-start rounded-3xl border border-white/10 bg-white/90 p-5 text-neutral-900 shadow-lg shadow-black/10">
-      <h2 className="mb-5 text-2xl font-semibold">마이페이지</h2>
-
-      <nav className="space-y-2 text-sm leading-relaxed">
-        <button onClick={onClickPersonInfo} className={personInfoClass}>
-          개인정보 관리
-        </button>
-
-        <button onClick={onClickSurveyManage} className={surveyClass}>
-          설문 조사
-        </button>
-
-        <button onClick={onClickReviewManage} className={reviewClass}>
-          내 후기
-        </button>
+    <>
+      {/* 모바일/태블릿 상단 탭형 네비게이션 */}
+      <nav className="mb-4 lg:hidden">
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            onClick={onClickPersonInfo}
+            aria-current={active === 'password' ? 'page' : undefined}
+            className={
+              active === 'password'
+                ? 'w-full rounded-full bg-neutral-900 px-3 py-2 text-sm font-semibold text-white'
+                : 'w-full rounded-full border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700'
+            }
+          >
+            개인정보
+          </button>
+          <button
+            onClick={onClickSurveyManage}
+            aria-current={active === 'survey' ? 'page' : undefined}
+            className={
+              active === 'survey'
+                ? 'w-full rounded-full bg-neutral-900 px-3 py-2 text-sm font-semibold text-white'
+                : 'w-full rounded-full border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700'
+            }
+          >
+            설문
+          </button>
+          <button
+            onClick={onClickReviewManage}
+            aria-current={active === 'reviews' ? 'page' : undefined}
+            className={
+              active === 'reviews'
+                ? 'w-full rounded-full bg-neutral-900 px-3 py-2 text-sm font-semibold text-white'
+                : 'w-full rounded-full border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700'
+            }
+          >
+            후기
+          </button>
+        </div>
       </nav>
-    </aside>
+
+      {/* 데스크톱 사이드바 (lg 이상) */}
+      <aside className="hidden rounded-3xl border border-white/10 bg-white/90 p-5 text-neutral-900 shadow-lg shadow-black/10 lg:block lg:w-56 lg:self-start">
+        <h2 className="mb-5 text-2xl font-semibold">마이페이지</h2>
+        <nav className="space-y-2 text-base leading-relaxed">
+          <button
+            onClick={onClickPersonInfo}
+            className={personInfoClass}
+            aria-current={active === 'password' ? 'page' : undefined}
+          >
+            개인정보 관리
+          </button>
+          <button
+            onClick={onClickSurveyManage}
+            className={surveyClass}
+            aria-current={active === 'survey' ? 'page' : undefined}
+          >
+            설문 조사
+          </button>
+          <button
+            onClick={onClickReviewManage}
+            className={reviewClass}
+            aria-current={active === 'reviews' ? 'page' : undefined}
+          >
+            내 후기
+          </button>
+        </nav>
+      </aside>
+    </>
   )
 }

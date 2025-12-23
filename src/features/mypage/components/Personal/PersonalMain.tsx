@@ -432,21 +432,72 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
               <Table className="table-fixed">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-15">NO</TableHead>
+                    <TableHead className="hidden w-15 sm:table-cell">NO</TableHead>
                     <TableHead>강의명</TableHead>
-                    <TableHead className="w-27.5">상태</TableHead>
-                    <TableHead className="w-30">수료일</TableHead>
-                    <TableHead className="w-25 text-center">관리</TableHead>
+                    <TableHead className="hidden w-27.5 sm:table-cell">상태</TableHead>
+                    <TableHead className="hidden w-30 md:table-cell">수료일</TableHead>
+                    <TableHead className="hidden w-25 text-center sm:table-cell">관리</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {lectures!.map((l, index) => (
                     <TableRow key={l.certificateId} className="hover:bg-muted/50 transition-colors">
-                      <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                      <TableCell className="text-muted-foreground hidden sm:table-cell">{index + 1}</TableCell>
                       <TableCell className="text-foreground truncate font-medium" title={l.lectureName}>
                         {l.lectureName}
+                        {/* 모바일 추가 정보 및 액션 */}
+                        <div className="mt-1 flex items-center justify-between sm:hidden">
+                          <div className="flex items-center gap-2">
+                            {l.canWriteReview ? (
+                              <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                                작성 가능
+                              </Badge>
+                            ) : (
+                              <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                                {approvedLectureIds.has(l.lectureId) ? '승인됨' : '작성완료'}
+                              </Badge>
+                            )}
+                            <span className="text-muted-foreground text-xs">{formatDate(l.certifiedAt)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {l.canWriteReview ? (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                aria-label="후기 작성"
+                                onClick={() => {
+                                  setCreateError(null)
+                                  setCreateLectureId(l.lectureId)
+                                  setCreateLectureName(l.lectureName)
+                                  setCreateScore(0)
+                                  setCreateComment('')
+                                  setCreateDetails(defaultReviewDetails(0))
+                                  setCreateOpen(true)
+                                }}
+                              >
+                                <LuStar className="h-4 w-4" />
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                aria-label={approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
+                                onClick={() => {
+                                  setSelectedReviewId(l.reviewId ?? null)
+                                  setSelectedLectureId(l.lectureId)
+                                  setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
+                                  setEditOpen(true)
+                                }}
+                              >
+                                <LuPencil className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         {l.canWriteReview ? (
                           <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
                             작성 가능
@@ -457,8 +508,10 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                           </Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{formatDate(l.certifiedAt)}</TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-muted-foreground hidden md:table-cell">
+                        {formatDate(l.certifiedAt)}
+                      </TableCell>
+                      <TableCell className="hidden text-center sm:table-cell">
                         <div className="flex justify-center gap-1">
                           {l.canWriteReview ? (
                             <Tooltip>
