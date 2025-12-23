@@ -2,19 +2,29 @@
 
 import { useState } from 'react'
 
-import { LuImage, LuTrendingUp } from 'react-icons/lu'
+import { LuChevronRight, LuImage, LuTrendingUp } from 'react-icons/lu'
 
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import { useTopBannersQuery, useTopLecturesQuery } from '../hooks/useAnalytics'
 
 type Period = 7 | 30
+type ModalType = 'banners' | 'lectures' | null
 
 export function ClickRankingSection() {
   const [period, setPeriod] = useState<Period>(7)
+  const [modalOpen, setModalOpen] = useState<ModalType>(null)
+
+  // 카드용: Top 5
   const { data: banners = [], isLoading: bannersLoading } = useTopBannersQuery(period, 5)
   const { data: lectures = [], isLoading: lecturesLoading } = useTopLecturesQuery(period, 5)
+
+  // 모달용: 전체 (limit=50)
+  const { data: allBanners = [], isLoading: allBannersLoading } = useTopBannersQuery(period, 50)
+  const { data: allLectures = [], isLoading: allLecturesLoading } = useTopLecturesQuery(period, 50)
 
   const PeriodToggle = () => (
     <div className="flex rounded-lg bg-gray-100 p-1">
@@ -37,6 +47,22 @@ export function ClickRankingSection() {
     </div>
   )
 
+  const RankBadge = ({ rank }: { rank: number }) => (
+    <span
+      className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold ${
+        rank === 1
+          ? 'bg-yellow-100 text-yellow-700'
+          : rank === 2
+            ? 'bg-gray-200 text-gray-600'
+            : rank === 3
+              ? 'bg-orange-100 text-orange-600'
+              : 'bg-gray-50 text-gray-500'
+      }`}
+    >
+      {rank}
+    </span>
+  )
+
   const SkeletonRows = () => (
     <>
       {[1, 2, 3].map(i => (
@@ -56,127 +82,217 @@ export function ClickRankingSection() {
   )
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {/* 배너 클릭 Top 5 */}
-      <Card className="bg-card">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-foreground flex items-center gap-2">
-            <LuImage className="h-5 w-5 text-purple-500" />
-            배너 클릭 Top 5
-          </CardTitle>
-          <PeriodToggle />
-        </CardHeader>
-        <CardContent>
+    <>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* 배너 클릭 Top 5 */}
+        <Card className="bg-card">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-foreground flex items-center gap-2">
+              <LuImage className="h-5 w-5 text-purple-500" />
+              배너 클릭 Top 5
+            </CardTitle>
+            <PeriodToggle />
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">순위</TableHead>
+                  <TableHead>배너명</TableHead>
+                  <TableHead className="w-20 text-right">클릭</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {bannersLoading ? (
+                  <SkeletonRows />
+                ) : banners.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-muted-foreground text-center">
+                      데이터가 없습니다
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  banners.map((banner, idx) => (
+                    <TableRow key={banner.bannerId}>
+                      <TableCell className="font-medium">
+                        <RankBadge rank={idx + 1} />
+                      </TableCell>
+                      <TableCell>
+                        <span className="line-clamp-1">{banner.bannerName || `배너 #${banner.bannerId}`}</span>
+                        <span className="text-muted-foreground ml-2 text-xs">({banner.bannerType})</span>
+                      </TableCell>
+                      <TableCell className="text-right font-semibold">{banner.clickCount.toLocaleString()}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+            {banners.length >= 5 && (
+              <Button
+                variant="ghost"
+                className="mt-2 w-full text-purple-600 hover:bg-purple-50 hover:text-purple-700"
+                onClick={() => setModalOpen('banners')}
+              >
+                전체 보기 <LuChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* 강의 클릭 Top 5 */}
+        <Card className="bg-card">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-foreground flex items-center gap-2">
+              <LuTrendingUp className="h-5 w-5 text-emerald-500" />
+              인기 강의 Top 5
+            </CardTitle>
+            <span className="text-muted-foreground text-sm">최근 {period}일</span>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">순위</TableHead>
+                  <TableHead>강의명</TableHead>
+                  <TableHead className="w-16 text-right">신청</TableHead>
+                  <TableHead className="w-16 text-right">공유</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {lecturesLoading ? (
+                  <SkeletonRows />
+                ) : lectures.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-muted-foreground text-center">
+                      데이터가 없습니다
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  lectures.map((lecture, idx) => (
+                    <TableRow key={lecture.lectureId}>
+                      <TableCell className="font-medium">
+                        <RankBadge rank={idx + 1} />
+                      </TableCell>
+                      <TableCell>
+                        <span className="line-clamp-1">{lecture.lectureName || `강의 #${lecture.lectureId}`}</span>
+                      </TableCell>
+                      <TableCell className="text-right font-semibold text-blue-600">
+                        {lecture.applyClicks.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold text-emerald-600">
+                        {lecture.shareClicks.toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+            {lectures.length >= 5 && (
+              <Button
+                variant="ghost"
+                className="mt-2 w-full text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                onClick={() => setModalOpen('lectures')}
+              >
+                전체 보기 <LuChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 배너 전체 보기 모달 */}
+      <Dialog open={modalOpen === 'banners'} onOpenChange={open => !open && setModalOpen(null)}>
+        <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LuImage className="h-5 w-5 text-purple-500" />
+              배너 클릭 순위 (최근 {period}일)
+            </DialogTitle>
+          </DialogHeader>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-12">순위</TableHead>
+                <TableHead className="w-16">순위</TableHead>
                 <TableHead>배너명</TableHead>
+                <TableHead className="w-20">타입</TableHead>
                 <TableHead className="w-20 text-right">클릭</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bannersLoading ? (
+              {allBannersLoading ? (
                 <SkeletonRows />
-              ) : banners.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-muted-foreground text-center">
-                    데이터가 없습니다
-                  </TableCell>
-                </TableRow>
-              ) : (
-                banners.map((banner, idx) => (
-                  <TableRow key={banner.bannerId}>
-                    <TableCell className="font-medium">
-                      <span
-                        className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold ${
-                          idx === 0
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : idx === 1
-                              ? 'bg-gray-200 text-gray-600'
-                              : idx === 2
-                                ? 'bg-orange-100 text-orange-600'
-                                : 'bg-gray-50 text-gray-500'
-                        }`}
-                      >
-                        {idx + 1}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="line-clamp-1">{banner.bannerName || `배너 #${banner.bannerId}`}</span>
-                      <span className="text-muted-foreground ml-2 text-xs">({banner.bannerType})</span>
-                    </TableCell>
-                    <TableCell className="text-right font-semibold">{banner.clickCount.toLocaleString()}</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* 강의 클릭 Top 5 */}
-      <Card className="bg-card">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-foreground flex items-center gap-2">
-            <LuTrendingUp className="h-5 w-5 text-emerald-500" />
-            인기 강의 Top 5
-          </CardTitle>
-          <span className="text-muted-foreground text-sm">최근 {period}일</span>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">순위</TableHead>
-                <TableHead>강의명</TableHead>
-                <TableHead className="w-16 text-right">신청</TableHead>
-                <TableHead className="w-16 text-right">공유</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {lecturesLoading ? (
-                <SkeletonRows />
-              ) : lectures.length === 0 ? (
+              ) : allBanners.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-muted-foreground text-center">
                     데이터가 없습니다
                   </TableCell>
                 </TableRow>
               ) : (
-                lectures.map((lecture, idx) => (
-                  <TableRow key={lecture.lectureId}>
-                    <TableCell className="font-medium">
-                      <span
-                        className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold ${
-                          idx === 0
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : idx === 1
-                              ? 'bg-gray-200 text-gray-600'
-                              : idx === 2
-                                ? 'bg-orange-100 text-orange-600'
-                                : 'bg-gray-50 text-gray-500'
-                        }`}
-                      >
-                        {idx + 1}
-                      </span>
-                    </TableCell>
+                allBanners.map((banner, idx) => (
+                  <TableRow key={banner.bannerId}>
                     <TableCell>
-                      <span className="line-clamp-1">{lecture.lectureName || `강의 #${lecture.lectureId}`}</span>
+                      <RankBadge rank={idx + 1} />
                     </TableCell>
+                    <TableCell className="font-medium">{banner.bannerName || `배너 #${banner.bannerId}`}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{banner.bannerType}</TableCell>
+                    <TableCell className="text-right font-semibold">{banner.clickCount.toLocaleString()}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </DialogContent>
+      </Dialog>
+
+      {/* 강의 전체 보기 모달 */}
+      <Dialog open={modalOpen === 'lectures'} onOpenChange={open => !open && setModalOpen(null)}>
+        <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LuTrendingUp className="h-5 w-5 text-emerald-500" />
+              인기 강의 순위 (최근 {period}일)
+            </DialogTitle>
+          </DialogHeader>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-16">순위</TableHead>
+                <TableHead>강의명</TableHead>
+                <TableHead className="w-20 text-right">신청</TableHead>
+                <TableHead className="w-20 text-right">공유</TableHead>
+                <TableHead className="w-20 text-right">합계</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {allLecturesLoading ? (
+                <SkeletonRows />
+              ) : allLectures.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-muted-foreground text-center">
+                    데이터가 없습니다
+                  </TableCell>
+                </TableRow>
+              ) : (
+                allLectures.map((lecture, idx) => (
+                  <TableRow key={lecture.lectureId}>
+                    <TableCell>
+                      <RankBadge rank={idx + 1} />
+                    </TableCell>
+                    <TableCell className="font-medium">{lecture.lectureName || `강의 #${lecture.lectureId}`}</TableCell>
                     <TableCell className="text-right font-semibold text-blue-600">
                       {lecture.applyClicks.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-right font-semibold text-emerald-600">
                       {lecture.shareClicks.toLocaleString()}
                     </TableCell>
+                    <TableCell className="text-right font-bold">{lecture.totalClicks.toLocaleString()}</TableCell>
                   </TableRow>
                 ))
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

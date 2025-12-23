@@ -53,17 +53,21 @@ export default function OAuthCallbackPage() {
         const data = await oauthLogin(provider, code)
 
         let userName = '사용자'
-        let userType: 'ORGANIZATION' | 'PERSONAL' | null = null
+        let userType: 'ORGANIZATION' | 'PERSONAL' | 'ADMIN' | null = null
 
         if (data) {
           userName = (data as any).name ?? (data as any).nickname ?? (data as any).email?.split?.('@')?.[0] ?? '사용자'
+          const role = (data as any)?.role
 
-          if ((data as any).userType === 'ORGANIZATION' || (data as any).userType === 'PERSONAL') {
+          // 관리자인 경우 ADMIN 타입으로 설정
+          if (role === 'ADMIN') {
+            userType = 'ADMIN'
+          } else if ((data as any).userType === 'ORGANIZATION' || (data as any).userType === 'PERSONAL') {
             userType = (data as any).userType
           } else if ((data as any).userType === 'organization' || (data as any).userType === 'personal') {
             userType = (data as any).userType === 'organization' ? 'ORGANIZATION' : 'PERSONAL'
-          } else if ((data as any).role) {
-            userType = (data as any).role === 'ORGANIZATION' ? 'ORGANIZATION' : 'PERSONAL'
+          } else if (role) {
+            userType = role === 'ORGANIZATION' ? 'ORGANIZATION' : 'PERSONAL'
           } else if ((data as any).isOrganization !== undefined) {
             userType = (data as any).isOrganization ? 'ORGANIZATION' : 'PERSONAL'
           }
@@ -86,7 +90,12 @@ export default function OAuthCallbackPage() {
         }
 
         toast.success('로그인되었습니다.')
-        router.replace('/')
+        // 관리자인 경우 /admin 페이지로, 그 외에는 홈으로 리다이렉트
+        if (userType === 'ADMIN') {
+          router.replace('/admin')
+        } else {
+          router.replace('/')
+        }
       } catch (err) {
         console.error(err)
         toast.error('소셜 로그인 처리에 실패했습니다. 다시 시도해주세요.')

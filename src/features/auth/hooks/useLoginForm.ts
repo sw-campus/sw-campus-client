@@ -34,17 +34,25 @@ export function useLoginForm() {
 
       let userName = email.split('@')[0]
 
-      let userType: 'ORGANIZATION' | 'PERSONAL' | null = null
+      let userType: 'ORGANIZATION' | 'PERSONAL' | 'ADMIN' | null = null
 
       if (data) {
         userName = (data as any).name ?? (data as any).nickname ?? userName
+        const role = (data as any)?.role?.toUpperCase?.() ?? (data as any)?.role
 
-        if ((data as any).userType === 'ORGANIZATION' || (data as any).userType === 'PERSONAL') {
+        console.log('[Login] Server response:', { role, data }) // 디버깅용
+
+        // 관리자인 경우 ADMIN 타입으로 설정
+        if (role === 'ADMIN') {
+          userType = 'ADMIN'
+        } else if ((data as any).userType === 'ORGANIZATION' || (data as any).userType === 'PERSONAL') {
           userType = (data as any).userType
         } else if ((data as any).userType === 'organization' || (data as any).userType === 'personal') {
           userType = (data as any).userType === 'organization' ? 'ORGANIZATION' : 'PERSONAL'
-        } else if ((data as any).role) {
-          userType = (data as any).role === 'ORGANIZATION' ? 'ORGANIZATION' : 'PERSONAL'
+        } else if (role === 'ORGANIZATION') {
+          userType = 'ORGANIZATION'
+        } else if (role === 'USER' || role === 'PERSONAL') {
+          userType = 'PERSONAL'
         } else if ((data as any).isOrganization !== undefined) {
           userType = (data as any).isOrganization ? 'ORGANIZATION' : 'PERSONAL'
         }
@@ -80,10 +88,12 @@ export function useLoginForm() {
       }
 
       // 관리자인 경우 /admin 페이지로, 그 외에는 홈으로 리다이렉트
-      const role = (data as any)?.role
-      if (role === 'ADMIN') {
+      console.log('[Login] Redirecting...', { userType }) // 디버깅용
+      if (userType === 'ADMIN') {
+        console.log('[Login] Redirecting to /admin')
         router.push('/admin')
       } else {
+        console.log('[Login] Redirecting to /')
         router.push('/')
       }
     } catch (error) {
