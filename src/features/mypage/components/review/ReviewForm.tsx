@@ -144,6 +144,7 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
         throw new Error(parsed.error.issues[0]?.message ?? '입력값을 확인해주세요')
       }
 
+      // 백엔드 스펙: PUT /reviews/{reviewId} with camelCase (detailScores)
       const payload = {
         comment: parsed.data.comment ?? '',
         detailScores: parsed.data.detailScores.map(d => ({
@@ -155,18 +156,11 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
 
       const targetReviewId = resolvedReviewId ?? reviewId ?? null
 
-      // lectureId가 있으면 마이페이지 수정 엔드포인트로 업데이트, 없으면 기존 리뷰 엔드포인트 사용
-      if (lectureId) {
-        await api.put(`/mypage/completed-lectures/${lectureId}/review`, payload)
-        return
-      }
-
       if (targetReviewId) {
         await api.put(`/reviews/${targetReviewId}`, payload)
         return
       }
 
-      // 생성은 이 폼에서 사용하지 않음(생성은 상위에서 lectureId/detailScores 포함해 처리)
       throw new Error('리뷰 ID를 찾을 수 없습니다.')
     },
   })

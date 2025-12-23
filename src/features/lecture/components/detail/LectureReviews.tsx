@@ -2,16 +2,17 @@
 
 import { useMemo, useState } from 'react'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, Loader2, Star } from 'lucide-react'
+import Image from 'next/image'
 import { toast } from 'sonner'
 
 import Modal from '@/components/ui/Modal'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
-import { createLectureReview, getLectureReviews } from '../../api/reviewApi.client'
-import { CATEGORY_LABELS, type DetailScore, type Review, type ReviewCategory } from '../../api/reviewApi.types'
+import { createReview, getLectureReviews, isCertificateVerified } from '../../api/reviewApi.client'
+import { CATEGORY_LABELS, type Review, type ReviewCategory } from '../../api/reviewApi.types'
 import { formatDate, Section, StarRating } from './DetailShared'
 
 interface Props {
@@ -87,6 +88,7 @@ function ReviewCard({ review }: { review: Review }) {
 }
 
 export default function LectureReviews({ lectureId }: Props) {
+  const queryClient = useQueryClient()
   const [openVerify, setOpenVerify] = useState(false)
   const [openWrite, setOpenWrite] = useState(false)
   const [openComplete, setOpenComplete] = useState(false)
@@ -97,7 +99,7 @@ export default function LectureReviews({ lectureId }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   // 리뷰 작성 폼 상태
-  const categories: ReviewCategory[] = useMemo(() => ['TEACHER', 'PROJECT', 'CURRICULUM', 'FACILITY', 'MANAGEMENT'], [])
+  const categories: ReviewCategory[] = useMemo(() => ['TEACHER', 'CURRICULUM', 'MANAGEMENT', 'FACILITY', 'PROJECT'], [])
   const [detailScores, setDetailScores] = useState<Record<ReviewCategory, { score: number; comment: string }>>({
     TEACHER: { score: 0, comment: '' },
     PROJECT: { score: 0, comment: '' },
@@ -106,11 +108,6 @@ export default function LectureReviews({ lectureId }: Props) {
     MANAGEMENT: { score: 0, comment: '' },
   })
   const [overallComment, setOverallComment] = useState('')
-  const overallScore = useMemo(() => {
-    const nums = categories.map(c => detailScores[c].score).filter(n => n > 0)
-    if (nums.length === 0) return 0
-    return Number((nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(1))
-  }, [categories, detailScores])
 
   const {
     data: reviews,
@@ -126,7 +123,14 @@ export default function LectureReviews({ lectureId }: Props) {
     <Button
       className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
       size="sm"
-      onClick={() => {
+      onClick={async () => {
+        // 이미 인증된 상태면 바로 작성 모달
+        const verified = await isCertificateVerified(lectureId)
+        if (verified) {
+          setOpenWrite(true)
+          return
+        }
+        // 미인증이면 인증 모달 초기화 후 오픈
         setError(null)
         setFile(null)
         if (previewUrl) URL.revokeObjectURL(previewUrl)
@@ -201,7 +205,7 @@ export default function LectureReviews({ lectureId }: Props) {
                   // 인증 성공 시: 인증 모달 닫고 리뷰 작성 모달 오픈
                   setOpenVerify(false)
                   setOpenWrite(true)
-                } catch (e) {
+                } catch {
                   setError('업로드/인증에 실패했습니다. 다시 시도해 주세요.')
                   setVerifyStep('select')
                   // 인증 실패 시: 모달 닫기
@@ -222,7 +226,14 @@ export default function LectureReviews({ lectureId }: Props) {
             <h2 className="mb-4 text-2xl font-bold text-gray-900">수료증의 정보를 읽어오는 중입니다.</h2>
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
               {previewUrl ? (
-                <img src={previewUrl} alt="업로드한 수료증" className="mx-auto max-h-[60vh] w-auto rounded-md" />
+                <Image
+                  src={previewUrl}
+                  alt="업로드한 수료증"
+                  width={800}
+                  height={600}
+                  className="mx-auto h-auto max-h-[60vh] w-auto rounded-md"
+                  unoptimized
+                />
               ) : (
                 <div className="flex h-48 items-center justify-center text-sm text-gray-500">
                   이미지를 불러오는 중...
@@ -295,29 +306,36 @@ export default function LectureReviews({ lectureId }: Props) {
             className="rounded-full"
             onClick={async () => {
               try {
-                // 간단한 검증
-                const commentsLongEnough = overallComment.trim().length >= 20
-                if (!commentsLongEnough) {
-                  toast.error('총평을 20자 이상 작성해 주세요.')
-                  return
+                // 스펙 검증: 5개 카테고리 모두 점수(1~5)와 20자 이상 코멘트
+                for (const cat of categories) {
+                  const s = detailScores[cat].score
+                  const c = (detailScores[cat].comment || '').trim()
+                  if (s < 1 || s > 5) {
+                    toast.error(`${CATEGORY_LABELS[cat]} 점수를 선택해 주세요.`)
+                    return
+                  }
+                  if (c.length < 20) {
+                    toast.error(`${CATEGORY_LABELS[cat]} 의견을 20자 이상 작성해 주세요.`)
+                    return
+                  }
                 }
+
                 const payload = {
-                  lectureId,
                   comment: overallComment.trim(),
-                  score: overallScore,
-                  detailScores: categories
-                    .map(cat => ({
-                      category: cat,
-                      score: detailScores[cat].score,
-                      comment: detailScores[cat].comment.trim(),
-                    }))
-                    .filter(ds => ds.score > 0) as DetailScore[],
+                  detail_scores: categories.map(cat => ({
+                    category: cat,
+                    score: detailScores[cat].score,
+                    comment: detailScores[cat].comment.trim(),
+                  })),
                 }
-                await createLectureReview(lectureId, payload)
+                // 스펙: POST /reviews (lecture_id 포함)
+                await createReview(lectureId, payload)
                 toast.success('리뷰가 등록되었습니다.')
+                // 목록 갱신
+                queryClient.invalidateQueries({ queryKey: ['lectureReviews', lectureId] })
                 setOpenWrite(false)
                 setOpenComplete(true)
-              } catch (err) {
+              } catch {
                 toast.error('리뷰 등록에 실패했습니다. 잠시 후 다시 시도해 주세요.')
               }
             }}
