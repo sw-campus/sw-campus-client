@@ -51,25 +51,20 @@ const orgInfoSchema = z.object({
 })
 
 type OrgInfoFormValues = z.infer<typeof orgInfoSchema>
-
-// ✅ PersonalForm과 동일한 인풋 톤
 const INPUT_CLASS =
   'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
 
 const TEXTAREA_CLASS =
   'w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
 
-// ✅ AddressInput(daum.Postcode)이 동작하려면 postcode 스크립트가 필요합니다.
 const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
 
 const loadDaumPostcodeScript = () => {
   if (typeof window === 'undefined') return
 
   const w = window as unknown as { daum?: { Postcode?: unknown } }
-  // 이미 로드되어 있으면 종료
   if (w.daum?.Postcode) return
 
-  // 이미 스크립트 태그가 있으면 종료
   if (document.getElementById(DAUM_POSTCODE_SCRIPT_ID)) return
 
   const script = document.createElement('script')
@@ -84,12 +79,11 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
   const [isPending, setIsPending] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [showAddressEditor, setShowAddressEditor] = useState(false)
 
-  // ✅ 수정 불가 정보는 텍스트로 노출
   const [organizationId, setOrganizationId] = useState<number | null>(null)
   const [approvalStatus, setApprovalStatus] = useState<string>('')
 
-  // ✅ AddressInput(store)
   const { address, detailAddress, setAddress, setDetailAddress } = useSignupStore()
 
   const methods = useForm<OrgInfoFormValues>({
@@ -156,8 +150,9 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
           location: '',
         })
 
-        // 주소는 사용자에게 다시 입력받도록 비워둠
-        setAddress('')
+        // 주소는 백엔드 값으로 초기 세팅 (수정 시 AddressInput 노출)
+        const loc = (data.location ?? '').trim()
+        setAddress(loc)
         setDetailAddress('')
       } catch {
         toast.error('기관 정보 조회에 실패했습니다.')
@@ -203,18 +198,16 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       toast.success('저장되었습니다.')
-      router.back()
+      router.push('/')
     } finally {
       setIsPending(false)
     }
   }
 
-  // 상태 표시용 UI 설정 (색상/라벨)
   const getApprovalStatusUI = (status: string) => {
     const s = (status || '').toLowerCase()
     if (s === 'approved') return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
     if (s === 'rejected') return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
-    // pending 또는 기타 상태는 보류로 표시
     return { label: '승인 대기', dot: 'bg-amber-500', text: 'text-amber-700' }
   }
 
@@ -306,9 +299,24 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
               />
             </div>
 
-            {/* 주소(검색 버튼 포함) */}
+            {/* 주소(수정 버튼 가로 배치, 수정 시 자동 검색) */}
             <div>
-              <AddressInput />
+              {!showAddressEditor ? (
+                <div className="flex items-center gap-2">
+                  <div className={`${INPUT_CLASS} flex flex-1 items-center bg-gray-50`}>
+                    <span className="truncate">{address || '주소를 입력해주세요.'}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddressEditor(true)}
+                    className="h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+                  >
+                    수정
+                  </button>
+                </div>
+              ) : (
+                <AddressInput autoOpen />
+              )}
             </div>
 
             <div>

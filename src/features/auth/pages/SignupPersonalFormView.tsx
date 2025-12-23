@@ -20,6 +20,9 @@ export default function SignupPersonalFormView() {
     nickname,
     phone,
 
+    isNicknameChecking,
+    nicknameCheckState,
+
     setEmail,
     setPassword,
     setPasswordConfirm,
@@ -29,6 +32,7 @@ export default function SignupPersonalFormView() {
 
     handleSendEmailAuth,
     handleCheckPasswordMatch,
+    handleCheckNickname,
     handleSubmit,
     resetPasswordValidation,
   } = useSignupForm()
@@ -67,10 +71,16 @@ export default function SignupPersonalFormView() {
       <NameInput value={name} onChange={setName} />
 
       {/* 닉네임 */}
-      <NicknameInput value={nickname} onChange={setNickname} />
+      <NicknameInput
+        value={nickname}
+        onChange={setNickname}
+        onClickCheck={handleCheckNickname}
+        isChecking={isNicknameChecking}
+        checkState={nicknameCheckState}
+      />
 
       {/* 전화번호 + 인증 */}
-      <PhoneAuthInput value={phone} onChange={setPhone} onClickAuth={() => {}} />
+      <PhoneAuthInput value={phone} onChange={setPhone} />
 
       {/* 주소 */}
       <AddressInput />

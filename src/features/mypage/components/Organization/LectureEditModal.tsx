@@ -56,15 +56,12 @@ export default function LectureEditModal({ open, onOpenChange, lectureId, onSucc
   const {
     reset,
     handleSubmit,
-    control,
     formState: { isSubmitting },
   } = methods
   const formCategoryId = methods.watch('categoryId')
 
-  // 강의 상세 데이터 로드 및 폼 채우기
   useEffect(() => {
     if (!open || !lectureId) return
-    // categoryTree가 로드될 때까지 대기
     if (!categoryTree) return
 
     const fetchLecture = async () => {
@@ -84,7 +81,6 @@ export default function LectureEditModal({ open, onOpenChange, lectureId, onSucc
     fetchLecture()
   }, [open, lectureId, reset, categoryTree])
 
-  // 모달 닫힐 때 폼 리셋
   useEffect(() => {
     if (!open) {
       reset(lectureCreateFormDefaultValues)

@@ -5,7 +5,14 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
-import { checkEmailStatus, sendEmailAuth, signupOrganization, signupSchema } from '@/features/auth/authApi'
+import {
+  checkEmailStatus,
+  checkNicknameAvailability,
+  organizationSignupSchema,
+  sendEmailAuth,
+  signupOrganization,
+  signupSchema,
+} from '@/features/auth/authApi'
 import { useAuthStore } from '@/store/authStore'
 import { useSignupStore } from '@/store/signupStore'
 
@@ -15,6 +22,7 @@ export function useSignupOrganizationForm() {
 
   const {
     address,
+    detailAddress,
     email,
     isSendingEmail,
     isEmailVerified,
@@ -43,9 +51,24 @@ export function useSignupOrganizationForm() {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const [isNicknameChecking, setIsNicknameChecking] = useState(false)
+  const [nicknameCheckState, setNicknameCheckState] = useState<'idle' | 'available' | 'unavailable' | 'error'>('idle')
+  const [lastCheckedNickname, setLastCheckedNickname] = useState<string | null>(null)
+
   const resetPasswordValidation = () => {
     setIsPasswordMatched(null)
     setIsPasswordConfirmed(false)
+  }
+
+  const resetNicknameValidation = () => {
+    setNicknameCheckState('idle')
+    setLastCheckedNickname(null)
+  }
+
+  const extractErrorMessage = (error: unknown): string | null => {
+    if (!error || typeof error !== 'object') return null
+    const maybeMessage = (error as { response?: { data?: { message?: unknown } } }).response?.data?.message
+    return typeof maybeMessage === 'string' ? maybeMessage : null
   }
 
   useEffect(() => {
@@ -70,6 +93,39 @@ export function useSignupOrganizationForm() {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null
     setCertificateImage(file)
+  }
+
+  const handleNicknameChange = (value: string) => {
+    setNickname(value)
+    resetNicknameValidation()
+  }
+
+  const handleCheckNickname = async () => {
+    const normalized = nickname.trim()
+    if (!normalized) {
+      toast.error('닉네임을 입력해 주세요.')
+      resetNicknameValidation()
+      return
+    }
+
+    try {
+      setIsNicknameChecking(true)
+      setNicknameCheckState('idle')
+
+      const data = await checkNicknameAvailability(normalized)
+      const available = Boolean(data?.available)
+
+      setLastCheckedNickname(normalized)
+      setNicknameCheckState(available ? 'available' : 'unavailable')
+    } catch (error: unknown) {
+      console.error('닉네임 중복 검사 실패', error)
+      setNicknameCheckState('error')
+      setLastCheckedNickname(null)
+
+      toast.error(extractErrorMessage(error) ?? '닉네임 확인에 실패했습니다. 잠시 후 다시 시도해 주세요.')
+    } finally {
+      setIsNicknameChecking(false)
+    }
   }
 
   // 비밀번호 일치 확인
@@ -101,15 +157,13 @@ export function useSignupOrganizationForm() {
   // 이메일 인증 메일 보내기
   const handleSendEmailAuth = async (signupType: 'personal' | 'organization' = 'personal') => {
     if (isEmailVerified) return
-
     try {
       setIsSendingEmail(true)
       await sendEmailAuth(email, signupType)
       toast.success('인증 메일을 발송했습니다. 메일함을 확인해 주세요.')
       setIsEmailVerified(false)
-    } catch (error: any) {
-      const message = error?.response?.data?.message ?? '인증 메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-      toast.error(message)
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error) ?? '인증 메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.')
     } finally {
       setIsSendingEmail(false)
     }
@@ -134,34 +188,62 @@ export function useSignupOrganizationForm() {
       return
     }
 
+    const normalizedNickname = nickname.trim()
+    if (nicknameCheckState !== 'available' || lastCheckedNickname !== normalizedNickname) {
+      toast.error('닉네임 중복 확인을 완료해 주세요.')
+      return
+    }
+
+    const location = (
+      address && detailAddress ? `${address} ${detailAddress}` : (address ?? detailAddress ?? '')
+    ).trim()
+
     try {
       setIsSubmitting(true)
 
       if (!certificateImage) {
         toast.error('재직증명서를 첨부해 주세요.')
-        setIsSubmitting(false)
         return
       }
 
-      await signupOrganization({
+      if (!phone || !phone.trim()) {
+        toast.error('전화번호를 입력해 주세요.')
+        return
+      }
+
+      if (!location) {
+        toast.error('주소를 입력해 주세요.')
+        return
+      }
+
+      const payload = {
         email: email || '',
         password: password || '',
         name: name || '',
-        nickname: nickname || '',
-        phone: phone || '',
-        location: address || '',
+        nickname: normalizedNickname,
+        phone: phone.trim(),
+        location,
         organizationName: organizationName || '',
-        certificateImage: certificateImage || '',
-      })
+        certificateImage,
+      }
+
+      const parsed = organizationSignupSchema.safeParse(payload)
+      if (!parsed.success) {
+        const firstError = parsed.error.issues[0]
+        toast.error(firstError?.message ?? '입력값을 다시 확인해 주세요.')
+        return
+      }
+
+      await signupOrganization(parsed.data)
 
       const headerName = organizationName.trim()
 
       if (headerName) setLogin(headerName)
 
       router.push('/login')
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Organization signup error:', error)
-      toast.error('회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.')
+      toast.error(extractErrorMessage(error) ?? '회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.')
     } finally {
       setIsSubmitting(false)
     }
@@ -169,6 +251,7 @@ export function useSignupOrganizationForm() {
 
   return {
     address,
+    detailAddress,
     email,
     isSendingEmail,
     isEmailVerified,
@@ -186,9 +269,13 @@ export function useSignupOrganizationForm() {
     setPassword,
     setPasswordConfirm,
     setName,
-    setNickname,
+    setNickname: handleNicknameChange,
     setPhone,
     setOrganizationName,
+
+    isNicknameChecking,
+    nicknameCheckState,
+    handleCheckNickname,
 
     handleSendEmailAuth,
     handleCheckPasswordMatch,

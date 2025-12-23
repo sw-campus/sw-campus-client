@@ -4,6 +4,7 @@ import AddressInput from '@/features/auth/components/AddressInput'
 import CertificateUploadSection from '@/features/auth/components/CertificateUploadSection'
 import EmailAuthInput from '@/features/auth/components/EmailAuthInput'
 import LabeledInput from '@/features/auth/components/LabeledInput'
+import NicknameInput from '@/features/auth/components/NickNameInput'
 import PasswordFields from '@/features/auth/components/PasswordFields'
 import PhoneAuthInput from '@/features/auth/components/PhoneAuthInput'
 import { useSignupOrganizationForm } from '@/features/auth/hooks/useSignupOrganizationForm'
@@ -26,6 +27,9 @@ export default function SignupOrganizationFormView() {
     certificateImage,
     isSubmitting,
 
+    isNicknameChecking,
+    nicknameCheckState,
+
     setEmail,
     setPassword,
     setPasswordConfirm,
@@ -36,6 +40,7 @@ export default function SignupOrganizationFormView() {
 
     handleSendEmailAuth,
     handleCheckPasswordMatch,
+    handleCheckNickname,
     handleFileChange,
     handleSubmit,
     resetPasswordValidation,
@@ -83,13 +88,12 @@ export default function SignupOrganizationFormView() {
       />
 
       {/* 닉네임 */}
-      <LabeledInput
-        label="닉네임"
-        type="text"
-        placeholder="nickname"
+      <NicknameInput
         value={nickname}
-        onChangeValue={setNickname}
-        className={INPUT_BASE_CLASS}
+        onChange={setNickname}
+        onClickCheck={handleCheckNickname}
+        isChecking={isNicknameChecking}
+        checkState={nicknameCheckState}
       />
 
       {/* 기관명 */}
@@ -104,7 +108,7 @@ export default function SignupOrganizationFormView() {
       />
 
       {/* 전화번호 + 인증 (기존 UI를 재사용 컴포넌트로 교체) */}
-      <PhoneAuthInput value={phone} onChange={setPhone} onClickAuth={() => {}} />
+      <PhoneAuthInput value={phone} onChange={setPhone} />
 
       {/* 주소 */}
       <AddressInput />

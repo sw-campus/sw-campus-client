@@ -1,12 +1,13 @@
 'use client'
 
-import { FormEvent, useEffect, useRef } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
 import {
   checkEmailStatus,
+  checkNicknameAvailability,
   getVerifiedEmail,
   sendEmailAuth,
   signup,
@@ -48,9 +49,28 @@ export function useSignupForm() {
   const verifiedParam = searchParams.get('verified')
   const hasInitializedRef = useRef(false)
 
+  const [isNicknameChecking, setIsNicknameChecking] = useState(false)
+  const [nicknameCheckState, setNicknameCheckState] = useState<'idle' | 'available' | 'unavailable' | 'error'>('idle')
+  const [lastCheckedNickname, setLastCheckedNickname] = useState<string | null>(null)
+
   const resetPasswordValidation = () => {
     setIsPasswordMatched(null)
     setIsPasswordConfirmed(false)
+  }
+
+  const resetNicknameValidation = () => {
+    setNicknameCheckState('idle')
+    setLastCheckedNickname(null)
+  }
+
+  const extractErrorMessage = (error: unknown): string | null => {
+    if (!error || typeof error !== 'object') return null
+    const response = (error as Record<string, unknown>).response
+    if (!response || typeof response !== 'object') return null
+    const data = (response as Record<string, unknown>).data
+    if (!data || typeof data !== 'object') return null
+    const message = (data as Record<string, unknown>).message
+    return typeof message === 'string' ? message : null
   }
 
   // 첫 진입 시 verified=true가 아니면 초기화
@@ -133,11 +153,43 @@ export function useSignupForm() {
       await sendEmailAuth(email)
       toast.success('인증 메일을 발송했습니다. 메일함을 확인해 주세요.')
       setIsEmailVerified(false)
-    } catch (error: any) {
-      const message = error?.response?.data?.message ?? '인증 메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-      toast.error(message)
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error) ?? '인증 메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.')
     } finally {
       setIsSendingEmail(false)
+    }
+  }
+
+  const handleNicknameChange = (value: string) => {
+    setNickname(value)
+    resetNicknameValidation()
+  }
+
+  const handleCheckNickname = async () => {
+    const normalized = nickname.trim()
+    if (!normalized) {
+      toast.error('닉네임을 입력해 주세요.')
+      resetNicknameValidation()
+      return
+    }
+
+    try {
+      setIsNicknameChecking(true)
+      setNicknameCheckState('idle')
+
+      const data = await checkNicknameAvailability(normalized)
+      const available = Boolean(data?.available)
+
+      setLastCheckedNickname(normalized)
+      setNicknameCheckState(available ? 'available' : 'unavailable')
+    } catch (error: unknown) {
+      console.error('닉네임 중복 검사 실패', error)
+      setNicknameCheckState('error')
+      setLastCheckedNickname(null)
+
+      toast.error(extractErrorMessage(error) ?? '닉네임 확인에 실패했습니다. 잠시 후 다시 시도해 주세요.')
+    } finally {
+      setIsNicknameChecking(false)
     }
   }
 
@@ -155,13 +207,19 @@ export function useSignupForm() {
       return
     }
 
+    const normalizedNickname = nickname.trim()
+    if (nicknameCheckState !== 'available' || lastCheckedNickname !== normalizedNickname) {
+      toast.error('닉네임 중복 확인을 완료해 주세요.')
+      return
+    }
+
     const location = address && detailAddress ? `${address} ${detailAddress}` : (address ?? detailAddress ?? null)
 
     const payload: SignupInput = {
       email,
       password,
       name,
-      nickname,
+      nickname: normalizedNickname,
       phone,
       location,
     }
@@ -178,9 +236,8 @@ export function useSignupForm() {
       reset()
       toast.success('회원가입이 완료되었습니다.')
       router.push('/login')
-    } catch (error: any) {
-      const message = error?.response?.data?.message ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-      toast.error(message)
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error) ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.')
     }
   }
 
@@ -204,8 +261,12 @@ export function useSignupForm() {
     setPassword,
     setPasswordConfirm,
     setName,
-    setNickname,
+    setNickname: handleNicknameChange,
     setPhone,
+
+    isNicknameChecking,
+    nicknameCheckState,
+    handleCheckNickname,
 
     // handlers
     handleSendEmailAuth,
