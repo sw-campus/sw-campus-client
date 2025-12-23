@@ -134,14 +134,10 @@ export default function LectureDetailPage({ lectureId }: Props) {
                 </CardContent>
               </Card>
 
-              {/* Sticky Tabs */}
-              <div className="sticky top-0 z-20 pb-4">
-                <LectureTabNav />
-              </div>
-
               {/* 본문 카드 (통합) */}
               <Card className="rounded-2xl bg-white/70 ring-1 ring-white/30 backdrop-blur-xl">
                 <CardContent className="space-y-16 p-6 md:p-8">
+                  <LectureTabNav />
                   {/* 모집개요 */}
                   <div id="overview" className="scroll-mt-28">
                     <LectureOverview

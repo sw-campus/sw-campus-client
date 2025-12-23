@@ -98,11 +98,7 @@ export default function LectureSidebar({ lecture }: Props) {
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {applicationSteps.map((step, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className="rounded-lg bg-orange-50 px-3 py-1.5 font-medium text-orange-700"
-                  >
+                  <Badge key={index} variant="secondary" className="rounded-lg bg-orange-50 px-3 py-1.5 font-medium">
                     {index + 1}. {step}
                   </Badge>
                 ))}

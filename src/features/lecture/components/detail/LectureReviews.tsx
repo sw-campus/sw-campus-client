@@ -27,9 +27,14 @@ function ReviewCard({ review }: { review: Review }) {
       {/* Header */}
       <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold">
-            {review.nickname.charAt(0)}
-          </div>
+          <Image
+            src={'/images/common/default_user.jpeg'}
+            alt={`${review.nickname} 프로필 이미지`}
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-full object-cover"
+            priority={false}
+          />
           <div>
             <p className="text-foreground text-sm font-semibold">{review.nickname}</p>
             <p className="text-muted-foreground text-xs">{formatDate(review.createdAt)}</p>

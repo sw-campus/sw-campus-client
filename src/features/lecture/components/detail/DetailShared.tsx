@@ -87,7 +87,7 @@ export function InfoBox({ children }: { children: ReactNode }) {
 export function InfoRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex items-start gap-6">
-      <span className="w-24 shrink-0 text-xs font-medium whitespace-nowrap text-gray-500">{label}</span>
+      <span className="w-24 shrink-0 text-xs font-medium whitespace-nowrap text-gray-800">{label}</span>
       <span className="text-sm text-gray-900">{children}</span>
     </div>
   )
@@ -129,7 +129,7 @@ export function RequirementItem({
 
 export function InlineBadge({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex h-9 items-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 align-middle text-base font-bold text-gray-900 shadow-sm">
+    <span className="inline-flex h-9 items-center rounded-lg border border-gray-400 bg-white px-3 py-1.5 align-middle text-base font-bold text-gray-900 shadow-sm">
       {children}
     </span>
   )
