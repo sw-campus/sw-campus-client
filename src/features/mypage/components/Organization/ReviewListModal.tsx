@@ -45,7 +45,7 @@ export default function ReviewListModal({ open, onOpenChange, lectureId, lecture
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-h-[70vh] max-w-lg overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{lectureName ? `${lectureName}` : '후기 관리'}</DialogTitle>
         </DialogHeader>
