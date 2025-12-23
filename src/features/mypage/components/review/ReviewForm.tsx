@@ -176,7 +176,6 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
     try {
       await saveMutation.mutateAsync()
       toast.success((resolvedReviewId ?? reviewId) ? '리뷰가 수정되었습니다.' : '리뷰가 저장되었습니다.')
-      // 저장 성공 시 모달 닫기
       onClose?.()
     } catch (e) {
       const message = e instanceof Error ? e.message : '리뷰 저장에 실패했습니다.'
@@ -208,22 +207,27 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
             <div key={`${d.category}-${idx}`} className="rounded-xl border border-gray-100 bg-white p-2.5 shadow-sm">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-900">{d.category}</span>
-                <div className="flex items-center gap-2">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-500" aria-hidden="true" />
-                  <input
-                    type="number"
-                    min={1}
-                    max={5}
-                    step={0.5}
-                    value={d.score}
-                    onChange={e => {
-                      const v = Number(e.target.value)
-                      setDetailScores(prev => prev.map((x, i) => (i === idx ? { ...x, score: v } : x)))
-                    }}
-                    aria-label={`${d.category} 점수 입력`}
-                    className="w-14 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm focus:border-amber-300 focus:ring-amber-200 disabled:bg-gray-100"
-                    disabled={effectiveReadOnly || loading || saveMutation.isPending}
-                  />
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => {
+                    const selected = d.score >= i + 1
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        aria-label={`${d.category} ${i + 1}점 선택`}
+                        onClick={() => {
+                          if (effectiveReadOnly || loading || saveMutation.isPending) return
+                          const v = i + 1
+                          setDetailScores(prev => prev.map((x, j) => (j === idx ? { ...x, score: v } : x)))
+                        }}
+                        className="p-0.5 text-yellow-500 disabled:opacity-50"
+                        disabled={effectiveReadOnly || loading || saveMutation.isPending}
+                      >
+                        <Star className={`h-4 w-4 ${selected ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                      </button>
+                    )
+                  })}
+                  <span className="ml-2 min-w-6 text-right text-sm font-bold text-yellow-600">{d.score || 0}</span>
                 </div>
               </div>
               <div className="mt-1.5 rounded-xl border border-gray-100 bg-gray-50 p-2">

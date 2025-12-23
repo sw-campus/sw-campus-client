@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, Loader2, Star } from 'lucide-react'
@@ -10,8 +10,8 @@ import Modal from '@/components/ui/Modal'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
-import { getLectureReviews } from '../../api/reviewApi.client'
-import { CATEGORY_LABELS, type Review } from '../../api/reviewApi.types'
+import { createLectureReview, getLectureReviews } from '../../api/reviewApi.client'
+import { CATEGORY_LABELS, type DetailScore, type Review, type ReviewCategory } from '../../api/reviewApi.types'
 import { formatDate, Section, StarRating } from './DetailShared'
 
 interface Props {
@@ -88,11 +88,29 @@ function ReviewCard({ review }: { review: Review }) {
 
 export default function LectureReviews({ lectureId }: Props) {
   const [openVerify, setOpenVerify] = useState(false)
+  const [openWrite, setOpenWrite] = useState(false)
+  const [openComplete, setOpenComplete] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [verifyStep, setVerifyStep] = useState<'select' | 'processing'>('select')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  // 리뷰 작성 폼 상태
+  const categories: ReviewCategory[] = useMemo(() => ['TEACHER', 'PROJECT', 'CURRICULUM', 'FACILITY', 'MANAGEMENT'], [])
+  const [detailScores, setDetailScores] = useState<Record<ReviewCategory, { score: number; comment: string }>>({
+    TEACHER: { score: 0, comment: '' },
+    PROJECT: { score: 0, comment: '' },
+    CURRICULUM: { score: 0, comment: '' },
+    FACILITY: { score: 0, comment: '' },
+    MANAGEMENT: { score: 0, comment: '' },
+  })
+  const [overallComment, setOverallComment] = useState('')
+  const overallScore = useMemo(() => {
+    const nums = categories.map(c => detailScores[c].score).filter(n => n > 0)
+    if (nums.length === 0) return 0
+    return Number((nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(1))
+  }, [categories, detailScores])
 
   const {
     data: reviews,
@@ -180,10 +198,14 @@ export default function LectureReviews({ lectureId }: Props) {
                     headers: { 'Content-Type': 'multipart/form-data' },
                   })
                   toast.success('수료증 인증이 완료되었습니다.')
+                  // 인증 성공 시: 인증 모달 닫고 리뷰 작성 모달 오픈
                   setOpenVerify(false)
+                  setOpenWrite(true)
                 } catch (e) {
                   setError('업로드/인증에 실패했습니다. 다시 시도해 주세요.')
                   setVerifyStep('select')
+                  // 인증 실패 시: 모달 닫기
+                  setOpenVerify(false)
                 } finally {
                   setUploading(false)
                 }
@@ -217,6 +239,129 @@ export default function LectureReviews({ lectureId }: Props) {
     </Modal>
   )
 
+  // 리뷰 작성 모달
+  const writeModal = (
+    <Modal isOpen={openWrite} onClose={() => setOpenWrite(false)} title="리뷰 작성" maxWidthClass="max-w-3xl">
+      <div className="space-y-5">
+        {categories.map(cat => (
+          <div key={cat} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-gray-800">
+                {CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS]}
+              </span>
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-label={`${i + 1}점 선택`}
+                    onClick={() => setDetailScores(prev => ({ ...prev, [cat]: { ...prev[cat], score: i + 1 } }))}
+                    className="text-yellow-500"
+                  >
+                    <Star
+                      className={`h-4 w-4 ${detailScores[cat].score >= i + 1 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                    />
+                  </button>
+                ))}
+                <span className="ml-2 min-w-8 text-right text-sm font-bold text-yellow-600">
+                  {detailScores[cat].score || 0}
+                </span>
+              </div>
+            </div>
+            <textarea
+              placeholder="리뷰를 써 주세요. (20자 이상)"
+              value={detailScores[cat].comment}
+              onChange={e => setDetailScores(prev => ({ ...prev, [cat]: { ...prev[cat], comment: e.target.value } }))}
+              className="h-24 w-full resize-y rounded-md border border-gray-200 px-3 py-2 text-sm"
+            />
+          </div>
+        ))}
+
+        <div className="space-y-2">
+          <span className="text-sm font-semibold text-gray-800">총평</span>
+          <textarea
+            placeholder="리뷰를 써 주세요. (20자 이상)"
+            value={overallComment}
+            onChange={e => setOverallComment(e.target.value)}
+            className="h-24 w-full resize-y rounded-md border border-gray-200 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div className="flex items-center justify-end gap-2 pt-2">
+          <Button variant="secondary" className="rounded-full" onClick={() => setOpenWrite(false)}>
+            취소
+          </Button>
+          <Button
+            className="rounded-full"
+            onClick={async () => {
+              try {
+                // 간단한 검증
+                const commentsLongEnough = overallComment.trim().length >= 20
+                if (!commentsLongEnough) {
+                  toast.error('총평을 20자 이상 작성해 주세요.')
+                  return
+                }
+                const payload = {
+                  lectureId,
+                  comment: overallComment.trim(),
+                  score: overallScore,
+                  detailScores: categories
+                    .map(cat => ({
+                      category: cat,
+                      score: detailScores[cat].score,
+                      comment: detailScores[cat].comment.trim(),
+                    }))
+                    .filter(ds => ds.score > 0) as DetailScore[],
+                }
+                await createLectureReview(lectureId, payload)
+                toast.success('리뷰가 등록되었습니다.')
+                setOpenWrite(false)
+                setOpenComplete(true)
+              } catch (err) {
+                toast.error('리뷰 등록에 실패했습니다. 잠시 후 다시 시도해 주세요.')
+              }
+            }}
+          >
+            입력
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  )
+
+  // 리뷰 완료 모달
+  const completeModal = (
+    <Modal
+      isOpen={openComplete}
+      onClose={() => setOpenComplete(false)}
+      title="모달·리뷰 대기 안내"
+      maxWidthClass="max-w-lg"
+    >
+      <div className="flex items-center justify-center rounded-2xl border border-gray-200 bg-white p-8 text-center">
+        <div className="space-y-3">
+          <div className="mx-auto h-16 w-16 rounded-full border border-gray-200 p-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              className="h-full w-full text-green-600"
+            >
+              <path d="M20 6L9 17l-5-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <p className="text-lg font-semibold">리뷰가 정상적으로 등록되었습니다.</p>
+          <p className="text-muted-foreground text-sm">관리자 확인 후 게시될 예정입니다.</p>
+          <div className="pt-2">
+            <Button className="rounded-full" onClick={() => setOpenComplete(false)}>
+              닫기
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  )
+
   if (isLoading) {
     return (
       <>
@@ -224,6 +369,8 @@ export default function LectureReviews({ lectureId }: Props) {
           <div className="text-muted-foreground py-8 text-center text-sm">후기를 불러오는 중...</div>
         </Section>
         {verifyModal}
+        {writeModal}
+        {completeModal}
       </>
     )
   }
@@ -235,6 +382,8 @@ export default function LectureReviews({ lectureId }: Props) {
           <div className="text-destructive py-8 text-center text-sm">후기를 불러오지 못했습니다.</div>
         </Section>
         {verifyModal}
+        {writeModal}
+        {completeModal}
       </>
     )
   }
@@ -250,6 +399,8 @@ export default function LectureReviews({ lectureId }: Props) {
           </Card>
         </Section>
         {verifyModal}
+        {writeModal}
+        {completeModal}
       </>
     )
   }
@@ -264,6 +415,8 @@ export default function LectureReviews({ lectureId }: Props) {
         </div>
       </Section>
       {verifyModal}
+      {writeModal}
+      {completeModal}
     </>
   )
 }
