@@ -30,7 +30,10 @@ function isExternalLink(url: string): boolean {
 
 export default function MidBanner() {
   const swiperRef = useRef<SwiperType | null>(null)
-  const { data: banners, isLoading } = useBannersByTypeQuery('MIDDLE')
+  const { data: middleBanners, isLoading: isMiddleLoading } = useBannersByTypeQuery('MIDDLE')
+  const { data: smallBanners, isLoading: isSmallLoading } = useBannersByTypeQuery('SMALL')
+
+  const isLoading = isMiddleLoading || isSmallLoading
 
   if (isLoading) {
     return (
@@ -49,8 +52,13 @@ export default function MidBanner() {
     )
   }
 
-  // 중배너가 없어도 소배너만 표시될 수 있도록 처리
-  const hasMiddleBanners = banners && banners.length > 0
+  const hasMiddleBanners = middleBanners && middleBanners.length > 0
+  const hasSmallBanners = smallBanners && smallBanners.length > 0
+
+  // 중배너와 소배너 모두 없으면 아무것도 렌더링하지 않음
+  if (!hasMiddleBanners && !hasSmallBanners) {
+    return null
+  }
 
   return (
     <div className="custom-container overflow-visible">
@@ -62,7 +70,7 @@ export default function MidBanner() {
               onBeforeInit={swiper => {
                 swiperRef.current = swiper
               }}
-              loop={banners.length > 2}
+              loop={middleBanners.length > 2}
               spaceBetween={16}
               slidesPerView={2}
               breakpoints={{
@@ -71,14 +79,20 @@ export default function MidBanner() {
                 1024: { slidesPerView: 2 },
               }}
             >
-              {banners.map(banner => {
+              {middleBanners.map(banner => {
                 const href = getBannerLink(banner)
                 const external = isExternalLink(href)
 
                 const content = (
                   <div className="relative h-[190px] w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
                     {banner.imageUrl ? (
-                      <Image src={banner.imageUrl} alt={banner.lectureName} fill className="object-cover" />
+                      <Image
+                        src={banner.imageUrl}
+                        alt={banner.lectureName}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover"
+                      />
                     ) : (
                       <div className="flex h-full items-center justify-center">
                         <span className="text-xl font-bold">{banner.lectureName}</span>
