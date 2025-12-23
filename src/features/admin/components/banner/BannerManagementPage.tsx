@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 
 import { LuCalendar, LuCheck, LuCircleCheck, LuList } from 'react-icons/lu'
 
@@ -45,11 +45,8 @@ export function BannerManagementPage() {
   const deleteMutation = useDeleteBannerMutation()
 
   // 클라이언트 사이드 타입 필터링 및 페이지네이션
-  const filteredBanners = useMemo(() => {
-    const banners = pageData?.content ?? []
-    if (typeFilter === 'ALL') return banners
-    return banners.filter(banner => banner.type === typeFilter)
-  }, [pageData?.content, typeFilter])
+  const banners = pageData?.content ?? []
+  const filteredBanners = typeFilter === 'ALL' ? banners : banners.filter(banner => banner.type === typeFilter)
 
   const totalElements = filteredBanners.length
   const totalPages = Math.ceil(totalElements / PAGE_SIZE)
