@@ -24,6 +24,10 @@ interface ApprovalFilterProps {
    * 필터 옵션 목록 (기본값: 전체/승인대기/승인완료/반려)
    */
   filterOptions?: FilterOption<ApprovalStatusFilter>[]
+  /**
+   * 상태 필터 숨김 여부
+   */
+  hideStatusFilter?: boolean
 }
 
 export function ApprovalFilter({
@@ -33,6 +37,7 @@ export function ApprovalFilter({
   onKeywordChange,
   searchPlaceholder,
   filterOptions = DEFAULT_FILTER_OPTIONS,
+  hideStatusFilter = false,
 }: ApprovalFilterProps) {
   const [inputValue, setInputValue] = useState(keyword)
 
@@ -49,26 +54,28 @@ export function ApprovalFilter({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       {/* Status Filter Tabs */}
-      <div className="flex gap-2">
-        {filterOptions.map(option => {
-          const isActive = currentStatus === option.value
+      {!hideStatusFilter && (
+        <div className="flex gap-2">
+          {filterOptions.map(option => {
+            const isActive = currentStatus === option.value
 
-          return (
-            <button
-              key={option.value}
-              onClick={() => onStatusChange(option.value)}
-              className={cn(
-                'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-              )}
-            >
-              {option.label}
-            </button>
-          )
-        })}
-      </div>
+            return (
+              <button
+                key={option.value}
+                onClick={() => onStatusChange(option.value)}
+                className={cn(
+                  'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                )}
+              >
+                {option.label}
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       {/* Search Input */}
       {searchPlaceholder && (

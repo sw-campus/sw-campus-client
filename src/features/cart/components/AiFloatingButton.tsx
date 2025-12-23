@@ -94,10 +94,10 @@ export function AiFloatingButton({
             'h-[90px] w-[90px] rounded-full',
             // Default Glass
             !hasResult && 'border border-white/20 bg-white/10 backdrop-blur-md',
-            !hasResult && 'shadow-[0_8px_32px_0_rgba(251,146,60,0.3)]',
-            // Success (Radiant Gold)
-            hasResult && 'border border-orange-300/50 bg-linear-to-br from-orange-500 to-yellow-400',
-            hasResult && 'shadow-[0_0_50px_rgba(251,146,60,0.6)]',
+            !hasResult && 'shadow-[0_8px_32px_0_rgba(132,204,22,0.3)]',
+            // Success (Radiant Lime)
+            hasResult && 'border border-lime-300/50 bg-linear-to-br from-lime-500 to-green-400',
+            hasResult && 'shadow-[0_0_50px_rgba(132,204,22,0.6)]',
             // Interaction
             'transition-all duration-500',
             'disabled:pointer-events-none disabled:opacity-0',
@@ -111,9 +111,9 @@ export function AiFloatingButton({
                 className="absolute inset-0"
                 animate={{
                   background: [
-                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(251, 146, 60, 0.8) 20%, transparent 60%)',
-                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(251, 146, 60, 0.8) 40%, transparent 70%)',
-                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(251, 146, 60, 0.8) 20%, transparent 60%)',
+                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(132, 204, 22, 0.8) 20%, transparent 60%)',
+                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(132, 204, 22, 0.8) 40%, transparent 70%)',
+                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(132, 204, 22, 0.8) 20%, transparent 60%)',
                   ],
                   scale: [1, 1.2, 1],
                 }}
@@ -126,7 +126,7 @@ export function AiFloatingButton({
               <motion.div
                 className="absolute inset-0 opacity-50"
                 style={{
-                  background: 'conic-gradient(from 0deg, transparent, #fb923c, #f97316, transparent)',
+                  background: 'conic-gradient(from 0deg, transparent, #84cc16, #22c55e, transparent)',
                 }}
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -144,9 +144,9 @@ export function AiFloatingButton({
                 className="absolute inset-0 rounded-full"
                 animate={{
                   background: [
-                    'radial-gradient(circle at 30% 30%, rgba(251, 146, 60, 0.4), transparent 70%)',
-                    'radial-gradient(circle at 70% 70%, rgba(251, 146, 60, 0.4), transparent 70%)',
-                    'radial-gradient(circle at 30% 30%, rgba(251, 146, 60, 0.4), transparent 70%)',
+                    'radial-gradient(circle at 30% 30%, rgba(132, 204, 22, 0.4), transparent 70%)',
+                    'radial-gradient(circle at 70% 70%, rgba(132, 204, 22, 0.4), transparent 70%)',
+                    'radial-gradient(circle at 30% 30%, rgba(132, 204, 22, 0.4), transparent 70%)',
                   ],
                 }}
                 transition={{
@@ -198,8 +198,8 @@ export function AiFloatingButton({
           {/* Notification Dot */}
           {isEnabled && !isLoading && !hasResult && (
             <span className="absolute top-1 right-2 flex h-4 w-4">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
-              <span className="relative inline-flex h-4 w-4 items-center justify-center rounded-full border border-white/20 bg-orange-500 text-[8px] text-white shadow-sm">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime-400 opacity-75" />
+              <span className="relative inline-flex h-4 w-4 items-center justify-center rounded-full border border-white/20 bg-lime-500 text-[8px] text-white shadow-sm">
                 !
               </span>
             </span>
@@ -259,7 +259,7 @@ function CelebrationEffect() {
   useEffect(() => {
     // Avoid concurrent render
     const timer = setTimeout(() => {
-      const colors = ['#f97316', '#fbbf24', '#ffffff', '#fb923c'] // Orange-500, Amber-400, White, Orange-400
+      const colors = ['#84cc16', '#22c55e', '#ffffff', '#a3e635'] // Lime-500, Green-500, White, Lime-400
       setParticles(
         [...Array(60)].map((_, i) => ({
           id: i,
@@ -288,7 +288,7 @@ function CelebrationEffect() {
 
       {/* 2. Expanding Ring Shockwave */}
       <motion.div
-        className="absolute rounded-full border-4 border-orange-300"
+        className="absolute rounded-full border-4 border-lime-300"
         initial={{ width: 0, height: 0, opacity: 1, borderWidth: 50 }}
         animate={{
           width: '150vw',

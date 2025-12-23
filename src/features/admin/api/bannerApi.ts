@@ -92,7 +92,7 @@ export async function createBanner(request: CreateBannerRequest, imageFile?: Fil
  * @returns 업데이트된 배너 정보
  */
 export async function toggleBannerActive(id: number, isActive: boolean): Promise<Banner> {
-  const { data } = await api.patch<Banner>(`/admin/banners/${id}/active`, { isActive })
+  const { data } = await api.patch<Banner>(`/admin/banners/${id}/active`, { isActive: isActive })
   return data
 }
 

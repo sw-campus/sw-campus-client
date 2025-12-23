@@ -19,12 +19,12 @@ export function AiCommentRow({
   rightTitle = '오른쪽 강의',
 }: AiCommentRowProps) {
   return (
-    <TableRow className="border-y-2 border-orange-400 !bg-orange-200/60">
+    <TableRow className="border-y-2 border-lime-400 !bg-lime-100/80">
       <TableCell colSpan={4} className="px-6 py-4">
         <div className="flex items-start gap-4">
           {/* AI 아이콘 */}
           <div className="flex-shrink-0">
-            <div className="flex size-8 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white shadow-md">
+            <div className="flex size-8 items-center justify-center rounded-full bg-lime-500 text-xs font-bold text-white shadow-md">
               AI
             </div>
           </div>
@@ -32,10 +32,12 @@ export function AiCommentRow({
           {/* 코멘트 내용 */}
           <div className="min-w-0 flex-1">
             <div className="mb-2 flex items-center gap-2">
-              <span className="text-sm font-bold text-orange-700">{sectionTitle} 분석</span>
+              <span className="text-sm font-bold text-lime-700">{sectionTitle} 분석</span>
               <AdvantageIndicator advantage={advantage} leftTitle={leftTitle} rightTitle={rightTitle} />
             </div>
-            <p className="whitespace-normal break-words text-base leading-relaxed font-medium text-gray-900">{comment}</p>
+            <p className="text-base leading-relaxed font-medium break-words whitespace-normal text-gray-900">
+              {comment}
+            </p>
           </div>
         </div>
       </TableCell>
