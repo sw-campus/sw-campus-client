@@ -166,7 +166,14 @@ export function OrganizationDetail({ organization, lectures = [] }: Organization
     <div className="w-full">
       {/* ===== HERO BANNER ===== */}
       <div className="relative -mx-6 -mt-6 mb-8 h-56 overflow-hidden rounded-t-xl md:h-72">
-        <Image src={heroImage} alt={`${organization.name} 배경`} fill className="object-cover" priority />
+        <Image
+          src={heroImage}
+          alt={`${organization.name} 배경`}
+          fill
+          sizes="(max-width: 768px) 100vw, 1200px"
+          className="object-cover"
+          priority
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
