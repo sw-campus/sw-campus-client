@@ -30,12 +30,12 @@ export function BannerManagementPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  // API 호출 (페이징, 검색) - 큰 size로 가져와서 클라이언트에서 타입 필터링
+  // API 호출 - periodStatus, keyword는 서버 필터링, typeFilter는 클라이언트 필터링
   const { data: pageData, isLoading } = useBannersQuery({
     keyword: keyword || undefined,
     periodStatus: statusFilter,
     page: 0,
-    size: 1000, // 클라이언트 필터링을 위해 충분한 크기
+    size: 1000, // 타입 필터링이 클라이언트에서 수행되므로 충분한 크기 필요
   })
 
   // 서버 API로 통계 조회
@@ -44,7 +44,7 @@ export function BannerManagementPage() {
   const toggleMutation = useToggleBannerActiveMutation()
   const deleteMutation = useDeleteBannerMutation()
 
-  // 클라이언트 사이드 타입 필터링 및 페이지네이션
+  // 클라이언트 사이드 타입 필터링 (서버 API 미지원)
   const banners = pageData?.content ?? []
   const filteredBanners = typeFilter === 'ALL' ? banners : banners.filter(banner => banner.type === typeFilter)
 
