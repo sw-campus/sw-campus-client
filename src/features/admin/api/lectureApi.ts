@@ -1,7 +1,16 @@
 import { api } from '@/lib/axios'
 import type { PageResponse } from '@/types/api.type'
 
+import type { ApprovalStats } from '../types/approval.type'
 import type { LectureAuthStatus, LectureDetail, LectureSummary } from '../types/lecture.type'
+
+/**
+ * Lecture 통계 조회 API
+ */
+export async function fetchLectureStats(): Promise<ApprovalStats> {
+  const { data } = await api.get<ApprovalStats>('/admin/lectures/stats')
+  return data
+}
 
 /**
  * Lecture 목록 조회 API (페이징)

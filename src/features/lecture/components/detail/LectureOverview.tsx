@@ -58,7 +58,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
           <div className="flex flex-col gap-5 rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:flex-row sm:items-center">
             <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-white">
               {org.logoUrl ? (
-                <Image src={org.logoUrl} alt={org.name} fill className="object-contain p-1" />
+                <Image src={org.logoUrl} alt={org.name} fill sizes="64px" className="object-contain p-1" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gray-50 text-xs text-gray-400">
                   Logo
@@ -219,7 +219,13 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
           {lecture.photos.slice(0, 4).map((src, idx) => (
             <div key={idx} className="border-border/50 relative aspect-4/3 overflow-hidden rounded-xl border bg-white">
               {src ? (
-                <Image src={src} alt={`학습공간 ${idx + 1}`} fill className="object-cover" />
+                <Image
+                  src={src}
+                  alt={`학습공간 ${idx + 1}`}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover"
+                />
               ) : (
                 <div className="text-muted-foreground flex h-full items-center justify-center text-xs">이미지</div>
               )}

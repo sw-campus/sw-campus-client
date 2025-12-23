@@ -1,37 +1,29 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
-import {
-  LectureCreateAddsFields,
-  LectureCreateBasicInfoFields,
-  LectureCreateCategoryFields,
-  LectureCreateCostFields,
-  LectureCreateCurriculumFields,
-  LectureCreateEquipmentFields,
-  LectureCreateLocationFields,
-  LectureCreateOptionsFields,
-  LectureCreateProjectFields,
-  LectureCreateQualificationFields,
-  LectureCreateRecruitProcedureFields,
-  LectureCreateScheduleFields,
-  LectureCreateTeachersFields,
-  lectureCreateFormDefaultValues,
-} from '@/features/lecture/components/lecture-create'
+import { FormStepper } from '@/components/ui/form-stepper'
+import { lectureCreateFormDefaultValues } from '@/features/lecture/components/lecture-create'
+import { LectureFormSteps, LECTURE_FORM_STEPS } from '@/features/lecture/components/lecture-create/LectureFormSteps'
 import { useCreateLectureMutation } from '@/features/lecture/hooks/useCreateLectureMutation'
 import { mapLectureFormToCreateRequest } from '@/features/lecture/utils/mapLectureFormToCreateRequest'
 import { lectureFormSchema, type LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
+import { stepFields } from '@/features/lecture/validation/lectureFormStepSchemas'
+
+const TOTAL_STEPS = LECTURE_FORM_STEPS.length
 
 export function LectureCreateForm() {
   const router = useRouter()
   const { mutateAsync, isPending } = useCreateLectureMutation()
+  const [currentStep, setCurrentStep] = useState(0)
 
   const selectTriggerClassName = 'h-10'
   const imageInputRef = useRef<HTMLInputElement | null>(null)
@@ -44,12 +36,60 @@ export function LectureCreateForm() {
 
   const {
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
     trigger,
   } = methods
+  const categoryId = methods.watch('categoryId')
+
+  const [isStepMoving, setIsStepMoving] = useState(false)
+
+  const validateCurrentStep = async () => {
+    const fields = stepFields[currentStep as keyof typeof stepFields]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isValid = await trigger(fields as any)
+    return isValid
+  }
+
+  const handleNext = async () => {
+    if (isStepMoving) return
+    setIsStepMoving(true)
+    try {
+      const isValid = await validateCurrentStep()
+      if (isValid && currentStep < TOTAL_STEPS - 1) {
+        setCurrentStep(prev => prev + 1)
+      } else if (!isValid) {
+        toast.error('현재 단계의 필수 항목을 확인해주세요.')
+      }
+    } finally {
+      setIsStepMoving(false)
+    }
+  }
+
+  const handlePrev = () => {
+    if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1)
+    }
+  }
+
+  const handleStepClick = async (step: number) => {
+    if (isStepMoving) return
+    if (step < currentStep) {
+      setCurrentStep(step)
+    } else if (step > currentStep) {
+      setIsStepMoving(true)
+      try {
+        // 앞으로 갈 때는 현재 단계 검증
+        const isValid = await validateCurrentStep()
+        if (isValid) {
+          setCurrentStep(step)
+        }
+      } finally {
+        setIsStepMoving(false)
+      }
+    }
+  }
 
   const onInvalid = (formErrors: Record<string, unknown>) => {
-    // Collect all error messages
     const errorMessages: string[] = []
     const flattenErrors = (obj: Record<string, unknown>): void => {
       for (const key in obj) {
@@ -104,29 +144,81 @@ export function LectureCreateForm() {
     router.back()
   }
 
+  // 단계 이동 시 스크롤 최상단으로 이동
+  useEffect(() => {
+    document.getElementById('lecture-create-scroll-area')?.scrollTo(0, 0)
+  }, [currentStep])
+
+  const checkFormSubmission = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (isLastStep) {
+      // 마지막 단계에서는 버튼 클릭으로만 제출 가능 (엔터 키 제출 방지)
+      return
+    } else {
+      // 마지막 단계가 아니면 엔터 키 등으로 인한 제출 시 다음 단계로 진행 시도
+      handleNext()
+    }
+  }
+
+  const isLastStep = currentStep === TOTAL_STEPS - 1
+  const isFirstStep = currentStep === 0
+
   return (
     <FormProvider {...methods}>
-      <form className="space-y-6" onSubmit={handleSubmit(onSubmit, onInvalid)}>
+      <form className="space-y-6" onSubmit={checkFormSubmission}>
+        {/* Stepper Navigation */}
+        <div className="pb-4">
+          <FormStepper
+            steps={LECTURE_FORM_STEPS}
+            currentStep={currentStep}
+            onStepClick={handleStepClick}
+            allowStepClick={!isStepMoving}
+          />
+        </div>
+
+        {/* Step Content */}
         <FieldSet>
           <FieldGroup>
-            <LectureCreateBasicInfoFields imageInputRef={imageInputRef} />
-            <LectureCreateCategoryFields selectTriggerClassName={selectTriggerClassName} />
-            <LectureCreateCurriculumFields selectTriggerClassName={selectTriggerClassName} />
-            <LectureCreateLocationFields selectTriggerClassName={selectTriggerClassName} />
-            <LectureCreateScheduleFields />
-            <LectureCreateRecruitProcedureFields selectTriggerClassName={selectTriggerClassName} />
-            <LectureCreateQualificationFields selectTriggerClassName={selectTriggerClassName} />
-            <LectureCreateCostFields selectTriggerClassName={selectTriggerClassName} />
-            <LectureCreateOptionsFields />
-            <LectureCreateEquipmentFields selectTriggerClassName={selectTriggerClassName} />
-            <LectureCreateProjectFields />
-            <LectureCreateTeachersFields />
-            <LectureCreateAddsFields />
+            <div className="min-h-[400px]">
+              <LectureFormSteps
+                currentStep={currentStep}
+                imageInputRef={imageInputRef}
+                selectTriggerClassName={selectTriggerClassName}
+                categoryId={categoryId}
+              />
+            </div>
 
-            <div className="pt-4">
-              <Button type="submit" disabled={!methods.formState.isValid || isSubmitting || isPending}>
-                {isSubmitting || isPending ? '등록 중...' : '등록'}
+            {/* Navigation Buttons */}
+            <div className="flex items-center justify-between border-t pt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handlePrev}
+                disabled={isFirstStep || isStepMoving}
+                className="gap-2"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                이전
               </Button>
+
+              <span className="text-muted-foreground text-sm">
+                {currentStep + 1} / {TOTAL_STEPS}
+              </span>
+
+              {isLastStep ? (
+                <Button
+                  type="button"
+                  onClick={handleSubmit(onSubmit, onInvalid)}
+                  disabled={isSubmitting || isPending || isStepMoving}
+                >
+                  {isSubmitting || isPending ? '등록 중...' : '등록'}
+                </Button>
+              ) : (
+                <Button type="button" onClick={handleNext} disabled={isStepMoving} className="gap-2">
+                  다음
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </FieldGroup>
         </FieldSet>

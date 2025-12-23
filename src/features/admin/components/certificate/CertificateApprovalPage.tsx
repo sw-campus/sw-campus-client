@@ -8,9 +8,9 @@ import { useCertificatesQuery, useCertificateStats } from '../../hooks/useCertif
 import { useApproveCertificateMutation, useRejectCertificateMutation } from '../../hooks/useReviews'
 import type { ApprovalStatusFilter } from '../../types/approval.type'
 import type { ReviewAuthStatus, ReviewSummary } from '../../types/review.type'
-import { StatCard } from '../StatCard'
 import { ApprovalFilter } from '../common/ApprovalFilter'
 import { ApprovalPagination } from '../common/ApprovalPagination'
+import { APPROVAL_STAT_COLORS, ColorfulStatCard } from '../common/ColorfulStatCard'
 import { CertificateDetailModal } from './CertificateDetailModal'
 import { CertificateTable } from './CertificateTable'
 
@@ -29,17 +29,17 @@ export function CertificateApprovalPage() {
   // 수료증 목록 조회 (certificateApprovalStatus 기준 필터링)
   const { data: pageData, isLoading } = useCertificatesQuery(apiStatus, keyword, currentPage)
 
-  // 수료증 통계 조회
+  // 서버 API로 수료증 통계 조회
   const { data: statsData } = useCertificateStats()
 
   const approveMutation = useApproveCertificateMutation()
   const rejectMutation = useRejectCertificateMutation()
 
   const stats = [
-    { title: '전체', value: statsData?.all ?? 0, icon: LuList },
-    { title: '승인 대기', value: statsData?.pending ?? 0, icon: LuClock },
-    { title: '승인 완료', value: statsData?.approved ?? 0, icon: LuCheck },
-    { title: '반려', value: statsData?.rejected ?? 0, icon: LuX },
+    { title: '전체', value: statsData?.total ?? 0, icon: LuList, bgColor: APPROVAL_STAT_COLORS.total },
+    { title: '승인 대기', value: statsData?.pending ?? 0, icon: LuClock, bgColor: APPROVAL_STAT_COLORS.pending },
+    { title: '승인 완료', value: statsData?.approved ?? 0, icon: LuCheck, bgColor: APPROVAL_STAT_COLORS.approved },
+    { title: '반려', value: statsData?.rejected ?? 0, icon: LuX, bgColor: APPROVAL_STAT_COLORS.rejected },
   ]
 
   const handleViewDetail = (item: ReviewSummary) => {
@@ -78,7 +78,13 @@ export function CertificateApprovalPage() {
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map(stat => (
-          <StatCard key={stat.title} title={stat.title} value={stat.value} icon={stat.icon} />
+          <ColorfulStatCard
+            key={stat.title}
+            title={stat.title}
+            value={stat.value}
+            icon={stat.icon}
+            bgColor={stat.bgColor}
+          />
         ))}
       </div>
 

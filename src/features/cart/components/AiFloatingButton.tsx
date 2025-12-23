@@ -92,14 +92,14 @@ export function AiFloatingButton({
             'fixed right-10 bottom-10 z-100',
             'flex flex-col items-center justify-center',
             'h-[90px] w-[90px] rounded-full',
-            // Default Glass
-            !hasResult && 'border border-white/20 bg-white/10 backdrop-blur-md',
-            !hasResult && 'shadow-[0_8px_32px_0_rgba(132,204,22,0.3)]',
-            // Success (Radiant Lime)
-            hasResult && 'border border-lime-300/50 bg-linear-to-br from-lime-500 to-green-400',
-            hasResult && 'shadow-[0_0_50px_rgba(132,204,22,0.6)]',
+            // Default State (Ready)
+            !hasResult && 'border-2 border-white/30 bg-linear-to-br from-purple-500 to-pink-600 shadow-xl',
+            !hasResult && 'shadow-[0_0_30px_rgba(236,72,153,0.5)]', // Pink glow
+            // Success (Radiant Purple)
+            hasResult && 'border border-purple-300/50 bg-linear-to-br from-purple-500 to-indigo-500',
+            hasResult && 'shadow-[0_0_50px_rgba(168,85,247,0.6)]',
             // Interaction
-            'transition-all duration-500',
+            'transition-all duration-300 hover:scale-110 hover:shadow-[0_0_40px_rgba(236,72,153,0.7)] active:scale-95',
             'disabled:pointer-events-none disabled:opacity-0',
             (isEnabled || hasResult) && !isLoading ? 'cursor-pointer' : 'cursor-default',
           )}
@@ -111,11 +111,10 @@ export function AiFloatingButton({
                 className="absolute inset-0"
                 animate={{
                   background: [
-                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(132, 204, 22, 0.8) 20%, transparent 60%)',
-                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(132, 204, 22, 0.8) 40%, transparent 70%)',
-                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(132, 204, 22, 0.8) 20%, transparent 60%)',
+                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(139, 92, 246, 0.8) 20%, transparent 60%)',
+                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(168, 85, 247, 0.8) 40%, transparent 70%)',
+                    'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(139, 92, 246, 0.8) 20%, transparent 60%)',
                   ],
-                  scale: [1, 1.2, 1],
                 }}
                 transition={{
                   duration: 1.5,
@@ -126,7 +125,7 @@ export function AiFloatingButton({
               <motion.div
                 className="absolute inset-0 opacity-50"
                 style={{
-                  background: 'conic-gradient(from 0deg, transparent, #84cc16, #22c55e, transparent)',
+                  background: 'conic-gradient(from 0deg, transparent, #8b5cf6, #ec4899, transparent)',
                 }}
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -198,8 +197,8 @@ export function AiFloatingButton({
           {/* Notification Dot */}
           {isEnabled && !isLoading && !hasResult && (
             <span className="absolute top-1 right-2 flex h-4 w-4">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime-400 opacity-75" />
-              <span className="relative inline-flex h-4 w-4 items-center justify-center rounded-full border border-white/20 bg-lime-500 text-[8px] text-white shadow-sm">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-pink-400 opacity-75" />
+              <span className="relative inline-flex h-4 w-4 items-center justify-center rounded-full border border-white/20 bg-pink-500 text-[8px] text-white shadow-sm">
                 !
               </span>
             </span>
@@ -207,7 +206,7 @@ export function AiFloatingButton({
 
           {/* Success Check */}
           {hasResult && (
-            <span className="absolute top-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-emerald-500 text-xs text-white shadow-[0_0_10px_rgba(255,255,255,0.8)] backdrop-blur-sm">
+            <span className="absolute top-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-indigo-500 text-xs text-white shadow-[0_0_10px_rgba(255,255,255,0.8)] backdrop-blur-sm">
               ✓
             </span>
           )}
@@ -259,7 +258,7 @@ function CelebrationEffect() {
   useEffect(() => {
     // Avoid concurrent render
     const timer = setTimeout(() => {
-      const colors = ['#84cc16', '#22c55e', '#ffffff', '#a3e635'] // Lime-500, Green-500, White, Lime-400
+      const colors = ['#8b5cf6', '#ec4899', '#ffffff', '#a855f7'] // Violet-500, Pink-500, White, Purple-500
       setParticles(
         [...Array(60)].map((_, i) => ({
           id: i,
@@ -288,7 +287,7 @@ function CelebrationEffect() {
 
       {/* 2. Expanding Ring Shockwave */}
       <motion.div
-        className="absolute rounded-full border-4 border-lime-300"
+        className="absolute rounded-full border-4 border-purple-300"
         initial={{ width: 0, height: 0, opacity: 1, borderWidth: 50 }}
         animate={{
           width: '150vw',

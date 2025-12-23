@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -33,7 +33,7 @@ export default function SignupAgreementsView({ mode }: Props) {
   const [smsAgree, setSmsAgree] = useState(false)
   const [emailAgree, setEmailAgree] = useState(false)
 
-  const requiredOK = useMemo(() => termsAgree && privacyAgree && ageAgree, [termsAgree, privacyAgree, ageAgree])
+  const requiredOK = termsAgree && privacyAgree && ageAgree
 
   const onToggleAll = () => {
     const next = !allAgree

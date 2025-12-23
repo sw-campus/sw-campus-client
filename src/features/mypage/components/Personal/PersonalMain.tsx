@@ -434,7 +434,13 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                     <div className="flex items-center gap-4">
                       <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-white">
                         {l.lectureImageUrl ? (
-                          <Image src={l.lectureImageUrl} alt={l.lectureName} fill className="object-cover" />
+                          <Image
+                            src={l.lectureImageUrl}
+                            alt={l.lectureName}
+                            fill
+                            sizes="48px"
+                            className="object-cover"
+                          />
                         ) : (
                           <div className="text-muted-foreground flex h-full w-full items-center justify-center bg-gray-50 text-sm font-semibold">
                             {l.lectureName.charAt(0)}

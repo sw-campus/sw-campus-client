@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import { FiChevronDown, FiChevronUp, FiSearch, FiTrash2, FiUpload, FiX } from 'react-icons/fi'
@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils'
 export function LectureCreateTeachersFields() {
   const {
     control,
+    clearErrors,
     formState: { errors },
   } = useFormContext<LectureFormValues>()
 

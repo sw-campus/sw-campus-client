@@ -1,6 +1,15 @@
 import { api } from '@/lib/axios'
 
-import type { Banner, BannerPeriodStatus, CreateBannerRequest } from '../types/banner.type'
+import type { Banner, BannerPeriodStatus, BannerTypeFilter, CreateBannerRequest } from '../types/banner.type'
+
+export interface BannerStats {
+  total: number
+  active: number
+  inactive: number
+  scheduled: number
+  currentlyActive: number
+  ended: number
+}
 
 /**
  * 배너 검색 응답 타입 (Spring Data Page)
@@ -21,8 +30,17 @@ export interface BannerPageResponse {
 export interface BannerSearchParams {
   keyword?: string
   periodStatus?: BannerPeriodStatus
+  type?: BannerTypeFilter
   page?: number
   size?: number
+}
+
+/**
+ * 배너 통계 조회 API
+ */
+export async function fetchBannerStats(): Promise<BannerStats> {
+  const { data } = await api.get<BannerStats>('/admin/banners/stats')
+  return data
 }
 
 /**
@@ -36,6 +54,9 @@ export async function fetchBanners(params?: BannerSearchParams): Promise<BannerP
   }
   if (params?.periodStatus && params.periodStatus !== 'ALL') {
     searchParams.append('periodStatus', params.periodStatus)
+  }
+  if (params?.type && params.type !== 'ALL') {
+    searchParams.append('type', params.type)
   }
   if (params?.page !== undefined) {
     searchParams.append('page', params.page.toString())

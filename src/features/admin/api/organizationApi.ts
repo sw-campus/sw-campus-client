@@ -1,7 +1,16 @@
 import { api } from '@/lib/axios'
 import type { PageResponse } from '@/types/api.type'
 
+import type { ApprovalStats } from '../types/approval.type'
 import type { ApprovalStatus, OrganizationDetail, OrganizationSummary } from '../types/organization.type'
+
+/**
+ * Organization 통계 조회 API
+ */
+export async function fetchOrganizationStats(): Promise<ApprovalStats> {
+  const { data } = await api.get<ApprovalStats>('/admin/organizations/stats')
+  return data
+}
 
 /**
  * Organization 목록 조회 API (페이징)

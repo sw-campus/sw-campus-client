@@ -71,7 +71,13 @@ export default function SmallBanner() {
           const content = (
             <div className="relative h-[200px] w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow">
               {banner.imageUrl ? (
-                <Image src={banner.imageUrl} alt={banner.lectureName} fill className="object-cover" />
+                <Image
+                  src={banner.imageUrl}
+                  alt={banner.lectureName}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover"
+                />
               ) : (
                 <div className="flex h-full items-center justify-center bg-gray-100">
                   <span className="text-lg font-bold text-gray-600">{banner.lectureName}</span>

@@ -5,9 +5,21 @@ import {
   approveOrganization,
   fetchOrganizationDetail,
   fetchOrganizations,
+  fetchOrganizationStats,
   rejectOrganization,
 } from '../api/organizationApi'
 import type { ApprovalStatus } from '../types/organization.type'
+
+/**
+ * Organization 통계 조회 Query Hook
+ */
+export function useOrganizationStatsQuery() {
+  return useQuery({
+    queryKey: ['admin', 'organizations', 'stats'],
+    queryFn: fetchOrganizationStats,
+    staleTime: 1000 * 60 * 5,
+  })
+}
 
 /**
  * Organization 목록 조회 Query Hook

@@ -27,7 +27,7 @@ export default function LectureCreatePage() {
           <DialogTitle>교육과정 등록</DialogTitle>
         </DialogHeader>
 
-        <div className="max-h-[75vh] overflow-y-auto px-6 pb-6">
+        <div id="lecture-create-scroll-area" className="max-h-[75vh] overflow-y-auto px-6 pb-6">
           <LectureCreateForm />
         </div>
       </DialogContent>

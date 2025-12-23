@@ -4,7 +4,7 @@ import { LECTURE_DAYS } from '@/features/lecture/types/lecture.type'
 
 export const lectureFormSchema = z
   .object({
-    orgId: z.number(), // 기관 ID (수정 시 필수)
+    orgId: z.number().optional().nullable(), // 기관 ID (수정 시 필수)
     lectureName: z.string().trim().min(1, '강의명은 필수입니다.'),
     lectureLoc: z.enum(['ONLINE', 'OFFLINE', 'MIXED']),
     location: z.string().trim().optional().nullable(),

@@ -26,13 +26,13 @@ export function AiFinalRecommendation({
   const recommendedId = isLeftRecommended ? leftId : rightId
 
   return (
-    <Card className="overflow-hidden border-0 bg-gradient-to-r from-lime-500 via-green-500 to-lime-500 shadow-xl">
+    <Card className="overflow-hidden border-0 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 shadow-xl">
       <CardContent className="p-6">
         <div className="flex flex-col gap-4 text-white md:flex-row md:items-center md:gap-6">
           {/* 아이콘 */}
           <div className="flex-shrink-0">
             <div className="flex size-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
-              <FiAward className="size-7 text-lime-100" />
+              <FiAward className="size-7 text-pink-100" />
             </div>
           </div>
 
@@ -52,13 +52,13 @@ export function AiFinalRecommendation({
             {recommendedId ? (
               <Link
                 href={`/lectures/${recommendedId}`}
-                className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-green-600 shadow-lg transition-transform hover:scale-105"
+                className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-purple-600 shadow-lg transition-transform hover:scale-105"
               >
                 <span className="max-w-[180px] truncate text-sm md:max-w-none">{recommendedTitle}</span>
                 <FiArrowRight className="size-4" />
               </Link>
             ) : (
-              <div className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-green-600 shadow-lg">
+              <div className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-purple-600 shadow-lg">
                 <span className="max-w-[180px] truncate text-sm md:max-w-none">{recommendedTitle}</span>
                 <FiArrowRight className="size-4" />
               </div>
