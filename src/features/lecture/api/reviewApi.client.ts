@@ -1,6 +1,6 @@
 import { api } from '@/lib/axios'
 
-import type { Review } from './reviewApi.types'
+import type { Review, ReviewPageResponse, ReviewSortType } from './reviewApi.types'
 
 /**
  * 강의별 승인된 후기 조회 API
@@ -11,10 +11,17 @@ export async function getLectureReviews(lectureId: string | number): Promise<Rev
 }
 
 /**
- * 기관별 승인된 후기 조회 API
+ * 기관별 승인된 후기 조회 API (페이지네이션, 정렬 지원)
  */
-export async function getOrganizationReviews(organizationId: string | number): Promise<Review[]> {
-  const { data } = await api.get<Review[]>(`/organizations/${organizationId}/reviews`)
+export async function getOrganizationReviews(
+  organizationId: string | number,
+  page: number = 0,
+  size: number = 6,
+  sort: ReviewSortType = 'LATEST',
+): Promise<ReviewPageResponse> {
+  const { data } = await api.get<ReviewPageResponse>(`/organizations/${organizationId}/reviews`, {
+    params: { page, size, sort },
+  })
   return data
 }
 
