@@ -146,6 +146,7 @@ function ReviewPagination({
         size="sm"
         onClick={() => onPageChange(Math.max(0, currentPage - 1))}
         disabled={currentPage === 0}
+        aria-label="이전 페이지"
       >
         <ChevronLeft className="h-4 w-4" />
         이전
@@ -162,6 +163,8 @@ function ReviewPagination({
             size="sm"
             onClick={() => onPageChange(page)}
             className="min-w-[36px]"
+            aria-label={`${page + 1}페이지로 이동`}
+            aria-current={currentPage === page ? 'page' : undefined}
           >
             {page + 1}
           </Button>
@@ -172,6 +175,7 @@ function ReviewPagination({
         size="sm"
         onClick={() => onPageChange(Math.min(displayTotalPages - 1, currentPage + 1))}
         disabled={currentPage >= displayTotalPages - 1}
+        aria-label="다음 페이지"
       >
         다음
         <ChevronRight className="h-4 w-4" />
@@ -243,7 +247,7 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
           <p className="text-muted-foreground mt-1 text-sm">총 {totalElements}개의 후기</p>
         </div>
         <Select value={sortType} onValueChange={handleSortChange}>
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[140px]" aria-label="정렬 기준 선택">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
