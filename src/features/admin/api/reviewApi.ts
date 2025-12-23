@@ -10,6 +10,29 @@ import type {
 import { api } from '@/lib/axios'
 import type { PageResponse } from '@/types/api.type'
 
+export interface ApprovalStats {
+  total: number
+  pending: number
+  approved: number
+  rejected: number
+}
+
+/**
+ * 수료증 통계 조회 API
+ */
+export async function fetchCertificateStats(): Promise<ApprovalStats> {
+  const { data } = await api.get<ApprovalStats>('/admin/certificates/stats')
+  return data
+}
+
+/**
+ * 리뷰 통계 조회 API
+ */
+export async function fetchReviewStats(): Promise<ApprovalStats> {
+  const { data } = await api.get<ApprovalStats>('/admin/reviews/stats')
+  return data
+}
+
 /**
  * Review 목록 조회 API (페이징)
  */

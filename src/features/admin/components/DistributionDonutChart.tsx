@@ -1,3 +1,4 @@
+
 'use client'
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
@@ -57,8 +58,8 @@ export function DistributionDonutChart({ data, isLoading }: DistributionDonutCha
         <div className="flex flex-col gap-2">
           {data.map(item => (
             <div key={item.name} className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
-              <span className="text-muted-foreground text-sm">
+              <div className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
+              <span className="text-muted-foreground text-sm whitespace-nowrap">
                 {item.name}: {item.value.toLocaleString()}
               </span>
             </div>

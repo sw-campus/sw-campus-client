@@ -35,6 +35,7 @@ export { MemberTable } from './components/member/MemberTable'
 export {
   useOrganizationsQuery,
   useOrganizationDetailQuery,
+  useOrganizationStatsQuery,
   useApproveOrganizationMutation,
   useRejectOrganizationMutation,
 } from './hooks/useOrganizations'
@@ -42,6 +43,7 @@ export {
 export {
   useLecturesQuery,
   useLectureDetailQuery,
+  useLectureStatsQuery,
   useApproveLectureMutation,
   useRejectLectureMutation,
 } from './hooks/useLectures'
@@ -49,13 +51,19 @@ export {
 export {
   useReviewsQuery,
   useReviewDetailQuery,
+  useReviewStats,
   useApproveReviewMutation,
   useRejectReviewMutation,
 } from './hooks/useReviews'
 
-export { useBannersQuery, useCreateBannerMutation, useToggleBannerActiveMutation } from './hooks/useBanners'
+export {
+  useBannersQuery,
+  useBannerStatsQuery,
+  useCreateBannerMutation,
+  useToggleBannerActiveMutation,
+} from './hooks/useBanners'
 
-export { useMembersQuery } from './hooks/useMembers'
+export { useMembersQuery, useMemberStatsQuery } from './hooks/useMembers'
 
 export { useDashboardStats } from './hooks/useDashboardStats'
 export type { DashboardStats, MemberDistribution, PendingCounts } from './hooks/useDashboardStats'

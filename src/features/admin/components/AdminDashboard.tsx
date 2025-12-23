@@ -67,11 +67,11 @@ export function AdminDashboard() {
     },
   ]
 
-  // 회원 분포 차트 데이터
+  // 회원 분포 차트 데이터 (구분이 쉬운 색상 사용)
   const distributionData = [
-    { name: '일반 회원', value: memberDistribution.user, color: 'hsl(var(--chart-1))' },
-    { name: '기관 회원', value: memberDistribution.organization, color: 'hsl(var(--chart-2))' },
-    { name: '관리자', value: memberDistribution.admin, color: 'hsl(var(--chart-3))' },
+    { name: '일반 회원', value: memberDistribution.user, color: '#3b82f6' }, // Blue
+    { name: '기관 회원', value: memberDistribution.organization, color: '#10b981' }, // Emerald
+    { name: '관리자', value: memberDistribution.admin, color: '#f59e0b' }, // Amber
   ]
 
   return (

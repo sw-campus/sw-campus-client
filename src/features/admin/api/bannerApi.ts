@@ -2,6 +2,15 @@ import { api } from '@/lib/axios'
 
 import type { Banner, BannerPeriodStatus, CreateBannerRequest } from '../types/banner.type'
 
+export interface BannerStats {
+  total: number
+  active: number
+  inactive: number
+  scheduled: number
+  currentlyActive: number
+  ended: number
+}
+
 /**
  * 배너 검색 응답 타입 (Spring Data Page)
  */
@@ -23,6 +32,14 @@ export interface BannerSearchParams {
   periodStatus?: BannerPeriodStatus
   page?: number
   size?: number
+}
+
+/**
+ * 배너 통계 조회 API
+ */
+export async function fetchBannerStats(): Promise<BannerStats> {
+  const { data } = await api.get<BannerStats>('/admin/banners/stats')
+  return data
 }
 
 /**

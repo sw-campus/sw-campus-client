@@ -1,8 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { approveLecture, fetchLectureDetail, fetchLectures, rejectLecture } from '../api/lectureApi'
+import { approveLecture, fetchLectureDetail, fetchLectures, fetchLectureStats, rejectLecture } from '../api/lectureApi'
 import type { LectureAuthStatus } from '../types/lecture.type'
+
+/**
+ * Lecture 통계 조회 Query Hook
+ */
+export function useLectureStatsQuery() {
+  return useQuery({
+    queryKey: ['admin', 'lectures', 'stats'],
+    queryFn: fetchLectureStats,
+    staleTime: 1000 * 60 * 5,
+  })
+}
 
 /**
  * Lecture 목록 조회 Query Hook

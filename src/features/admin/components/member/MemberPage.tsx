@@ -4,43 +4,64 @@ import { useState } from 'react'
 
 import { LuBuilding, LuList, LuShield, LuUser } from 'react-icons/lu'
 
-import { useMembersQuery } from '../../hooks/useMembers'
+import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+
+import { useMembersQuery, useMemberStatsQuery } from '../../hooks/useMembers'
 import type { MemberRole, MemberRoleFilter } from '../../types/member.type'
-import { StatCard } from '../StatCard'
 import { ApprovalPagination } from '../common/ApprovalPagination'
 import { MemberFilter } from './MemberFilter'
 import { MemberTable } from './MemberTable'
 
 const PAGE_SIZE = 10
 
-// 'use client' is already at top
+// 통계 카드 설정
+const STAT_CARDS = [
+  {
+    key: 'total' as const,
+    title: '전체 회원',
+    icon: LuList,
+    bgColor: 'bg-gradient-to-br from-gray-500 to-gray-600',
+    iconBg: 'bg-white/20',
+  },
+  {
+    key: 'user' as const,
+    title: '일반 회원',
+    icon: LuUser,
+    bgColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
+    iconBg: 'bg-white/20',
+  },
+  {
+    key: 'organization' as const,
+    title: '기관 회원',
+    icon: LuBuilding,
+    bgColor: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
+    iconBg: 'bg-white/20',
+  },
+  {
+    key: 'admin' as const,
+    title: '관리자',
+    icon: LuShield,
+    bgColor: 'bg-gradient-to-br from-amber-500 to-amber-600',
+    iconBg: 'bg-white/20',
+  },
+]
 
 export function MemberPage() {
   const [roleFilter, setRoleFilter] = useState<MemberRoleFilter>('ALL')
   const [keyword, setKeyword] = useState('')
   const [currentPage, setCurrentPage] = useState(0)
 
-  // 모든 회원 조회 (Client-side filtering을 위해 큰 size로 조회)
-  const { data: pageData, isLoading } = useMembersQuery(keyword, 0, 1000)
+  // Role을 API 파라미터로 변환
+  const apiRole: MemberRole | undefined = roleFilter === 'ALL' ? undefined : roleFilter
 
-  const allMembers = pageData?.content ?? []
+  // 서버 사이드 필터링 및 페이지네이션
+  const { data: pageData, isLoading } = useMembersQuery(apiRole, keyword, currentPage, PAGE_SIZE)
 
-  // Role 필터링
-  const filteredMembers = roleFilter === 'ALL' ? allMembers : allMembers.filter(member => member.role === roleFilter)
+  // 서버 API로 통계 조회
+  const { data: statsData } = useMemberStatsQuery()
 
-  // Frontend Pagination
-  const totalElements = filteredMembers.length
-  const totalPages = Math.ceil(totalElements / PAGE_SIZE)
-  const offset = currentPage * PAGE_SIZE
-  const paginatedMembers = filteredMembers.slice(offset, offset + PAGE_SIZE)
-
-  // 상태별 통계 계산
-  const stats = {
-    all: allMembers.length,
-    user: allMembers.filter(m => m.role === 'USER').length,
-    organization: allMembers.filter(m => m.role === 'ORGANIZATION').length,
-    admin: allMembers.filter(m => m.role === 'ADMIN').length,
-  }
+  const totalPages = pageData?.page?.totalPages ?? 0
 
   const handleRoleChange = (role: MemberRoleFilter) => {
     setRoleFilter(role)
@@ -56,11 +77,26 @@ export function MemberPage() {
     <div className="flex flex-1 flex-col gap-6">
       <h1 className="text-foreground text-2xl font-bold">회원 관리</h1>
 
+      {/* 통계 카드 */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard title="전체 회원" value={stats.all} icon={LuList} />
-        <StatCard title="일반 회원" value={stats.user} icon={LuUser} />
-        <StatCard title="기관 회원" value={stats.organization} icon={LuBuilding} />
-        <StatCard title="관리자" value={stats.admin} icon={LuShield} />
+        {STAT_CARDS.map(card => {
+          const Icon = card.icon
+          const value = statsData?.[card.key] ?? 0
+
+          return (
+            <Card key={card.key} className={cn('border-0 text-white shadow-lg', card.bgColor)}>
+              <CardContent className="flex items-center gap-4 p-4">
+                <div className={cn('rounded-xl p-3', card.iconBg)}>
+                  <Icon className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white/80">{card.title}</p>
+                  <p className="text-2xl font-bold">{value.toLocaleString()}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
 
       <MemberFilter
@@ -71,7 +107,12 @@ export function MemberPage() {
         searchPlaceholder="이름, 닉네임, 이메일 검색..."
       />
 
-      <MemberTable members={paginatedMembers} isLoading={isLoading} currentPage={currentPage} pageSize={PAGE_SIZE} />
+      <MemberTable
+        members={pageData?.content ?? []}
+        isLoading={isLoading}
+        currentPage={currentPage}
+        pageSize={PAGE_SIZE}
+      />
 
       <ApprovalPagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </div>

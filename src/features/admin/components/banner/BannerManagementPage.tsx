@@ -1,13 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
-import { LuCheck, LuClock, LuList, LuX } from 'react-icons/lu'
+import { LuCalendar, LuCheck, LuCircleCheck, LuList } from 'react-icons/lu'
 
-import { useBannersQuery, useDeleteBannerMutation, useToggleBannerActiveMutation } from '../../hooks/useBanners'
-import type { Banner, BannerPeriodStatus } from '../../types/banner.type'
-import { StatCard } from '../StatCard'
+import {
+  useBannersQuery,
+  useBannerStatsQuery,
+  useDeleteBannerMutation,
+  useToggleBannerActiveMutation,
+} from '../../hooks/useBanners'
+import type { Banner, BannerPeriodStatus, BannerTypeFilter } from '../../types/banner.type'
 import { ApprovalPagination } from '../common/ApprovalPagination'
+import { BANNER_STAT_COLORS, ColorfulStatCard } from '../common/ColorfulStatCard'
 import { BannerCreateModal } from './BannerCreateModal'
 import { BannerDetailModal } from './BannerDetailModal'
 import { BannerEditModal } from './BannerEditModal'
@@ -18,28 +23,37 @@ const PAGE_SIZE = 10
 
 export function BannerManagementPage() {
   const [statusFilter, setStatusFilter] = useState<BannerPeriodStatus>('ALL')
+  const [typeFilter, setTypeFilter] = useState<BannerTypeFilter>('ALL')
   const [keyword, setKeyword] = useState('')
   const [currentPage, setCurrentPage] = useState(0)
   const [selectedBanner, setSelectedBanner] = useState<Banner | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  // API 호출 (페이징, 검색)
+  // API 호출 (페이징, 검색) - 큰 size로 가져와서 클라이언트에서 타입 필터링
   const { data: pageData, isLoading } = useBannersQuery({
     keyword: keyword || undefined,
     periodStatus: statusFilter,
-    page: currentPage,
-    size: PAGE_SIZE,
+    page: 0,
+    size: 1000, // 클라이언트 필터링을 위해 충분한 크기
   })
 
-  // 통계용 쿼리들 (전체/예정/진행중/진행완료)
-  const { data: allData } = useBannersQuery({ size: 1 })
-  const { data: scheduledData } = useBannersQuery({ periodStatus: 'SCHEDULED', size: 1 })
-  const { data: activeData } = useBannersQuery({ periodStatus: 'ACTIVE', size: 1 })
-  const { data: endedData } = useBannersQuery({ periodStatus: 'ENDED', size: 1 })
+  // 서버 API로 통계 조회
+  const { data: statsData } = useBannerStatsQuery()
 
   const toggleMutation = useToggleBannerActiveMutation()
   const deleteMutation = useDeleteBannerMutation()
+
+  // 클라이언트 사이드 타입 필터링 및 페이지네이션
+  const filteredBanners = useMemo(() => {
+    const banners = pageData?.content ?? []
+    if (typeFilter === 'ALL') return banners
+    return banners.filter(banner => banner.type === typeFilter)
+  }, [pageData?.content, typeFilter])
+
+  const totalElements = filteredBanners.length
+  const totalPages = Math.ceil(totalElements / PAGE_SIZE)
+  const paginatedBanners = filteredBanners.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE)
 
   const handleToggle = (id: number, isActive: boolean) => {
     toggleMutation.mutate({ id, isActive })
@@ -80,20 +94,23 @@ export function BannerManagementPage() {
     setCurrentPage(0)
   }
 
+  const handleTypeChange = (type: BannerTypeFilter) => {
+    setTypeFilter(type)
+    setCurrentPage(0)
+  }
+
   const handleKeywordChange = (newKeyword: string) => {
     setKeyword(newKeyword)
     setCurrentPage(0)
   }
 
-  // 통계 계산
+  // 통계 (서버 API 사용)
   const stats = [
-    { title: '전체', value: allData?.page?.totalElements ?? 0, icon: LuList },
-    { title: '예정', value: scheduledData?.page?.totalElements ?? 0, icon: LuClock },
-    { title: '진행중', value: activeData?.page?.totalElements ?? 0, icon: LuCheck },
-    { title: '진행완료', value: endedData?.page?.totalElements ?? 0, icon: LuX },
+    { title: '전체', value: statsData?.total ?? 0, icon: LuList, bgColor: BANNER_STAT_COLORS.total },
+    { title: '예정', value: statsData?.scheduled ?? 0, icon: LuCalendar, bgColor: BANNER_STAT_COLORS.scheduled },
+    { title: '진행중', value: statsData?.currentlyActive ?? 0, icon: LuCheck, bgColor: BANNER_STAT_COLORS.active },
+    { title: '진행완료', value: statsData?.ended ?? 0, icon: LuCircleCheck, bgColor: BANNER_STAT_COLORS.ended },
   ]
-
-  const totalPages = pageData?.page?.totalPages ?? 0
 
   return (
     <div className="flex flex-1 flex-col gap-6">
@@ -106,21 +123,29 @@ export function BannerManagementPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map(stat => (
-          <StatCard key={stat.title} title={stat.title} value={stat.value} icon={stat.icon} />
+          <ColorfulStatCard
+            key={stat.title}
+            title={stat.title}
+            value={stat.value}
+            icon={stat.icon}
+            bgColor={stat.bgColor}
+          />
         ))}
       </div>
 
       {/* Filter */}
       <BannerFilter
         currentStatus={statusFilter}
+        currentType={typeFilter}
         keyword={keyword}
         onStatusChange={handleStatusChange}
+        onTypeChange={handleTypeChange}
         onKeywordChange={handleKeywordChange}
       />
 
       {/* Table */}
       <BannerTable
-        banners={pageData?.content ?? []}
+        banners={paginatedBanners}
         isLoading={isLoading}
         isToggling={toggleMutation.isPending}
         onViewDetail={handleViewDetail}

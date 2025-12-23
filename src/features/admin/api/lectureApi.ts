@@ -3,6 +3,21 @@ import type { PageResponse } from '@/types/api.type'
 
 import type { LectureAuthStatus, LectureDetail, LectureSummary } from '../types/lecture.type'
 
+export interface ApprovalStats {
+  total: number
+  pending: number
+  approved: number
+  rejected: number
+}
+
+/**
+ * Lecture 통계 조회 API
+ */
+export async function fetchLectureStats(): Promise<ApprovalStats> {
+  const { data } = await api.get<ApprovalStats>('/admin/lectures/stats')
+  return data
+}
+
 /**
  * Lecture 목록 조회 API (페이징)
  * @param status - 승인 상태 필터 (undefined면 전체)
