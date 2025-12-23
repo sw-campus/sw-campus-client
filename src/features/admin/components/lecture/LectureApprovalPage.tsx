@@ -93,6 +93,7 @@ export function LectureApprovalPage() {
         keyword={keyword}
         onStatusChange={handleStatusChange}
         onKeywordChange={handleKeywordChange}
+        searchPlaceholder="강의명 검색..."
       />
 
       <LectureTable
