@@ -30,8 +30,8 @@ export default function MyPage() {
     return (
       <div className="custom-container">
         <div className="custom-card">
-          {/* 실제 내용 영역 */}
-          <div className="relative z-10 flex w-full gap-6">
+          {/* 실제 내용 영역: 모바일 세로, 데스크톱 가로 */}
+          <div className="relative z-10 flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
             <PersonalAside
               active={activeSection}
               onClickPersonInfo={handleOpenPersonInfo}

@@ -77,10 +77,7 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
     const load = async () => {
       setLoading(true)
       try {
-        // 스웨거(첨부 이미지) 기준: lectureId 기반으로 상세 조회
-        // - 개인 마이페이지에서 "리뷰 수정" 클릭 시 lectureId가 항상 있으므로 이 경로를 우선 사용
         if (lectureId) {
-          // 스웨거(첨부 이미지): GET /api/v1/mypage/completed-lectures/{lectureId}/review
           const res = await api.get<CompletedLectureReviewResponse>(`/mypage/completed-lectures/${lectureId}/review`)
           if (!mounted) return
           setResolvedReviewId(res.data?.reviewId ?? null)
@@ -115,7 +112,6 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
           )
         }
       } catch {
-        // 조회 실패 시에도 수정 UI는 열리게 둠
       } finally {
         if (mounted) setLoading(false)
       }
@@ -150,8 +146,6 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
           .join('\n')
         throw new Error(detailedMessage || '입력값을 확인해주세요')
       }
-
-      // 백엔드 스펙: PUT /reviews/{reviewId} with camelCase (detailScores)
       const payload = {
         comment: parsed.data.comment ?? '',
         detailScores: parsed.data.detailScores.map(d => ({

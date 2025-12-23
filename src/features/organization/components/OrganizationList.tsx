@@ -15,46 +15,48 @@ export function OrganizationList() {
 
   return (
     <div className="w-full pt-10 pb-20">
-      {/* Header Section */}
-      <div className="mb-8 flex flex-col gap-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <h2 className="text-foreground text-2xl font-bold">{organizations.length}곳의 훈련기관을 찾았어요.</h2>
-          {/* Search Bar */}
-          <div className="relative w-full md:w-96">
-            <input
-              type="text"
-              placeholder="검색"
-              aria-label="훈련기관 검색"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="border-border bg-card/50 text-foreground placeholder:text-muted-foreground focus:ring-primary/20 w-full rounded-full border px-4 py-3 pl-10 text-sm focus:ring-2 focus:outline-none"
-            />
-            <FiSearch className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 text-lg" />
+      <div className="rounded-3xl bg-white/60 px-4 py-6 ring-1 ring-white/30 backdrop-blur-xl md:px-6">
+        {/* Header Section */}
+        <div className="mb-8 flex flex-col gap-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <h2 className="text-foreground text-2xl font-bold">{organizations.length}곳의 훈련기관을 찾았어요.</h2>
+            {/* Search Bar */}
+            <div className="relative w-full md:w-96">
+              <input
+                type="text"
+                placeholder="검색"
+                aria-label="훈련기관 검색"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="border-border bg-card/50 text-foreground placeholder:text-muted-foreground focus:ring-primary/20 w-full rounded-full border px-4 py-3 pl-10 text-sm focus:ring-2 focus:outline-none"
+              />
+              <FiSearch className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 text-lg" />
+            </div>
           </div>
         </div>
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-20">
+            <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+          </div>
+        )}
+
+        {/* Grid Section or No Results */}
+        {!isLoading &&
+          (organizations.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {organizations.map(org => (
+                <OrganizationCard key={org.id} organization={org} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-muted-foreground py-20 text-center">
+              <p className="text-lg">"{searchTerm}"에 대한 검색 결과가 없습니다.</p>
+              <p className="mt-2 text-sm">다른 검색어로 시도해보세요.</p>
+            </div>
+          ))}
       </div>
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-20">
-          <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
-        </div>
-      )}
-
-      {/* Grid Section or No Results */}
-      {!isLoading &&
-        (organizations.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {organizations.map(org => (
-              <OrganizationCard key={org.id} organization={org} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-muted-foreground py-20 text-center">
-            <p className="text-lg">"{searchTerm}"에 대한 검색 결과가 없습니다.</p>
-            <p className="mt-2 text-sm">다른 검색어로 시도해보세요.</p>
-          </div>
-        ))}
     </div>
   )
 }

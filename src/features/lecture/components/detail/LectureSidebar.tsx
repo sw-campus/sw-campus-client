@@ -119,7 +119,7 @@ export default function LectureSidebar({ lecture }: Props) {
                   <Badge
                     key={index}
                     variant="secondary"
-                    className="rounded-lg bg-orange-50 px-3 py-1.5 font-medium text-orange-700"
+                    className="rounded-lg bg-orange-400 px-3 py-1.5 font-medium text-white"
                   >
                     {index + 1}. {step}
                   </Badge>

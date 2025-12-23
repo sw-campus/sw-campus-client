@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react'
 
 import { isAxiosError } from 'axios'
 import { Star } from 'lucide-react'
-import Image from 'next/image'
+import { LuStar, LuPencil } from 'react-icons/lu'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { CATEGORY_LABELS, type ReviewCategory } from '@/features/lecture/api/reviewApi.types'
 import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
 import { api } from '@/lib/axios'
@@ -393,15 +395,17 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
           <CardTitle className="text-foreground">내 강의 목록</CardTitle>
         </CardHeader>
         <CardContent>
-          {lecturesLoading && <p className="text-muted-foreground">불러오는 중...</p>}
-          {lecturesError && !lecturesLoading && (
-            <div className="text-destructive-foreground flex items-center gap-3">
-              <p>{lecturesError}</p>
+          {lecturesLoading ? (
+            <div className="flex h-32 items-center justify-center">
+              <span className="text-muted-foreground">로딩 중...</span>
+            </div>
+          ) : lecturesError ? (
+            <div className="flex h-32 flex-col items-center justify-center gap-3">
+              <span className="text-destructive">강의 목록을 불러오지 못했습니다.</span>
               <Button
-                size="sm"
                 variant="secondary"
+                size="sm"
                 onClick={() => {
-                  // simple retry
                   ;(async () => {
                     try {
                       setLecturesLoading(true)
@@ -419,101 +423,154 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                 다시 시도
               </Button>
             </div>
-          )}
-          {!lecturesLoading && !lecturesError && (lectures?.length ?? 0) === 0 && (
-            <p className="text-muted-foreground">등록된 강의가 없습니다.</p>
-          )}
-          {!lecturesLoading && !lecturesError && (lectures?.length ?? 0) > 0 && (
-            <ul className="space-y-3">
-              {lectures!.map(l => (
-                <li
-                  key={l.certificateId}
-                  className="bg-card/40 text-foreground rounded-2xl p-5 shadow-sm backdrop-blur-xl transition hover:shadow-md"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-white">
-                        {l.lectureImageUrl ? (
-                          <Image
-                            src={l.lectureImageUrl}
-                            alt={l.lectureName}
-                            fill
-                            sizes="48px"
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="text-muted-foreground flex h-full w-full items-center justify-center bg-gray-50 text-sm font-semibold">
-                            {l.lectureName.charAt(0)}
+          ) : (lectures?.length ?? 0) === 0 ? (
+            <div className="flex h-32 items-center justify-center">
+              <span className="text-muted-foreground">등록된 강의가 없습니다.</span>
+            </div>
+          ) : (
+            <TooltipProvider>
+              <Table className="table-fixed">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w- 16 sm :table - cell hidden"> 아니요 </TableHead>
+                    <TableHead>강의명</TableHead>
+                    <TableHead className="hidden w-27.5 sm:table-cell">상태</TableHead>
+                    <TableHead className="w- [7.5rem] hidden md:table-cell"> 수료일 </TableHead>
+                    <TableHead className="hidden w-25 text-center sm:table-cell">관리</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {lectures!.map((l, index) => (
+                    <TableRow key={l.certificateId} className="hover:bg-muted/50 transition-colors">
+                      <TableCell className="text-muted-foreground hidden sm:table-cell">{index + 1}</TableCell>
+                      <TableCell className="text-foreground truncate font-medium" title={l.lectureName}>
+                        {l.lectureName}
+                        {/* 모바일 추가 정보 및 액션 */}
+                        <div className="mt-1 flex items-center justify-between sm:hidden">
+                          <div className="flex items-center gap-2">
+                            {l.canWriteReview ? (
+                              <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                                작성 가능
+                              </Badge>
+                            ) : (
+                              <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                                {approvedLectureIds.has(l.lectureId) ? '승인됨' : '작성완료'}
+                              </Badge>
+                            )}
+                            <span className="text-muted-foreground text-xs">{formatDate(l.certifiedAt)}</span>
                           </div>
+                          <div className="flex items-center gap-1">
+                            {l.canWriteReview ? (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                aria-label="후기 작성"
+                                onClick={() => {
+                                  setCreateError(null)
+                                  setCreateLectureId(l.lectureId)
+                                  setCreateLectureName(l.lectureName)
+                                  setCreateScore(0)
+                                  setCreateComment('')
+                                  setCreateDetails(defaultReviewDetails(0))
+                                  setCreateOpen(true)
+                                }}
+                              >
+                                <LuStar className="h-4 w-4" />
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                aria-label={approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
+                                onClick={() => {
+                                  setSelectedReviewId(l.reviewId ?? null)
+                                  setSelectedLectureId(l.lectureId)
+                                  setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
+                                  setEditOpen(true)
+                                }}
+                              >
+                                <LuPencil className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {l.canWriteReview ? (
+                          <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                            작성 가능
+                          </Badge>
+                        ) : (
+                          <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
+                            {approvedLectureIds.has(l.lectureId) ? '승인됨' : '작성완료'}
+                          </Badge>
                         )}
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground text-xs">코스</p>
-                        <p className="text-foreground text-base font-semibold">{l.lectureName}</p>
-                        <p className="text-muted-foreground mt-0.5 text-xs">기관: {l.organizationName}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {l.canWriteReview ? (
-                        <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                          작성 가능
-                        </Badge>
-                      ) : (
-                        <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                          작성완료
-                        </Badge>
-                      )}
-                      {l.canWriteReview ? (
-                        <Button
-                          size="sm"
-                          className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
-                          onClick={() => {
-                            setCreateError(null)
-                            setCreateLectureId(l.lectureId)
-                            setCreateLectureName(l.lectureName)
-                            setCreateScore(0)
-                            setCreateComment('')
-                            setCreateDetails(defaultReviewDetails(0))
-                            setCreateOpen(true)
-                          }}
-                        >
-                          후기 작성
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
-                          onClick={() => {
-                            setSelectedReviewId(l.reviewId ?? null)
-                            setSelectedLectureId(l.lectureId)
-                            setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
-                            setEditOpen(true)
-                          }}
-                        >
-                          {approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-                    <span className="text-muted-foreground">
-                      교육기관: <span className="text-foreground font-medium">{l.organizationName}</span>
-                    </span>
-                    <span className="text-muted-foreground">
-                      수료일: <span className="text-foreground font-medium">{formatDate(l.certifiedAt)}</span>
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground hidden md:table-cell">
+                        {formatDate(l.certifiedAt)}
+                      </TableCell>
+                      <TableCell className="hidden text-center sm:table-cell">
+                        <div className="flex justify-center gap-1">
+                          {l.canWriteReview ? (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    setCreateError(null)
+                                    setCreateLectureId(l.lectureId)
+                                    setCreateLectureName(l.lectureName)
+                                    setCreateScore(0)
+                                    setCreateComment('')
+                                    setCreateDetails(defaultReviewDetails(0))
+                                    setCreateOpen(true)
+                                  }}
+                                >
+                                  <LuStar className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>후기 작성</TooltipContent>
+                            </Tooltip>
+                          ) : (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    setSelectedReviewId(l.reviewId ?? null)
+                                    setSelectedLectureId(l.lectureId)
+                                    setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
+                                    setEditOpen(true)
+                                  }}
+                                >
+                                  <LuPencil className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TooltipProvider>
           )}
         </CardContent>
       </Card>
 
       {/* 리뷰 수정 모달 - ReviewForm 임베드 */}
       <Dialog open={editOpen} onOpenChange={open => setEditOpen(open)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-h-[70vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-foreground text-2xl font-bold">
               {selectedReviewReadOnly ? '리뷰 조회' : '리뷰 수정'}
@@ -533,84 +590,109 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
         </DialogContent>
       </Dialog>
 
-      {/* 후기 작성 모달 */}
+      {/* 후기 작성 모달 - ReviewForm 디자인 준용 */}
       <Dialog open={createOpen} onOpenChange={open => setCreateOpen(open)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-h-[70vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-foreground text-2xl font-bold">후기 작성</DialogTitle>
           </DialogHeader>
           {createError && <p className="text-destructive-foreground text-sm">{createError}</p>}
 
           <div className="space-y-5">
+            {/* 헤더 정보 */}
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-muted-foreground text-xs">강의</p>
                 <p className="text-foreground text-sm font-semibold">{createLectureName}</p>
-                {createLectureId && <p className="text-muted-foreground text-xs">강의 ID: {createLectureId}</p>}
               </div>
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                <input
-                  type="number"
-                  min={0}
-                  max={5}
-                  step={0.5}
-                  value={createScore}
-                  onChange={e => setCreateScore(Number(e.target.value))}
-                  className="w-20 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm"
+              {/* 총점: ReviewForm 스타일에 맞춘 별 선택 UI */}
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => {
+                  const selected = createScore >= i + 1
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      aria-label={`${i + 1}점 선택`}
+                      onClick={() => setCreateScore(i + 1)}
+                      className="text-yellow-500"
+                    >
+                      <Star className={`h-5 w-5 ${selected ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                    </button>
+                  )
+                })}
+                <span className="ml-2 min-w-8 text-right text-sm font-bold text-yellow-600">{createScore || 0}</span>
+              </div>
+            </div>
+
+            {/* 총평 - ReviewForm 버블 스타일 */}
+            <div className="space-y-1.5">
+              <label className="mb-1 block text-sm font-semibold text-gray-900">총평</label>
+              <div className="rounded-xl border border-gray-100 bg-gray-50 p-2">
+                <textarea
+                  value={createComment}
+                  onChange={e => setCreateComment(e.target.value)}
+                  rows={2}
+                  className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
+                  placeholder="후기를 입력하세요"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="text-foreground mb-1 block text-sm font-medium">한줄 후기</label>
-              <textarea
-                value={createComment}
-                onChange={e => setCreateComment(e.target.value)}
-                rows={3}
-                className="text-foreground w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm placeholder-gray-400"
-                placeholder="후기를 입력하세요"
-              />
-            </div>
-
+            {/* 카테고리 카드 - ReviewForm 별점 UI */}
             {createDetails && createDetails.length > 0 && (
-              <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="space-y-2.5">
                 {createDetails.map((d, idx) => (
-                  <div key={`${d.category}-${idx}`} className="space-y-2">
+                  <div
+                    key={`${d.category}-${idx}`}
+                    className="rounded-xl border border-gray-100 bg-white p-2.5 shadow-sm"
+                  >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-gray-800">{CATEGORY_LABELS[d.category]}</span>
-                      <div className="flex items-center gap-2">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <input
-                          type="number"
-                          min={0}
-                          max={5}
-                          step={0.5}
-                          value={d.score}
-                          onChange={e => {
-                            const v = Number(e.target.value)
-                            setCreateDetails(prev => prev.map((x, i) => (i === idx ? { ...x, score: v } : x)))
-                          }}
-                          className="w-16 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm"
-                        />
+                      <span className="text-sm font-semibold text-gray-900">{CATEGORY_LABELS[d.category]}</span>
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => {
+                          const selected = d.score >= i + 1
+                          return (
+                            <button
+                              key={i}
+                              type="button"
+                              aria-label={`${d.category} ${i + 1}점 선택`}
+                              onClick={() => {
+                                const v = i + 1
+                                setCreateDetails(prev => prev.map((x, j) => (j === idx ? { ...x, score: v } : x)))
+                              }}
+                              className="p-0.5 text-yellow-500"
+                            >
+                              <Star
+                                className={`h-4 w-4 ${selected ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                              />
+                            </button>
+                          )
+                        })}
+                        <span className="ml-2 min-w-6 text-right text-sm font-bold text-yellow-600">
+                          {d.score || 0}
+                        </span>
                       </div>
                     </div>
-                    <textarea
-                      value={d.comment ?? ''}
-                      onChange={e =>
-                        setCreateDetails(prev =>
-                          prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)),
-                        )
-                      }
-                      rows={2}
-                      className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
-                      placeholder="세부 의견을 입력하세요"
-                    />
+                    <div className="mt-1.5 rounded-xl border border-gray-100 bg-gray-50 p-2">
+                      <textarea
+                        value={d.comment ?? ''}
+                        onChange={e =>
+                          setCreateDetails(prev =>
+                            prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)),
+                          )
+                        }
+                        rows={2}
+                        className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-800 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
+                        placeholder="세부 의견을 입력하세요"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
             )}
 
+            {/* 액션 영역 */}
             <div className="flex justify-end gap-2 pt-2">
               <Button size="sm" className="rounded-full" variant="secondary" onClick={() => setCreateOpen(false)}>
                 닫기
@@ -622,10 +704,36 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                 onClick={async () => {
                   if (!createLectureId) return
                   try {
+                    for (const item of createDetails) {
+                      for (const item of createDetails) {
+                        // 간단 검증: 총평 및 각 카테고리 점수(1~5), 코멘트 20자 이상
+                        if ((createComment || '').trim().length < 20) {
+                          setCreateError('총평을 20자 이상 작성해 주세요.')
+                          return
+                        }
+                        if (item.score < 1 || item.score > 5) {
+                          setCreateError(`${CATEGORY_LABELS[item.category]} 점수를 선택해 주세요.`)
+                          return
+                        }
+                        const c = (item.comment || '').trim()
+                        if (c.length < 20) {
+                          setCreateError(`${CATEGORY_LABELS[item.category]} 의견을 20자 이상 작성해 주세요.`)
+                          return
+                        }
+                      }
+                      if (item.score < 1 || item.score > 5) {
+                        setCreateError(`${CATEGORY_LABELS[item.category]} 점수를 선택해 주세요.`)
+                        return
+                      }
+                      const c = (item.comment || '').trim()
+                      if (c.length < 20) {
+                        setCreateError(`${CATEGORY_LABELS[item.category]} 의견을 20자 이상 작성해 주세요.`)
+                        return
+                      }
+                    }
+
                     setCreateSaving(true)
                     setCreateError(null)
-                    // 스펙: POST /api/v1/reviews
-                    // 프런트 베이스 URL에 /api/v1가 포함되어 있으므로 상대 경로 사용
                     await api.post('/reviews', {
                       lectureId: createLectureId,
                       comment: createComment,
@@ -637,7 +745,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                     })
 
                     setCreateOpen(false)
-                    // refresh list to reflect canWriteReview change
+                    // 목록 갱신
                     try {
                       setLecturesLoading(true)
                       const { data } = await api.get<CompletedLecture[]>(`/mypage/completed-lectures`)
