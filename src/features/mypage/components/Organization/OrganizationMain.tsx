@@ -283,11 +283,11 @@ export default function OrganizationMain({
               <Table className="table-fixed">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[60px]">NO</TableHead>
+                    <TableHead className="w-15">NO</TableHead>
                     <TableHead>강의명</TableHead>
-                    <TableHead className="w-[110px]">상태</TableHead>
-                    <TableHead className="w-[120px]">등록일</TableHead>
-                    <TableHead className="w-[100px] text-center">관리</TableHead>
+                    <TableHead className="w-27.5">상태</TableHead>
+                    <TableHead className="w-30">등록일</TableHead>
+                    <TableHead className="w-25 text-center">관리</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

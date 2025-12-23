@@ -89,7 +89,7 @@ export default function LectureSection() {
         </motion.div>
 
         {/* 카테고리별 부트캠프 리스트 */}
-        <motion.div variants={itemVariants} className="relative z-10 min-h-[300px]">
+        <motion.div variants={itemVariants} className="relative z-10 min-h-75">
           <AnimatePresence mode="wait">
             {isLoading ? (
               <motion.div

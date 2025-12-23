@@ -34,7 +34,7 @@ export default function MyPage() {
     return (
       <div className="custom-container">
         <div className="custom-card">
-          <div className="relative z-10 flex w-full gap-6">
+          <div className="relative z-10 flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
             <OrganizationAside
               active={isOrgPasswordOpen ? 'orgInfo' : 'lectureManage'}
               onClickOrgInfo={handleOpenOrgInfo}
