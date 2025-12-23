@@ -54,21 +54,21 @@ export default function LectureTabNav() {
 
   return (
     <div className="w-full">
-      <nav className="no-scrollbar flex w-full items-center gap-8 overflow-x-auto py-5">
+      <nav className="no-scrollbar flex w-full items-center gap-6 overflow-x-auto py-5">
         {TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => scrollToSection(tab.id)}
             aria-current={activeTab === tab.id ? 'page' : undefined}
+            type="button"
             className={cn(
-              'relative shrink-0 px-1 text-base transition-colors duration-200 sm:text-lg',
-              activeTab === tab.id ? 'font-extrabold text-gray-900' : 'font-semibold text-gray-500 hover:text-gray-700',
+              'group relative shrink-0 rounded-xl px-4 py-2 text-base transition-all duration-200 sm:px-5 sm:text-lg',
+              activeTab === tab.id
+                ? 'bg-white/80 font-extrabold text-gray-900 shadow-sm ring-1 ring-gray-200'
+                : 'font-semibold text-gray-500 hover:text-gray-700',
             )}
           >
             <span>{tab.label}</span>
-            {activeTab === tab.id && (
-              <span className="absolute -bottom-1 left-1/2 h-0.75 w-9 -translate-x-1/2 rounded-full bg-gray-900 sm:w-10" />
-            )}
           </button>
         ))}
       </nav>
