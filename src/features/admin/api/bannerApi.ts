@@ -1,6 +1,6 @@
 import { api } from '@/lib/axios'
 
-import type { Banner, BannerPeriodStatus, CreateBannerRequest } from '../types/banner.type'
+import type { Banner, BannerPeriodStatus, BannerTypeFilter, CreateBannerRequest } from '../types/banner.type'
 
 export interface BannerStats {
   total: number
@@ -30,6 +30,7 @@ export interface BannerPageResponse {
 export interface BannerSearchParams {
   keyword?: string
   periodStatus?: BannerPeriodStatus
+  type?: BannerTypeFilter
   page?: number
   size?: number
 }
@@ -53,6 +54,9 @@ export async function fetchBanners(params?: BannerSearchParams): Promise<BannerP
   }
   if (params?.periodStatus && params.periodStatus !== 'ALL') {
     searchParams.append('periodStatus', params.periodStatus)
+  }
+  if (params?.type && params.type !== 'ALL') {
+    searchParams.append('type', params.type)
   }
   if (params?.page !== undefined) {
     searchParams.append('page', params.page.toString())

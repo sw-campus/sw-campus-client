@@ -30,12 +30,13 @@ export function BannerManagementPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  // API 호출 - periodStatus, keyword는 서버 필터링, typeFilter는 클라이언트 필터링
+  // API 호출 - 모든 필터링을 서버에서 수행
   const { data: pageData, isLoading } = useBannersQuery({
     keyword: keyword || undefined,
     periodStatus: statusFilter,
-    page: 0,
-    size: 1000, // 타입 필터링이 클라이언트에서 수행되므로 충분한 크기 필요
+    type: typeFilter,
+    page: currentPage,
+    size: PAGE_SIZE,
   })
 
   // 서버 API로 통계 조회
@@ -44,13 +45,9 @@ export function BannerManagementPage() {
   const toggleMutation = useToggleBannerActiveMutation()
   const deleteMutation = useDeleteBannerMutation()
 
-  // 클라이언트 사이드 타입 필터링 (서버 API 미지원)
+  // 서버에서 필터링 및 페이지네이션된 데이터 사용
   const banners = pageData?.content ?? []
-  const filteredBanners = typeFilter === 'ALL' ? banners : banners.filter(banner => banner.type === typeFilter)
-
-  const totalElements = filteredBanners.length
-  const totalPages = Math.ceil(totalElements / PAGE_SIZE)
-  const paginatedBanners = filteredBanners.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE)
+  const totalPages = pageData?.page?.totalPages ?? 0
 
   const handleToggle = (id: number, isActive: boolean) => {
     toggleMutation.mutate({ id, isActive })
@@ -142,7 +139,7 @@ export function BannerManagementPage() {
 
       {/* Table */}
       <BannerTable
-        banners={paginatedBanners}
+        banners={banners}
         isLoading={isLoading}
         isToggling={toggleMutation.isPending}
         onViewDetail={handleViewDetail}
