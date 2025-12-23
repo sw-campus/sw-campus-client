@@ -432,10 +432,10 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
               <Table className="table-fixed">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="hidden w-15 sm:table-cell">NO</TableHead>
+                    <TableHead className="w- 16 sm :table - cell hidden"> 아니요 </TableHead>
                     <TableHead>강의명</TableHead>
                     <TableHead className="hidden w-27.5 sm:table-cell">상태</TableHead>
-                    <TableHead className="hidden w-30 md:table-cell">수료일</TableHead>
+                    <TableHead className="w- [7.5rem] hidden md:table-cell"> 수료일 </TableHead>
                     <TableHead className="hidden w-25 text-center sm:table-cell">관리</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -604,7 +604,6 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
               <div>
                 <p className="text-muted-foreground text-xs">강의</p>
                 <p className="text-foreground text-sm font-semibold">{createLectureName}</p>
-                {createLectureId && <p className="text-muted-foreground text-xs"></p>}
               </div>
               {/* 총점: ReviewForm 스타일에 맞춘 별 선택 UI */}
               <div className="flex items-center gap-1">
@@ -705,8 +704,23 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                 onClick={async () => {
                   if (!createLectureId) return
                   try {
-                    // 간단 검증: 각 카테고리 점수(1~5), 코멘트 20자 이상
                     for (const item of createDetails) {
+                      for (const item of createDetails) {
+                        // 간단 검증: 총평 및 각 카테고리 점수(1~5), 코멘트 20자 이상
+                        if ((createComment || '').trim().length < 20) {
+                          setCreateError('총평을 20자 이상 작성해 주세요.')
+                          return
+                        }
+                        if (item.score < 1 || item.score > 5) {
+                          setCreateError(`${CATEGORY_LABELS[item.category]} 점수를 선택해 주세요.`)
+                          return
+                        }
+                        const c = (item.comment || '').trim()
+                        if (c.length < 20) {
+                          setCreateError(`${CATEGORY_LABELS[item.category]} 의견을 20자 이상 작성해 주세요.`)
+                          return
+                        }
+                      }
                       if (item.score < 1 || item.score > 5) {
                         setCreateError(`${CATEGORY_LABELS[item.category]} 점수를 선택해 주세요.`)
                         return
