@@ -32,7 +32,7 @@ const detailScoreSchema = z.object({
     .refine((v): v is AllowedCategory => (allowedCategories as readonly string[]).includes(v), {
       message: '카테고리 값이 올바르지 않습니다.',
     }),
-  score: z.number().min(1, '점수는 1.0 이상이어야 합니다').max(5, '점수는 5.0 이하여야 합니다'),
+  score: z.number().int().min(1, '점수는 1점 이상이어야 합니다').max(5, '점수는 5점 이하여야 합니다'),
   comment: z.string().trim().min(20, '세부 의견은 20자 이상이어야 합니다').max(500, '세부 의견은 최대 500자입니다'),
 })
 

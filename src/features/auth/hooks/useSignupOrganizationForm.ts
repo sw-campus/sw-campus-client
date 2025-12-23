@@ -198,8 +198,9 @@ export function useSignupOrganizationForm() {
       return
     }
 
-    const location = (address && detailAddress ? `${address} ${detailAddress}` : (address ?? detailAddress ?? ''))
-      .trim()
+    const location = (
+      address && detailAddress ? `${address} ${detailAddress}` : (address ?? detailAddress ?? '')
+    ).trim()
 
     try {
       setIsSubmitting(true)
@@ -246,7 +247,7 @@ export function useSignupOrganizationForm() {
       router.push('/login')
     } catch (error: unknown) {
       console.error('Organization signup error:', error)
-      toast.error('회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.')
+      toast.error(extractErrorMessage(error) ?? '회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.')
     } finally {
       setIsSubmitting(false)
     }
