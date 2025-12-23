@@ -252,7 +252,7 @@ export default function LectureReviews({ lectureId }: Props) {
 
   // 리뷰 작성 모달
   const writeModal = (
-    <Modal isOpen={openWrite} onClose={() => setOpenWrite(false)} title="리뷰 작성" maxWidthClass="max-w-3xl">
+    <Modal isOpen={openWrite} onClose={() => setOpenWrite(false)} title="리뷰 작성" maxWidthClass="max-w-lg">
       <div className="space-y-5">
         {categories.map(cat => (
           <div key={cat} className="space-y-2">

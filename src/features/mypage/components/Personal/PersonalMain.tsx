@@ -507,7 +507,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
 
       {/* 리뷰 수정 모달 - ReviewForm 임베드 */}
       <Dialog open={editOpen} onOpenChange={open => setEditOpen(open)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-h-[70vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-foreground text-2xl font-bold">
               {selectedReviewReadOnly ? '리뷰 조회' : '리뷰 수정'}
@@ -527,84 +527,110 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
         </DialogContent>
       </Dialog>
 
-      {/* 후기 작성 모달 */}
+      {/* 후기 작성 모달 - ReviewForm 디자인 준용 */}
       <Dialog open={createOpen} onOpenChange={open => setCreateOpen(open)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-h-[70vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-foreground text-2xl font-bold">후기 작성</DialogTitle>
           </DialogHeader>
           {createError && <p className="text-destructive-foreground text-sm">{createError}</p>}
 
           <div className="space-y-5">
+            {/* 헤더 정보 */}
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-muted-foreground text-xs">강의</p>
                 <p className="text-foreground text-sm font-semibold">{createLectureName}</p>
                 {createLectureId && <p className="text-muted-foreground text-xs">강의 ID: {createLectureId}</p>}
               </div>
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                <input
-                  type="number"
-                  min={0}
-                  max={5}
-                  step={0.5}
-                  value={createScore}
-                  onChange={e => setCreateScore(Number(e.target.value))}
-                  className="w-20 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm"
+              {/* 총점: ReviewForm 스타일에 맞춘 별 선택 UI */}
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => {
+                  const selected = createScore >= i + 1
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      aria-label={`${i + 1}점 선택`}
+                      onClick={() => setCreateScore(i + 1)}
+                      className="text-yellow-500"
+                    >
+                      <Star className={`h-5 w-5 ${selected ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                    </button>
+                  )
+                })}
+                <span className="ml-2 min-w-8 text-right text-sm font-bold text-yellow-600">{createScore || 0}</span>
+              </div>
+            </div>
+
+            {/* 총평 - ReviewForm 버블 스타일 */}
+            <div className="space-y-1.5">
+              <label className="mb-1 block text-sm font-semibold text-gray-900">총평</label>
+              <div className="rounded-xl border border-gray-100 bg-gray-50 p-2">
+                <textarea
+                  value={createComment}
+                  onChange={e => setCreateComment(e.target.value)}
+                  rows={2}
+                  className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
+                  placeholder="후기를 입력하세요"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="text-foreground mb-1 block text-sm font-medium">한줄 후기</label>
-              <textarea
-                value={createComment}
-                onChange={e => setCreateComment(e.target.value)}
-                rows={3}
-                className="text-foreground w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm placeholder-gray-400"
-                placeholder="후기를 입력하세요"
-              />
-            </div>
-
+            {/* 카테고리 카드 - ReviewForm 별점 UI */}
             {createDetails && createDetails.length > 0 && (
-              <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="space-y-2.5">
                 {createDetails.map((d, idx) => (
-                  <div key={`${d.category}-${idx}`} className="space-y-2">
+                  <div
+                    key={`${d.category}-${idx}`}
+                    className="rounded-xl border border-gray-100 bg-white p-2.5 shadow-sm"
+                  >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-gray-800">{CATEGORY_LABELS[d.category]}</span>
-                      <div className="flex items-center gap-2">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <input
-                          type="number"
-                          min={0}
-                          max={5}
-                          step={0.5}
-                          value={d.score}
-                          onChange={e => {
-                            const v = Number(e.target.value)
-                            setCreateDetails(prev => prev.map((x, i) => (i === idx ? { ...x, score: v } : x)))
-                          }}
-                          className="w-16 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm"
-                        />
+                      <span className="text-sm font-semibold text-gray-900">{CATEGORY_LABELS[d.category]}</span>
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => {
+                          const selected = d.score >= i + 1
+                          return (
+                            <button
+                              key={i}
+                              type="button"
+                              aria-label={`${d.category} ${i + 1}점 선택`}
+                              onClick={() => {
+                                const v = i + 1
+                                setCreateDetails(prev => prev.map((x, j) => (j === idx ? { ...x, score: v } : x)))
+                              }}
+                              className="p-0.5 text-yellow-500"
+                            >
+                              <Star
+                                className={`h-4 w-4 ${selected ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                              />
+                            </button>
+                          )
+                        })}
+                        <span className="ml-2 min-w-6 text-right text-sm font-bold text-yellow-600">
+                          {d.score || 0}
+                        </span>
                       </div>
                     </div>
-                    <textarea
-                      value={d.comment ?? ''}
-                      onChange={e =>
-                        setCreateDetails(prev =>
-                          prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)),
-                        )
-                      }
-                      rows={2}
-                      className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
-                      placeholder="세부 의견을 입력하세요"
-                    />
+                    <div className="mt-1.5 rounded-xl border border-gray-100 bg-gray-50 p-2">
+                      <textarea
+                        value={d.comment ?? ''}
+                        onChange={e =>
+                          setCreateDetails(prev =>
+                            prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)),
+                          )
+                        }
+                        rows={2}
+                        className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-800 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
+                        placeholder="세부 의견을 입력하세요"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
             )}
 
+            {/* 액션 영역 */}
             <div className="flex justify-end gap-2 pt-2">
               <Button size="sm" className="rounded-full" variant="secondary" onClick={() => setCreateOpen(false)}>
                 닫기
@@ -616,10 +642,21 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                 onClick={async () => {
                   if (!createLectureId) return
                   try {
+                    // 간단 검증: 각 카테고리 점수(1~5), 코멘트 20자 이상
+                    for (const item of createDetails) {
+                      if (item.score < 1 || item.score > 5) {
+                        setCreateError(`${CATEGORY_LABELS[item.category]} 점수를 선택해 주세요.`)
+                        return
+                      }
+                      const c = (item.comment || '').trim()
+                      if (c.length < 20) {
+                        setCreateError(`${CATEGORY_LABELS[item.category]} 의견을 20자 이상 작성해 주세요.`)
+                        return
+                      }
+                    }
+
                     setCreateSaving(true)
                     setCreateError(null)
-                    // 스펙: POST /api/v1/reviews
-                    // 프런트 베이스 URL에 /api/v1가 포함되어 있으므로 상대 경로 사용
                     await api.post('/reviews', {
                       lectureId: createLectureId,
                       comment: createComment,
@@ -631,7 +668,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                     })
 
                     setCreateOpen(false)
-                    // refresh list to reflect canWriteReview change
+                    // 목록 갱신
                     try {
                       setLecturesLoading(true)
                       const { data } = await api.get<CompletedLecture[]>(`/mypage/completed-lectures`)
