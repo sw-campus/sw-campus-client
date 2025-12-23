@@ -1,14 +1,8 @@
 import { api } from '@/lib/axios'
 import type { PageResponse } from '@/types/api.type'
 
+import type { ApprovalStats } from '../types/approval.type'
 import type { LectureAuthStatus, LectureDetail, LectureSummary } from '../types/lecture.type'
-
-export interface ApprovalStats {
-  total: number
-  pending: number
-  approved: number
-  rejected: number
-}
 
 /**
  * Lecture 통계 조회 API

@@ -10,12 +10,7 @@ import type {
 import { api } from '@/lib/axios'
 import type { PageResponse } from '@/types/api.type'
 
-export interface ApprovalStats {
-  total: number
-  pending: number
-  approved: number
-  rejected: number
-}
+import type { ApprovalStats } from '../types/approval.type'
 
 /**
  * 수료증 통계 조회 API

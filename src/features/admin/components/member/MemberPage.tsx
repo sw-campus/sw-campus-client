@@ -4,12 +4,10 @@ import { useState } from 'react'
 
 import { LuBuilding, LuList, LuShield, LuUser } from 'react-icons/lu'
 
-import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
-
 import { useMembersQuery, useMemberStatsQuery } from '../../hooks/useMembers'
 import type { MemberRole, MemberRoleFilter } from '../../types/member.type'
 import { ApprovalPagination } from '../common/ApprovalPagination'
+import { ColorfulStatCard } from '../common/ColorfulStatCard'
 import { MemberFilter } from './MemberFilter'
 import { MemberTable } from './MemberTable'
 
@@ -22,28 +20,24 @@ const STAT_CARDS = [
     title: '전체 회원',
     icon: LuList,
     bgColor: 'bg-gradient-to-br from-gray-500 to-gray-600',
-    iconBg: 'bg-white/20',
   },
   {
     key: 'user' as const,
     title: '일반 회원',
     icon: LuUser,
     bgColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
-    iconBg: 'bg-white/20',
   },
   {
     key: 'organization' as const,
     title: '기관 회원',
     icon: LuBuilding,
     bgColor: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
-    iconBg: 'bg-white/20',
   },
   {
     key: 'admin' as const,
     title: '관리자',
     icon: LuShield,
     bgColor: 'bg-gradient-to-br from-amber-500 to-amber-600',
-    iconBg: 'bg-white/20',
   },
 ]
 
@@ -79,24 +73,15 @@ export function MemberPage() {
 
       {/* 통계 카드 */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {STAT_CARDS.map(card => {
-          const Icon = card.icon
-          const value = statsData?.[card.key] ?? 0
-
-          return (
-            <Card key={card.key} className={cn('border-0 text-white shadow-lg', card.bgColor)}>
-              <CardContent className="flex items-center gap-4 p-4">
-                <div className={cn('rounded-xl p-3', card.iconBg)}>
-                  <Icon className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-white/80">{card.title}</p>
-                  <p className="text-2xl font-bold">{value.toLocaleString()}</p>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+        {STAT_CARDS.map(card => (
+          <ColorfulStatCard
+            key={card.key}
+            title={card.title}
+            value={statsData?.[card.key] ?? 0}
+            icon={card.icon}
+            bgColor={card.bgColor}
+          />
+        ))}
       </div>
 
       <MemberFilter

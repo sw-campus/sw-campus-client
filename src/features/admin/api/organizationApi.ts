@@ -1,14 +1,8 @@
 import { api } from '@/lib/axios'
 import type { PageResponse } from '@/types/api.type'
 
+import type { ApprovalStats } from '../types/approval.type'
 import type { ApprovalStatus, OrganizationDetail, OrganizationSummary } from '../types/organization.type'
-
-export interface ApprovalStats {
-  total: number
-  pending: number
-  approved: number
-  rejected: number
-}
 
 /**
  * Organization 통계 조회 API
