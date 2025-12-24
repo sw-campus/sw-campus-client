@@ -26,7 +26,7 @@ export default function LabeledInput({
 }: LabeledInputProps) {
   return (
     <div className="mb-4">
-      <label className="mb-1 block text-neutral-700">{label}</label>
+      <label className="mb-1 block text-white/75">{label}</label>
       <input
         type={type}
         name={name}

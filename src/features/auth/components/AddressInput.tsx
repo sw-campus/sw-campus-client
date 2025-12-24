@@ -4,10 +4,8 @@ import { useEffect } from 'react'
 
 import { toast } from 'sonner'
 
+import { INPUT_BASE_CLASS } from '@/features/auth/inputBaseClass'
 import { useSignupStore } from '@/store/signupStore'
-
-const INPUT_BASE_CLASS =
-  'h-9 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white'
 
 type AddressInputProps = {
   autoOpen?: boolean
@@ -64,7 +62,7 @@ export default function AddressInput({ autoOpen = false }: AddressInputProps) {
 
   return (
     <div className="mb-3">
-      <label className="mb-1 block text-neutral-700">주소</label>
+      <label className="mb-1 block text-white/75">주소</label>
       <div className="mb-2 flex gap-2">
         <input
           type="text"
@@ -76,7 +74,7 @@ export default function AddressInput({ autoOpen = false }: AddressInputProps) {
         <button
           type="button"
           onClick={handleSearchAddress}
-          className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white"
+          className="h-10 rounded-md bg-white/85 px-4 font-semibold text-black transition hover:bg-white"
         >
           검색
         </button>

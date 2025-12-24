@@ -22,7 +22,7 @@ export default function NicknameInput({
 }: NicknameInputProps) {
   return (
     <div className="mb-4">
-      <label className="mb-1 block text-neutral-700" htmlFor="signup-nickname">
+      <label className="mb-1 block text-white/75" htmlFor="signup-nickname">
         닉네임
       </label>
       <div className="flex gap-2">
@@ -39,16 +39,16 @@ export default function NicknameInput({
           type="button"
           onClick={onClickCheck}
           disabled={disabled || isChecking}
-          className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+          className="h-10 rounded-md bg-white/85 px-4 font-semibold text-black transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isChecking ? '확인 중...' : '인증'}
         </button>
       </div>
 
-      {checkState === 'available' && <p className="mt-1 text-xs text-green-600">사용 가능한 닉네임입니다.</p>}
-      {checkState === 'unavailable' && <p className="mt-1 text-xs text-red-600">이미 사용 중인 닉네임입니다.</p>}
+      {checkState === 'available' && <p className="mt-1 text-xs text-green-400">사용 가능한 닉네임입니다.</p>}
+      {checkState === 'unavailable' && <p className="mt-1 text-xs text-red-400">이미 사용 중인 닉네임입니다.</p>}
       {checkState === 'error' && (
-        <p className="mt-1 text-xs text-red-600">닉네임 확인에 실패했습니다. 다시 시도해 주세요.</p>
+        <p className="mt-1 text-xs text-red-400">닉네임 확인에 실패했습니다. 다시 시도해 주세요.</p>
       )}
     </div>
   )

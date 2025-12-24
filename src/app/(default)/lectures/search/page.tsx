@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect } from 'react'
 
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
@@ -26,6 +27,50 @@ import { trackSearch } from '@/lib/analytics'
 
 const filterSelectTriggerClass =
   'flex items-center justify-between gap-1 rounded-full border border-input bg-background px-3 py-1 text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+
+function GoToPageControl({
+  totalPages,
+  currentPage,
+  onGo,
+}: {
+  totalPages: number
+  currentPage: number
+  onGo: (pageIndex: number) => void
+}) {
+  const [value, setValue] = useState(String(currentPage + 1))
+
+  return (
+    <div className="flex items-center gap-3 rounded-2xl bg-white/60 px-8 py-4 shadow-sm">
+      <span className="text-sm text-neutral-500">Go to page:</span>
+      <Select value={value} onValueChange={setValue}>
+        <SelectTrigger className="h-10 w-23 rounded-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {Array.from({ length: totalPages }, (_, idx) => {
+            const page = String(idx + 1)
+            return (
+              <SelectItem key={page} value={page}>
+                {page}
+              </SelectItem>
+            )
+          })}
+        </SelectContent>
+      </Select>
+      <Button
+        type="button"
+        onClick={() => {
+          const target = Number(value)
+          if (!Number.isFinite(target) || target < 1 || target > totalPages) return
+          onGo(target - 1)
+        }}
+        className="h-10 rounded-full bg-neutral-700 px-6 text-white hover:bg-neutral-700/90"
+      >
+        GO
+      </Button>
+    </div>
+  )
+}
 
 function SearchContent() {
   const router = useRouter()
