@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect } from 'react'
 
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,50 @@ import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLecture
 
 const filterSelectTriggerClass =
   'flex items-center justify-between gap-1 rounded-full border border-input bg-background px-3 py-1 text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+
+function GoToPageControl({
+  totalPages,
+  currentPage,
+  onGo,
+}: {
+  totalPages: number
+  currentPage: number
+  onGo: (pageIndex: number) => void
+}) {
+  const [value, setValue] = useState(String(currentPage + 1))
+
+  return (
+    <div className="flex items-center gap-3 rounded-2xl bg-white/60 px-8 py-4 shadow-sm">
+      <span className="text-sm text-neutral-500">Go to page:</span>
+      <Select value={value} onValueChange={setValue}>
+        <SelectTrigger className="h-10 w-23 rounded-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {Array.from({ length: totalPages }, (_, idx) => {
+            const page = String(idx + 1)
+            return (
+              <SelectItem key={page} value={page}>
+                {page}
+              </SelectItem>
+            )
+          })}
+        </SelectContent>
+      </Select>
+      <Button
+        type="button"
+        onClick={() => {
+          const target = Number(value)
+          if (!Number.isFinite(target) || target < 1 || target > totalPages) return
+          onGo(target - 1)
+        }}
+        className="h-10 rounded-full bg-neutral-700 px-6 text-white hover:bg-neutral-700/90"
+      >
+        GO
+      </Button>
+    </div>
+  )
+}
 
 function SearchContent() {
   const router = useRouter()
@@ -438,53 +483,80 @@ function SearchContent() {
 
             {/* 페이지네이션 */}
             {pageInfo.totalPages > 1 && (
-              <div className="mt-8 flex items-center justify-center gap-2">
-                {/* 이전 페이지 */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(pageInfo.currentPage - 1)}
-                  disabled={pageInfo.isFirst}
-                  className="h-9 px-3"
-                >
-                  이전
-                </Button>
+              <div className="mt-8 flex flex-col items-center justify-center gap-4">
+                <div className="flex items-center justify-center gap-3">
+                  {/* 처음/이전 */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(0)}
+                    disabled={pageInfo.isFirst}
+                    className="h-10 w-10 rounded-xl p-0"
+                    aria-label="첫 페이지"
+                  >
+                    <ChevronsLeft className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(pageInfo.currentPage - 1)}
+                    disabled={pageInfo.isFirst}
+                    className="h-10 w-10 rounded-xl p-0"
+                    aria-label="이전 페이지"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
 
-                {/* 페이지 번호 */}
-                <div className="flex items-center gap-1">
-                  {getPageNumbers().map(pageNum => (
-                    <Button
-                      key={pageNum}
-                      variant={pageNum === pageInfo.currentPage ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`h-9 w-9 ${
-                        pageNum === pageInfo.currentPage
-                          ? 'bg-primary hover:bg-primary/90 text-white'
-                          : 'hover:bg-gray-100'
-                      }`}
-                    >
-                      {pageNum + 1}
-                    </Button>
-                  ))}
+                  {/* 페이지 번호 */}
+                  <div className="flex items-center gap-2">
+                    {getPageNumbers().map(pageNum => (
+                      <Button
+                        key={pageNum}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(pageNum)}
+                        className={
+                          'h-10 w-10 rounded-full border-none ' +
+                          (pageNum === pageInfo.currentPage
+                            ? 'bg-neutral-700 text-white hover:bg-neutral-700'
+                            : 'bg-transparent text-neutral-500 hover:bg-neutral-100')
+                        }
+                      >
+                        {pageNum + 1}
+                      </Button>
+                    ))}
+                  </div>
+
+                  {/* 다음/마지막 */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(pageInfo.currentPage + 1)}
+                    disabled={pageInfo.isLast}
+                    className="h-10 w-10 rounded-xl p-0"
+                    aria-label="다음 페이지"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(pageInfo.totalPages - 1)}
+                    disabled={pageInfo.isLast}
+                    className="h-10 w-10 rounded-xl p-0"
+                    aria-label="마지막 페이지"
+                  >
+                    <ChevronsRight className="h-5 w-5" />
+                  </Button>
                 </div>
 
-                {/* 다음 페이지 */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(pageInfo.currentPage + 1)}
-                  disabled={pageInfo.isLast}
-                  className="h-9 px-3"
-                >
-                  다음
-                </Button>
-
-                {/* 전체 페이지 정보 */}
-                <span className="ml-4 text-sm text-gray-500">
-                  총 {pageInfo.totalElements}개 중 {pageInfo.currentPage * pageInfo.size + 1}-
-                  {Math.min((pageInfo.currentPage + 1) * pageInfo.size, pageInfo.totalElements)}개
-                </span>
+                {/* Go to page */}
+                <GoToPageControl
+                  key={pageInfo.currentPage}
+                  totalPages={pageInfo.totalPages}
+                  currentPage={pageInfo.currentPage}
+                  onGo={handlePageChange}
+                />
               </div>
             )}
           </>
