@@ -14,8 +14,11 @@ type ReviewFormProps = {
   embedded?: boolean
   reviewId?: number
   lectureId?: number
+  lectureName?: string // 생성 모드에서 강의명 표시용
+  isCreateMode?: boolean // true면 새 리뷰 생성, false면 기존 리뷰 수정
   readOnly?: boolean
   onClose?: () => void
+  onSaveSuccess?: () => void // 저장 성공 시 콜백 (목록 갱신 등)
 }
 
 const reviewSchema = z.object({
@@ -24,6 +27,14 @@ const reviewSchema = z.object({
 
 const allowedCategories = ['TEACHER', 'CURRICULUM', 'MANAGEMENT', 'FACILITY', 'PROJECT'] as const
 type AllowedCategory = (typeof allowedCategories)[number]
+
+const CATEGORY_LABELS: Record<AllowedCategory, string> = {
+  TEACHER: '강사',
+  CURRICULUM: '커리큘럼',
+  MANAGEMENT: '운영',
+  FACILITY: '시설',
+  PROJECT: '프로젝트',
+}
 
 const detailScoreSchema = z.object({
   category: z
@@ -61,16 +72,33 @@ type CompletedLectureReviewResponse = {
   approvalStatus?: string | null
 }
 
-export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = false, onClose }: ReviewFormProps) {
-  const [loading, setLoading] = useState<boolean>(!!reviewId || !!lectureId)
+// 생성 모드용 빈 상세 점수 초기화
+const createEmptyDetailScores = () => allowedCategories.map(category => ({ category, score: 0, comment: '' }))
+
+export function ReviewForm({
+  embedded = false,
+  reviewId,
+  lectureId,
+  lectureName,
+  isCreateMode = false,
+  readOnly = false,
+  onClose,
+  onSaveSuccess,
+}: ReviewFormProps) {
+  // 생성 모드면 로딩 불필요, 수정 모드면 기존 데이터 로드
+  const [loading, setLoading] = useState<boolean>(!isCreateMode && (!!reviewId || !!lectureId))
   const [resolvedReviewId, setResolvedReviewId] = useState<number | null>(reviewId ?? null)
   const [comment, setComment] = useState<string>('')
-  const [detailScores, setDetailScores] = useState<Array<{ category: string; score: number; comment?: string }>>([])
+  const [detailScores, setDetailScores] = useState<Array<{ category: string; score: number; comment?: string }>>(
+    isCreateMode ? createEmptyDetailScores() : [],
+  )
   const [serverApproved, setServerApproved] = useState(false)
 
   const effectiveReadOnly = readOnly || serverApproved
 
   useEffect(() => {
+    // 생성 모드면 기존 데이터 로드 불필요
+    if (isCreateMode) return
     if (!reviewId && !lectureId) return
     let mounted = true
 
@@ -121,7 +149,7 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
     return () => {
       mounted = false
     }
-  }, [reviewId, lectureId])
+  }, [reviewId, lectureId, isCreateMode])
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -146,6 +174,7 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
           .join('\n')
         throw new Error(detailedMessage || '입력값을 확인해주세요')
       }
+
       const payload = {
         comment: parsed.data.comment ?? '',
         detailScores: parsed.data.detailScores.map(d => ({
@@ -155,8 +184,16 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
         })),
       }
 
-      const targetReviewId = resolvedReviewId ?? reviewId ?? null
+      // 생성 모드면 POST, 수정 모드면 PUT
+      if (isCreateMode && lectureId) {
+        await api.post('/reviews', {
+          lectureId,
+          ...payload,
+        })
+        return
+      }
 
+      const targetReviewId = resolvedReviewId ?? reviewId ?? null
       if (targetReviewId) {
         await api.put(`/reviews/${targetReviewId}`, payload)
         return
@@ -170,7 +207,8 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
     if (effectiveReadOnly) return
     try {
       await saveMutation.mutateAsync()
-      toast.success((resolvedReviewId ?? reviewId) ? '리뷰가 수정되었습니다.' : '리뷰가 저장되었습니다.')
+      toast.success(isCreateMode ? '리뷰가 등록되었습니다.' : '리뷰가 수정되었습니다.')
+      onSaveSuccess?.()
       onClose?.()
     } catch (e) {
       const message = e instanceof Error ? e.message : '리뷰 저장에 실패했습니다.'
@@ -180,6 +218,14 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
 
   const content = (
     <div className="space-y-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      {/* 생성 모드일 때 강의명 표시 */}
+      {isCreateMode && lectureName && (
+        <div className="mb-2">
+          <p className="text-muted-foreground text-xs">강의</p>
+          <p className="text-foreground text-sm font-semibold">{lectureName}</p>
+        </div>
+      )}
+
       {/* 총평: 버블 스타일 */}
       <div className="space-y-1.5">
         <label className="mb-1 block text-sm font-semibold text-gray-900">총평</label>
@@ -201,7 +247,9 @@ export function ReviewForm({ embedded = false, reviewId, lectureId, readOnly = f
           {detailScores.map((d, idx) => (
             <div key={`${d.category}-${idx}`} className="rounded-xl border border-gray-100 bg-white p-2.5 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-900">{d.category}</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {CATEGORY_LABELS[d.category as AllowedCategory] || d.category}
+                </span>
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => {
                     const selected = d.score >= i + 1

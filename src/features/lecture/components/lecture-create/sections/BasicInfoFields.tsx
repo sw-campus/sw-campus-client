@@ -81,7 +81,6 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
                     className="hidden"
                     onChange={e => {
                       const file = e.target.files?.[0] ?? null
-                      console.log('Lecture image changed:', file)
                       onChange(file)
                     }}
                   />

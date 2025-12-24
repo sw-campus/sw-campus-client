@@ -10,42 +10,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import { useTopBannersQuery, useTopLecturesQuery } from '../hooks/useAnalytics'
+import { PeriodToggle, type Period } from './shared/PeriodToggle'
 
-type Period = 7 | 30
 type ModalType = 'banners' | 'lectures' | null
 
 export function ClickRankingSection() {
   const [period, setPeriod] = useState<Period>(7)
   const [modalOpen, setModalOpen] = useState<ModalType>(null)
 
-  // 카드용: Top 5
-  const { data: banners = [], isLoading: bannersLoading } = useTopBannersQuery(period, 5)
-  const { data: lectures = [], isLoading: lecturesLoading } = useTopLecturesQuery(period, 5)
+  // 전체 데이터 조회 (limit=50) - 카드와 모달에서 공유
+  const { data: allBanners = [], isLoading: bannersLoading } = useTopBannersQuery(period, 50)
+  const { data: allLectures = [], isLoading: lecturesLoading } = useTopLecturesQuery(period, 50)
 
-  // 모달용: 전체 (limit=50)
-  const { data: allBanners = [], isLoading: allBannersLoading } = useTopBannersQuery(period, 50)
-  const { data: allLectures = [], isLoading: allLecturesLoading } = useTopLecturesQuery(period, 50)
-
-  const PeriodToggle = () => (
-    <div className="flex rounded-lg bg-gray-100 p-1">
-      <button
-        onClick={() => setPeriod(7)}
-        className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-          period === 7 ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-        }`}
-      >
-        7일
-      </button>
-      <button
-        onClick={() => setPeriod(30)}
-        className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-          period === 30 ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-        }`}
-      >
-        30일
-      </button>
-    </div>
-  )
+  // 카드용: Top 5 (slice로 추출)
+  const banners = allBanners.slice(0, 5)
+  const lectures = allLectures.slice(0, 5)
 
   const RankBadge = ({ rank }: { rank: number }) => (
     <span
@@ -91,15 +70,15 @@ export function ClickRankingSection() {
               <LuImage className="h-5 w-5 text-purple-500" />
               배너 클릭 Top 5
             </CardTitle>
-            <PeriodToggle />
+            <PeriodToggle period={period} onPeriodChange={setPeriod} />
           </CardHeader>
           <CardContent>
-            <Table>
+            <Table className="table-fixed">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">순위</TableHead>
-                  <TableHead>배너명</TableHead>
-                  <TableHead className="w-20 text-right">클릭</TableHead>
+                  <TableHead className="w-auto">배너명</TableHead>
+                  <TableHead className="w-16 text-right">클릭</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -117,9 +96,11 @@ export function ClickRankingSection() {
                       <TableCell className="font-medium">
                         <RankBadge rank={idx + 1} />
                       </TableCell>
-                      <TableCell>
-                        <span className="line-clamp-1">{banner.bannerName || `배너 #${banner.bannerId}`}</span>
-                        <span className="text-muted-foreground ml-2 text-xs">({banner.bannerType})</span>
+                      <TableCell className="max-w-0">
+                        <div className="truncate" title={banner.bannerName || `배너 #${banner.bannerId}`}>
+                          {banner.bannerName || `배너 #${banner.bannerId}`}
+                          <span className="text-muted-foreground ml-1 text-xs">({banner.bannerType})</span>
+                        </div>
                       </TableCell>
                       <TableCell className="text-right font-semibold">{banner.clickCount.toLocaleString()}</TableCell>
                     </TableRow>
@@ -149,13 +130,13 @@ export function ClickRankingSection() {
             <span className="text-muted-foreground text-sm">최근 {period}일</span>
           </CardHeader>
           <CardContent>
-            <Table>
+            <Table className="table-fixed">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">순위</TableHead>
-                  <TableHead>강의명</TableHead>
-                  <TableHead className="w-16 text-right">신청</TableHead>
-                  <TableHead className="w-16 text-right">공유</TableHead>
+                  <TableHead className="w-auto">강의명</TableHead>
+                  <TableHead className="w-12 text-right">신청</TableHead>
+                  <TableHead className="w-12 text-right">공유</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -173,8 +154,10 @@ export function ClickRankingSection() {
                       <TableCell className="font-medium">
                         <RankBadge rank={idx + 1} />
                       </TableCell>
-                      <TableCell>
-                        <span className="line-clamp-1">{lecture.lectureName || `강의 #${lecture.lectureId}`}</span>
+                      <TableCell className="max-w-0">
+                        <div className="truncate" title={lecture.lectureName || `강의 #${lecture.lectureId}`}>
+                          {lecture.lectureName || `강의 #${lecture.lectureId}`}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right font-semibold text-blue-600">
                         {lecture.applyClicks.toLocaleString()}
@@ -209,17 +192,17 @@ export function ClickRankingSection() {
               배너 클릭 순위 (최근 {period}일)
             </DialogTitle>
           </DialogHeader>
-          <Table>
+          <Table className="table-fixed">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16">순위</TableHead>
-                <TableHead>배너명</TableHead>
+                <TableHead className="w-14">순위</TableHead>
+                <TableHead className="w-auto">배너명</TableHead>
                 <TableHead className="w-20">타입</TableHead>
-                <TableHead className="w-20 text-right">클릭</TableHead>
+                <TableHead className="w-16 text-right">클릭</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {allBannersLoading ? (
+              {bannersLoading ? (
                 <SkeletonRows />
               ) : allBanners.length === 0 ? (
                 <TableRow>
@@ -233,7 +216,11 @@ export function ClickRankingSection() {
                     <TableCell>
                       <RankBadge rank={idx + 1} />
                     </TableCell>
-                    <TableCell className="font-medium">{banner.bannerName || `배너 #${banner.bannerId}`}</TableCell>
+                    <TableCell className="max-w-0">
+                      <div className="truncate font-medium" title={banner.bannerName || `배너 #${banner.bannerId}`}>
+                        {banner.bannerName || `배너 #${banner.bannerId}`}
+                      </div>
+                    </TableCell>
                     <TableCell className="text-muted-foreground text-sm">{banner.bannerType}</TableCell>
                     <TableCell className="text-right font-semibold">{banner.clickCount.toLocaleString()}</TableCell>
                   </TableRow>
@@ -253,18 +240,18 @@ export function ClickRankingSection() {
               인기 강의 순위 (최근 {period}일)
             </DialogTitle>
           </DialogHeader>
-          <Table>
+          <Table className="table-fixed">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16">순위</TableHead>
-                <TableHead>강의명</TableHead>
-                <TableHead className="w-20 text-right">신청</TableHead>
-                <TableHead className="w-20 text-right">공유</TableHead>
-                <TableHead className="w-20 text-right">합계</TableHead>
+                <TableHead className="w-14">순위</TableHead>
+                <TableHead className="w-auto">강의명</TableHead>
+                <TableHead className="w-14 text-right">신청</TableHead>
+                <TableHead className="w-14 text-right">공유</TableHead>
+                <TableHead className="w-14 text-right">합계</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {allLecturesLoading ? (
+              {lecturesLoading ? (
                 <SkeletonRows />
               ) : allLectures.length === 0 ? (
                 <TableRow>
@@ -278,7 +265,11 @@ export function ClickRankingSection() {
                     <TableCell>
                       <RankBadge rank={idx + 1} />
                     </TableCell>
-                    <TableCell className="font-medium">{lecture.lectureName || `강의 #${lecture.lectureId}`}</TableCell>
+                    <TableCell className="max-w-0">
+                      <div className="truncate font-medium" title={lecture.lectureName || `강의 #${lecture.lectureId}`}>
+                        {lecture.lectureName || `강의 #${lecture.lectureId}`}
+                      </div>
+                    </TableCell>
                     <TableCell className="text-right font-semibold text-blue-600">
                       {lecture.applyClicks.toLocaleString()}
                     </TableCell>

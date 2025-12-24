@@ -51,6 +51,16 @@ export default function SmallBanner() {
     return null
   }
 
+  const handleBannerClick = (banner: (typeof banners)[0]) => {
+    trackBannerClick({
+      bannerId: banner.id,
+      bannerType: 'SMALL',
+      bannerName: banner.lectureName,
+      lectureId: banner.lectureId,
+      url: banner.url,
+    })
+  }
+
   return (
     <div className="relative mx-auto mt-4 w-full rounded-3xl">
       <Swiper
@@ -88,24 +98,20 @@ export default function SmallBanner() {
             </div>
           )
 
-          const handleClick = () => {
-            trackBannerClick({
-              bannerId: banner.id,
-              bannerType: 'SMALL',
-              bannerName: banner.lectureName,
-              lectureId: banner.lectureId,
-              url: banner.url,
-            })
-          }
-
           return (
             <SwiperSlide key={banner.id}>
               {external ? (
-                <a href={href} target="_blank" rel="noopener noreferrer" className="block" onClick={handleClick}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                  onClick={() => handleBannerClick(banner)}
+                >
                   {content}
                 </a>
               ) : (
-                <Link href={href} className="block" onClick={handleClick}>
+                <Link href={href} className="block" onClick={() => handleBannerClick(banner)}>
                   {content}
                 </Link>
               )}

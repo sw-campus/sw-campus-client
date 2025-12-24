@@ -3,7 +3,6 @@ import { toLocalTimeString, toLocalDateString } from '@/features/lecture/utils/i
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 export const mapLectureFormToCreateRequest = (values: LectureFormValues): LectureCreateRequest => {
-  console.log('Mapper received lectureImageFile:', values.lectureImageFile)
   // 파일명은 로깅/참조용으로 전송되며, 실제 파일은 FormData를 통해 서버로 전송되어 S3에 업로드됩니다.
   const lectureImageUrl = values.lectureImageFile?.name ?? null
 
@@ -23,7 +22,7 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     : undefined
 
   return {
-    orgId: values.orgId,
+    orgId: values.orgId ?? undefined,
     lectureName: values.lectureName,
     days: values.days,
     startTime: toLocalTimeString(values.startTime),

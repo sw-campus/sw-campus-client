@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 
 import { isAxiosError } from 'axios'
-import { Star } from 'lucide-react'
 import { LuStar, LuPencil } from 'react-icons/lu'
 
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { CATEGORY_LABELS, type ReviewCategory } from '@/features/lecture/api/reviewApi.types'
 import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
 import { api } from '@/lib/axios'
 
@@ -70,24 +68,10 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
   // lectureId별 승인(버튼 라벨 전환용)
   const [approvedLectureIds, setApprovedLectureIds] = useState<Set<number>>(new Set())
 
-  // Create review modal state
+  // Create review modal state (ReviewForm 재사용)
   const [createOpen, setCreateOpen] = useState(false)
   const [createLectureId, setCreateLectureId] = useState<number | null>(null)
   const [createLectureName, setCreateLectureName] = useState<string>('')
-  const [createSaving, setCreateSaving] = useState(false)
-  const [createError, setCreateError] = useState<string | null>(null)
-  const [createScore, setCreateScore] = useState<number>(0)
-  const [createComment, setCreateComment] = useState<string>('')
-  const [createDetails, setCreateDetails] = useState<
-    Array<{ category: ReviewCategory; score: number; comment?: string }>
-  >([])
-
-  const defaultReviewDetails = (
-    initialScore = 0,
-  ): Array<{ category: ReviewCategory; score: number; comment?: string }> => {
-    const categories = Object.keys(CATEGORY_LABELS) as ReviewCategory[]
-    return categories.map(category => ({ category, score: initialScore, comment: '' }))
-  }
 
   // 설문 존재 여부 상태 (surveyId가 null이 아니면 1, null이면 0)
   const [surveyExists, setSurveyExists] = useState<boolean | null>(null)
@@ -467,12 +451,8 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                                 className="h-8 w-8"
                                 aria-label="후기 작성"
                                 onClick={() => {
-                                  setCreateError(null)
                                   setCreateLectureId(l.lectureId)
                                   setCreateLectureName(l.lectureName)
-                                  setCreateScore(0)
-                                  setCreateComment('')
-                                  setCreateDetails(defaultReviewDetails(0))
                                   setCreateOpen(true)
                                 }}
                               >
@@ -521,12 +501,8 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                                   size="icon"
                                   className="h-8 w-8"
                                   onClick={() => {
-                                    setCreateError(null)
                                     setCreateLectureId(l.lectureId)
                                     setCreateLectureName(l.lectureName)
-                                    setCreateScore(0)
-                                    setCreateComment('')
-                                    setCreateDetails(defaultReviewDetails(0))
                                     setCreateOpen(true)
                                   }}
                                 >
@@ -590,180 +566,33 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
         </DialogContent>
       </Dialog>
 
-      {/* 후기 작성 모달 - ReviewForm 디자인 준용 */}
+      {/* 후기 작성 모달 - ReviewForm 재사용 */}
       <Dialog open={createOpen} onOpenChange={open => setCreateOpen(open)}>
         <DialogContent className="max-h-[70vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-foreground text-2xl font-bold">후기 작성</DialogTitle>
           </DialogHeader>
-          {createError && <p className="text-destructive-foreground text-sm">{createError}</p>}
-
-          <div className="space-y-5">
-            {/* 헤더 정보 */}
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-muted-foreground text-xs">강의</p>
-                <p className="text-foreground text-sm font-semibold">{createLectureName}</p>
-              </div>
-              {/* 총점: ReviewForm 스타일에 맞춘 별 선택 UI */}
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => {
-                  const selected = createScore >= i + 1
-                  return (
-                    <button
-                      key={i}
-                      type="button"
-                      aria-label={`${i + 1}점 선택`}
-                      onClick={() => setCreateScore(i + 1)}
-                      className="text-yellow-500"
-                    >
-                      <Star className={`h-5 w-5 ${selected ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
-                    </button>
-                  )
-                })}
-                <span className="ml-2 min-w-8 text-right text-sm font-bold text-yellow-600">{createScore || 0}</span>
-              </div>
-            </div>
-
-            {/* 총평 - ReviewForm 버블 스타일 */}
-            <div className="space-y-1.5">
-              <label className="mb-1 block text-sm font-semibold text-gray-900">총평</label>
-              <div className="rounded-xl border border-gray-100 bg-gray-50 p-2">
-                <textarea
-                  value={createComment}
-                  onChange={e => setCreateComment(e.target.value)}
-                  rows={2}
-                  className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
-                  placeholder="후기를 입력하세요"
-                />
-              </div>
-            </div>
-
-            {/* 카테고리 카드 - ReviewForm 별점 UI */}
-            {createDetails && createDetails.length > 0 && (
-              <div className="space-y-2.5">
-                {createDetails.map((d, idx) => (
-                  <div
-                    key={`${d.category}-${idx}`}
-                    className="rounded-xl border border-gray-100 bg-white p-2.5 shadow-sm"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-gray-900">{CATEGORY_LABELS[d.category]}</span>
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => {
-                          const selected = d.score >= i + 1
-                          return (
-                            <button
-                              key={i}
-                              type="button"
-                              aria-label={`${d.category} ${i + 1}점 선택`}
-                              onClick={() => {
-                                const v = i + 1
-                                setCreateDetails(prev => prev.map((x, j) => (j === idx ? { ...x, score: v } : x)))
-                              }}
-                              className="p-0.5 text-yellow-500"
-                            >
-                              <Star
-                                className={`h-4 w-4 ${selected ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-                              />
-                            </button>
-                          )
-                        })}
-                        <span className="ml-2 min-w-6 text-right text-sm font-bold text-yellow-600">
-                          {d.score || 0}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="mt-1.5 rounded-xl border border-gray-100 bg-gray-50 p-2">
-                      <textarea
-                        value={d.comment ?? ''}
-                        onChange={e =>
-                          setCreateDetails(prev =>
-                            prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)),
-                          )
-                        }
-                        rows={2}
-                        className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-800 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
-                        placeholder="세부 의견을 입력하세요"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* 액션 영역 */}
-            <div className="flex justify-end gap-2 pt-2">
-              <Button size="sm" className="rounded-full" variant="secondary" onClick={() => setCreateOpen(false)}>
-                닫기
-              </Button>
-              <Button
-                size="sm"
-                className="rounded-full"
-                disabled={createSaving || !createLectureId}
-                onClick={async () => {
-                  if (!createLectureId) return
-                  try {
-                    for (const item of createDetails) {
-                      for (const item of createDetails) {
-                        // 간단 검증: 총평 및 각 카테고리 점수(1~5), 코멘트 20자 이상
-                        if ((createComment || '').trim().length < 20) {
-                          setCreateError('총평을 20자 이상 작성해 주세요.')
-                          return
-                        }
-                        if (item.score < 1 || item.score > 5) {
-                          setCreateError(`${CATEGORY_LABELS[item.category]} 점수를 선택해 주세요.`)
-                          return
-                        }
-                        const c = (item.comment || '').trim()
-                        if (c.length < 20) {
-                          setCreateError(`${CATEGORY_LABELS[item.category]} 의견을 20자 이상 작성해 주세요.`)
-                          return
-                        }
-                      }
-                      if (item.score < 1 || item.score > 5) {
-                        setCreateError(`${CATEGORY_LABELS[item.category]} 점수를 선택해 주세요.`)
-                        return
-                      }
-                      const c = (item.comment || '').trim()
-                      if (c.length < 20) {
-                        setCreateError(`${CATEGORY_LABELS[item.category]} 의견을 20자 이상 작성해 주세요.`)
-                        return
-                      }
-                    }
-
-                    setCreateSaving(true)
-                    setCreateError(null)
-                    await api.post('/reviews', {
-                      lectureId: createLectureId,
-                      comment: createComment,
-                      detailScores: createDetails.map(d => ({
-                        category: d.category,
-                        score: d.score,
-                        comment: d.comment,
-                      })),
-                    })
-
-                    setCreateOpen(false)
-                    // 목록 갱신
-                    try {
-                      setLecturesLoading(true)
-                      const { data } = await api.get<CompletedLecture[]>(`/mypage/completed-lectures`)
-                      setLectures(Array.isArray(data) ? data : [])
-                    } finally {
-                      setLecturesLoading(false)
-                    }
-                  } catch {
-                    setCreateError('후기 저장에 실패했습니다.')
-                  } finally {
-                    setCreateSaving(false)
-                  }
-                }}
-              >
-                저장
-              </Button>
-            </div>
-          </div>
+          {createLectureId ? (
+            <ReviewForm
+              embedded
+              isCreateMode
+              lectureId={createLectureId}
+              lectureName={createLectureName}
+              onClose={() => setCreateOpen(false)}
+              onSaveSuccess={async () => {
+                // 목록 갱신
+                try {
+                  setLecturesLoading(true)
+                  const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
+                  setLectures(Array.isArray(data) ? data : [])
+                } finally {
+                  setLecturesLoading(false)
+                }
+              }}
+            />
+          ) : (
+            <p className="text-muted-foreground text-sm">강의 정보를 찾을 수 없습니다.</p>
+          )}
         </DialogContent>
       </Dialog>
     </main>

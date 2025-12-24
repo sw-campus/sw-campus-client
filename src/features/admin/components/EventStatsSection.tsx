@@ -8,8 +8,7 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recha
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 import { useEventStatsQuery } from '../hooks/useAnalytics'
-
-type Period = 7 | 30
+import { PeriodToggle, type Period } from './shared/PeriodToggle'
 
 export function EventStatsSection() {
   const [period, setPeriod] = useState<Period>(7)
@@ -44,27 +43,6 @@ export function EventStatsSection() {
       bgColor: 'bg-emerald-50',
     },
   ]
-
-  const PeriodToggle = () => (
-    <div className="flex rounded-lg bg-gray-100 p-1">
-      <button
-        onClick={() => setPeriod(7)}
-        className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-          period === 7 ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-        }`}
-      >
-        7일
-      </button>
-      <button
-        onClick={() => setPeriod(30)}
-        className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-          period === 30 ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-        }`}
-      >
-        30일
-      </button>
-    </div>
-  )
 
   if (isLoading) {
     return (
@@ -102,7 +80,7 @@ export function EventStatsSection() {
             <LuActivity className="h-5 w-5 text-orange-500" />
             배너 클릭 통계
           </CardTitle>
-          <PeriodToggle />
+          <PeriodToggle period={period} onPeriodChange={setPeriod} />
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>

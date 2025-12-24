@@ -220,7 +220,6 @@ function TeacherItem({ control, index, totalCount, onMove, onRemove }: TeacherIt
                   className="hidden"
                   onChange={e => {
                     const file = e.target.files?.[0] ?? null
-                    console.log(`Teacher ${index + 1} image changed:`, file)
                     onChange(file)
                   }}
                 />
