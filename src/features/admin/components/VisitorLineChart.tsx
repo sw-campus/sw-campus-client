@@ -1,19 +1,21 @@
 'use client'
 
-import { useState } from 'react'
-
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import { useAnalyticsReportQuery } from '../hooks/useAnalytics'
+import { AnalyticsReport } from '../api/analyticsApi'
 
 type Period = 7 | 30
 
-export function VisitorLineChart() {
-  const [period, setPeriod] = useState<Period>(7)
-  const { data: report, isLoading } = useAnalyticsReportQuery(period)
+interface VisitorLineChartProps {
+  report?: AnalyticsReport
+  isLoading: boolean
+  period: Period
+  setPeriod: (period: Period) => void
+}
 
+export function VisitorLineChart({ report, isLoading, period, setPeriod }: VisitorLineChartProps) {
   // 일별 데이터를 차트용으로 변환
   const chartData =
     report?.dailyStats?.map(stat => ({
@@ -21,7 +23,8 @@ export function VisitorLineChart() {
         period === 7
           ? new Date(stat.date).toLocaleDateString('ko-KR', { weekday: 'short' })
           : new Date(stat.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
-      visitors: stat.activeUsers,
+      visitors: stat.totalUsers,
+      newVisitors: stat.newUsers,
       pageViews: stat.pageViews,
     })) ?? []
 
@@ -65,18 +68,25 @@ export function VisitorLineChart() {
           </div>
         </div>
         <div className="text-muted-foreground flex items-center gap-4 text-sm">
-          <span>
-            총 방문자: <strong className="text-foreground">{report?.totalUsers?.toLocaleString() ?? 0}</strong>
-          </span>
-          <span>
-            페이지뷰: <strong className="text-foreground">{report?.pageViews?.toLocaleString() ?? 0}</strong>
-          </span>
+          <div className="flex items-center gap-2">
+            <div className="h-2.5 w-2.5 rounded-full bg-[hsl(var(--primary))]" />
+            <span>
+              총 방문자: <strong className="text-foreground">{report?.totalUsers?.toLocaleString() ?? 0}</strong>
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2.5 w-2.5 rounded-full bg-[#10b981]" />
+            <span>
+              신규 방문자: <strong className="text-foreground">{report?.newUsers?.toLocaleString() ?? 0}</strong>
+            </span>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={chartData}>
+            <ComposedChart data={chartData}>
+              <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis
                 dataKey="date"
                 stroke="hsl(var(--muted-foreground))"
@@ -98,16 +108,30 @@ export function VisitorLineChart() {
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
                 }}
-                formatter={(value, name) => [`${value ?? 0}`, name === 'visitors' ? '방문자' : '페이지뷰']}
+                formatter={(value, name) => {
+                  let label = ''
+                  switch (name) {
+                    case 'visitors':
+                      label = '방문자'
+                      break
+                    case 'newVisitors':
+                      label = '신규 방문자'
+                      break
+                    default:
+                      label = '페이지뷰'
+                  }
+                  return [`${value ?? 0}`, label]
+                }}
               />
+              <Bar dataKey="visitors" fill="hsl(var(--primary))" barSize={20} radius={[4, 4, 0, 0]} />
               <Line
                 type="monotone"
-                dataKey="visitors"
-                stroke="hsl(var(--primary))"
+                dataKey="newVisitors"
+                stroke="#10b981" // Emerald-500
                 strokeWidth={2}
-                dot={period === 7 ? { fill: 'hsl(var(--primary))' } : false}
+                dot={period === 7 ? { fill: '#10b981' } : false}
               />
-            </LineChart>
+            </ComposedChart>
           </ResponsiveContainer>
         ) : (
           <div className="flex h-[200px] items-center justify-center">

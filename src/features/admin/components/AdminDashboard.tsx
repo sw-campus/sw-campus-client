@@ -1,16 +1,23 @@
 'use client'
 
+import { useState } from 'react'
+
 import { LuAward, LuBookOpen, LuStar, LuUsers } from 'react-icons/lu'
 
+import { useAnalyticsReportQuery } from '../hooks/useAnalytics'
 import { useDashboardStats } from '../hooks/useDashboardStats'
 import { ClickRankingSection } from './ClickRankingSection'
+import { DeviceDonutChart } from './DeviceDonutChart'
 import { DistributionDonutChart } from './DistributionDonutChart'
+import { EngagementCard } from './EngagementCard'
 import { EventStatsSection } from './EventStatsSection'
 import { StatCard } from './StatCard'
 import { VisitorLineChart } from './VisitorLineChart'
 
 export function AdminDashboard() {
+  const [period, setPeriod] = useState<7 | 30>(7)
   const { stats, pendingCounts, memberDistribution, isLoading } = useDashboardStats()
+  const { data: analyticsReport, isLoading: isAnalyticsLoading } = useAnalyticsReportQuery(period)
 
   // 동적 stats 데이터 (서브텍스트로 승인 대기 건수 표시)
   const statCards = [
@@ -40,7 +47,7 @@ export function AdminDashboard() {
     },
   ]
 
-  // 회원 분포 차트 데이터 (구분이 쉬운 색상 사용)
+  // 회원 분포 차트 데이터
   const distributionData = [
     { name: '일반 회원', value: memberDistribution.user, color: '#3b82f6' }, // Blue
     { name: '기관 회원', value: memberDistribution.organization, color: '#10b981' }, // Emerald
@@ -65,9 +72,27 @@ export function AdminDashboard() {
         ))}
       </div>
 
-      {/* Charts Section - 기본 통계 */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <VisitorLineChart />
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        {/* 상단: 방문자 차트 (전체 너비) */}
+        <div className="col-span-1 lg:col-span-3">
+          <VisitorLineChart
+            report={analyticsReport}
+            isLoading={isAnalyticsLoading}
+            period={period}
+            setPeriod={setPeriod}
+          />
+        </div>
+
+        {/* 하단: 통계 및 도넛 차트들 (3열) */}
+        <EngagementCard
+          period={period}
+          averageEngagementTime={analyticsReport?.averageEngagementTime || 0}
+          pageViews={analyticsReport?.pageViews || 0}
+          sessions={analyticsReport?.sessions || 0}
+          isLoading={isAnalyticsLoading}
+        />
+        <DeviceDonutChart data={analyticsReport?.deviceStats} isLoading={isAnalyticsLoading} />
         <DistributionDonutChart data={distributionData} isLoading={isLoading} />
       </div>
 

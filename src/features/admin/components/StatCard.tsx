@@ -5,9 +5,10 @@ interface StatCardProps {
   value: number
   icon?: React.ElementType
   subtext?: string
+  customFormatter?: (value: number) => string
 }
 
-export function StatCard({ title, value, icon: Icon, subtext }: StatCardProps) {
+export function StatCard({ title, value, icon: Icon, subtext, customFormatter }: StatCardProps) {
   return (
     <Card className="bg-card">
       <CardContent className="flex flex-col items-center justify-center gap-2 p-6">
@@ -16,7 +17,9 @@ export function StatCard({ title, value, icon: Icon, subtext }: StatCardProps) {
             <Icon className="h-6 w-6" />
           </div>
         )}
-        <p className="text-foreground text-3xl font-bold">{value.toLocaleString()}</p>
+        <p className="text-foreground text-3xl font-bold">
+          {customFormatter ? customFormatter(value) : value.toLocaleString()}
+        </p>
         <p className="text-muted-foreground text-sm">{title}</p>
         {subtext && <p className="text-primary text-xs font-medium">{subtext}</p>}
       </CardContent>

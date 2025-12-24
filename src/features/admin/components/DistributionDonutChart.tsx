@@ -1,4 +1,3 @@
-
 'use client'
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
@@ -38,23 +37,25 @@ export function DistributionDonutChart({ data, isLoading }: DistributionDonutCha
       <CardHeader>
         <CardTitle className="text-foreground">회원 분포</CardTitle>
       </CardHeader>
-      <CardContent className="flex items-center justify-center">
-        <ResponsiveContainer width="100%" height={200}>
-          <PieChart>
-            <Pie data={data} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={2} dataKey="value">
-              {data.map(entry => (
-                <Cell key={entry.name} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '8px',
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+      <CardContent className="flex flex-col items-center justify-center gap-4">
+        <div className="h-[200px] w-[200px] shrink-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie data={data} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={2} dataKey="value">
+                {data.map(entry => (
+                  <Cell key={entry.name} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px',
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
         <div className="flex flex-col gap-2">
           {data.map(item => (
             <div key={item.name} className="flex items-center gap-2">

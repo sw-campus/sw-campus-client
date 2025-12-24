@@ -3,15 +3,24 @@ import { api } from '@/lib/axios'
 export interface AnalyticsReport {
   totalUsers: number
   activeUsers: number
+  newUsers: number
+  averageEngagementTime: number
   pageViews: number
   sessions: number
   dailyStats: DailyStat[]
+  deviceStats: DeviceStat[]
 }
 
 export interface DailyStat {
   date: string
-  activeUsers: number
+  totalUsers: number
+  newUsers: number
   pageViews: number
+}
+
+export interface DeviceStat {
+  category: string
+  activeUsers: number
 }
 
 export interface EventStats {
