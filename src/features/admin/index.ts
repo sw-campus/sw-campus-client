@@ -1,11 +1,11 @@
 // Components
 export { AdminSidebar } from './components/AdminSidebar'
-export { StatCard } from './components/StatCard'
-export { VisitorLineChart } from './components/VisitorLineChart'
-export { DistributionDonutChart } from './components/DistributionDonutChart'
+export { StatCard } from './components/dashboard/StatCard'
+export { VisitorLineChart } from './components/dashboard/VisitorLineChart'
+export { DistributionDonutChart } from './components/dashboard/DistributionDonutChart'
 export { FeatureCard } from './components/FeatureCard'
 export { MemberStatusTable } from './components/MemberStatusTable'
-export { AdminDashboard } from './components/AdminDashboard'
+export { AdminDashboard } from './components/dashboard/AdminDashboard'
 
 // Organization Components
 export {
