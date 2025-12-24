@@ -14,6 +14,7 @@ const menuItems: SidebarMenuItem[] = [
   { label: '배너관리', href: '/admin/banners' },
   { label: '수료증관리', href: '/admin/certificates' },
   { label: '리뷰관리', href: '/admin/reviews' },
+  { label: '테스트 데이터', href: '/admin/test-data' },
 ]
 
 export function AdminSidebar() {

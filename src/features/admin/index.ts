@@ -27,6 +27,9 @@ export { BannerCreateModal, BannerManagementPage, BannerTable } from './componen
 // Review Components
 export { ReviewApprovalPage, ReviewDetailModal, ReviewTable } from './components/review'
 
+// TestData Components
+export { TestDataPage } from './components/testdata/TestDataPage'
+
 // Member Components
 export { MemberPage } from './components/member/MemberPage'
 export { MemberTable } from './components/member/MemberTable'
