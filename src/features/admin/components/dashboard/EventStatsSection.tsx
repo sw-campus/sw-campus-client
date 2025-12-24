@@ -98,7 +98,7 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={bannerData} layout="vertical" margin={{ left: -20 }}>
+            <BarChart data={bannerData} layout="vertical">
               <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} allowDecimals={false} />
               <YAxis
                 type="category"

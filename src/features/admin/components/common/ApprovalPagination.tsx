@@ -121,9 +121,6 @@ export function ApprovalPagination({ currentPage, totalPages, onPageChange }: Ap
               ))}
             </SelectContent>
           </Select>
-          <Button size="sm" className="h-8 bg-gray-700 px-4 text-white hover:bg-gray-600" onClick={() => {}}>
-            GO
-          </Button>
         </div>
       )}
     </div>

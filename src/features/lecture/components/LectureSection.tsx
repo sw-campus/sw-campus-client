@@ -10,6 +10,7 @@ import { useCategoryTree } from '@/features/category'
 import { LectureList } from '@/features/lecture/components/LectureList'
 import { LectureFilterTabs } from '@/features/lecture/components/lecture-search/LectureFilterTabs'
 import { useTopRatedLecturesByCategory } from '@/features/lecture/hooks/useTopRatedLecturesByCategory'
+import { DEFAULT_PAGE_SIZE } from '@/features/lecture/types/filter.type'
 import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLectureResponseToSummary'
 
 const containerVariants: Variants = {
@@ -131,7 +132,7 @@ export default function LectureSection() {
         {/* 더보기 버튼 */}
         <motion.div variants={itemVariants} className="relative z-10 mt-10 flex justify-center">
           <motion.button
-            onClick={() => router.push(`/lectures/search?categoryIds=${resolvedCategoryId}&size=12`)}
+            onClick={() => router.push(`/lectures/search?categoryIds=${resolvedCategoryId}&size=${DEFAULT_PAGE_SIZE}`)}
             disabled={resolvedCategoryId === null}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

@@ -21,6 +21,7 @@ import {
   REGION_QUERY_MAP,
   STATUS_QUERY_MAP,
   FilterGroupKey,
+  DEFAULT_PAGE_SIZE,
 } from '@/features/lecture/types/filter.type'
 import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLectureResponseToSummary'
 import { trackSearch } from '@/lib/analytics'
@@ -260,7 +261,7 @@ function SearchContent() {
     const sortValue = selectedSort || DEFAULT_SORT
     params.append('sort', sortValue)
 
-    params.set('size', '12')
+    params.set('size', DEFAULT_PAGE_SIZE)
     params.set('page', '1')
 
     const queryString = params.toString()
@@ -279,7 +280,7 @@ function SearchContent() {
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
-    params.set('size', '12')
+    params.set('size', DEFAULT_PAGE_SIZE)
     params.set('page', String(newPage + 1))
     router.push(`/lectures/search?${params.toString()}`)
   }
@@ -418,6 +419,7 @@ function SearchContent() {
                         onClick={() => handlePageChange(0)}
                         disabled={pageInfo.isFirst}
                         className="h-9 w-9"
+                        aria-label="첫 페이지로 이동"
                       >
                         «
                       </Button>
@@ -428,6 +430,7 @@ function SearchContent() {
                         onClick={() => handlePageChange(pageInfo.currentPage - 1)}
                         disabled={pageInfo.isFirst}
                         className="h-9 w-9"
+                        aria-label="이전 페이지로 이동"
                       >
                         ‹
                       </Button>
@@ -456,6 +459,7 @@ function SearchContent() {
                         onClick={() => handlePageChange(pageInfo.currentPage + 1)}
                         disabled={pageInfo.isLast}
                         className="h-9 w-9"
+                        aria-label="다음 페이지로 이동"
                       >
                         ›
                       </Button>
@@ -466,6 +470,7 @@ function SearchContent() {
                         onClick={() => handlePageChange(pageInfo.totalPages - 1)}
                         disabled={pageInfo.isLast}
                         className="h-9 w-9"
+                        aria-label="마지막 페이지로 이동"
                       >
                         »
                       </Button>
@@ -489,13 +494,6 @@ function SearchContent() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <Button
-                        size="sm"
-                        className="h-8 bg-gray-700 px-4 text-white hover:bg-gray-600"
-                        onClick={() => {}}
-                      >
-                        GO
-                      </Button>
                     </div>
                   </div>
                 )}
