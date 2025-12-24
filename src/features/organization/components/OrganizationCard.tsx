@@ -33,16 +33,16 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
       >
         {/* Circular Logo with Ring */}
         <div
-          className="ring-border group-hover:ring-primary/30 mb-4 flex h-18 w-18 items-center justify-center overflow-hidden rounded-full shadow-sm ring-2 transition-all group-hover:shadow-md"
+          className="ring-border group-hover:ring-primary/30 relative mb-4 flex h-18 w-18 items-center justify-center overflow-hidden rounded-full shadow-sm ring-2 transition-all group-hover:shadow-md"
           style={{ backgroundColor: accentCircleBg }}
         >
           {organization.logoUrl ? (
             <Image
               src={organization.logoUrl}
               alt={organization.name}
-              width={64}
-              height={64}
-              className="h-full w-full object-contain p-1"
+              fill
+              sizes="72px"
+              className="object-cover object-center"
             />
           ) : (
             <span className="text-2xl">🏢</span>

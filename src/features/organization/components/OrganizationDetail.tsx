@@ -299,7 +299,7 @@ export function OrganizationDetail({ organization, lectures = [] }: Organization
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/40 to-black/20" />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           {/* Logo */}
@@ -364,18 +364,18 @@ export function OrganizationDetail({ organization, lectures = [] }: Organization
               {facilityImages.length > 0 && (
                 <section>
                   <h2 className="text-foreground mb-5 text-xl font-bold">{organization.name}의 현장이에요.</h2>
-                  <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+                  <div className="grid w-full grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
                     {facilityImages.map((url, index) => (
                       <div
                         key={url}
-                        className="group bg-muted aspect-square overflow-hidden rounded-xl shadow-sm transition-all duration-200 hover:shadow-lg"
+                        className="group bg-muted relative aspect-square overflow-hidden rounded-xl shadow-sm transition-all duration-200 hover:shadow-lg"
                       >
                         <Image
                           src={url}
                           alt={`${organization.name} 현장 이미지 ${index + 1}`}
-                          width={400}
-                          height={400}
-                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          fill
+                          sizes="(max-width: 768px) 50vw, 20vw"
+                          className="object-cover object-center transition-transform duration-300 group-hover:scale-110"
                         />
                       </div>
                     ))}
