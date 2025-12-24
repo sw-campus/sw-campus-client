@@ -72,7 +72,7 @@ export function OrganizationDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="h-[calc(100vh-6rem)] w-[calc(100vw-2rem)] max-w-none overflow-y-auto sm:h-[calc(90vh-6rem)] sm:w-[calc(100vw-4rem)] sm:max-w-none md:h-[calc(80vh-6rem)] md:w-[calc(85vw-4rem)] lg:w-[calc(70vw-4rem)] xl:w-[calc(60vw-4rem)]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             기관 상세 정보
@@ -86,21 +86,13 @@ export function OrganizationDetailModal({
             <span className="text-muted-foreground">로딩 중...</span>
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* 기관 정보 */}
-            <div className="border-border rounded-lg border p-4">
-              <h3 className="text-foreground mb-3 font-semibold">기관 정보</h3>
-              <div className="divide-border divide-y">
-                <DetailRow label="기관명" value={detail?.name ?? organization.name} />
-                <DetailRow label="설명" value={detail?.description} />
-                <DetailRow label="홈페이지" value={detail?.homepage} />
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* 재직증명서 (왼쪽) */}
+            <div className="border-border overflow-hidden rounded-lg border bg-gray-50">
+              <div className="flex justify-center p-2">
+                <span className="text-muted-foreground text-xs font-medium">CERTIFICATE IMAGE</span>
               </div>
-            </div>
-
-            {/* 재직증명서 */}
-            <div className="border-border rounded-lg border p-4">
-              <h3 className="text-foreground mb-3 font-semibold">재직증명서</h3>
-              <div className="bg-muted relative aspect-4/3 w-full overflow-hidden rounded-lg">
+              <div className="bg-muted relative aspect-4/3 w-full overflow-hidden rounded-lg bg-white">
                 <S3Image
                   s3Key={detail?.certificateKey}
                   alt="재직증명서"
@@ -112,6 +104,16 @@ export function OrganizationDetailModal({
                     </div>
                   }
                 />
+              </div>
+            </div>
+
+            {/* 기관 정보 (오른쪽) */}
+            <div className="border-border rounded-lg border p-6">
+              <h3 className="text-foreground mb-3 font-semibold">기관 정보</h3>
+              <div className="divide-border divide-y">
+                <DetailRow label="기관명" value={detail?.name ?? organization.name} />
+                <DetailRow label="설명" value={detail?.description} />
+                <DetailRow label="홈페이지" value={detail?.homepage} />
               </div>
             </div>
           </div>
