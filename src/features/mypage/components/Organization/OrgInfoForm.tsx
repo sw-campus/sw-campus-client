@@ -37,7 +37,6 @@ type MyOrganizationResponse = {
 const orgInfoSchema = z.object({
   organizationName: z.string().min(1, '기관명을 입력해주세요.'),
   representativeName: z.string().min(1, '대표자명을 입력해주세요.'),
-  phone: z.string().min(1, '연락처를 입력해주세요.'),
   description: z.string().optional(),
   homepage: z.string().optional(),
   logoUrl: z.string().optional(),
@@ -92,7 +91,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     defaultValues: {
       organizationName: '',
       representativeName: '',
-      phone: '',
       description: '',
       homepage: '',
       logoUrl: '',
@@ -137,7 +135,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
         methods.reset({
           organizationName: data.organizationName ?? '',
           representativeName: data.representativeName ?? '',
-          phone: data.phone ?? '',
           description: data.description ?? '',
           homepage: data.homepage ?? '',
           logoUrl: data.logoUrl ?? '',
@@ -181,7 +178,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
       // 텍스트 필드 (Swagger 스펙 기반)
       fd.append('organizationName', methods.getValues('organizationName') ?? '')
       fd.append('description', methods.getValues('description') ?? '')
-      fd.append('phone', methods.getValues('phone') ?? '')
       fd.append('location', _nextLocation)
       fd.append('homepage', methods.getValues('homepage') ?? '')
       fd.append('govAuth', methods.getValues('govAuth') ?? '')
@@ -270,23 +266,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
               {errors.representativeName && (
                 <p className="mt-1 text-xs text-red-600">{errors.representativeName.message}</p>
               )}
-            </div>
-
-            <div>
-              <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-800">
-                연락처
-              </label>
-              <input
-                id="phone"
-                type="text"
-                disabled
-                placeholder="예) 010-1234-5678"
-                {...register('phone')}
-                className={`${INPUT_CLASS} cursor-not-allowed bg-gray-100 text-gray-500`}
-              />
-              <p className="mt-1 text-xs text-neutral-500">
-                연락처 및 계정 정보는 &apos;내 정보 관리&apos; 탭에서 수정 가능합니다.
-              </p>
             </div>
 
             <div>
