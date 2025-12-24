@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { oauthLogin } from '@/features/auth/authApi'
 import { getProfile } from '@/features/mypage/api/survey.api'
+import { parseUserType, parseUserName, parseNickname, type LoginResponse } from '@/lib/parseLoginResponse'
 import { useAuthStore } from '@/store/authStore'
 
 export default function OAuthCallbackPage() {
@@ -50,32 +51,18 @@ export default function OAuthCallbackPage() {
       }
 
       try {
-        const data = await oauthLogin(provider, code)
+        const data = (await oauthLogin(provider, code)) as LoginResponse | null
 
-        let userName = '사용자'
-        let userType: 'ORGANIZATION' | 'PERSONAL' | null = null
-
-        if (data) {
-          userName = (data as any).name ?? (data as any).nickname ?? (data as any).email?.split?.('@')?.[0] ?? '사용자'
-
-          if ((data as any).userType === 'ORGANIZATION' || (data as any).userType === 'PERSONAL') {
-            userType = (data as any).userType
-          } else if ((data as any).userType === 'organization' || (data as any).userType === 'personal') {
-            userType = (data as any).userType === 'organization' ? 'ORGANIZATION' : 'PERSONAL'
-          } else if ((data as any).role) {
-            userType = (data as any).role === 'ORGANIZATION' ? 'ORGANIZATION' : 'PERSONAL'
-          } else if ((data as any).isOrganization !== undefined) {
-            userType = (data as any).isOrganization ? 'ORGANIZATION' : 'PERSONAL'
-          }
-        }
+        const userName = parseUserName(data)
+        const userType = parseUserType(data)
 
         setUserType(userType)
         setLogin(userName)
 
         // 닉네임 설정: 응답에 있으면 사용, 없으면 프로필 조회
         try {
-          const nickFromResponse = (data as any)?.nickname
-          if (typeof nickFromResponse === 'string' && nickFromResponse.length > 0) {
+          const nickFromResponse = parseNickname(data)
+          if (nickFromResponse) {
             setNickname(nickFromResponse)
           } else {
             const profile = await getProfile()
@@ -86,7 +73,12 @@ export default function OAuthCallbackPage() {
         }
 
         toast.success('로그인되었습니다.')
-        router.replace('/')
+        // 관리자인 경우 /admin 페이지로, 그 외에는 홈으로 리다이렉트
+        if (userType === 'ADMIN') {
+          router.replace('/admin')
+        } else {
+          router.replace('/')
+        }
       } catch (err) {
         console.error(err)
         toast.error('소셜 로그인 처리에 실패했습니다. 다시 시도해주세요.')

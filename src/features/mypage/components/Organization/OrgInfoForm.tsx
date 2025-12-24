@@ -279,11 +279,14 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
               <input
                 id="phone"
                 type="text"
+                disabled
                 placeholder="예) 010-1234-5678"
                 {...register('phone')}
-                className={INPUT_CLASS}
+                className={`${INPUT_CLASS} cursor-not-allowed bg-gray-100 text-gray-500`}
               />
-              {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone.message}</p>}
+              <p className="mt-1 text-xs text-neutral-500">
+                연락처 및 계정 정보는 &apos;내 정보 관리&apos; 탭에서 수정 가능합니다.
+              </p>
             </div>
 
             <div>
@@ -299,24 +302,15 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
               />
             </div>
 
-            {/* 주소(수정 버튼 가로 배치, 수정 시 자동 검색) */}
+            {/* 주소(수정 불가) */}
             <div>
-              {!showAddressEditor ? (
-                <div className="flex items-center gap-2">
-                  <div className={`${INPUT_CLASS} flex flex-1 items-center bg-gray-50`}>
-                    <span className="truncate">{address || '주소를 입력해주세요.'}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddressEditor(true)}
-                    className="h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
-                  >
-                    수정
-                  </button>
-                </div>
-              ) : (
-                <AddressInput autoOpen />
-              )}
+              <label className="mb-1 block text-sm font-medium text-gray-800">주소</label>
+              <div className={`${INPUT_CLASS} flex flex-1 items-center bg-gray-100`}>
+                <span className="truncate text-gray-500">{address || '주소 정보가 없습니다.'}</span>
+              </div>
+              <p className="mt-1 text-xs text-neutral-500">
+                기업 주소는 &apos;내 정보 관리&apos; 탭에서 수정 가능합니다.
+              </p>
             </div>
 
             <div>

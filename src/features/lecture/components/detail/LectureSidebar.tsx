@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import { AddToCartButton } from '@/features/cart'
 import { type LectureDetail } from '@/features/lecture/api/lectureApi'
 import { processApplicationSteps } from '@/features/lecture/utils/processApplicationSteps'
+import { trackApplyButtonClick, trackShare } from '@/lib/analytics'
 
 import { formatDateDot, SideInfoRow } from './DetailShared'
 
@@ -20,8 +21,25 @@ export default function LectureSidebar({ lecture }: Props) {
     try {
       await navigator.clipboard.writeText(window.location.href)
       toast.success('링크가 복사되었습니다!')
+      trackShare({
+        lectureId: lecture.id,
+        lectureName: lecture.title,
+        method: 'clipboard',
+      })
     } catch {
       toast.error('링크 복사에 실패했습니다.')
+    }
+  }
+
+  const handleApplyClick = () => {
+    if (lecture.url) {
+      trackApplyButtonClick({
+        lectureId: lecture.id,
+        lectureName: lecture.title,
+        orgName: lecture.orgName,
+        url: lecture.url,
+      })
+      window.open(lecture.url, '_blank')
     }
   }
 
@@ -36,7 +54,7 @@ export default function LectureSidebar({ lecture }: Props) {
             size="lg"
             className="h-14 w-full rounded-xl bg-orange-400 text-lg font-bold text-white shadow-lg shadow-orange-200 hover:bg-orange-500 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none"
             disabled={!lecture.url}
-            onClick={() => lecture.url && window.open(lecture.url, '_blank')}
+            onClick={handleApplyClick}
           >
             신청페이지 바로가기
           </Button>

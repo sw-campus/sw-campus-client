@@ -12,15 +12,20 @@ export default function MyPage() {
   const router = useRouter()
   const { userType } = useAuthStore()
   const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(true)
+  const [activeTab, setActiveTab] = useState<'orgInfo' | 'lectureManage' | 'myInfo'>('orgInfo')
 
   // 기관 마이페이지
   if (userType === 'ORGANIZATION') {
     const handleOpenOrgInfo = () => {
-      setIsOrgPasswordOpen(true)
+      setActiveTab('orgInfo')
     }
 
     const handleOpenLectureManage = () => {
-      setIsOrgPasswordOpen(false)
+      setActiveTab('lectureManage')
+    }
+
+    const handleOpenMyInfo = () => {
+      setActiveTab('myInfo')
     }
 
     const openInfoModal = () => {
@@ -36,12 +41,13 @@ export default function MyPage() {
         <div className="custom-card">
           <div className="relative z-10 flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
             <OrganizationAside
-              active={isOrgPasswordOpen ? 'orgInfo' : 'lectureManage'}
+              active={activeTab}
               onClickOrgInfo={handleOpenOrgInfo}
               onClickLectureManage={handleOpenLectureManage}
+              onClickMyInfo={handleOpenMyInfo}
             />
             <OrganizationMain
-              isOrgPasswordOpen={isOrgPasswordOpen}
+              activeTab={activeTab}
               openInfoModal={openInfoModal}
               onOpenProductModal={openProductModal}
             />
