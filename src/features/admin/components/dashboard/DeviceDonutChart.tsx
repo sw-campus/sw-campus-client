@@ -4,7 +4,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import { DeviceStat } from '../api/analyticsApi'
+import { DeviceStat } from '../../api/analyticsApi'
 
 interface DeviceDonutChartProps {
   data?: DeviceStat[]
@@ -27,7 +27,7 @@ export function DeviceDonutChart({ data, isLoading }: DeviceDonutChartProps) {
 
   if (isLoading) {
     return (
-      <Card className="bg-card">
+      <Card className="bg-card h-full">
         <CardHeader>
           <CardTitle className="text-foreground">기기별 접속</CardTitle>
         </CardHeader>
@@ -39,7 +39,7 @@ export function DeviceDonutChart({ data, isLoading }: DeviceDonutChartProps) {
   }
 
   return (
-    <Card className="bg-card">
+    <Card className="bg-card flex h-full flex-col">
       <CardHeader>
         <CardTitle className="text-foreground">기기별 접속</CardTitle>
       </CardHeader>

@@ -4,11 +4,13 @@ import { LuClock, LuEye, LuMousePointer2 } from 'react-icons/lu'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
+import { Period } from './shared/PeriodToggle'
+
 interface EngagementCardProps {
   averageEngagementTime: number
   pageViews: number
   sessions: number
-  period: 7 | 30
+  period: Period
   isLoading?: boolean
 }
 
@@ -21,7 +23,7 @@ export function EngagementCard({ averageEngagementTime, pageViews, sessions, per
 
   if (isLoading) {
     return (
-      <Card className="bg-card">
+      <Card className="bg-card h-full">
         <CardHeader>
           <CardTitle className="text-foreground">참여 현황</CardTitle>
         </CardHeader>
@@ -33,13 +35,15 @@ export function EngagementCard({ averageEngagementTime, pageViews, sessions, per
   }
 
   return (
-    <Card className="bg-card flex flex-col justify-between">
+    <Card className="bg-card flex h-full flex-col justify-between">
       <CardHeader className="pb-2">
         <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
           <LuClock className="text-primary h-5 w-5" />
           참여 현황
         </CardTitle>
-        <p className="text-muted-foreground text-xs">최근 {period}일 기준</p>
+        <p className="text-muted-foreground text-xs">
+          {period === 1 ? '일간' : period === 7 ? '주간' : period === 30 ? '월간' : '주간'} 기준
+        </p>
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col justify-center gap-6 pb-6">

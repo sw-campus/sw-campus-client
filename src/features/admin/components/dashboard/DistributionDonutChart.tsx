@@ -21,7 +21,7 @@ export function DistributionDonutChart({ data, isLoading }: DistributionDonutCha
 
   if (isLoading || totalValue === 0) {
     return (
-      <Card className="bg-card">
+      <Card className="bg-card h-full">
         <CardHeader>
           <CardTitle className="text-foreground">회원 분포</CardTitle>
         </CardHeader>
@@ -33,7 +33,7 @@ export function DistributionDonutChart({ data, isLoading }: DistributionDonutCha
   }
 
   return (
-    <Card className="bg-card">
+    <Card className="bg-card flex h-full flex-col">
       <CardHeader>
         <CardTitle className="text-foreground">회원 분포</CardTitle>
       </CardHeader>

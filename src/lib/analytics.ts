@@ -78,3 +78,14 @@ export function trackShare(params: {
     method: params.method,
   })
 }
+
+/**
+ * 검색 이벤트 추적 (인기 검색어 분석용)
+ */
+export function trackSearch(searchTerm: string) {
+  if (searchTerm.trim()) {
+    sendEvent('search', {
+      search_term: searchTerm.trim(),
+    })
+  }
+}

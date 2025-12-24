@@ -4,18 +4,16 @@ import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, 
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import { AnalyticsReport } from '../api/analyticsApi'
-
-type Period = 7 | 30
+import { AnalyticsReport } from '../../api/analyticsApi'
+import { Period } from './shared/PeriodToggle'
 
 interface VisitorLineChartProps {
   report?: AnalyticsReport
   isLoading: boolean
   period: Period
-  setPeriod: (period: Period) => void
 }
 
-export function VisitorLineChart({ report, isLoading, period, setPeriod }: VisitorLineChartProps) {
+export function VisitorLineChart({ report, isLoading, period }: VisitorLineChartProps) {
   // 일별 데이터를 차트용으로 변환
   const chartData =
     report?.dailyStats?.map(stat => ({
@@ -28,11 +26,26 @@ export function VisitorLineChart({ report, isLoading, period, setPeriod }: Visit
       pageViews: stat.pageViews,
     })) ?? []
 
+  const getPeriodLabel = (p: Period) => {
+    switch (p) {
+      case 1:
+        return '일간'
+      case 7:
+        return '주간'
+      case 30:
+        return '월간'
+      default:
+        return '주간'
+    }
+  }
+
+  const periodLabel = getPeriodLabel(period)
+
   if (isLoading) {
     return (
       <Card className="bg-card">
         <CardHeader>
-          <CardTitle className="text-foreground">{period === 7 ? '주간' : '월간'} 방문자수</CardTitle>
+          <CardTitle className="text-foreground">{periodLabel} 방문자수</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex h-[200px] items-center justify-center">
@@ -47,25 +60,7 @@ export function VisitorLineChart({ report, isLoading, period, setPeriod }: Visit
     <Card className="bg-card">
       <CardHeader className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-3">
-          <CardTitle className="text-foreground whitespace-nowrap">{period === 7 ? '주간' : '월간'} 방문자수</CardTitle>
-          <div className="flex rounded-lg bg-gray-100 p-1">
-            <button
-              onClick={() => setPeriod(7)}
-              className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-                period === 7 ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              7일
-            </button>
-            <button
-              onClick={() => setPeriod(30)}
-              className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-                period === 30 ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              30일
-            </button>
-          </div>
+          <CardTitle className="text-foreground whitespace-nowrap">{periodLabel} 방문자수</CardTitle>
         </div>
         <div className="text-muted-foreground flex items-center gap-4 text-sm">
           <div className="flex items-center gap-2">

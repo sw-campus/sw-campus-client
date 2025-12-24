@@ -22,6 +22,7 @@ import {
   FilterGroupKey,
 } from '@/features/lecture/types/filter.type'
 import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLectureResponseToSummary'
+import { trackSearch } from '@/lib/analytics'
 
 const filterSelectTriggerClass =
   'flex items-center justify-between gap-1 rounded-full border border-input bg-background px-3 py-1 text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
@@ -219,6 +220,12 @@ function SearchContent() {
 
     const queryString = params.toString()
     const destination = `/lectures/search${queryString ? `?${queryString}` : ''}`
+
+    // GA4 검색 이벤트 추적 (인기 검색어용)
+    if (trimmedText) {
+      trackSearch(trimmedText)
+    }
+
     router.push(destination)
 
     // 모바일에서 검색 후 필터 닫기
