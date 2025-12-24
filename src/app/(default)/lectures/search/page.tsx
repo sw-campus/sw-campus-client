@@ -454,7 +454,7 @@ function SearchContent() {
           </Select>
 
           <Input
-            className="text-shadow-accent min-w-[220px] flex-1"
+            className="text-shadow-accent min-w-55 flex-1"
             type="text"
             placeholder="검색어를 입력해주세요."
             value={searchTerm}
