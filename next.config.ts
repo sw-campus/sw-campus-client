@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      // {
+      //   protocol: 'https',
+      //   hostname: 'sw-campus-public-prod-afe42bff.s3.amazonaws.com',
+      //   port: '',
+      //   pathname: '/**',
+      // },
       {
         protocol: 'https',
         hostname: 'cdn.sayun.studio',
