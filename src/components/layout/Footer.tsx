@@ -47,9 +47,9 @@ export default function Footer() {
       <div className="mt-8 text-sm leading-relaxed text-white/80">
         소프트웨어캠퍼스
         <br />
-        서울특별시 종로구 우정국로 2길 21 대왕빌딩 7층
+        서울특별시 금천구 가산디지털1로 70 호서대벤처타워 912호
         <br />
-        E-mail. sw.campus2025@gmail.com
+        E-mail. softwarecampusmain@gmail.com
       </div>
 
       {/* 하단 설명 */}
