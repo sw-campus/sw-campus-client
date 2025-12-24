@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
@@ -64,7 +64,7 @@ export default function FloatingCart() {
             onClick={() => router.push('/cart/compare')}
             className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black shadow-lg transition-transform hover:scale-105 active:scale-95"
           >
-            <ArrowUpRight strokeWidth={2} />
+            <Image src="/images/move_cart.png" alt="장바구니로 이동" width={18} height={18} />
           </button>
         </motion.div>
       )}
