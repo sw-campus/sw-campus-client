@@ -10,7 +10,7 @@ type PhoneAuthInputProps = {
 export default function PhoneAuthInput({ value, onChange }: PhoneAuthInputProps) {
   return (
     <div className="mb-4">
-      <label className="mb-1 block text-neutral-700" htmlFor="signup-phone">
+      <label className="mb-1 block text-white/75" htmlFor="signup-phone">
         전화번호
       </label>
 

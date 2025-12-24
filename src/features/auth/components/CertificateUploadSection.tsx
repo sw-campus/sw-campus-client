@@ -21,7 +21,7 @@ export default function CertificateUploadSection({
           <input
             type="file"
             name="certificateImage"
-            accept=".pdf,image/*"
+                <label className="mb-1 block text-white/75">재직증명서</label>
             onChange={onChangeFile}
             className="h-9 w-full flex-1 rounded-md border border-neutral-300 bg-neutral-100 px-2 py-1 text-sm outline-none file:mr-2 file:cursor-pointer file:rounded-md file:border-0 file:bg-neutral-900 file:px-3 file:py-1 file:text-sm file:font-semibold file:text-white focus:border-neutral-500 focus:bg-white"
           />
@@ -29,5 +29,7 @@ export default function CertificateUploadSection({
         {certificateImage && <p className="text-xs text-neutral-500">선택된 파일: {certificateImage.name}</p>}
       </div>
     </div>
-  )
+                      className="h-10 w-full flex-1 rounded-md border border-white/15 bg-white/10 px-2 py-2 text-sm text-white/75 outline-none file:mr-2 file:cursor-pointer file:rounded-md file:border-0 file:bg-white/85 file:px-3 file:py-1 file:text-sm file:font-semibold file:text-black focus:border-white/35 focus:bg-white/15"
 }
+
+                  {certificateImage && <p className="text-xs text-white/55">선택된 파일: {certificateImage.name}</p>}

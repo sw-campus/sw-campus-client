@@ -2,12 +2,17 @@
 
 import { useState } from 'react'
 
+import { usePathname } from 'next/navigation'
+
 import Header from '@/components/layout/header/Header'
 import { useCategoryTree } from '@/features/category'
 import { Navigation } from '@/features/navigation'
 import { useDesktopNavigationStore } from '@/store/navigation.store'
 
 export default function HeaderSection() {
+  const pathname = usePathname()
+  if (pathname === '/login' || pathname.startsWith('/signup')) return null
+
   const [open, setOpen] = useState(false)
 
   const { data: categoryTree } = useCategoryTree()

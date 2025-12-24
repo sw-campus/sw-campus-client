@@ -40,7 +40,6 @@ export default function Header({
     if (!isLoggedIn) return
 
     const check = () => {
-      // 세션 만료 시 store 초기화 → 헤더에서 닉네임/로그인 UI 즉시 반영
       void ensureSessionActive()
     }
 

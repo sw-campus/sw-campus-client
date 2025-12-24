@@ -12,10 +12,10 @@ interface Props {
 
 function SectionBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-3">
-      <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
-      <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-600 shadow-sm">
-        <div className="max-h-52 overflow-y-auto pr-2">{children}</div>
+    <div className="flex flex-col gap-2">
+      <h3 className="text-xs font-semibold text-white/80">{title}</h3>
+      <div className="rounded-xl border border-white/15 bg-white/10 p-3 text-sm text-white/65 shadow-sm backdrop-blur-xl">
+        <div className="max-h-24 overflow-y-auto pr-2 sm:max-h-28">{children}</div>
       </div>
     </div>
   )
@@ -52,20 +52,20 @@ export default function SignupAgreementsView({ mode }: Props) {
   }
 
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-6 rounded-3xl bg-white/90 p-8 shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
+    <div className="flex w-full max-w-2xl flex-col gap-4 rounded-3xl border border-white/15 bg-white/10 p-6 text-white shadow-xl backdrop-blur-xl">
       {/* 헤더 */}
       <div className="flex flex-col gap-1">
-        <h2 className="text-xl font-bold text-neutral-900">회원가입 약관 동의</h2>
-        <p className="text-sm text-neutral-600">서비스 이용을 위해 필수 항목에 동의해주세요.</p>
+        <h2 className="text-xl font-bold">회원가입 약관 동의</h2>
+        <p className="text-sm text-white/65">서비스 이용을 위해 필수 항목에 동의해주세요.</p>
       </div>
 
       {/* 전체 동의 */}
-      <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+      <div className="rounded-xl border border-white/15 bg-white/10 p-3">
         <label className="flex items-start gap-3">
           <input type="checkbox" className="mt-0.5 h-4 w-4" checked={allAgree} onChange={onToggleAll} />
-          <span className="text-sm font-medium text-neutral-900">
+          <span className="text-sm font-medium text-white">
             전체 동의
-            <span className="ml-2 align-middle text-xs font-normal text-neutral-600">
+            <span className="ml-2 align-middle text-xs font-normal text-white/65">
               (이용약관, 개인정보, 마케팅 수신, 만 14세 이상)
             </span>
           </span>
@@ -80,9 +80,9 @@ export default function SignupAgreementsView({ mode }: Props) {
           checked={termsAgree}
           onChange={() => setTermsAgree(!termsAgree)}
         />
-        <span className="text-sm font-medium text-gray-900">
+        <span className="text-sm font-medium text-white">
           이용약관 동의
-          <span className="ml-2 inline-flex items-center rounded-md border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+          <span className="ml-2 inline-flex items-center rounded-md border border-red-500/25 bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-200">
             필수
           </span>
         </span>
@@ -102,9 +102,9 @@ export default function SignupAgreementsView({ mode }: Props) {
           checked={privacyAgree}
           onChange={() => setPrivacyAgree(!privacyAgree)}
         />
-        <span className="text-sm font-medium text-gray-900">
+        <span className="text-sm font-medium text-white">
           개인정보 수집 및 이용 동의
-          <span className="ml-2 inline-flex items-center rounded-md border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+          <span className="ml-2 inline-flex items-center rounded-md border border-red-500/25 bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-200">
             필수
           </span>
         </span>
@@ -115,7 +115,7 @@ export default function SignupAgreementsView({ mode }: Props) {
           <li>계정 관리, 접근 제어, 부정 이용 방지 및 보안 강화</li>
           <li>법령 준수 및 고지·통지 수행 등 필수 처리 목적</li>
         </ul>
-        <p className="mt-2 text-xs text-gray-500">자세한 전문은 내부 정책 문서로 대체 예정입니다.</p>
+        <p className="mt-2 text-xs text-white/55">자세한 전문은 내부 정책 문서로 대체 예정입니다.</p>
       </SectionBox>
 
       {/* 마케팅 활용 동의 (선택) */}
@@ -126,9 +126,9 @@ export default function SignupAgreementsView({ mode }: Props) {
           checked={marketingAgree}
           onChange={() => setMarketingAgree(!marketingAgree)}
         />
-        <span className="text-sm font-medium text-gray-900">
+        <span className="text-sm font-medium text-white">
           마케팅 활용 동의 및 광고 수신 동의
-          <span className="ml-2 inline-flex items-center rounded-md border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-xs font-medium text-neutral-700">
+          <span className="ml-2 inline-flex items-center rounded-md border border-white/15 bg-white/10 px-2 py-0.5 text-xs font-medium text-white/65">
             선택
           </span>
         </span>
@@ -150,7 +150,7 @@ export default function SignupAgreementsView({ mode }: Props) {
             disabled={!marketingAgree}
             onChange={() => setSmsAgree(!smsAgree)}
           />
-          <span className="text-sm text-gray-800">메시지(SMS, 카카오톡 등) 수신 동의 (선택)</span>
+          <span className="text-sm text-white/75">메시지(SMS, 카카오톡 등) 수신 동의 (선택)</span>
         </label>
         <label className="flex items-start gap-3">
           <input
@@ -160,21 +160,21 @@ export default function SignupAgreementsView({ mode }: Props) {
             disabled={!marketingAgree}
             onChange={() => setEmailAgree(!emailAgree)}
           />
-          <span className="text-sm text-gray-800">E-Mail 수신 동의 (선택)</span>
+          <span className="text-sm text-white/75">E-Mail 수신 동의 (선택)</span>
         </label>
       </div>
 
       {/* 만 14세 이상 (필수) */}
-      <label className="mt-3 flex items-start gap-3">
+      <label className="mt-2 flex items-start gap-3">
         <input type="checkbox" className="mt-1 h-4 w-4" checked={ageAgree} onChange={() => setAgeAgree(!ageAgree)} />
-        <span className="text-sm font-medium text-gray-900">만 14세 이상입니다. (필수)</span>
+        <span className="text-sm font-medium text-white">만 14세 이상입니다. (필수)</span>
       </label>
 
       {/* 액션 영역 */}
-      <div className="mt-6 flex items-center justify-end gap-3">
+      <div className="mt-4 flex items-center justify-end gap-3">
         <button
           type="button"
-          className="rounded-xl border border-gray-200 px-4 py-2 text-sm text-gray-700"
+          className="rounded-xl border border-white/20 px-4 py-2 text-sm text-white/75"
           onClick={() => router.back()}
         >
           취소
@@ -185,7 +185,7 @@ export default function SignupAgreementsView({ mode }: Props) {
           onClick={goNext}
           className={
             'rounded-xl px-4 py-2 text-sm font-semibold ' +
-            (requiredOK ? 'bg-neutral-900 text-white hover:bg-neutral-800' : 'bg-gray-200 text-gray-500')
+            (requiredOK ? 'bg-white/85 text-black hover:bg-white' : 'bg-white/20 text-white/45')
           }
         >
           동의하고 다음으로 ({mode === 'personal' ? '개인' : '기관'})
