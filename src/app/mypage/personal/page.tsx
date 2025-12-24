@@ -1,49 +1,16 @@
 'use client'
 
-import { useState } from 'react'
-
-import { useRouter } from 'next/navigation'
-
-import PersonalAside from '@/features/mypage/components/Personal/PersonalAside'
-import PersonalMain from '@/features/mypage/components/Personal/PersonalMain'
+import { MyPageDashboard } from '@/features/mypage/components/MyPageDashboard'
 import { useAuthStore } from '@/store/authStore'
 
 export default function MyPage() {
-  type Section = 'password' | 'survey' | 'reviews'
-  const [activeSection, setActiveSection] = useState<Section>('password')
-  const router = useRouter()
   const { userType } = useAuthStore()
 
   if (userType === 'PERSONAL') {
-    const handleOpenPersonInfo = () => setActiveSection('password')
-    const handleOpenSurveyManage = () => setActiveSection('survey')
-    const handleOpenReviewManage = () => setActiveSection('reviews')
-
-    const openInfoModal = () => {
-      router.push('/mypage/personal/info')
-    }
-
-    const openProductModal = () => {
-      router.push('/mypage/personal/survey')
-    }
-
     return (
       <div className="custom-container">
         <div className="custom-card">
-          {/* 실제 내용 영역: 모바일 세로, 데스크톱 가로 */}
-          <div className="relative z-10 flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
-            <PersonalAside
-              active={activeSection}
-              onClickPersonInfo={handleOpenPersonInfo}
-              onClickSurveyManage={handleOpenSurveyManage}
-              onClickReviewManage={handleOpenReviewManage}
-            />
-            <PersonalMain
-              activeSection={activeSection}
-              openInfoModal={openInfoModal}
-              onOpenProductModal={openProductModal}
-            />
-          </div>
+          <MyPageDashboard />
         </div>
       </div>
     )

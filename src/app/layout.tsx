@@ -43,7 +43,7 @@ export default function RootLayout({
         </>
       )}
       <body className="relative flex min-h-screen flex-col">
-        <div className="pointer-events-none fixed inset-0 -z-20 bg-[url('/images/bg.png')] bg-cover bg-top bg-no-repeat" />
+        <div className="pointer-events-none fixed inset-0 -z-20 bg-[url('/images/bg-2.png')] bg-cover bg-top bg-no-repeat" />
         <div className="pointer-events-none fixed inset-0 -z-10 bg-black/40" />
         <QueryClientProviderWrapper>
           {children}
