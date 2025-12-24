@@ -72,7 +72,7 @@ export function OrganizationDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="h-[calc(70vh-6rem)] w-[calc(60vw-4rem)] max-w-none overflow-y-auto sm:max-w-none">
+      <DialogContent className="h-[calc(100vh-6rem)] w-[calc(100vw-2rem)] max-w-none overflow-y-auto sm:h-[calc(90vh-6rem)] sm:w-[calc(100vw-4rem)] sm:max-w-none md:h-[calc(80vh-6rem)] md:w-[calc(85vw-4rem)] lg:w-[calc(70vw-4rem)] xl:w-[calc(60vw-4rem)]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             기관 상세 정보
