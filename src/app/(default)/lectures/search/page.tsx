@@ -5,26 +5,19 @@ import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { MultiSelect } from '@/components/ui/multi-select'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCategoryTree } from '@/features/category'
 import type { CategoryTreeNode } from '@/features/category/types/category.type'
 import { LectureList } from '@/features/lecture/components/LectureList'
-import { FilterGroup } from '@/features/lecture/components/lecture-search/FilterGroups'
-import { FilterTag } from '@/features/lecture/components/lecture-search/FilterTag'
+import { LectureSearchSidebar } from '@/features/lecture/components/lecture-search/LectureSearchSidebar'
 import { useSearchLectureQuery } from '@/features/lecture/hooks/useSearchLectureQuery'
 import {
-  COST_FILTERS,
-  PROCEDURE_FILTERS,
-  REGION_FILTERS,
   SORT_OPTIONS,
   DEFAULT_SORT,
   COST_QUERY_MAP,
   PROCEDURE_QUERY_MAP,
   REGION_QUERY_MAP,
-  STATUS_FILTERS,
   STATUS_QUERY_MAP,
   FilterGroupKey,
 } from '@/features/lecture/types/filter.type'
@@ -50,13 +43,11 @@ function SearchContent() {
     isLast: (data?.page?.number ?? 0) >= (data?.page?.totalPages ?? 1) - 1,
   }
 
-  // Category Tree Data
   const { data: categoryTree } = useCategoryTree()
 
-  // Category State
-  const [level1Id, setLevel1Id] = useState<number | null>(null) // Single
-  const [level2Id, setLevel2Id] = useState<number | null>(null) // Single
-  const [level3Ids, setLevel3Ids] = useState<string[]>([]) // Multi
+  const [level1Id, setLevel1Id] = useState<number | null>(null)
+  const [level2Id, setLevel2Id] = useState<number | null>(null)
+  const [level3Ids, setLevel3Ids] = useState<string[]>([])
 
   const [selectedCost, setSelectedCost] = useState<string | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
@@ -67,24 +58,23 @@ function SearchContent() {
     region: [],
   })
 
-  // Level 1 Categories
+  // 모바일에서 필터 사이드바 토글
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+
   const level1Categories = categoryTree ?? []
 
-  // Level 2 Categories (Children of single L1)
   const level2Categories = (() => {
     if (!level1Id || !categoryTree) return []
     const parent = categoryTree.find((c: CategoryTreeNode) => c.categoryId === level1Id)
     return parent?.children ?? []
   })()
 
-  // Level 3 Categories (Children of single L2)
   const level3Categories = (() => {
     if (!level2Id || !level2Categories.length) return []
     const parent = level2Categories.find((c: CategoryTreeNode) => c.categoryId === level2Id)
     return parent?.children ?? []
   })()
 
-  // Category ID → Path 매핑 (O(1) 조회를 위한 최적화)
   type CategoryPath = { l1: number; l2?: number; l3?: number }
   const categoryPathMap = (() => {
     const map = new Map<number, CategoryPath>()
@@ -108,8 +98,6 @@ function SearchContent() {
     return map
   })()
 
-  // Reset Child Categories on Parent Change
-  // Sync State with URL Params
   useEffect(() => {
     if (!categoryTree || categoryTree.length === 0) return
 
@@ -121,27 +109,20 @@ function SearchContent() {
       return
     }
 
-    // Find deepest category level from URL
-    // URL에 여러 ID가 있을 수 있음 (L3 다중 선택 등)
-    // 여기서는 첫 번째 유효한 ID를 기준으로 L1, L2를 설정하고, L3는 모아서 설정
-
     let foundL1: number | null = null
     let foundL2: number | null = null
     const foundL3s: string[] = []
 
-    // Process all Category IDs
     categoryIdsParam.forEach(idStr => {
       const id = Number(idStr)
       if (!id) return
 
       const path = categoryPathMap.get(id)
       if (path) {
-        // L1이 변경되면 하위 상태(L2)도 초기화
         if (path.l1 && path.l1 !== foundL1) {
           foundL1 = path.l1
-          foundL2 = null // L1이 바뀌면 L2는 반드시 초기화
+          foundL2 = null
         }
-        // L2는 현재 L1의 자식일 때만 업데이트
         if (path.l2 && path.l1 === foundL1) {
           foundL2 = path.l2
         }
@@ -149,12 +130,9 @@ function SearchContent() {
       }
     })
 
-    // Update State
-    // Only update if changed to avoid loops (though SetState handles this)
     if (foundL1 !== level1Id) setLevel1Id(foundL1)
     if (foundL2 !== level2Id) setLevel2Id(foundL2)
 
-    // 배열 비교
     const isL3Same = foundL3s.length === level3Ids.length && foundL3s.every(id => level3Ids.includes(id))
     if (!isL3Same) setLevel3Ids(foundL3s)
   }, [searchParams, categoryTree, categoryPathMap])
@@ -186,7 +164,6 @@ function SearchContent() {
   const handleSearch = () => {
     const params = new URLSearchParams()
 
-    // Resolve Category IDs (Deepest selected level wins)
     let finalCategoryIds: string[] = []
     if (level3Ids.length > 0) {
       finalCategoryIds = level3Ids
@@ -214,11 +191,9 @@ function SearchContent() {
       }
     }
 
-    // Procedure Filters (Inverted logic for "No ...")
     ;(activeFilters.procedure ?? []).forEach(filter => {
       const parameter = PROCEDURE_QUERY_MAP[filter]
       if (parameter) {
-        // Special handling for "No ...인" filters
         if (filter.includes('없음')) {
           params.append(parameter, 'false')
         } else {
@@ -227,7 +202,6 @@ function SearchContent() {
       }
     })
     ;(activeFilters.region ?? []).forEach(region => {
-      // Use mapping if available, otherwise use original label
       const shortRegion = REGION_QUERY_MAP[region] ?? region
       params.append('regions', shortRegion)
     })
@@ -240,29 +214,30 @@ function SearchContent() {
     const sortValue = selectedSort || DEFAULT_SORT
     params.append('sort', sortValue)
 
-    // 검색 시 첫 페이지로 초기화 (백엔드는 1-indexed)
+    params.set('size', '12')
     params.set('page', '1')
 
     const queryString = params.toString()
     const destination = `/lectures/search${queryString ? `?${queryString}` : ''}`
     router.push(destination)
+
+    // 모바일에서 검색 후 필터 닫기
+    setIsFilterOpen(false)
   }
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
-    // 백엔드는 1-indexed 페이지를 기대하므로 +1
+    params.set('size', '12')
     params.set('page', String(newPage + 1))
     router.push(`/lectures/search?${params.toString()}`)
   }
 
-  // 페이지 번호 목록 생성 (최대 5개)
   const getPageNumbers = () => {
     const { currentPage, totalPages } = pageInfo
     const maxVisible = 5
     let start = Math.max(0, currentPage - Math.floor(maxVisible / 2))
     const end = Math.min(totalPages - 1, start + maxVisible - 1)
 
-    // 끝에 가까우면 시작점 조정
     if (end - start + 1 < maxVisible) {
       start = Math.max(0, end - maxVisible + 1)
     }
@@ -274,221 +249,208 @@ function SearchContent() {
     return pages
   }
 
-  // Convert categories to options for MultiSelect
-  const level3Options = categoryTree
-    ? level3Categories.map(c => ({ label: c.categoryName, value: String(c.categoryId) }))
-    : []
+  const handleLevel1Change = (value: number | null) => {
+    setLevel1Id(value)
+    setLevel2Id(null)
+    setLevel3Ids([])
+  }
+
+  const handleLevel2Change = (value: number | null) => {
+    setLevel2Id(value)
+    setLevel3Ids([])
+  }
 
   return (
     <div className="custom-container">
-      <div className="custom-card">
-        {/* 필터 */}
-        <Card className="flex flex-col gap-6 bg-white/50 px-20 py-10">
-          <div className="flex flex-wrap items-end gap-4">
-            {/* 대분류 */}
-            <FilterGroup label="대분류">
-              <Select
-                value={level1Id?.toString() ?? ''}
-                onValueChange={v => {
-                  setLevel1Id(v ? Number(v) : null)
-                  setLevel2Id(null) // Reset child
-                  setLevel3Ids([]) // Reset child
-                }}
-              >
-                <SelectTrigger className={`${filterSelectTriggerClass} w-[220px]`}>
-                  <SelectValue placeholder="대분류 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {level1Categories.map(cat => (
-                      <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
-                        {cat.categoryName}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </FilterGroup>
-
-            {/* 중분류 */}
-            <FilterGroup label="중분류">
-              <Select
-                value={level2Id?.toString() ?? ''}
-                onValueChange={v => {
-                  setLevel2Id(v ? Number(v) : null)
-                  setLevel3Ids([]) // Reset child
-                }}
-                disabled={!level1Id || level2Categories.length === 0}
-              >
-                <SelectTrigger className={`${filterSelectTriggerClass} w-[220px]`}>
-                  <SelectValue placeholder="중분류 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {level2Categories.map(cat => (
-                      <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
-                        {cat.categoryName}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </FilterGroup>
-
-            {/* 소분류 */}
-            <FilterGroup label="소분류">
-              <MultiSelect
-                options={level3Options}
-                selected={level3Ids}
-                onChange={setLevel3Ids}
-                placeholder="소분류 선택"
-                disabled={!level2Id || level3Categories.length === 0}
-                className="w-[220px]"
-              />
-            </FilterGroup>
-          </div>
-
-          <FilterGroup label="모집 상태">
-            {STATUS_FILTERS.map(status => (
-              <FilterTag
-                key={`status-${status}`}
-                label={status}
-                active={selectedStatus === status}
-                onClick={() => handleStatusClick(status)}
-              />
-            ))}
-          </FilterGroup>
-
-          <FilterGroup label="비용">
-            {COST_FILTERS.map(cost => (
-              <FilterTag
-                key={`cost-${cost}`}
-                label={cost}
-                active={selectedCost === cost}
-                onClick={() => handleCostClick(cost)}
-              />
-            ))}
-          </FilterGroup>
-
-          <FilterGroup label="선발 절차">
-            {PROCEDURE_FILTERS.map(procedure => (
-              <FilterTag
-                key={`procedure-${procedure}`}
-                label={procedure}
-                active={isActive('procedure', procedure)}
-                onClick={() => toggleFilter('procedure', procedure)}
-              />
-            ))}
-          </FilterGroup>
-
-          <FilterGroup label="지역">
-            {REGION_FILTERS.map(region => (
-              <FilterTag
-                key={`region-${region}`}
-                label={region}
-                active={isActive('region', region)}
-                onClick={() => toggleFilter('region', region)}
-              />
-            ))}
-          </FilterGroup>
-        </Card>
-
-        {/* 검색 */}
-        <div className="flex w-full flex-wrap items-center gap-5 pt-4">
-          <Select value={selectedSort} onValueChange={value => setSelectedSort(value)}>
-            <SelectTrigger className={`${filterSelectTriggerClass} w-[180px]`}>
-              <SelectValue placeholder="정렬 기준" />
-            </SelectTrigger>
-            <SelectContent>
-              {SORT_OPTIONS.map(option => (
-                <SelectItem key={`sort-${option.value}`} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Input
-            className="text-shadow-accent min-w-[220px] flex-1"
-            type="text"
-            placeholder="검색어를 입력해주세요."
-            value={searchTerm}
-            onChange={event => setSearchTerm(event.target.value)}
-          />
+      <div className="custom-card flex flex-col gap-4 lg:flex-row lg:gap-6">
+        {/* 모바일: 필터 토글 버튼 */}
+        <div className="flex items-center justify-between lg:hidden">
+          <span className="text-sm text-gray-600">
+            총 <strong className="text-primary">{pageInfo.totalElements}</strong>개의 강의
+          </span>
           <Button
-            type="button"
-            className="border-primary bg-primary focus-visible:ring-offset-primary/20 hover:bg-primary/90 w-[100px] text-white"
-            onClick={handleSearch}
+            variant="outline"
+            size="sm"
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="flex items-center gap-2"
           >
-            검색
+            <span>🔍</span>
+            <span>{isFilterOpen ? '필터 닫기' : '필터 열기'}</span>
           </Button>
         </div>
-      </div>
 
-      <div className="custom-card">
-        {isLoading ? (
-          <div className="py-10 text-center text-sm">강의 목록을 불러오는 중...</div>
-        ) : isError ? (
-          <div className="text-destructive py-10 text-center text-sm">강의 목록을 불러오지 못했습니다.</div>
-        ) : lectures.length === 0 ? (
-          <div className="py-10 text-center text-sm">검색 결과가 없습니다.</div>
-        ) : (
-          <>
-            <LectureList lectures={lectures} />
+        {/* 사이드바 - 모바일에서는 토글, 데스크탑에서는 항상 표시 */}
+        <div className={`${isFilterOpen ? 'block' : 'hidden'} lg:block`}>
+          <LectureSearchSidebar
+            level1Id={level1Id}
+            level2Id={level2Id}
+            level3Ids={level3Ids}
+            onLevel1Change={handleLevel1Change}
+            onLevel2Change={handleLevel2Change}
+            onLevel3Change={setLevel3Ids}
+            level1Categories={level1Categories}
+            level2Categories={level2Categories}
+            level3Categories={level3Categories}
+            selectedCost={selectedCost}
+            selectedStatus={selectedStatus}
+            activeFilters={activeFilters}
+            onCostClick={handleCostClick}
+            onStatusClick={handleStatusClick}
+            toggleFilter={toggleFilter}
+            isActive={isActive}
+            onSearch={handleSearch}
+          />
+        </div>
 
-            {/* 페이지네이션 */}
-            {pageInfo.totalPages > 1 && (
-              <div className="mt-8 flex items-center justify-center gap-2">
-                {/* 이전 페이지 */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(pageInfo.currentPage - 1)}
-                  disabled={pageInfo.isFirst}
-                  className="h-9 px-3"
-                >
-                  이전
-                </Button>
+        {/* 오른쪽: 검색 + 결과 + 강의 목록 */}
+        <div className="flex min-w-0 flex-1 flex-col gap-4">
+          {/* 검색창 + 정렬 */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+            <div className="flex flex-1 items-center gap-2">
+              <Input
+                className="flex-1"
+                type="text"
+                placeholder="검색어를 입력해주세요."
+                value={searchTerm}
+                onChange={event => setSearchTerm(event.target.value)}
+                onKeyDown={event => {
+                  if (event.key === 'Enter') {
+                    handleSearch()
+                  }
+                }}
+              />
+              <Button type="button" className="bg-primary hover:bg-primary/90 text-white" onClick={handleSearch}>
+                검색
+              </Button>
+            </div>
+            <Select value={selectedSort} onValueChange={value => setSelectedSort(value)}>
+              <SelectTrigger className={`${filterSelectTriggerClass} w-full sm:w-[150px]`}>
+                <SelectValue placeholder="정렬" />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map(option => (
+                  <SelectItem key={`sort-${option.value}`} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-                {/* 페이지 번호 */}
-                <div className="flex items-center gap-1">
-                  {getPageNumbers().map(pageNum => (
-                    <Button
-                      key={pageNum}
-                      variant={pageNum === pageInfo.currentPage ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`h-9 w-9 ${
-                        pageNum === pageInfo.currentPage
-                          ? 'bg-primary hover:bg-primary/90 text-white'
-                          : 'hover:bg-gray-100'
-                      }`}
-                    >
-                      {pageNum + 1}
-                    </Button>
-                  ))}
-                </div>
+          {/* 결과 수 - 데스크탑만 */}
+          <div className="hidden text-sm text-gray-600 lg:block">
+            총 <strong className="text-primary">{pageInfo.totalElements}</strong>개의 강의가 검색되었습니다.
+          </div>
 
-                {/* 다음 페이지 */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(pageInfo.currentPage + 1)}
-                  disabled={pageInfo.isLast}
-                  className="h-9 px-3"
-                >
-                  다음
-                </Button>
+          {/* 강의 목록 */}
+          <div className="min-w-0 flex-1">
+            {isLoading ? (
+              <div className="py-10 text-center text-sm">강의 목록을 불러오는 중...</div>
+            ) : isError ? (
+              <div className="text-destructive py-10 text-center text-sm">강의 목록을 불러오지 못했습니다.</div>
+            ) : lectures.length === 0 ? (
+              <div className="py-10 text-center text-sm">검색 결과가 없습니다.</div>
+            ) : (
+              <>
+                <LectureList lectures={lectures} />
 
-                {/* 전체 페이지 정보 */}
-                <span className="ml-4 text-sm text-gray-500">
-                  총 {pageInfo.totalElements}개 중 {pageInfo.currentPage * pageInfo.size + 1}-
-                  {Math.min((pageInfo.currentPage + 1) * pageInfo.size, pageInfo.totalElements)}개
-                </span>
-              </div>
+                {/* 페이지네이션 */}
+                {pageInfo.totalPages > 1 && (
+                  <div className="mt-8 flex flex-col items-center gap-4">
+                    {/* 페이지네이션 버튼 */}
+                    <div className="flex items-center gap-1">
+                      {/* 처음 */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(0)}
+                        disabled={pageInfo.isFirst}
+                        className="h-9 w-9"
+                      >
+                        «
+                      </Button>
+                      {/* 이전 */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(pageInfo.currentPage - 1)}
+                        disabled={pageInfo.isFirst}
+                        className="h-9 w-9"
+                      >
+                        ‹
+                      </Button>
+
+                      {/* 페이지 번호 */}
+                      {getPageNumbers().map(pageNum => (
+                        <Button
+                          key={pageNum}
+                          variant={pageNum === pageInfo.currentPage ? 'default' : 'ghost'}
+                          size="sm"
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`h-9 w-9 ${
+                            pageNum === pageInfo.currentPage
+                              ? 'bg-gray-700 text-white hover:bg-gray-600'
+                              : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                        >
+                          {pageNum + 1}
+                        </Button>
+                      ))}
+
+                      {/* 다음 */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(pageInfo.currentPage + 1)}
+                        disabled={pageInfo.isLast}
+                        className="h-9 w-9"
+                      >
+                        ›
+                      </Button>
+                      {/* 마지막 */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(pageInfo.totalPages - 1)}
+                        disabled={pageInfo.isLast}
+                        className="h-9 w-9"
+                      >
+                        »
+                      </Button>
+                    </div>
+
+                    {/* Go to page */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500">Go to page:</span>
+                      <Select
+                        value={String(pageInfo.currentPage + 1)}
+                        onValueChange={value => handlePageChange(Number(value) - 1)}
+                      >
+                        <SelectTrigger className="h-8 w-16">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: pageInfo.totalPages }, (_, i) => (
+                            <SelectItem key={i} value={String(i + 1)}>
+                              {i + 1}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        size="sm"
+                        className="h-8 bg-gray-700 px-4 text-white hover:bg-gray-600"
+                        onClick={() => {}}
+                      >
+                        GO
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   )

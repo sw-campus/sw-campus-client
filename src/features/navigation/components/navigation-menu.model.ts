@@ -14,11 +14,11 @@ export const buildMobileNavData = (categoryTree?: CategoryNode[] | null): Mobile
     items:
       l1.children?.map(l2 => ({
         title: l2.categoryName,
-        href: `/lectures/search?categoryIds=${l2.categoryId}`,
+        href: `/lectures/search?categoryIds=${l2.categoryId}&size=12`,
         items:
           l2.children?.map(l3 => ({
             title: l3.categoryName,
-            href: `/lectures/search?categoryIds=${l3.categoryId}`,
+            href: `/lectures/search?categoryIds=${l3.categoryId}&size=12`,
           })) || [],
       })) || [],
   }))
@@ -35,11 +35,11 @@ export const buildActiveCategoryChildren = (
 
   return activeCategory.children.map(l2 => ({
     title: l2.categoryName,
-    href: `/lectures/search?categoryIds=${l2.categoryId}`,
+    href: `/lectures/search?categoryIds=${l2.categoryId}&size=12`,
     children:
       l2.children?.map(l3 => ({
         title: l3.categoryName,
-        href: `/lectures/search?categoryIds=${l3.categoryId}`,
+        href: `/lectures/search?categoryIds=${l3.categoryId}&size=12`,
       })) || [],
   }))
 }

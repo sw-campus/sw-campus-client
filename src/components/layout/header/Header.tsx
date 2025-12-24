@@ -99,7 +99,7 @@ export default function Header({
         {categories.map(category => (
           <Link
             key={category.categoryId}
-            href={`/lectures/search?categoryIds=${category.categoryId}`}
+            href={`/lectures/search?categoryIds=${category.categoryId}&size=12`}
             onMouseEnter={() => onCategoryEnter(category.categoryId)}
             onFocus={() => onCategoryEnter(category.categoryId)}
             onClick={() => onCategoryEnter(category.categoryId)}

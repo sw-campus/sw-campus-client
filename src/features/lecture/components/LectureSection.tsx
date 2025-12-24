@@ -131,7 +131,7 @@ export default function LectureSection() {
         {/* 더보기 버튼 */}
         <motion.div variants={itemVariants} className="relative z-10 mt-10 flex justify-center">
           <motion.button
-            onClick={() => router.push(`/lectures/search?categoryIds=${resolvedCategoryId}`)}
+            onClick={() => router.push(`/lectures/search?categoryIds=${resolvedCategoryId}&size=12`)}
             disabled={resolvedCategoryId === null}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
