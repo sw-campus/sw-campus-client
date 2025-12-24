@@ -94,7 +94,7 @@ export function CertificateDetailModal({
               </div>
               <div className="relative aspect-[1.414/1] w-full bg-white">
                 <S3Image
-                  s3Key={detail?.imageKey}
+                  s3Key={detail?.imageUrl}
                   alt="Certificate"
                   fill
                   className="object-contain"
@@ -112,9 +112,9 @@ export function CertificateDetailModal({
               <h3 className="text-foreground mb-3 font-semibold">신청 정보</h3>
               <div className="divide-border divide-y text-sm">
                 <DetailRow label="강의명" value={detail?.lectureName ?? review.lectureName} />
-                <DetailRow label="작성자(이름)" value={detail?.userName ?? review.userName} />
-                <DetailRow label="작성자(닉네임)" value={detail?.nickname ?? review.nickname} />
-                <DetailRow label="신청일" value={formatDate(detail?.createdAt ?? review.createdAt)} />
+                <DetailRow label="작성자(이름)" value={review.userName} />
+                <DetailRow label="작성자(닉네임)" value={review.nickname} />
+                <DetailRow label="신청일" value={formatDate(detail?.certifiedAt ?? review.createdAt)} />
               </div>
             </div>
           </div>
