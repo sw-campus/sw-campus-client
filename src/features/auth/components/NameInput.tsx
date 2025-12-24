@@ -10,7 +10,7 @@ type NameInputProps = {
 export default function NameInput({ value, onChange }: NameInputProps) {
   return (
     <div className="mb-4">
-      <label className="mb-1 block text-neutral-700" htmlFor="signup-name">
+      <label className="mb-1 block text-white/75" htmlFor="signup-name">
         이름
       </label>
       <input
