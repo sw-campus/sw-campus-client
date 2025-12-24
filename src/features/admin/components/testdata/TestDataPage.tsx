@@ -1,41 +1,15 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 
-import { createTestData, deleteTestData, fetchTestDataSummary } from '../../api/testDataApi'
+import { useCreateTestDataMutation, useDeleteTestDataMutation, useTestDataSummaryQuery } from '../../hooks/useTestData'
 
 export function TestDataPage() {
-  const queryClient = useQueryClient()
-
-  const { data: summary, isLoading } = useQuery({
-    queryKey: ['testDataSummary'],
-    queryFn: fetchTestDataSummary,
-  })
-
-  const createMutation = useMutation({
-    mutationFn: createTestData,
-    onSuccess: data => {
-      toast.success(`테스트 데이터 생성 완료 (총 ${data.totalCount}건)`)
-      queryClient.invalidateQueries({ queryKey: ['testDataSummary'] })
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || '테스트 데이터 생성 실패')
-    },
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteTestData,
-    onSuccess: () => {
-      toast.success('테스트 데이터 삭제 완료')
-      queryClient.invalidateQueries({ queryKey: ['testDataSummary'] })
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || '테스트 데이터 삭제 실패')
-    },
-  })
+  const { data: summary, isLoading } = useTestDataSummaryQuery()
+  const createMutation = useCreateTestDataMutation()
+  const deleteMutation = useDeleteTestDataMutation()
 
   const handleCreate = () => {
     if (summary?.exists) {

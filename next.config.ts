@@ -36,12 +36,6 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'sw-campus-public-prod-afe42bff.s3.amazonaws.com',
-        port: '',
-        pathname: '/**',
-      },
       // 환경변수가 설정된 경우에만 추가
       ...(process.env.NEXT_PRIVATE_S3_HOSTNAME
         ? [{ protocol: 'https' as const, hostname: process.env.NEXT_PRIVATE_S3_HOSTNAME, port: '', pathname: '/**' }]
