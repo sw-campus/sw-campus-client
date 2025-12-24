@@ -99,12 +99,11 @@ export interface ReviewListParams {
  */
 export interface CertificateDetail {
   certificateId: number
+  lectureId: number
   lectureName: string
-  userName: string
-  nickname: string
-  imageKey: string
+  imageUrl: string
   approvalStatus: ReviewAuthStatus
-  createdAt: string
+  certifiedAt: string
 }
 
 /**
