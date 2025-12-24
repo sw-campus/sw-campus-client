@@ -119,21 +119,11 @@ export function LectureCreateForm() {
   }
 
   const onSubmit = async (values: LectureFormValues) => {
-    console.log('Form values:', values)
-    console.log('Teachers:', values.teachers)
-    console.log(
-      'Teacher image files:',
-      values.teachers?.map(t => t.teacherImageFile),
-    )
-    console.log('Lecture image file:', values.lectureImageFile)
-
     const payload = mapLectureFormToCreateRequest(values)
     const teacherImageFiles = (values.teachers ?? [])
       .filter(t => !t.teacherId)
       .map(t => t.teacherImageFile)
       .filter((f): f is File => !!f)
-
-    console.log('Filtered teacher image files:', teacherImageFiles)
 
     await mutateAsync({
       payload,

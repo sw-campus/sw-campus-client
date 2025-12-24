@@ -60,7 +60,7 @@ const loadDaumPostcodeScript = () => {
   document.body.appendChild(script)
 }
 
-export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
+export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: boolean; onSuccess?: () => void }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
   const [isCheckingNickname, setIsCheckingNickname] = useState(false)
@@ -166,8 +166,12 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
         location,
       })
       toast.success('저장되었습니다.')
-      router.back()
-      router.refresh()
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        router.back()
+        router.refresh()
+      }
     } catch {
       toast.error('저장에 실패했습니다.')
     } finally {

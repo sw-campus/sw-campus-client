@@ -1,46 +1,51 @@
 'use client'
 
 type OrganizationAsideProps = {
-  active: 'orgInfo' | 'lectureManage'
+  active: 'orgInfo' | 'lectureManage' | 'myInfo'
   onClickOrgInfo: () => void
   onClickLectureManage: () => void
+  onClickMyInfo: () => void
 }
 
-export default function OrganizationAside({ active, onClickOrgInfo, onClickLectureManage }: OrganizationAsideProps) {
-  const orgInfoClass =
-    active === 'orgInfo'
+export default function OrganizationAside({
+  active,
+  onClickOrgInfo,
+  onClickLectureManage,
+  onClickMyInfo,
+}: OrganizationAsideProps) {
+  const getButtonClass = (isActive: boolean) =>
+    isActive
       ? 'block w-full rounded-lg bg-neutral-100 px-3 py-2 text-left font-medium transition'
       : 'block w-full rounded-lg px-3 py-2 text-left text-neutral-700 transition hover:bg-neutral-100'
 
-  const lectureManageClass =
-    active === 'lectureManage'
-      ? 'block w-full rounded-lg bg-neutral-100 px-3 py-2 text-left font-medium transition'
-      : 'block w-full rounded-lg px-3 py-2 text-left text-neutral-700 transition hover:bg-neutral-100'
+  const getMobileButtonClass = (isActive: boolean) =>
+    isActive
+      ? 'flex-1 rounded-lg bg-neutral-100 px-3 py-2 text-sm font-medium whitespace-nowrap'
+      : 'flex-1 rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 whitespace-nowrap'
 
   return (
     <>
       {/* Mobile/Tablet Top Tabs */}
-      <div className="lg:hidden w-full">
-        <nav className="flex w-full items-center gap-2">
+      <div className="w-full lg:hidden">
+        <nav className="flex w-full items-center gap-2 overflow-x-auto">
           <button
             onClick={onClickOrgInfo}
             aria-current={active === 'orgInfo' ? 'page' : undefined}
-            className={
-              active === 'orgInfo'
-                ? 'flex-1 rounded-lg bg-neutral-100 px-3 py-2 text-sm font-medium'
-                : 'flex-1 rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100'
-            }
+            className={getMobileButtonClass(active === 'orgInfo')}
           >
             기업정보 관리
           </button>
           <button
+            onClick={onClickMyInfo}
+            aria-current={active === 'myInfo' ? 'page' : undefined}
+            className={getMobileButtonClass(active === 'myInfo')}
+          >
+            내 정보 관리
+          </button>
+          <button
             onClick={onClickLectureManage}
             aria-current={active === 'lectureManage' ? 'page' : undefined}
-            className={
-              active === 'lectureManage'
-                ? 'flex-1 rounded-lg bg-neutral-100 px-3 py-2 text-sm font-medium'
-                : 'flex-1 rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100'
-            }
+            className={getMobileButtonClass(active === 'lectureManage')}
           >
             강의 관리
           </button>
@@ -52,13 +57,25 @@ export default function OrganizationAside({ active, onClickOrgInfo, onClickLectu
         <h2 className="mb-5 text-2xl font-semibold">마이페이지</h2>
 
         <nav className="space-y-2 text-sm leading-relaxed">
-          <button onClick={onClickOrgInfo} className={orgInfoClass} aria-current={active === 'orgInfo' ? 'page' : undefined}>
+          <button
+            onClick={onClickOrgInfo}
+            className={getButtonClass(active === 'orgInfo')}
+            aria-current={active === 'orgInfo' ? 'page' : undefined}
+          >
             기업정보 관리
           </button>
 
           <button
+            onClick={onClickMyInfo}
+            className={getButtonClass(active === 'myInfo')}
+            aria-current={active === 'myInfo' ? 'page' : undefined}
+          >
+            내 정보 관리
+          </button>
+
+          <button
             onClick={onClickLectureManage}
-            className={lectureManageClass}
+            className={getButtonClass(active === 'lectureManage')}
             aria-current={active === 'lectureManage' ? 'page' : undefined}
           >
             강의 관리

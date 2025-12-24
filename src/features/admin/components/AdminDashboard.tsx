@@ -3,38 +3,11 @@
 import { LuAward, LuBookOpen, LuStar, LuUsers } from 'react-icons/lu'
 
 import { useDashboardStats } from '../hooks/useDashboardStats'
+import { ClickRankingSection } from './ClickRankingSection'
 import { DistributionDonutChart } from './DistributionDonutChart'
-import { FeatureCard } from './FeatureCard'
-import { MemberStatusTable } from './MemberStatusTable'
+import { EventStatsSection } from './EventStatsSection'
 import { StatCard } from './StatCard'
 import { VisitorLineChart } from './VisitorLineChart'
-
-const features = [
-  {
-    title: '회원관리',
-    description:
-      "Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.",
-    icon: LuUsers,
-  },
-  {
-    title: '강의관리',
-    description:
-      "Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.",
-    icon: LuBookOpen,
-  },
-  {
-    title: '수료증관리',
-    description:
-      "Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.",
-    icon: LuAward,
-  },
-  {
-    title: '리뷰관리',
-    description:
-      "Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.",
-    icon: LuStar,
-  },
-]
 
 export function AdminDashboard() {
   const { stats, pendingCounts, memberDistribution, isLoading } = useDashboardStats()
@@ -75,9 +48,10 @@ export function AdminDashboard() {
   ]
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-1 flex-col gap-6">
       {/* Header */}
       <h1 className="text-foreground text-2xl font-bold">대시보드</h1>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map(stat => (
@@ -90,24 +64,18 @@ export function AdminDashboard() {
           />
         ))}
       </div>
-      {/* Charts Section */}
+
+      {/* Charts Section - 기본 통계 */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <VisitorLineChart />
         <DistributionDonutChart data={distributionData} isLoading={isLoading} />
       </div>
-      Feature Cards
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {features.map(feature => (
-          <FeatureCard
-            key={feature.title}
-            title={feature.title}
-            description={feature.description}
-            icon={feature.icon}
-          />
-        ))}
-      </div>
-      {/* Member Status Table */}
-      <MemberStatusTable />
+
+      {/* Event Stats Section - 이벤트 통계 */}
+      <EventStatsSection />
+
+      {/* Click Ranking Section - 클릭 순위 */}
+      <ClickRankingSection />
     </div>
   )
 }

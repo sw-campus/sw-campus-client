@@ -9,12 +9,12 @@ interface AuthState {
   isLoggedIn: boolean
   userName: string | null
   nickname: string | null
-  userType: 'ORGANIZATION' | 'PERSONAL' | null
+  userType: 'ORGANIZATION' | 'PERSONAL' | 'ADMIN' | null
 
   // actions
   login: (name: string) => void
-  setAuth: (token: string | null, userType: 'ORGANIZATION' | 'PERSONAL' | null) => void
-  setUserType: (userType: 'ORGANIZATION' | 'PERSONAL' | null) => void
+  setAuth: (token: string | null, userType: 'ORGANIZATION' | 'PERSONAL' | 'ADMIN' | null) => void
+  setUserType: (userType: 'ORGANIZATION' | 'PERSONAL' | 'ADMIN' | null) => void
   setNickname: (nickname: string | null) => void
   logout: () => void
   resetAuth: () => void
@@ -35,14 +35,14 @@ export const useAuthStore = create<AuthState>()(
           userName: name,
         }),
 
-      setAuth: (token: string | null, userType: 'ORGANIZATION' | 'PERSONAL' | null) =>
+      setAuth: (token: string | null, userType: 'ORGANIZATION' | 'PERSONAL' | 'ADMIN' | null) =>
         set({
           accessToken: token,
           userType,
           isLoggedIn: !!token,
         }),
 
-      setUserType: (userType: 'ORGANIZATION' | 'PERSONAL' | null) => set({ userType }),
+      setUserType: (userType: 'ORGANIZATION' | 'PERSONAL' | 'ADMIN' | null) => set({ userType }),
 
       setNickname: (nickname: string | null) => set({ nickname }),
 

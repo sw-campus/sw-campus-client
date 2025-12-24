@@ -10,6 +10,7 @@ import 'swiper/css'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import SmallBanner from '@/features/banner/components/SmallBanner'
+import { trackBannerClick } from '@/lib/analytics'
 
 import { useBannersByTypeQuery } from '../hooks/useBannerQuery'
 
@@ -60,6 +61,16 @@ export default function MidBanner() {
     return null
   }
 
+  const handleBannerClick = (banner: NonNullable<typeof middleBanners>[0]) => {
+    trackBannerClick({
+      bannerId: banner.id,
+      bannerType: 'MIDDLE',
+      bannerName: banner.lectureName,
+      lectureId: banner.lectureId,
+      url: banner.url,
+    })
+  }
+
   return (
     <div className="custom-container overflow-visible">
       <div className="custom-card overflow-visible">
@@ -104,11 +115,17 @@ export default function MidBanner() {
                 return (
                   <SwiperSlide key={banner.id}>
                     {external ? (
-                      <a href={href} target="_blank" rel="noopener noreferrer" className="block">
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                        onClick={() => handleBannerClick(banner)}
+                      >
                         {content}
                       </a>
                     ) : (
-                      <Link href={href} className="block">
+                      <Link href={href} className="block" onClick={() => handleBannerClick(banner)}>
                         {content}
                       </Link>
                     )}
