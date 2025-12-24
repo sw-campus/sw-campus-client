@@ -72,7 +72,7 @@ export function CertificateDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
+      <DialogContent className="h-[calc(70vh-6rem)] w-[calc(60vw-4rem)] max-w-none overflow-y-auto sm:max-w-none">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             수료증 상세 정보
@@ -86,8 +86,8 @@ export function CertificateDetailModal({
             <span className="text-muted-foreground">로딩 중...</span>
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* 수료증 이미지 */}
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* 수료증 이미지 (왼쪽) */}
             <div className="border-border overflow-hidden rounded-lg border bg-gray-50">
               <div className="flex justify-center p-2">
                 <span className="text-muted-foreground text-xs font-medium">CERTIFICATE IMAGE</span>
@@ -107,8 +107,8 @@ export function CertificateDetailModal({
               </div>
             </div>
 
-            {/* 상세 정보 */}
-            <div className="border-border rounded-lg border p-4">
+            {/* 상세 정보 (오른쪽) */}
+            <div className="border-border rounded-lg border p-6">
               <h3 className="text-foreground mb-3 font-semibold">신청 정보</h3>
               <div className="divide-border divide-y text-sm">
                 <DetailRow label="강의명" value={detail?.lectureName ?? review.lectureName} />
