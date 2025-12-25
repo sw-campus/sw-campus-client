@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write  # GitHub Release 생성용
   packages: write
 
 jobs:
@@ -18,6 +18,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Read version from package.json
+        id: version
+        if: github.ref == 'refs/heads/main'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          VERSION_TAG="v${VERSION}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_tag=$VERSION_TAG" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+          echo "Version tag: $VERSION_TAG"
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -39,13 +50,34 @@ jobs:
       - name: Build and push image
         run: |
           IMAGE="ghcr.io/sw-campus/sw-campus-client"
-          TAG="${{ steps.tag.outputs.tag }}"
+          SHA_TAG="${{ steps.tag.outputs.tag }}"
 
-          docker build -t $IMAGE:$TAG .
-          docker push $IMAGE:$TAG
+          docker build -t $IMAGE:$SHA_TAG .
+          docker push $IMAGE:$SHA_TAG
           
           # develop 브랜치일 때 develop 태그로도 푸시
           if [ "${{ github.ref }}" == "refs/heads/develop" ]; then
-            docker tag $IMAGE:$TAG $IMAGE:develop
+            docker tag $IMAGE:$SHA_TAG $IMAGE:develop
             docker push $IMAGE:develop
           fi
+          
+          # main 브랜치일 때 버전 태그로도 푸시
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            VERSION_TAG="${{ steps.version.outputs.version_tag }}"
+            docker tag $IMAGE:$SHA_TAG $IMAGE:$VERSION_TAG
+            docker push $IMAGE:$VERSION_TAG
+            echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
+          fi
+
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main'
+        run: |
+          gh release create ${{ steps.version.outputs.version_tag }} \
+            --title "Release ${{ steps.version.outputs.version_tag }}" \
+            --notes "Automated release from main branch
+          - Version: ${{ steps.version.outputs.version }}
+          - Image tag: ${{ steps.version.outputs.version_tag }}
+          - Commit: ${{ github.sha }}" \
+            --target ${{ github.sha }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
