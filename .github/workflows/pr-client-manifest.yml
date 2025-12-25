@@ -27,7 +27,11 @@ jobs:
           SHA="${{ github.event.workflow_run.head_sha }}"
 
           if [ "$BRANCH" = "main" ]; then
-            echo "tag=prod-$SHA" >> $GITHUB_OUTPUT
+            # main 브랜치일 때는 package.json에서 버전을 읽어서 버전 태그 사용
+            VERSION=$(node -p "require('./package.json').version")
+            VERSION_TAG="v${VERSION}"
+            echo "tag=$VERSION_TAG" >> $GITHUB_OUTPUT
+            echo "Version tag: $VERSION_TAG"
           else
             echo "tag=dev-$SHA" >> $GITHUB_OUTPUT
           fi
