@@ -73,7 +73,7 @@ jobs:
           token: ${{ secrets.MANIFEST_REPO_TOKEN }}
           path: manifest
           base: ${{ steps.target.outputs.branch }}
-          branch: chore/client-image-${{ steps.target.outputs.env }}-${{ steps.tag.outputs.tag }}
+          branch: chore/client-image-${{ steps.target.outputs.env }}-${{ github.run_id }}
           commit-message: "chore(client): update image (${{ steps.target.outputs.env }}) to ${{ steps.tag.outputs.tag }}"
           title: "Deploy Client (${{ steps.target.outputs.env }}) – ${{ steps.tag.outputs.tag }}"
           body: |
@@ -83,3 +83,4 @@ jobs:
           add-paths: |
             k8s/environments/develop/values.yaml
             k8s/environments/release/values.yaml
+        continue-on-error: true
