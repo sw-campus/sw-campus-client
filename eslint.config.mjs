@@ -1,3 +1,5 @@
+import tsPlugin from '@typescript-eslint/eslint-plugin'
+import tsParser from '@typescript-eslint/parser'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 import prettier from 'eslint-config-prettier/flat'
@@ -8,6 +10,17 @@ const eslintConfig = defineConfig([
   ...nextTs,
   prettier,
   {
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './tsconfig.json',
+        tsconfigRootDir: process.cwd(),
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+    },
     rules: {
       // TypeScript 규칙
       '@typescript-eslint/no-explicit-any': 'warn', // any 타입 사용하면 막지는 않고 경고만

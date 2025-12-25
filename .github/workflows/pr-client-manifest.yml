@@ -1,0 +1,85 @@
+name: Update Manifest (Client)
+
+on:
+  workflow_run:
+    workflows: ["Build Client Image"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  update-manifest:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ client 레포 체크아웃 (태그 계산용)
+      - name: Checkout client repo
+        uses: actions/checkout@v4
+
+      # 2️⃣ 이미지 태그 결정
+      - name: Determine image tag
+        id: tag
+        run: |
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
+          SHA="${{ github.event.workflow_run.head_sha }}"
+
+          if [ "$BRANCH" = "main" ]; then
+            echo "tag=prod-$SHA" >> $GITHUB_OUTPUT
+          else
+            echo "tag=dev-$SHA" >> $GITHUB_OUTPUT
+          fi
+
+      # 3️⃣ 대상 manifest 브랜치 결정
+      - name: Determine target manifest branch
+        id: target
+        run: |
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
+
+          if [ "$BRANCH" = "develop" ]; then
+            echo "branch=develop" >> $GITHUB_OUTPUT
+            echo "env=dev" >> $GITHUB_OUTPUT
+          else
+            echo "branch=main" >> $GITHUB_OUTPUT
+            echo "env=prod" >> $GITHUB_OUTPUT
+          fi
+
+      # 4️⃣ manifest 레포 체크아웃
+      - name: Checkout manifest repo
+        uses: actions/checkout@v4
+        with:
+          repository: sw-campus/sw-campus-manifest
+          token: ${{ secrets.MANIFEST_REPO_TOKEN }}
+          path: manifest
+
+      # 5️⃣ client 이미지 태그 변경
+      - name: Update client image tag
+        run: |
+          cd manifest
+          # develop 브랜치면 develop 환경 values.yaml 업데이트
+          if [ "${{ steps.target.outputs.branch }}" == "develop" ]; then
+            VALUES_FILE="k8s/environments/develop/values.yaml"
+          else
+            VALUES_FILE="k8s/environments/release/values.yaml"
+          fi
+          sed -i '/repository: ghcr.io\/sw-campus\/sw-campus-client$/,/pullPolicy:/ s|tag: ".*"|tag: "${{ steps.tag.outputs.tag }}"|' "$VALUES_FILE"
+
+      # 6️⃣ PR 생성
+      - name: Create PR to manifest repo
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.MANIFEST_REPO_TOKEN }}
+          path: manifest
+          base: ${{ steps.target.outputs.branch }}
+          branch: chore/client-image-${{ steps.target.outputs.env }}-${{ steps.tag.outputs.tag }}
+          commit-message: "chore(client): update image (${{ steps.target.outputs.env }}) to ${{ steps.tag.outputs.tag }}"
+          title: "Deploy Client (${{ steps.target.outputs.env }}) – ${{ steps.tag.outputs.tag }}"
+          body: |
+            - Service: Client
+            - Environment: ${{ steps.target.outputs.env }}
+            - Image tag: `${{ steps.tag.outputs.tag }}`
+          add-paths: |
+            k8s/environments/develop/values.yaml
+            k8s/environments/release/values.yaml
