@@ -40,6 +40,8 @@ export const SORT_OPTIONS: SortOption[] = [
 
 export const DEFAULT_SORT = SORT_OPTIONS[0].value
 
+export const DEFAULT_PAGE_SIZE = '12'
+
 export const COST_QUERY_MAP: Record<string, string> = {
   '무료(내배카 필요)': 'isFreeKdt',
   '무료(내배카 필요X)': 'isFreeNoKdt',

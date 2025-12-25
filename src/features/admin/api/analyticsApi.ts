@@ -3,15 +3,24 @@ import { api } from '@/lib/axios'
 export interface AnalyticsReport {
   totalUsers: number
   activeUsers: number
+  newUsers: number
+  averageEngagementTime: number
   pageViews: number
   sessions: number
   dailyStats: DailyStat[]
+  deviceStats: DeviceStat[]
 }
 
 export interface DailyStat {
   date: string
-  activeUsers: number
+  totalUsers: number
+  newUsers: number
   pageViews: number
+}
+
+export interface DeviceStat {
+  category: string
+  activeUsers: number
 }
 
 export interface EventStats {
@@ -39,6 +48,7 @@ export interface BannerClickStats {
 export interface LectureClickStats {
   lectureId: string
   lectureName: string
+  views: number
   applyClicks: number
   shareClicks: number
   totalClicks: number
@@ -79,6 +89,41 @@ export async function fetchTopBanners(days: number = 7, limit: number = 10): Pro
  */
 export async function fetchTopLectures(days: number = 7, limit: number = 10): Promise<LectureClickStats[]> {
   const { data } = await api.get<LectureClickStats[]>(`/admin/analytics/events/top-lectures`, {
+    params: { days, limit },
+  })
+  return data
+}
+
+// =========================
+// 인기 강의 & 인기 검색어
+// =========================
+
+export interface PopularLecture {
+  lectureId: string
+  lectureName: string
+  views: number
+}
+
+export interface PopularSearchTerm {
+  term: string
+  count: number
+}
+
+/**
+ * 인기 강의 조회 (페이지 조회수 기준)
+ */
+export async function fetchPopularLectures(days: number = 7, limit: number = 5): Promise<PopularLecture[]> {
+  const { data } = await api.get<PopularLecture[]>(`/admin/analytics/popular-lectures`, {
+    params: { days, limit },
+  })
+  return data
+}
+
+/**
+ * 인기 검색어 조회
+ */
+export async function fetchPopularSearchTerms(days: number = 7, limit: number = 10): Promise<PopularSearchTerm[]> {
+  const { data } = await api.get<PopularSearchTerm[]>(`/admin/analytics/popular-search-terms`, {
     params: { days, limit },
   })
   return data

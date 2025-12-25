@@ -4,6 +4,8 @@ import { useState } from 'react'
 
 import { LuCheck, LuClock, LuList, LuX } from 'react-icons/lu'
 
+import { Button } from '@/components/ui/button'
+
 import { useLecturesQuery, useLectureStatsQuery } from '../../hooks/useLectures'
 import { useApproveLectureMutation, useRejectLectureMutation } from '../../hooks/useLectures'
 import type { ApprovalStatusFilter } from '../../types/approval.type'
@@ -11,6 +13,7 @@ import type { LectureAuthStatus, LectureSummary } from '../../types/lecture.type
 import { ApprovalFilter } from '../common/ApprovalFilter'
 import { ApprovalPagination } from '../common/ApprovalPagination'
 import { APPROVAL_STAT_COLORS, ColorfulStatCard } from '../common/ColorfulStatCard'
+import { AdminLectureRegisterModal } from './AdminLectureRegisterModal'
 import { LectureDetailModal } from './LectureDetailModal'
 import { LectureTable } from './LectureTable'
 
@@ -22,6 +25,7 @@ export function LectureApprovalPage() {
   const [currentPage, setCurrentPage] = useState(0)
   const [selectedItem, setSelectedItem] = useState<LectureSummary | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
 
   // 필터 상태를 API 호출용으로 변환
   const apiStatus: LectureAuthStatus | undefined = statusFilter === 'ALL' ? undefined : statusFilter
@@ -74,7 +78,10 @@ export function LectureApprovalPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-6">
-      <h1 className="text-foreground text-2xl font-bold">강의 승인 관리</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-foreground text-2xl font-bold">강의 승인 관리</h1>
+        <Button onClick={() => setIsRegisterModalOpen(true)}>강의 등록</Button>
+      </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map(stat => (
@@ -115,6 +122,8 @@ export function LectureApprovalPage() {
         isApproving={approveMutation.isPending}
         isRejecting={rejectMutation.isPending}
       />
+
+      <AdminLectureRegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
     </div>
   )
 }

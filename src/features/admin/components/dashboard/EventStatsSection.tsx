@@ -1,17 +1,16 @@
-'use client'
-
-import { useState } from 'react'
-
 import { LuActivity, LuExternalLink, LuMousePointerClick, LuShare2 } from 'react-icons/lu'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import { useEventStatsQuery } from '../hooks/useAnalytics'
-import { PeriodToggle, type Period } from './shared/PeriodToggle'
+import { useEventStatsQuery } from '../../hooks/useAnalytics'
+import { type Period } from './shared/PeriodToggle'
 
-export function EventStatsSection() {
-  const [period, setPeriod] = useState<Period>(7)
+interface EventStatsSectionProps {
+  period?: Period
+}
+
+export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
   const { data: eventStats, isLoading } = useEventStatsQuery(period)
 
   const bannerData = [
@@ -44,9 +43,24 @@ export function EventStatsSection() {
     },
   ]
 
+  const getPeriodLabel = (p: Period) => {
+    switch (p) {
+      case 1:
+        return '일간'
+      case 7:
+        return '주간'
+      case 30:
+        return '월간'
+      default:
+        return '주간'
+    }
+  }
+
+  const periodLabel = getPeriodLabel(period)
+
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <>
         <Card className="animate-pulse">
           <CardHeader>
             <div className="h-6 w-32 rounded bg-gray-200" />
@@ -67,26 +81,33 @@ export function EventStatsSection() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <>
       {/* 배너 클릭 차트 */}
-      <Card className="bg-card">
-        <CardHeader className="flex flex-row items-center justify-between">
+      <Card className="bg-card h-full">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-foreground flex items-center gap-2">
             <LuActivity className="h-5 w-5 text-orange-500" />
             배너 클릭 통계
           </CardTitle>
-          <PeriodToggle period={period} onPeriodChange={setPeriod} />
+          <span className="text-muted-foreground text-sm">{periodLabel} 기준</span>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={bannerData} layout="vertical">
               <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} allowDecimals={false} />
-              <YAxis type="category" dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} width={60} />
+              <YAxis
+                type="category"
+                dataKey="name"
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={12}
+                width={60}
+                tick={{ dx: -5 }}
+              />
               <Tooltip
                 contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
@@ -95,32 +116,35 @@ export function EventStatsSection() {
                 }}
                 formatter={value => [`${value ?? 0}회`, '클릭']}
               />
-              <Bar dataKey="value" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={32} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      {/* 주요 액션 통계 */}
-      <Card className="bg-card">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-foreground">사용자 액션</CardTitle>
-          <span className="text-muted-foreground text-sm">최근 {period}일</span>
+      {/* 사용자 액션 통계 */}
+      <Card className="bg-card h-full">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-foreground flex items-center gap-2">
+            <LuMousePointerClick className="h-5 w-5 text-blue-500" />
+            사용자 액션
+          </CardTitle>
+          <span className="text-muted-foreground text-sm">{periodLabel} 합계</span>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-3">
           {actionStats.map(stat => (
-            <div key={stat.title} className={`flex items-center justify-between rounded-xl ${stat.bgColor} p-4`}>
+            <div key={stat.title} className={`flex items-center justify-between rounded-lg ${stat.bgColor} p-3`}>
               <div className="flex items-center gap-3">
-                <div className={`rounded-lg bg-white p-2 shadow-sm ${stat.color}`}>
-                  <stat.icon className="h-5 w-5" />
+                <div className={`rounded-md bg-white p-1.5 shadow-sm ${stat.color}`}>
+                  <stat.icon className="h-4 w-4" />
                 </div>
-                <span className="font-medium text-gray-700">{stat.title}</span>
+                <span className="text-sm font-medium text-gray-700">{stat.title}</span>
               </div>
-              <span className="text-2xl font-bold text-gray-900">{stat.value.toLocaleString()}</span>
+              <span className="text-lg font-bold text-gray-900">{stat.value.toLocaleString()}</span>
             </div>
           ))}
         </CardContent>
       </Card>
-    </div>
+    </>
   )
 }

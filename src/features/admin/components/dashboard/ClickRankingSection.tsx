@@ -9,13 +9,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
-import { useTopBannersQuery, useTopLecturesQuery } from '../hooks/useAnalytics'
-import { PeriodToggle, type Period } from './shared/PeriodToggle'
+import { useTopBannersQuery, useTopLecturesQuery } from '../../hooks/useAnalytics'
+import { type Period } from './shared/PeriodToggle'
 
 type ModalType = 'banners' | 'lectures' | null
 
-export function ClickRankingSection() {
-  const [period, setPeriod] = useState<Period>(7)
+interface ClickRankingSectionProps {
+  period?: Period
+}
+
+export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
   const [modalOpen, setModalOpen] = useState<ModalType>(null)
 
   // 전체 데이터 조회 (limit=50) - 카드와 모달에서 공유
@@ -25,6 +28,21 @@ export function ClickRankingSection() {
   // 카드용: Top 5 (slice로 추출)
   const banners = allBanners.slice(0, 5)
   const lectures = allLectures.slice(0, 5)
+
+  const getPeriodLabel = (p: Period) => {
+    switch (p) {
+      case 1:
+        return '일간' // or '지난 1일'
+      case 7:
+        return '주간'
+      case 30:
+        return '월간'
+      default:
+        return '주간'
+    }
+  }
+
+  const periodLabel = getPeriodLabel(period)
 
   const RankBadge = ({ rank }: { rank: number }) => (
     <span
@@ -64,13 +82,13 @@ export function ClickRankingSection() {
     <>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* 배너 클릭 Top 5 */}
-        <Card className="bg-card">
+        <Card className="bg-card flex h-full flex-col">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-foreground flex items-center gap-2">
               <LuImage className="h-5 w-5 text-purple-500" />
               배너 클릭 Top 5
             </CardTitle>
-            <PeriodToggle period={period} onPeriodChange={setPeriod} />
+            <span className="text-muted-foreground text-sm">{periodLabel} 기준</span>
           </CardHeader>
           <CardContent>
             <Table className="table-fixed">
@@ -121,22 +139,23 @@ export function ClickRankingSection() {
         </Card>
 
         {/* 강의 클릭 Top 5 */}
-        <Card className="bg-card">
+        <Card className="bg-card flex h-full flex-col">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-foreground flex items-center gap-2">
               <LuTrendingUp className="h-5 w-5 text-emerald-500" />
               인기 강의 Top 5
             </CardTitle>
-            <span className="text-muted-foreground text-sm">최근 {period}일</span>
+            <span className="text-muted-foreground text-sm">{periodLabel} 기준</span>
           </CardHeader>
           <CardContent>
             <Table className="table-fixed">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">순위</TableHead>
+                  <TableHead className="w-10">순위</TableHead>
                   <TableHead className="w-auto">강의명</TableHead>
-                  <TableHead className="w-12 text-right">신청</TableHead>
-                  <TableHead className="w-12 text-right">공유</TableHead>
+                  <TableHead className="w-12 text-right">조회</TableHead>
+                  <TableHead className="w-10 text-right">신청</TableHead>
+                  <TableHead className="w-10 text-right">공유</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -144,7 +163,7 @@ export function ClickRankingSection() {
                   <SkeletonRows />
                 ) : lectures.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-muted-foreground text-center">
+                    <TableCell colSpan={5} className="text-muted-foreground text-center">
                       데이터가 없습니다
                     </TableCell>
                   </TableRow>
@@ -158,6 +177,9 @@ export function ClickRankingSection() {
                         <div className="truncate" title={lecture.lectureName || `강의 #${lecture.lectureId}`}>
                           {lecture.lectureName || `강의 #${lecture.lectureId}`}
                         </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-right text-sm">
+                        {(lecture.views || 0).toLocaleString()}
                       </TableCell>
                       <TableCell className="text-right font-semibold text-blue-600">
                         {lecture.applyClicks.toLocaleString()}
@@ -245,6 +267,7 @@ export function ClickRankingSection() {
               <TableRow>
                 <TableHead className="w-14">순위</TableHead>
                 <TableHead className="w-auto">강의명</TableHead>
+                <TableHead className="w-16 text-right">조회</TableHead>
                 <TableHead className="w-14 text-right">신청</TableHead>
                 <TableHead className="w-14 text-right">공유</TableHead>
                 <TableHead className="w-14 text-right">합계</TableHead>
@@ -255,7 +278,7 @@ export function ClickRankingSection() {
                 <SkeletonRows />
               ) : allLectures.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-muted-foreground text-center">
+                  <TableCell colSpan={6} className="text-muted-foreground text-center">
                     데이터가 없습니다
                   </TableCell>
                 </TableRow>
@@ -269,6 +292,9 @@ export function ClickRankingSection() {
                       <div className="truncate font-medium" title={lecture.lectureName || `강의 #${lecture.lectureId}`}>
                         {lecture.lectureName || `강의 #${lecture.lectureId}`}
                       </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-right text-sm">
+                      {(lecture.views || 0).toLocaleString()}
                     </TableCell>
                     <TableCell className="text-right font-semibold text-blue-600">
                       {lecture.applyClicks.toLocaleString()}

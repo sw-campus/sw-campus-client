@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from '@/features/lecture/types/filter.type'
 import type { DesktopNavCategory, MobileNavGroup } from '@/features/navigation/types/navigation-menu.types'
 
 type CategoryNode = {
@@ -14,11 +15,11 @@ export const buildMobileNavData = (categoryTree?: CategoryNode[] | null): Mobile
     items:
       l1.children?.map(l2 => ({
         title: l2.categoryName,
-        href: `/lectures/search?categoryIds=${l2.categoryId}`,
+        href: `/lectures/search?categoryIds=${l2.categoryId}&size=${DEFAULT_PAGE_SIZE}`,
         items:
           l2.children?.map(l3 => ({
             title: l3.categoryName,
-            href: `/lectures/search?categoryIds=${l3.categoryId}`,
+            href: `/lectures/search?categoryIds=${l3.categoryId}&size=${DEFAULT_PAGE_SIZE}`,
           })) || [],
       })) || [],
   }))
@@ -35,11 +36,11 @@ export const buildActiveCategoryChildren = (
 
   return activeCategory.children.map(l2 => ({
     title: l2.categoryName,
-    href: `/lectures/search?categoryIds=${l2.categoryId}`,
+    href: `/lectures/search?categoryIds=${l2.categoryId}&size=${DEFAULT_PAGE_SIZE}`,
     children:
       l2.children?.map(l3 => ({
         title: l3.categoryName,
-        href: `/lectures/search?categoryIds=${l3.categoryId}`,
+        href: `/lectures/search?categoryIds=${l3.categoryId}&size=${DEFAULT_PAGE_SIZE}`,
       })) || [],
   }))
 }
