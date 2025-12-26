@@ -165,6 +165,32 @@ export function LectureDetailModal({
                 </div>
               </div>
             )}
+
+            {/* 강사 정보 */}
+            {detail?.teachers && detail.teachers.length > 0 && (
+              <div className="border-border rounded-lg border p-4">
+                <h3 className="text-foreground mb-3 font-semibold">강사 정보</h3>
+                <div className="space-y-3">
+                  {detail.teachers.map(teacher => (
+                    <div key={teacher.teacherId} className="bg-muted flex items-start gap-4 rounded-md px-4 py-3">
+                      {teacher.teacherImageUrl && (
+                        <img
+                          src={teacher.teacherImageUrl}
+                          alt={teacher.teacherName}
+                          className="h-16 w-16 shrink-0 rounded-full object-cover"
+                        />
+                      )}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-foreground font-semibold">{teacher.teacherName}</span>
+                        {teacher.teacherDescription && (
+                          <span className="text-muted-foreground text-sm">{teacher.teacherDescription}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

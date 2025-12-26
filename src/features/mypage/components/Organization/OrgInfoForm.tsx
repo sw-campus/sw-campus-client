@@ -255,15 +255,27 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                   <Controller
                     control={methods.control}
                     name="certificateKey"
-                    render={() => (
-                      <ImageUploadInput
-                        currentUrl={undefined}
-                        file={certificateFile}
-                        onFileChange={setCertificateFile}
-                      />
+                    render={({ field }) => (
+                      <div className="space-y-2">
+                        {/* 기존 재직증명서 등록 여부 표시 */}
+                        {field.value && !certificateFile && (
+                          <div className="flex items-center gap-2 rounded-md border border-green-200 bg-green-50 px-3 py-2">
+                            <span className="text-green-600">✅</span>
+                            <span className="text-sm font-medium text-green-700">재직증명서 등록됨</span>
+                          </div>
+                        )}
+                        {/* 새 파일 업로드 */}
+                        <ImageUploadInput
+                          currentUrl={undefined}
+                          file={certificateFile}
+                          onFileChange={setCertificateFile}
+                        />
+                        {field.value && !certificateFile && (
+                          <p className="text-xs text-gray-500">새 파일을 업로드하면 기존 파일이 대체됩니다.</p>
+                        )}
+                      </div>
                     )}
                   />
-                  {/* 재직증명서는 S3 private bucket에 저장되어 직접 URL로 조회 불가 */}
                 </div>
 
                 <div>
