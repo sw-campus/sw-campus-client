@@ -53,7 +53,7 @@ export function TestDataPage() {
               <p>총 레코드: {summary.totalCount}건</p>
             </div>
             {summary.counts && (
-              <div className="border-border mt-4 grid grid-cols-2 gap-3 border-t pt-4 sm:grid-cols-3 lg:grid-cols-7">
+              <div className="border-border mt-4 grid grid-cols-2 gap-3 border-t pt-4 sm:grid-cols-4 lg:grid-cols-8">
                 <div className="bg-muted rounded-lg p-3 text-center">
                   <p className="text-muted-foreground text-xs">기관</p>
                   <p className="text-foreground text-xl font-bold">{summary.counts.organizations}</p>
@@ -61,6 +61,10 @@ export function TestDataPage() {
                 <div className="bg-muted rounded-lg p-3 text-center">
                   <p className="text-muted-foreground text-xs">강의</p>
                   <p className="text-foreground text-xl font-bold">{summary.counts.lectures}</p>
+                </div>
+                <div className="bg-muted rounded-lg p-3 text-center">
+                  <p className="text-muted-foreground text-xs">선생님</p>
+                  <p className="text-foreground text-xl font-bold">{summary.counts.teachers}</p>
                 </div>
                 <div className="bg-muted rounded-lg p-3 text-center">
                   <p className="text-muted-foreground text-xs">회원</p>
@@ -113,8 +117,9 @@ export function TestDataPage() {
         </div>
 
         <p className="text-muted-foreground mt-4 text-sm">
-          * 테스트 데이터는 2개의 기관, 4개의 강의, 17명의 회원(기관담당자 2명 + 일반회원 15명), 60개의 수료증, 60개의
-          리뷰, 10개의 설문조사, 6개의 배너(대배너 1, 중배너 2, 소배너 3)로 구성됩니다.
+          * 테스트 데이터는 3개의 기관(승인 2 + 대기 1), 4개의 강의(승인 3 + 대기 1), 10명의 선생님, 18명의 회원(기관담당자
+          3명 + 일반회원 15명), 60개의 수료증, 60개의 리뷰(승인 59 + 대기 1), 10개의 설문조사, 8개의 배너(대배너 3, 중배너
+          2, 소배너 3)로 구성됩니다.
         </p>
       </div>
     </div>
