@@ -126,6 +126,7 @@ export default function LectureDetailPage({ lectureId }: Props) {
                       displaySummary={displaySummary}
                       isLoading={isLoading}
                       isAiLoading={isAiLoading}
+                      isAiSummary={!!aiSummary}
                     />
                   </div>
 

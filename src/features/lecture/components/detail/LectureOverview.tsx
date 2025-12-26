@@ -16,13 +16,26 @@ interface Props {
   displaySummary: string
   isLoading: boolean
   isAiLoading: boolean
+  isAiSummary: boolean
 }
 
-export default function LectureOverview({ lecture, org, displaySummary, isLoading, isAiLoading }: Props) {
+export default function LectureOverview({ lecture, org, displaySummary, isLoading, isAiLoading, isAiSummary }: Props) {
   return (
     <div className="space-y-12">
       {/* 프로그램 요약 */}
-      <Section title="프로그램 요약">
+      <Section
+        title={
+          <span className="flex items-center gap-2">
+            프로그램 요약
+            {isAiSummary && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-2.5 py-0.5 text-xs font-medium text-white shadow-sm">
+                <span>✨</span>
+                AI 요약
+              </span>
+            )}
+          </span>
+        }
+      >
         {isLoading ? (
           <div className="text-muted-foreground py-4 text-center">기본 정보 로딩 중...</div>
         ) : isAiLoading ? (
