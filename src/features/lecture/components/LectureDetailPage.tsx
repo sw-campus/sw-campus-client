@@ -134,10 +134,12 @@ export default function LectureDetailPage({ lectureId }: Props) {
                 </CardContent>
               </Card>
 
-              {/* 본문 카드 (통합) */}
-              <Card className="rounded-2xl bg-white/70 ring-1 ring-white/30 backdrop-blur-xl">
+              {/* 탭 네비게이션 (Sticky) - 카드와 붙어서 보이도록 */}
+              <LectureTabNav />
+
+              {/* 본문 카드 (통합) - 탭과 붙어서 보이도록 상단 모서리 제거 */}
+              <Card className="rounded-t-none rounded-b-2xl bg-white/70 ring-1 ring-white/30 backdrop-blur-xl">
                 <CardContent className="space-y-16 p-6 md:p-8">
-                  <LectureTabNav />
                   {/* 모집개요 */}
                   <div id="overview" className="scroll-mt-28">
                     <LectureOverview
