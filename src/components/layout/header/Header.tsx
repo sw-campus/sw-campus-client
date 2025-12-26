@@ -29,7 +29,7 @@ export default function Header({
 }) {
   const router = useRouter()
   const [logoutOpen, setLogoutOpen] = useState(false)
-  const { isLoggedIn, nickname, userType } = useAuthStore()
+  const { isLoggedIn, nickname, userType, hasHydrated } = useAuthStore()
   const { logout, isPending } = useLogout()
   const { data: cartItems } = useCartLecturesQuery()
   const hasCartItems = (cartItems?.length ?? 0) > 0
@@ -113,7 +113,10 @@ export default function Header({
 
       {/* 아이콘 */}
       <div className="flex items-center gap-6 text-xl text-white">
-        {isLoggedIn ? (
+        {!hasHydrated ? (
+          // 하이드레이션 전에는 아무것도 표시하지 않음
+          <div className="h-6 w-24" />
+        ) : isLoggedIn ? (
           <>
             <span className="text-base font-medium">{nickname}님</span>
 

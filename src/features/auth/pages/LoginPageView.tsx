@@ -14,7 +14,7 @@ export default function LoginPageView() {
   const router = useRouter()
   const isLoggedIn = useAuthStore(state => state.isLoggedIn)
   const userType = useAuthStore(state => state.userType)
-  const { email, password, isLoading, setEmail, setPassword, rememberMe, setRememberMe, handleSubmit } = useLoginForm()
+  const { email, password, isLoading, setEmail, setPassword, handleSubmit } = useLoginForm()
   const { handleOAuthStart } = useOAuthUrls()
 
   // 마운트 시점의 로그인 상태를 저장
@@ -51,8 +51,6 @@ export default function LoginPageView() {
             isLoading={isLoading}
             onChangeEmail={setEmail}
             onChangePassword={setPassword}
-            rememberMe={rememberMe}
-            onChangeRememberMe={setRememberMe}
             onSubmit={handleSubmit}
             onOAuthStart={handleOAuthStart}
             signupHref="/signup"
