@@ -12,9 +12,7 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import { ImageUploadInput } from '@/components/ui/image-upload-input'
-import AddressInput from '@/features/auth/components/AddressInput'
 import { api } from '@/lib/axios'
-import { useSignupStore } from '@/store/signupStore'
 
 type MyOrganizationResponse = {
   organizationId: number
@@ -56,34 +54,13 @@ const INPUT_CLASS =
 const TEXTAREA_CLASS =
   'w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
 
-const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
-
-const loadDaumPostcodeScript = () => {
-  if (typeof window === 'undefined') return
-
-  const w = window as unknown as { daum?: { Postcode?: unknown } }
-  if (w.daum?.Postcode) return
-
-  if (document.getElementById(DAUM_POSTCODE_SCRIPT_ID)) return
-
-  const script = document.createElement('script')
-  script.id = DAUM_POSTCODE_SCRIPT_ID
-  script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
-  script.async = true
-  document.body.appendChild(script)
-}
-
 export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
 
   const [isPending, setIsPending] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [showAddressEditor, setShowAddressEditor] = useState(false)
-
   const [organizationId, setOrganizationId] = useState<number | null>(null)
   const [approvalStatus, setApprovalStatus] = useState<string>('')
-
-  const { address, detailAddress, setAddress, setDetailAddress } = useSignupStore()
 
   const methods = useForm<OrgInfoFormValues>({
     resolver: zodResolver(orgInfoSchema),
@@ -120,8 +97,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     let mounted = true
 
     const load = async () => {
-      loadDaumPostcodeScript()
-
       setIsLoading(true)
       try {
         const res = await api.get<MyOrganizationResponse>('/mypage/organization')
@@ -146,11 +121,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
           facilityImageUrl4: data.facilityImageUrl4 ?? '',
           location: '',
         })
-
-        // 주소는 백엔드 값으로 초기 세팅 (수정 시 AddressInput 노출)
-        const loc = (data.location ?? '').trim()
-        setAddress(loc)
-        setDetailAddress('')
       } catch {
         toast.error('기관 정보 조회에 실패했습니다.')
       } finally {
@@ -163,22 +133,16 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     return () => {
       mounted = false
     }
-  }, [methods, setAddress, setDetailAddress])
+  }, [methods])
 
   const onSubmit = async (_values: OrgInfoFormValues) => {
     setIsPending(true)
     try {
-      // AddressInput은 store 기반이므로 여기서 location 조합
-      const _nextLocation = detailAddress?.trim() ? `${address ?? ''} ${detailAddress}`.trim() : (address ?? '').trim()
-      if (!_nextLocation) {
-        toast.error('주소를 입력해주세요.')
-        return
-      }
       const fd = new FormData()
       // 텍스트 필드 (Swagger 스펙 기반)
       fd.append('organizationName', methods.getValues('organizationName') ?? '')
       fd.append('description', methods.getValues('description') ?? '')
-      fd.append('location', _nextLocation)
+
       fd.append('homepage', methods.getValues('homepage') ?? '')
       fd.append('govAuth', methods.getValues('govAuth') ?? '')
 
@@ -212,14 +176,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <FieldSet>
           <FieldGroup className="grid grid-cols-1 gap-6">
-            {/* 수정 불가: 기관 ID */}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-800">기관 ID</label>
-              <div className={`${INPUT_CLASS} flex items-center bg-gray-50`}>
-                <span className="truncate">{organizationId ?? '-'}</span>
-              </div>
-            </div>
-
             {/* 수정 불가: 승인 상태 */}
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-800">승인 상태</label>
@@ -253,22 +209,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
             </div>
 
             <div>
-              <label htmlFor="representativeName" className="mb-1 block text-sm font-medium text-gray-800">
-                대표자명
-              </label>
-              <input
-                id="representativeName"
-                type="text"
-                placeholder="예) 홍길동"
-                {...register('representativeName')}
-                className={INPUT_CLASS}
-              />
-              {errors.representativeName && (
-                <p className="mt-1 text-xs text-red-600">{errors.representativeName.message}</p>
-              )}
-            </div>
-
-            <div>
               <label htmlFor="description" className="mb-1 block text-sm font-medium text-gray-800">
                 기관 소개
               </label>
@@ -279,17 +219,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                 {...register('description')}
                 className={TEXTAREA_CLASS}
               />
-            </div>
-
-            {/* 주소(수정 불가) */}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-800">주소</label>
-              <div className={`${INPUT_CLASS} flex flex-1 items-center bg-gray-100`}>
-                <span className="truncate text-gray-500">{address || '주소 정보가 없습니다.'}</span>
-              </div>
-              <p className="mt-1 text-xs text-neutral-500">
-                기업 주소는 &apos;내 정보 관리&apos; 탭에서 수정 가능합니다.
-              </p>
             </div>
 
             <div>
