@@ -12,7 +12,7 @@ import Modal from '@/components/ui/Modal'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
-import { createReview, getLectureReviews, isCertificateVerified } from '../../api/reviewApi.client'
+import { checkReviewEligibility, createReview, getLectureReviews } from '../../api/reviewApi.client'
 import { CATEGORY_LABELS, type Review, type ReviewCategory } from '../../api/reviewApi.types'
 import { formatDate, Section, StarRating } from './DetailShared'
 
@@ -130,11 +130,22 @@ export default function LectureReviews({ lectureId }: Props) {
       className="rounded-full border-gray-200 bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100"
       size="sm"
       onClick={async () => {
-        const verified = await isCertificateVerified(lectureId)
-        if (verified) {
+        // eligibility API로 리뷰 작성 가능 여부 확인
+        const eligibility = await checkReviewEligibility(lectureId)
+
+        // 이미 리뷰를 작성한 경우
+        if (!eligibility.canWrite) {
+          toast.error('이미 리뷰를 작성했습니다.')
+          return
+        }
+
+        // 수료증이 이미 인증된 경우 바로 리뷰 작성 모달 열기
+        if (eligibility.hasCertificate) {
           setOpenWrite(true)
           return
         }
+
+        // 수료증 인증 모달 열기
         setError(null)
         setFile(null)
         if (previewUrl) URL.revokeObjectURL(previewUrl)
