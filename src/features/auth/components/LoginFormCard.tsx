@@ -74,10 +74,10 @@ export function LoginFormCard({
         />
       </div>
 
-      {/* 아이디/비번 찾기 + 회원가입 */}
-      <div className="mb-4 flex items-center justify-end gap-4 text-white/65">
+      {/* 비번 찾기 + 회원가입 */}
+      <div className="mb-4 flex items-center justify-between text-white/65">
         <button type="button" onClick={onFindAccountClick} className="underline-offset-2 hover:underline">
-          아이디/비밀번호 찾기
+          비밀번호 찾기
         </button>
 
         <Link href={signupHref} className="underline-offset-2 hover:underline">
