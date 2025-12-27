@@ -19,7 +19,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # 빌드 인자 (기본값 설정)
-ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_API_URL=http://localhost:3000
 
 # 환경 변수 설정 (빌드 시 필요)
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
