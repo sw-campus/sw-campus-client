@@ -20,9 +20,9 @@ import { AiFloatingButton } from '@/features/cart/components/AiFloatingButton'
 import { CartItemSidebar } from '@/features/cart/components/compare-table/CartItemSidebar'
 import { CompareTable } from '@/features/cart/components/compare-table/CompareTable'
 import { LectureSummaryCard } from '@/features/cart/components/compare-table/LectureSummaryCard'
+import { useAiCompare } from '@/features/cart/hooks/useAiCompare'
 import { useCartComparePageModel } from '@/features/cart/hooks/useCartComparePageModel'
 import { getDragLectureId } from '@/features/cart/utils/cartCompareDnd'
-import type { ComparisonResult } from '@/features/lecture/actions/gemini'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 
@@ -34,10 +34,6 @@ export default function CartCompareSection() {
   const [isLeftOver, setIsLeftOver] = useState(false)
   const [isRightOver, setIsRightOver] = useState(false)
   const [isSurveyDialogOpen, setIsSurveyDialogOpen] = useState(false)
-
-  // AI 분석 상태
-  const [aiResult, setAiResult] = useState<ComparisonResult | null>(null)
-  const [isAiLoading, setIsAiLoading] = useState(false)
 
   const isLoggedIn = useAuthStore(state => state.isLoggedIn)
 
@@ -63,83 +59,31 @@ export default function CartCompareSection() {
     dropLecture,
   } = useCartComparePageModel()
 
+  // AI 분석 훅 (TanStack Query 캐싱 적용)
+  const {
+    result: aiResult,
+    isLoading: isAiLoading,
+    analyze: runAiAnalyze,
+    clearResult: handleClearAi,
+    hasCachedResult,
+  } = useAiCompare({
+    leftId,
+    rightId,
+    leftDetail,
+    rightDetail,
+    isLoggedIn,
+  })
+
   // AI 분석이 가능한지 여부
   const canAnalyze = Boolean(leftDetail && rightDetail && isLoggedIn)
 
-  // AI 분석 실행 핸들러
+  // AI 분석 실행 핸들러 (캐싱 적용)
   const handleAiAnalyze = async () => {
-    if (!leftDetail || !rightDetail) {
-      toast.error('두 강의를 모두 선택해주세요')
-      return
-    }
-
-    if (!isLoggedIn) {
-      toast.error('로그인이 필요한 기능입니다')
-      return
-    }
-
-    setIsAiLoading(true)
-    setAiResult(null)
-
-    // 1단계: 모듈 동적 로딩
-    let compareCoursesWithAI: typeof import('@/features/lecture/actions/gemini').compareCoursesWithAI
-    let getSurvey: typeof import('@/features/mypage/api/survey.api').getSurvey
-    let getProfile: typeof import('@/features/mypage/api/survey.api').getProfile
-
-    try {
-      const [geminiModule, surveyModule] = await Promise.all([
-        import('@/features/lecture/actions/gemini'),
-        import('@/features/mypage/api/survey.api'),
-      ])
-      compareCoursesWithAI = geminiModule.compareCoursesWithAI
-      getSurvey = surveyModule.getSurvey
-      getProfile = surveyModule.getProfile
-    } catch (error) {
-      console.error('Module Loading Error:', error)
-      toast.error('서비스 모듈을 불러오는데 실패했습니다. 페이지를 새로고침해주세요.')
-      setIsAiLoading(false)
-      return
-    }
-
-    // 2단계: 사용자 데이터 조회
-    let survey: Awaited<ReturnType<typeof getSurvey>>
-    let profile: Awaited<ReturnType<typeof getProfile>>
-
-    try {
-      ;[survey, profile] = await Promise.all([getSurvey(), getProfile()])
-    } catch (error) {
-      console.error('User Data Fetch Error:', error)
-      toast.error('사용자 정보를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.')
-      setIsAiLoading(false)
-      return
-    }
-
-    if (!survey.exists) {
+    const result = await runAiAnalyze()
+    // 설문조사 필요 시 다이얼로그 오픈
+    if (result && 'needsSurvey' in result && result.needsSurvey) {
       setIsSurveyDialogOpen(true)
-      setIsAiLoading(false)
-      return
     }
-
-    // 3단계: AI 비교 분석 실행
-    try {
-      const result = await compareCoursesWithAI(leftDetail, rightDetail, {
-        ...survey,
-        userLocation: profile.location,
-      })
-      setAiResult(result)
-      toast.success('AI 분석이 완료되었습니다!')
-    } catch (error) {
-      console.error('AI Analysis Error:', error)
-      const errorMessage = error instanceof Error ? error.message : 'AI 분석 중 오류가 발생했습니다.'
-      toast.error(`${errorMessage} 잠시 후 다시 시도해주세요.`)
-    } finally {
-      setIsAiLoading(false)
-    }
-  }
-
-  // AI 분석 초기화
-  const handleClearAi = () => {
-    setAiResult(null)
   }
 
   // 비활성 이유 메시지
@@ -152,18 +96,18 @@ export default function CartCompareSection() {
   // 강의 드롭 핸들러 (AI 결과 초기화 포함)
   const handleDropLecture = (side: 'left' | 'right', lectureId: string) => {
     dropLecture(side, lectureId)
-    setAiResult(null)
+    handleClearAi()
   }
 
   // 강의 선택 해제 핸들러 (AI 결과 초기화 포함)
   const handleClearLeft = () => {
     setLeftId(null)
-    setAiResult(null)
+    handleClearAi()
   }
 
   const handleClearRight = () => {
     setRightId(null)
-    setAiResult(null)
+    handleClearAi()
   }
 
   return (
