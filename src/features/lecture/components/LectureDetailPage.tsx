@@ -34,7 +34,7 @@ export default function LectureDetailPage({ lectureId }: Props) {
 
   const lecture = data
 
-  // Gemini 요약 Query
+  // Gemini 요약 Query (캐싱 적용)
   const { data: aiSummary, isLoading: isAiLoading } = useQuery({
     queryKey: ['lectureSummary', lectureId, lecture?.title],
     queryFn: async () => {
@@ -44,7 +44,8 @@ export default function LectureDetailPage({ lectureId }: Props) {
       return generateGeminiSummary(lecture)
     },
     enabled: !!lecture,
-    staleTime: Infinity,
+    staleTime: Infinity, // 영구 캐싱 (fresh 상태 유지)
+    gcTime: 60 * 60 * 1000, // 1시간 동안 메모리 유지
   })
 
   // 실제 표시할 요약: AI 요약 우선, 없으면 기본(매퍼) 요약
@@ -126,6 +127,7 @@ export default function LectureDetailPage({ lectureId }: Props) {
                       displaySummary={displaySummary}
                       isLoading={isLoading}
                       isAiLoading={isAiLoading}
+                      isAiSummary={!!aiSummary}
                     />
                   </div>
 

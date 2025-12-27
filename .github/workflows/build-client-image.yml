@@ -1,4 +1,4 @@
-name: Build Client Image
+name: Build AI Image
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # GitHub Release 생성용
+  contents: write
   packages: write
 
 jobs:
@@ -19,78 +19,59 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Read version from package.json
+      - name: Read version (main only)
         id: version
         if: github.ref == 'refs/heads/main'
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          VERSION_TAG="v${VERSION}"
+          VERSION=$(grep "^version = " pyproject.toml | cut -d'"' -f2)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "version_tag=$VERSION_TAG" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
-          echo "Version tag: $VERSION_TAG"
+          echo "version_tag=v$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Log in to GHCR
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Determine image tag
-        id: tag
+      - name: Build & Push Image
         run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            TAG="prod-${{ github.sha }}"
-          else
-            TAG="dev-${{ github.sha }}"
-          fi
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          IMAGE=ghcr.io/sw-campus/sw-campus-ai
 
-      - name: Build and push image
-        run: |
-          IMAGE="ghcr.io/sw-campus/sw-campus-client"
-          SHA_TAG="${{ steps.tag.outputs.tag }}"
-
-          docker build -t $IMAGE:$SHA_TAG .
-          docker push $IMAGE:$SHA_TAG
-          
-          # develop 브랜치일 때 develop 태그로도 푸시
-          if [ "${{ github.ref }}" == "refs/heads/develop" ]; then
-            docker tag $IMAGE:$SHA_TAG $IMAGE:develop
+          if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            TAG=dev-${{ github.sha }}
+            docker build -t $IMAGE:$TAG .
+            docker push $IMAGE:$TAG
+            docker tag $IMAGE:$TAG $IMAGE:develop
             docker push $IMAGE:develop
-          fi
-          
-          # main 브랜치일 때 버전 태그로도 푸시
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            VERSION_TAG="${{ steps.version.outputs.version_tag }}"
-            docker tag $IMAGE:$SHA_TAG $IMAGE:$VERSION_TAG
-            docker push $IMAGE:$VERSION_TAG
-            echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
+          else
+            TAG=${{ steps.version.outputs.version_tag }}
+            docker build -t $IMAGE:$TAG .
+            docker push $IMAGE:$TAG
           fi
 
-      - name: Create or Update GitHub Release
+      - name: Create or Update GitHub Release (main only)
         if: github.ref == 'refs/heads/main'
         run: |
-          VERSION_TAG="${{ steps.version.outputs.version_tag }}"
+          TAG=${{ steps.version.outputs.version_tag }}
           
           # 기존 릴리즈가 있으면 업데이트
-          if gh release view "$VERSION_TAG" &>/dev/null; then
-            echo "Release $VERSION_TAG already exists, updating..."
-            gh release edit "$VERSION_TAG" \
-              --title "Release $VERSION_TAG" \
-              --notes "Automated release from main branch
+          if gh release view "$TAG" &>/dev/null; then
+            echo "Release $TAG already exists, updating..."
+            gh release edit "$TAG" \
+              --title "Release $TAG" \
+              --notes "Client release $TAG
           - Version: ${{ steps.version.outputs.version }}
-          - Image tag: $VERSION_TAG
+          - Image tag: $TAG
           - Commit: ${{ github.sha }}"
           else
             # 새 릴리즈 생성
-            echo "Creating new release $VERSION_TAG..."
-            gh release create "$VERSION_TAG" \
-              --title "Release $VERSION_TAG" \
-              --notes "Automated release from main branch
+            echo "Creating new release $TAG..."
+            gh release create "$TAG" \
+              --title "Release $TAG" \
+              --notes "Client release $TAG
           - Version: ${{ steps.version.outputs.version }}
-          - Image tag: $VERSION_TAG
+          - Image tag: $TAG
           - Commit: ${{ github.sha }}" \
               --target ${{ github.sha }}
           fi
