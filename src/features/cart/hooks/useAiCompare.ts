@@ -74,9 +74,7 @@ export function useAiCompare({ leftId, rightId, leftDetail, rightDetail, isLogge
   })
   
   // 캐시된 결과가 있으면 반환, 없으면 mutation 결과 반환
-  const result = queryKey 
-    ? queryClient.getQueryData<ComparisonResult>(queryKey) ?? mutation.data 
-    : null
+  const result = cachedResult ?? mutation.data ?? null
   
   // 비교 분석 실행 함수
   const analyze = async () => {
@@ -91,19 +89,14 @@ export function useAiCompare({ leftId, rightId, leftDetail, rightDetail, isLogge
     }
     
     // 이미 캐시된 결과가 있으면 재사용
-    if (queryKey) {
-      const cached = queryClient.getQueryData<ComparisonResult>(queryKey)
-      if (cached) {
-        toast.success('캐시된 AI 분석 결과를 사용합니다!')
-        return cached
-      }
+    if (cachedResult) {
+      toast.success('캐시된 AI 분석 결과를 사용합니다!')
+      return cachedResult
     }
     
     // 사용자 데이터 조회
     try {
-      const [surveyModule] = await Promise.all([
-        import('@/features/mypage/api/survey.api'),
-      ])
+      const surveyModule = await import('@/features/mypage/api/survey.api')
       
       const [survey, profile] = await Promise.all([
         surveyModule.getSurvey(),
@@ -123,6 +116,7 @@ export function useAiCompare({ leftId, rightId, leftDetail, rightDetail, isLogge
       })
     } catch (error) {
       console.error('AI Analysis Error:', error)
+      toast.error('사용자 정보를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
     }
   }
   
@@ -139,6 +133,6 @@ export function useAiCompare({ leftId, rightId, leftDetail, rightDetail, isLogge
     isLoading: mutation.isPending,
     analyze,
     clearResult,
-    hasCachedResult: Boolean(queryKey && queryClient.getQueryData(queryKey)),
+    hasCachedResult: !!cachedResult,
   }
 }
