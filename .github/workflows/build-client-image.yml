@@ -23,7 +23,7 @@ jobs:
         id: version
         if: github.ref == 'refs/heads/main'
         run: |
-          VERSION=$(grep "^version = " pyproject.toml | cut -d'"' -f2)
+          VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "version_tag=v$VERSION" >> $GITHUB_OUTPUT
 
