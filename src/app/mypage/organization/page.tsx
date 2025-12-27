@@ -1,18 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
 import OrganizationAside from '@/features/mypage/components/Organization/OrganizationAside'
 import OrganizationMain from '@/features/mypage/components/Organization/OrganizationMain'
+import { api } from '@/lib/axios'
 import { useAuthStore } from '@/store/authStore'
+
+type MyOrganizationResponse = {
+  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
+}
 
 export default function MyPage() {
   const router = useRouter()
   const { userType } = useAuthStore()
   const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(true)
   const [activeTab, setActiveTab] = useState<'orgInfo' | 'lectureManage' | 'myInfo'>('orgInfo')
+  const [isApproved, setIsApproved] = useState(false)
+
+  // 기관 승인 상태 조회
+  useEffect(() => {
+    if (userType === 'ORGANIZATION') {
+      api
+        .get<MyOrganizationResponse>('/mypage/organization')
+        .then(res => {
+          const status = res.data.approvalStatus?.toUpperCase()
+          setIsApproved(status === 'APPROVED')
+        })
+        .catch(() => {
+          setIsApproved(false)
+        })
+    }
+  }, [userType])
 
   // 기관 마이페이지
   if (userType === 'ORGANIZATION') {
@@ -45,6 +66,7 @@ export default function MyPage() {
               onClickOrgInfo={handleOpenOrgInfo}
               onClickLectureManage={handleOpenLectureManage}
               onClickMyInfo={handleOpenMyInfo}
+              isApproved={isApproved}
             />
             <OrganizationMain
               activeTab={activeTab}
