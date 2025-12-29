@@ -8,7 +8,7 @@ WORKDIR /app
 
 # package.json과 package-lock.json 복사 (있으면)
 COPY package.json package-lock.json* ./
-RUN npm ci || npm install
+RUN npm install
 
 # 빌드 단계
 FROM base AS builder
