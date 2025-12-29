@@ -30,18 +30,6 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "version_tag=v$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Create .env.production
-        run: |
-          cat > .env.production << EOF
-          NODE_ENV=production
-          NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
-          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-          NEXT_PUBLIC_S3_HOSTNAME=${{ secrets.NEXT_PUBLIC_S3_HOSTNAME }}
-          NEXT_PRIVATE_S3_HOSTNAME=${{ secrets.NEXT_PRIVATE_S3_HOSTNAME }}
-          NEXT_S3_ONEDAY_HOSTNAME=${{ secrets.NEXT_S3_ONEDAY_HOSTNAME }}
-          NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID }}
-          EOF
-
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -53,16 +41,25 @@ jobs:
         run: |
           IMAGE=ghcr.io/sw-campus/sw-campus-client
 
+          BUILD_ARGS="
+            --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+            --build-arg GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            --build-arg NEXT_PUBLIC_S3_HOSTNAME=${{ secrets.NEXT_PUBLIC_S3_HOSTNAME }}
+            --build-arg NEXT_PRIVATE_S3_HOSTNAME=${{ secrets.NEXT_PRIVATE_S3_HOSTNAME }}
+            --build-arg NEXT_S3_ONEDAY_HOSTNAME=${{ secrets.NEXT_S3_ONEDAY_HOSTNAME }}
+            --build-arg NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID }}
+          "
+
           if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
             TAG=RHSA-${{ github.sha }}
             echo "Building DEV image with tag $TAG"
-            docker build -t $IMAGE:$TAG .
+            docker build $BUILD_ARGS -t $IMAGE:$TAG .
             docker push $IMAGE:$TAG
 
           elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
             TAG=${{ steps.version.outputs.version_tag }}
             echo "Building RELEASE image with tag $TAG"
-            docker build -t $IMAGE:$TAG .
+            docker build $BUILD_ARGS -t $IMAGE:$TAG .
             docker push $IMAGE:$TAG
           fi
 
