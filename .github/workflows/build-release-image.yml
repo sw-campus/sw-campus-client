@@ -1,22 +1,22 @@
-name: Build Release Image
+name: Build Release Image (Client)
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types: [published]
 
 permissions:
   contents: read
   packages: write
-  id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -28,8 +28,8 @@ jobs:
       - name: Build & Push Image
         run: |
           IMAGE=ghcr.io/sw-campus/sw-campus-client
-          TAG=${{ github.ref_name }}
-          echo "Building RELEASE image with tag $TAG"
+          TAG=${{ github.event.release.tag_name }}
+
+          echo "Building CLIENT RELEASE image: $IMAGE:$TAG"
           docker build -t $IMAGE:$TAG .
           docker push $IMAGE:$TAG
-
