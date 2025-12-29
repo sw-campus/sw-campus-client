@@ -160,6 +160,7 @@ export function ProfileCard({ onEditClick }: ProfileCardProps) {
         onOpenChange={setWithdrawModalOpen}
         onSuccess={handleWithdrawSuccess}
         isOrganization={profile?.role === 'ORGANIZATION'}
+        isSocialUser={!!isSocialUser}
       />
 
       {/* Withdraw Complete Modal */}

@@ -13,6 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 import { withdrawMember, WithdrawResponse } from '../api/member.api'
 
@@ -21,17 +23,25 @@ type WithdrawModalProps = {
   onOpenChange: (open: boolean) => void
   onSuccess: (response: WithdrawResponse) => void
   isOrganization?: boolean
+  isSocialUser?: boolean
 }
 
-export function WithdrawModal({ open, onOpenChange, onSuccess, isOrganization }: WithdrawModalProps) {
+export function WithdrawModal({ open, onOpenChange, onSuccess, isOrganization, isSocialUser }: WithdrawModalProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [password, setPassword] = useState('')
 
   const handleWithdraw = async () => {
+    // 일반 사용자는 비밀번호 필수
+    if (!isSocialUser && !password.trim()) {
+      setError('비밀번호를 입력해주세요.')
+      return
+    }
+
     try {
       setLoading(true)
       setError(null)
-      const response = await withdrawMember()
+      const response = await withdrawMember(isSocialUser ? '' : password)
       onSuccess(response)
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : '탈퇴 처리 중 오류가 발생했습니다.'
@@ -41,8 +51,16 @@ export function WithdrawModal({ open, onOpenChange, onSuccess, isOrganization }:
     }
   }
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setPassword('')
+      setError(null)
+    }
+    onOpenChange(open)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-destructive flex items-center gap-2">
@@ -62,10 +80,25 @@ export function WithdrawModal({ open, onOpenChange, onSuccess, isOrganization }:
           </DialogDescription>
         </DialogHeader>
 
+        {/* 일반 사용자만 비밀번호 입력 */}
+        {!isSocialUser && (
+          <div className="space-y-2">
+            <Label htmlFor="withdraw-password">비밀번호 확인</Label>
+            <Input
+              id="withdraw-password"
+              type="password"
+              placeholder="비밀번호를 입력하세요"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+        )}
+
         {error && <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">{error}</div>}
 
         <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={loading}>
             취소
           </Button>
           <Button variant="destructive" onClick={handleWithdraw} disabled={loading}>
