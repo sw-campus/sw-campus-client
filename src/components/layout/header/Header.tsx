@@ -29,12 +29,13 @@ export default function Header({
 }) {
   const router = useRouter()
   const [logoutOpen, setLogoutOpen] = useState(false)
-  const { isLoggedIn, nickname, userType } = useAuthStore()
+  const { isLoggedIn, nickname, userType, hasHydrated } = useAuthStore()
   const { logout, isPending } = useLogout()
   const { data: cartItems } = useCartLecturesQuery()
   const hasCartItems = (cartItems?.length ?? 0) > 0
 
-  const mypageHref = userType === 'ORGANIZATION' ? '/mypage/organization' : '/mypage/personal'
+  const mypageHref =
+    userType === 'ADMIN' ? '/mypage/admin' : userType === 'ORGANIZATION' ? '/mypage/organization' : '/mypage/personal'
 
   useEffect(() => {
     if (!isLoggedIn) return
@@ -77,7 +78,7 @@ export default function Header({
         </button>
 
         {/* 로고 */}
-        <Link href="/" className="flex items-center gap-3">
+        <Link href={userType === 'ADMIN' ? '/admin' : '/'} className="flex items-center gap-3">
           <Image
             src="/images/logo.png"
             alt="SOFTWARE CAMPUS 로고"
@@ -113,7 +114,10 @@ export default function Header({
 
       {/* 아이콘 */}
       <div className="flex items-center gap-6 text-xl text-white">
-        {isLoggedIn ? (
+        {!hasHydrated ? (
+          // 하이드레이션 전에는 아무것도 표시하지 않음
+          <div className="h-6 w-24" />
+        ) : isLoggedIn ? (
           <>
             <span className="text-base font-medium">{nickname}님</span>
 
@@ -131,9 +135,11 @@ export default function Header({
               <FiUser />
             </HeaderIconAction>
 
-            <HeaderIconAction kind="link" ariaLabel="위시리스트" tooltip="장바구니" href="/cart/compare">
-              <BsCart4 />
-            </HeaderIconAction>
+            {userType !== 'ADMIN' && (
+              <HeaderIconAction kind="link" ariaLabel="위시리스트" tooltip="장바구니" href="/cart/compare">
+                <BsCart4 />
+              </HeaderIconAction>
+            )}
           </>
         ) : (
           <>

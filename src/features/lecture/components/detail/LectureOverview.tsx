@@ -8,6 +8,7 @@ import { processApplicationSteps } from '@/features/lecture/utils/processApplica
 import { type OrganizationDetail } from '@/features/organization/types/organization.type'
 
 import { Section, InfoBox, InfoRow, RequirementItem, InlineBadge, formatDateDot, formatKRW } from './DetailShared'
+import PhotoSlider from './PhotoSlider'
 
 interface Props {
   lecture: LectureDetail
@@ -15,13 +16,26 @@ interface Props {
   displaySummary: string
   isLoading: boolean
   isAiLoading: boolean
+  isAiSummary: boolean
 }
 
-export default function LectureOverview({ lecture, org, displaySummary, isLoading, isAiLoading }: Props) {
+export default function LectureOverview({ lecture, org, displaySummary, isLoading, isAiLoading, isAiSummary }: Props) {
   return (
     <div className="space-y-12">
       {/* 프로그램 요약 */}
-      <Section title="프로그램 요약">
+      <Section
+        title={
+          <span className="flex items-center gap-2">
+            프로그램 요약
+            {isAiSummary && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-2.5 py-0.5 text-xs font-medium text-white shadow-sm">
+                <span>✨</span>
+                AI 요약
+              </span>
+            )}
+          </span>
+        }
+      >
         {isLoading ? (
           <div className="text-muted-foreground py-4 text-center">기본 정보 로딩 중...</div>
         ) : isAiLoading ? (
@@ -213,25 +227,13 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
         })()}
       </Section>
 
-      {/* 학습공간 사진 */}
+      {/* 학습공간 사진 - 슬라이드 */}
       <Section title="학습 공간 사진">
-        <div className="grid grid-cols-4 gap-3">
-          {lecture.photos.slice(0, 4).map((src, idx) => (
-            <div key={idx} className="border-border/50 relative aspect-4/3 overflow-hidden rounded-xl border bg-white">
-              {src ? (
-                <Image
-                  src={src}
-                  alt={`학습공간 ${idx + 1}`}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="text-muted-foreground flex h-full items-center justify-center text-xs">이미지</div>
-              )}
-            </div>
-          ))}
-        </div>
+        {lecture.photos.filter(src => src).length > 0 ? (
+          <PhotoSlider photos={lecture.photos.filter(src => src)} />
+        ) : (
+          <div className="text-muted-foreground py-8 text-center text-sm">등록된 학습 공간 사진이 없습니다.</div>
+        )}
       </Section>
 
       {/* 추가 제공 항목 */}
