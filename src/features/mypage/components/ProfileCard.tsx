@@ -2,14 +2,17 @@
 
 import { useEffect, useState } from 'react'
 
-import { LuKey, LuPencil, LuUser } from 'react-icons/lu'
+import { LuKey, LuPencil, LuUser, LuUserX } from 'react-icons/lu'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { api } from '@/lib/axios'
 
+import { WithdrawResponse } from '../api/member.api'
 import { PasswordChangeModal } from './PasswordChangeModal'
 import { PasswordVerifyModal } from './PasswordVerifyModal'
+import { WithdrawCompleteModal } from './WithdrawCompleteModal'
+import { WithdrawModal } from './WithdrawModal'
 
 type ProfileData = {
   email: string
@@ -32,6 +35,9 @@ export function ProfileCard({ onEditClick }: ProfileCardProps) {
   // Modal states
   const [verifyModalOpen, setVerifyModalOpen] = useState(false)
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false)
+  const [withdrawCompleteOpen, setWithdrawCompleteOpen] = useState(false)
+  const [withdrawProviders, setWithdrawProviders] = useState<string[]>([])
 
   useEffect(() => {
     let mounted = true
@@ -61,8 +67,16 @@ export function ProfileCard({ onEditClick }: ProfileCardProps) {
     setVerifyModalOpen(true)
   }
 
+  const handleWithdrawSuccess = (response: WithdrawResponse) => {
+    setWithdrawModalOpen(false)
+    setWithdrawProviders(response.oauthProviders)
+    setWithdrawCompleteOpen(true)
+  }
+
   // OAuth 사용자인지 체크
   const isSocialUser = profile?.provider && profile.provider !== 'LOCAL'
+  // 일반 사용자(USER) 및 기관 회원(ORGANIZATION)은 탈퇴 가능 (ADMIN만 제외)
+  const canWithdraw = profile?.role === 'USER' || profile?.role === 'ORGANIZATION'
 
   return (
     <>
@@ -116,6 +130,21 @@ export function ProfileCard({ onEditClick }: ProfileCardProps) {
               <span className="text-muted-foreground text-sm">프로필 정보를 불러올 수 없습니다.</span>
             </div>
           )}
+
+          {/* 회원 탈퇴 버튼 */}
+          {canWithdraw && (
+            <div className="border-border border-t pt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 gap-1.5"
+                onClick={() => setWithdrawModalOpen(true)}
+              >
+                <LuUserX className="h-3.5 w-3.5" />
+                회원 탈퇴
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -124,6 +153,17 @@ export function ProfileCard({ onEditClick }: ProfileCardProps) {
 
       {/* Password Change Modal */}
       <PasswordChangeModal open={changePasswordOpen} onOpenChange={setChangePasswordOpen} />
+
+      {/* Withdraw Confirmation Modal */}
+      <WithdrawModal
+        open={withdrawModalOpen}
+        onOpenChange={setWithdrawModalOpen}
+        onSuccess={handleWithdrawSuccess}
+        isOrganization={profile?.role === 'ORGANIZATION'}
+      />
+
+      {/* Withdraw Complete Modal */}
+      <WithdrawCompleteModal open={withdrawCompleteOpen} oauthProviders={withdrawProviders} />
     </>
   )
 }
