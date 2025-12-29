@@ -94,33 +94,33 @@ jobs:
               --target ${{ github.sha }}
           fi
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            IMAGE=${{ needs.build.outputs.image }}
-            TAG=${{ needs.build.outputs.tag }}
-            CONTAINER_NAME=sw-campus-client
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Deploy to Server
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         key: ${{ secrets.SSH_KEY }}
+  #         script: |
+  #           IMAGE=${{ needs.build.outputs.image }}
+  #           TAG=${{ needs.build.outputs.tag }}
+  #           CONTAINER_NAME=sw-campus-client
 
-            # Login to GHCR
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+  #           # Login to GHCR
+  #           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            docker pull $IMAGE:$TAG
-            docker stop $CONTAINER_NAME || true
-            docker rm $CONTAINER_NAME || true
+  #           docker pull $IMAGE:$TAG
+  #           docker stop $CONTAINER_NAME || true
+  #           docker rm $CONTAINER_NAME || true
 
-            # Run with runtime secrets
-            docker run -d --name $CONTAINER_NAME \
-              -p 3000:3000 \
-              --restart unless-stopped \
-              -e GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
-              -e NEXT_PRIVATE_S3_HOSTNAME="${{ secrets.NEXT_PRIVATE_S3_HOSTNAME }}" \
-              -e NEXT_S3_ONEDAY_HOSTNAME="${{ secrets.NEXT_S3_ONEDAY_HOSTNAME }}" \
-              $IMAGE:$TAG
+  #           # Run with runtime secrets
+  #           docker run -d --name $CONTAINER_NAME \
+  #             -p 3000:3000 \
+  #             --restart unless-stopped \
+  #             -e GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
+  #             -e NEXT_PRIVATE_S3_HOSTNAME="${{ secrets.NEXT_PRIVATE_S3_HOSTNAME }}" \
+  #             -e NEXT_S3_ONEDAY_HOSTNAME="${{ secrets.NEXT_S3_ONEDAY_HOSTNAME }}" \
+  #             $IMAGE:$TAG
