@@ -46,8 +46,9 @@ jobs:
             --build-arg GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
             --build-arg NEXT_PUBLIC_S3_HOSTNAME=${{ secrets.NEXT_PUBLIC_S3_HOSTNAME }}
             --build-arg NEXT_PRIVATE_S3_HOSTNAME=${{ secrets.NEXT_PRIVATE_S3_HOSTNAME }}
-            --build-arg NEXT_S3_ONEDAY_HOSTNAME=${{ secrets.NEXT_S3_ONEDAY_HOSTNAME }}
             --build-arg NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID }}
+            --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+            --build-arg NEXT_PUBLIC_GITHUB_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GITHUB_CLIENT_ID }}
           "
 
           if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
