@@ -1,4 +1,4 @@
-name: Build AI Image
+name: Build Client Image
 
 on:
   push:
@@ -36,14 +36,12 @@ jobs:
 
       - name: Build & Push Image
         run: |
-          IMAGE=ghcr.io/sw-campus/sw-campus-ai
+          IMAGE=ghcr.io/sw-campus/sw-campus-client
 
           if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
             TAG=dev-${{ github.sha }}
             docker build -t $IMAGE:$TAG .
             docker push $IMAGE:$TAG
-            docker tag $IMAGE:$TAG $IMAGE:develop
-            docker push $IMAGE:develop
           else
             TAG=${{ steps.version.outputs.version_tag }}
             docker build -t $IMAGE:$TAG .
@@ -52,12 +50,12 @@ jobs:
 
       - name: Create or Update GitHub Release (main only)
         if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG=${{ steps.version.outputs.version_tag }}
-          
-          # 기존 릴리즈가 있으면 업데이트
+
           if gh release view "$TAG" &>/dev/null; then
-            echo "Release $TAG already exists, updating..."
             gh release edit "$TAG" \
               --title "Release $TAG" \
               --notes "Client release $TAG
@@ -65,8 +63,6 @@ jobs:
           - Image tag: $TAG
           - Commit: ${{ github.sha }}"
           else
-            # 새 릴리즈 생성
-            echo "Creating new release $TAG..."
             gh release create "$TAG" \
               --title "Release $TAG" \
               --notes "Client release $TAG
@@ -75,5 +71,3 @@ jobs:
           - Commit: ${{ github.sha }}" \
               --target ${{ github.sha }}
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
