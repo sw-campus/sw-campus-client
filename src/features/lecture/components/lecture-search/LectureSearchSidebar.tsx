@@ -17,7 +17,7 @@ import { FilterGroup } from './FilterGroups'
 import { FilterTag } from './FilterTag'
 
 const filterSelectTriggerClass =
-  'flex items-center justify-between gap-1 rounded-lg border border-gray-200 bg-white/60 px-3 py-2 text-sm font-medium text-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+  'flex w-full items-center justify-between gap-1 rounded-lg border border-gray-200 bg-white/60 px-3 py-2 text-sm font-medium text-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
 interface LectureSearchSidebarProps {
   level1Id: number | null
@@ -152,29 +152,31 @@ export function LectureSearchSidebar({
 
       {/* 강의 조건 섹션 */}
       <FilterSection title="⚙️ 강의 조건">
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3">
             <FilterGroup label="모집 상태">
-              <div className="flex flex-wrap gap-1.5">
+              <div className="grid w-full grid-cols-1 gap-1.5">
                 {STATUS_FILTERS.map(status => (
                   <FilterTag
                     key={`status-${status}`}
                     label={status}
                     active={selectedStatus === status}
                     onClick={() => onStatusClick(status)}
+                    className="w-full"
                   />
                 ))}
               </div>
             </FilterGroup>
 
             <FilterGroup label="비용">
-              <div className="flex flex-wrap gap-1.5">
+              <div className="grid w-full grid-cols-1 gap-1.5">
                 {COST_FILTERS.map(cost => (
                   <FilterTag
                     key={`cost-${cost}`}
                     label={cost}
                     active={selectedCost === cost}
                     onClick={() => onCostClick(cost)}
+                    className="w-full"
                   />
                 ))}
               </div>
@@ -182,13 +184,14 @@ export function LectureSearchSidebar({
           </div>
 
           <FilterGroup label="선발 절차">
-            <div className="flex flex-wrap gap-1.5">
+            <div className="grid w-full grid-cols-1 gap-1.5">
               {PROCEDURE_FILTERS.map(procedure => (
                 <FilterTag
                   key={`procedure-${procedure}`}
                   label={procedure}
                   active={isActive('procedure', procedure)}
                   onClick={() => toggleFilter('procedure', procedure)}
+                  className="w-full"
                 />
               ))}
             </div>
