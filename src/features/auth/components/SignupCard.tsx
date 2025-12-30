@@ -15,10 +15,17 @@ type Props = {
 
 export default function SignupCard({ title, imageSrc, imageAlt, onClick, children, className }: Props) {
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className={`flex flex-1 flex-col items-center rounded-3xl border border-white/15 bg-white/10 p-5 text-center text-white shadow-xl backdrop-blur-xl transition-transform hover:-translate-y-0.5 hover:bg-white/15 md:p-6 ${className ?? ''}`}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
+      className={`flex flex-1 cursor-pointer flex-col items-center rounded-3xl border border-white/15 bg-white/10 p-5 text-center text-white shadow-xl backdrop-blur-xl transition-transform hover:-translate-y-0.5 hover:bg-white/15 md:p-6 ${className ?? ''}`}
     >
       <div className="relative mb-4 h-24 w-full overflow-hidden rounded-2xl bg-white/5 md:h-28">
         <Image
@@ -35,6 +42,6 @@ export default function SignupCard({ title, imageSrc, imageAlt, onClick, childre
       </div>
 
       <div className="mt-4 flex min-h-10 items-center justify-center">{children}</div>
-    </button>
+    </div>
   )
 }

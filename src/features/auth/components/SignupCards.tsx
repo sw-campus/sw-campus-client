@@ -2,11 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 
+import { useOAuthUrls } from '@/features/auth/hooks/useOAuthUrls'
+
 import SignupCard from './SignupCard'
 import SocialIcons from './SocialIcons'
 
 export default function SignupCards() {
   const router = useRouter()
+  const { handleOAuthStart } = useOAuthUrls()
 
   return (
     <div className="flex w-full flex-col gap-4 md:flex-row">
@@ -16,7 +19,7 @@ export default function SignupCards() {
         imageAlt="개인회원 가입 이미지"
         onClick={() => router.push('/signup/personal/agreements')}
       >
-        <SocialIcons />
+        <SocialIcons onGoogle={() => handleOAuthStart('google')} onGithub={() => handleOAuthStart('github')} />
       </SignupCard>
 
       <SignupCard
