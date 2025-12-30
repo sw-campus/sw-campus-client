@@ -168,7 +168,7 @@ export function LectureSearchSidebar({
             </FilterGroup>
 
             <FilterGroup label="비용">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-wrap gap-1.5">
                 {COST_FILTERS.map(cost => (
                   <FilterTag
                     key={`cost-${cost}`}

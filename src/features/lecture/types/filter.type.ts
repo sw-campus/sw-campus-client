@@ -5,7 +5,7 @@ export type SortOption = {
 
 export type FilterGroupKey = 'procedure' | 'region'
 
-export const COST_FILTERS = ['무료(내배카 필요)', '무료(내배카 필요X)', '유료(자부담)'] as const
+export const COST_FILTERS = ['무료(내배카O)', '무료(내배카X)', '유료(자부담)'] as const
 
 export const PROCEDURE_FILTERS = ['면접 없음', '코딩테스트 없음', '사전학습과제 없음'] as const
 
@@ -43,8 +43,8 @@ export const DEFAULT_SORT = SORT_OPTIONS[0].value
 export const DEFAULT_PAGE_SIZE = '12'
 
 export const COST_QUERY_MAP: Record<string, string> = {
-  '무료(내배카 필요)': 'isFreeKdt',
-  '무료(내배카 필요X)': 'isFreeNoKdt',
+  '무료(내배카O)': 'isFreeKdt',
+  '무료(내배카X)': 'isFreeNoKdt',
   '유료(자부담)': 'isPaid',
 }
 
