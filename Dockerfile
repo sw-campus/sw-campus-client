@@ -1,7 +1,7 @@
 # Next.js 프로덕션 이미지
 FROM node:20-alpine AS base
 
-# 의존성 설치 단계
+# 의존성 설치 단계 
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
