@@ -16,7 +16,7 @@ export default function NameInput({ value, onChange }: NameInputProps) {
       <input
         id="signup-name"
         type="text"
-        placeholder="name"
+        placeholder="이름을 입력하세요"
         className={`${INPUT_BASE_CLASS} w-full`}
         value={value}
         required

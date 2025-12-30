@@ -18,7 +18,7 @@ export default function PhoneAuthInput({ value, onChange }: PhoneAuthInputProps)
         <input
           id="signup-phone"
           type="tel"
-          placeholder="phone"
+          placeholder="전화번호를 입력하세요"
           className={`${INPUT_BASE_CLASS} w-full flex-1`}
           value={value ?? ''}
           maxLength={11}

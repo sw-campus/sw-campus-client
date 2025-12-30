@@ -29,7 +29,7 @@ export default function NicknameInput({
         <input
           id="signup-nickname"
           type="text"
-          placeholder="nickname"
+          placeholder="닉네임을 입력하세요"
           className={`${INPUT_BASE_CLASS} w-full flex-1`}
           value={value}
           disabled={disabled}

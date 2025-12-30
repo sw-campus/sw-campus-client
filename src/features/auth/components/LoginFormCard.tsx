@@ -55,7 +55,7 @@ export function LoginFormCard({
         <label className="mb-1 block text-white/75">이메일</label>
         <input
           type="email"
-          placeholder="email"
+          placeholder="이메일을 입력하세요"
           value={email}
           onChange={e => onChangeEmail(e.target.value)}
           className={INPUT_BASE_CLASS}
@@ -67,7 +67,7 @@ export function LoginFormCard({
         <label className="mb-1 block text-white/75">비밀번호</label>
         <input
           type="password"
-          placeholder="password"
+          placeholder="비밀번호를 입력하세요"
           value={password}
           onChange={e => onChangePassword(e.target.value)}
           className={INPUT_BASE_CLASS}

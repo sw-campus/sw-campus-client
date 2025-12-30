@@ -81,7 +81,7 @@ export default function SignupOrganizationFormView() {
       <LabeledInput
         label="이름"
         type="text"
-        placeholder="name"
+        placeholder="이름을 입력하세요"
         value={name}
         onChangeValue={setName}
         className={INPUT_BASE_CLASS}

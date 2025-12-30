@@ -49,7 +49,7 @@ export default function Footer() {
         <br />
         서울특별시 종로구 우정국로 2길 21 대왕빌딩 7층
         <br />
-        E-mail: sw.campus2025@gmail.com
+        문의: sw.campus2025@gmail.com
       </div>
 
       {/* 하단 설명 */}
