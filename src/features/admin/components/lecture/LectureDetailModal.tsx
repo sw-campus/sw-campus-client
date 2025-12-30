@@ -29,6 +29,7 @@ interface LectureDetailModalProps {
   onClose: () => void
   onApprove: (lectureId: number, options?: MutationOptions) => void
   onReject: (lectureId: number, options?: MutationOptions) => void
+  onEdit?: (lectureId: number) => void
   isApproving: boolean
   isRejecting: boolean
 }
@@ -56,6 +57,7 @@ export function LectureDetailModal({
   onClose,
   onApprove,
   onReject,
+  onEdit,
   isApproving,
   isRejecting,
 }: LectureDetailModalProps) {
@@ -69,6 +71,13 @@ export function LectureDetailModal({
 
   const handleReject = () => {
     onReject(lecture.lectureId, { onSuccess: onClose })
+  }
+
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(lecture.lectureId)
+      onClose()
+    }
   }
 
   return (
@@ -194,7 +203,12 @@ export function LectureDetailModal({
           </div>
         )}
 
-        <DialogFooter>
+        <DialogFooter className="gap-2 sm:gap-0">
+          {onEdit && (
+            <Button variant="outline" onClick={handleEdit}>
+              수정
+            </Button>
+          )}
           {lecture.lectureAuthStatus === 'PENDING' && (
             <>
               <Button

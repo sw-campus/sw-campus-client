@@ -1,7 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { approveLecture, fetchLectureDetail, fetchLectures, fetchLectureStats, rejectLecture } from '../api/lectureApi'
+import {
+  adminUpdateLecture,
+  type AdminUpdateLectureParams,
+  approveLecture,
+  fetchLectureDetail,
+  fetchLectures,
+  fetchLectureStats,
+  rejectLecture,
+} from '../api/lectureApi'
 import type { LectureAuthStatus } from '../types/lecture.type'
 
 /**
@@ -68,6 +76,23 @@ export function useRejectLectureMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'lectures'] })
       toast.success('강의가 반려되었습니다.')
+    },
+  })
+}
+
+/**
+ * 관리자용 강의 수정 Mutation Hook
+ */
+export function useAdminUpdateLectureMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, unknown, AdminUpdateLectureParams>({
+    mutationFn: adminUpdateLecture,
+    onSuccess: (_data, variables) => {
+      // 관리자 강의 목록 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ['admin', 'lectures'] })
+      // 강의 상세 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ['admin', 'lecture', variables.lectureId] })
     },
   })
 }
