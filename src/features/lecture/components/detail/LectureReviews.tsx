@@ -172,6 +172,7 @@ export default function LectureReviews({ lectureId }: Props) {
       const { api } = await import('@/lib/axios')
       await api.post('/certificates/verify', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 60_000, // OCR 분석 시간 고려하여 60초로 설정
       })
 
       toast.success('수료증 인증이 완료되었습니다.')
