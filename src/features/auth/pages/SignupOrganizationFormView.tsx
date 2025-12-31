@@ -5,6 +5,7 @@ import CertificateUploadSection from '@/features/auth/components/CertificateUplo
 import EmailAuthInput from '@/features/auth/components/EmailAuthInput'
 import LabeledInput from '@/features/auth/components/LabeledInput'
 import NicknameInput from '@/features/auth/components/NickNameInput'
+import OrganizationSearchSelect from '@/features/auth/components/OrganizationSearchSelect'
 import PasswordFields from '@/features/auth/components/PasswordFields'
 import PhoneAuthInput from '@/features/auth/components/PhoneAuthInput'
 import { useSignupOrganizationForm } from '@/features/auth/hooks/useSignupOrganizationForm'
@@ -23,6 +24,7 @@ export default function SignupOrganizationFormView() {
     name,
     nickname,
     phone,
+    organizationId,
     organizationName,
     certificateImage,
     isSubmitting,
@@ -36,7 +38,8 @@ export default function SignupOrganizationFormView() {
     setName,
     setNickname,
     setPhone,
-    setOrganizationName,
+    handleSelectExistingOrg,
+    handleInputNewOrg,
 
     handleSendEmailAuth,
     handleCheckPasswordMatch,
@@ -96,15 +99,12 @@ export default function SignupOrganizationFormView() {
         checkState={nicknameCheckState}
       />
 
-      {/* 기관명 */}
-      <LabeledInput
-        label="기관명"
-        type="text"
-        name="organizationName"
-        placeholder="기관명을 입력해 주세요"
-        value={organizationName}
-        onChangeValue={setOrganizationName}
-        className={INPUT_BASE_CLASS}
+      {/* 기관 선택/입력 */}
+      <OrganizationSearchSelect
+        organizationId={organizationId}
+        organizationName={organizationName}
+        onSelectExisting={handleSelectExistingOrg}
+        onInputNew={handleInputNewOrg}
       />
 
       {/* 전화번호 + 인증 (기존 UI를 재사용 컴포넌트로 교체) */}

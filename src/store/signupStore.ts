@@ -23,6 +23,7 @@ export type SignupState = {
   nickname: string
   phone: string | null
 
+  organizationId: number | null
   organizationName: string
   certificateImage: File | null
 
@@ -42,6 +43,7 @@ export type SignupState = {
   setName: (value: string) => void
   setNickname: (value: string) => void
   setPhone: (value: string | null) => void
+  setOrganizationId: (value: number | null) => void
   setOrganizationName: (value: string) => void
   setCertificateImage: (value: File | null) => void
   reset: () => void
@@ -60,6 +62,7 @@ export const useSignupStore = create<SignupState>(set => ({
   name: '',
   nickname: '',
   phone: null,
+  organizationId: null,
   organizationName: '',
   certificateImage: null,
 
@@ -77,6 +80,7 @@ export const useSignupStore = create<SignupState>(set => ({
   setName: value => set({ name: value }),
   setNickname: value => set({ nickname: value }),
   setPhone: value => set({ phone: value }),
+  setOrganizationId: value => set({ organizationId: value }),
   setOrganizationName: value => set({ organizationName: value }),
   setCertificateImage: value => set({ certificateImage: value }),
 
@@ -96,6 +100,7 @@ export const useSignupStore = create<SignupState>(set => ({
       name: '',
       nickname: '',
       phone: null,
+      organizationId: null,
       organizationName: '',
       certificateImage: null,
       userType: null,
