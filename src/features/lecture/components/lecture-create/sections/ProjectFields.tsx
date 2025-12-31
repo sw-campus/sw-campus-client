@@ -47,7 +47,7 @@ export function LectureCreateProjectFields() {
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  placeholder="프로젝트 시간"
+                  placeholder="프로젝트 시간 (주)"
                   {...field}
                   value={field.value === null || field.value === undefined ? '' : String(field.value)}
                   onChange={e => {
