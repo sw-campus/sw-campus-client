@@ -175,11 +175,11 @@ export default function LectureReviews({ lectureId }: Props) {
         timeout: 60_000, // OCR 분석 시간 고려하여 60초로 설정
       })
 
-      toast.success('수료증 인증이 완료되었습니다.')
+      toast.success('수료증 업로드가 완료되었습니다. 관리자 검토 후 승인됩니다.')
       setOpenVerify(false)
       setOpenWrite(true)
     } catch {
-      setError('업로드/인증에 실패했습니다. 다시 시도해 주세요.')
+      setError('수료증 업로드에 실패했습니다. 다시 시도해 주세요.')
       setVerifyStep('select')
       setOpenVerify(false)
     } finally {
