@@ -43,7 +43,7 @@ export interface LectureSummary {
   lectureName: string
   orgName: string
   lectureAuthStatus: LectureAuthStatus
-  createdAt: string
+  lastUpdatedAt: string
 }
 
 /**
