@@ -251,7 +251,7 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
                   </button>
                 </div>
               ) : (
-                <AddressInput autoOpen />
+                <AddressInput autoOpen variant="light" />
               )}
             </div>
           </FieldGroup>

@@ -81,7 +81,7 @@ export default function MidBanner() {
               onBeforeInit={swiper => {
                 swiperRef.current = swiper
               }}
-              loop={middleBanners.length > 2}
+              loop={true}
               spaceBetween={16}
               slidesPerView={2}
               breakpoints={{

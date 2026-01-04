@@ -38,7 +38,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
         <label className="mb-1 block text-white/75">비밀번호</label>
         <input
           type="password"
-          placeholder="password"
+          placeholder="비밀번호를 입력하세요"
           className={`${INPUT_BASE_CLASS} w-full`}
           value={password}
           onChange={e => onChangePassword(e.target.value)}
@@ -51,7 +51,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
         <div className="flex gap-2">
           <input
             type="password"
-            placeholder="password"
+            placeholder="비밀번호를 다시 입력하세요"
             className={`${INPUT_BASE_CLASS} w-full flex-1`}
             value={passwordConfirm}
             onChange={e => onChangePasswordConfirm(e.target.value)}

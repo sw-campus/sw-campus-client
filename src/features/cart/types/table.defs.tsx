@@ -248,7 +248,7 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
       {
         key: 'time',
         label: '기간',
-        value: d => (d?.project?.time !== null && d?.project?.time !== undefined ? `총 ${d.project.time}일` : '-'),
+        value: d => (d?.project?.time !== null && d?.project?.time !== undefined ? `총 ${d.project.time}주` : '-'),
       },
       { key: 'team', label: '팀 구성 방식', value: d => d?.project?.team ?? '-' },
       { key: 'tool', label: '사용하는 협업툴', value: d => d?.project?.tool ?? '-' },

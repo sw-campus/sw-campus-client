@@ -72,7 +72,7 @@ function ScanningView({ previewUrl }: { previewUrl: string | null }) {
     <div className="space-y-5">
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
         <p className="mb-2 text-sm font-semibold text-gray-800">수료증 등록</p>
-        <h2 className="mb-4 text-2xl font-bold text-gray-900">수료증의 정보를 읽어오는 중입니다.</h2>
+        <h2 className="mb-4 text-2xl font-bold text-gray-900">수료증을 제출하고 있습니다.</h2>
 
         {/* 스캔 애니메이션 컨테이너 */}
         <div className="relative overflow-hidden rounded-xl border-2 border-blue-400 bg-gray-900 p-3">
@@ -126,7 +126,7 @@ function ScanningView({ previewUrl }: { previewUrl: string | null }) {
                 <Loader2 className="h-3 w-3 animate-spin text-white" />
               </span>
             </div>
-            <span>문서 스캔 중...</span>
+            <span>업로드 중...</span>
           </div>
 
           {/* 프로그레스 바 */}

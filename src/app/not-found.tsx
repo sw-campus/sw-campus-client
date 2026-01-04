@@ -9,7 +9,7 @@ export default function NotFound() {
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
       <div className="text-center">
         {/* 404 Number */}
-        <h1 className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-9xl font-black text-transparent">
+        <h1 className="bg-linear-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-9xl font-black text-transparent">
           404
         </h1>
 

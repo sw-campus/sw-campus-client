@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Controller, useFormContext } from 'react-hook-form'
@@ -12,15 +12,26 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useOrganizationsQuery } from '@/features/organization/hooks/useOrganizations'
 import { cn } from '@/lib/utils'
 
-export function OrganizationSearchInput() {
+type OrganizationSearchInputProps = {
+  initialOrgName?: string
+}
+
+export function OrganizationSearchInput({ initialOrgName = '' }: OrganizationSearchInputProps) {
   const { control, setValue, watch } = useFormContext()
   const [open, setOpen] = useState(false)
   const [keyword, setKeyword] = useState('')
-  const [selectedOrgName, setSelectedOrgName] = useState('')
+  const [selectedOrgName, setSelectedOrgName] = useState(initialOrgName)
 
   // Use public API hook which returns OrganizationSummary[] directly
   const { data: orgData, isLoading } = useOrganizationsQuery(keyword)
   const orgId = watch('orgId')
+
+  // initialOrgName이 변경되면 selectedOrgName 업데이트
+  useEffect(() => {
+    if (initialOrgName) {
+      setSelectedOrgName(initialOrgName)
+    }
+  }, [initialOrgName])
 
   return (
     <Field>
@@ -39,7 +50,7 @@ export function OrganizationSearchInput() {
                     aria-expanded={open}
                     className={cn('w-full justify-between', !field.value && 'text-muted-foreground')}
                   >
-                    {selectedOrgName || (field.value ? '기관 ID: ' + field.value : '기관을 검색해 주세요')}
+                    {selectedOrgName || initialOrgName || (field.value ? '기관이 선택됨' : '기관을 검색해 주세요')}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>

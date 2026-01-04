@@ -58,6 +58,7 @@ export const signupOrganization = async (payload: {
   nickname: string
   phone: string | null
   location: string | null
+  organizationId: number | null
   organizationName: string
   certificateImage: File
 }) => {
@@ -73,6 +74,9 @@ export const signupOrganization = async (payload: {
   // 백엔드 스펙: phone/location은 필수
   formData.append('phone', (payload.phone ?? '').toString())
   formData.append('location', (payload.location ?? '').toString())
+  if (payload.organizationId) {
+    formData.append('organizationId', payload.organizationId.toString())
+  }
   formData.append('organizationName', payload.organizationName)
 
   // 재직증명서 (필수)
@@ -141,6 +145,7 @@ export const organizationSignupSchema = baseSignupSchema.extend({
     .nullable()
     .refine(val => !val || /^\d{11}$/.test(val), '전화번호는 11자리 숫자여야 합니다.'),
   location: z.string().nullable(),
+  organizationId: z.number().nullable(),
   organizationName: z.string().trim().min(1, '기관명은 필수 입력값입니다.'),
   certificateImage: z.instanceof(File, { message: '재직증명서는 필수입니다.' }),
 })

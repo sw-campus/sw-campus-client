@@ -1,0 +1,14 @@
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production.local
+.env.production
+node_modules
+.git
+.gitignore
+README.md
+.next
+.vscode
+*.log

@@ -2,7 +2,6 @@ import type {
   ReviewApprovalResponse,
   ReviewAuthStatus,
   ReviewDetail,
-  ReviewListResponse,
   ReviewSummary,
   CertificateDetail,
   CertificateApprovalResponse,
@@ -37,7 +36,7 @@ export async function fetchReviews(
   page: number = 0,
   size: number = 10,
 ): Promise<PageResponse<ReviewSummary>> {
-  const { data } = await api.get<ReviewListResponse>('/admin/reviews/all', {
+  const { data } = await api.get<PageResponse<ReviewSummary>>('/admin/reviews/all', {
     params: {
       ...(status && { status }),
       ...(keyword && { keyword }),
@@ -46,16 +45,8 @@ export async function fetchReviews(
     },
   })
 
-  // Spring Data Page 응답을 ApprovalPage 공통 컴포넌트 호환 형식으로 변환
-  return {
-    content: data.content,
-    page: {
-      size: data.size,
-      number: data.number,
-      totalElements: data.totalElements,
-      totalPages: data.totalPages,
-    },
-  }
+  // API 응답이 이미 PageResponse 형태 (content + page 객체)
+  return data
 }
 
 /**

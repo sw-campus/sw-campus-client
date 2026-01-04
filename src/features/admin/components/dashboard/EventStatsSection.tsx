@@ -97,7 +97,7 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
           <span className="text-muted-foreground text-sm">{periodLabel} 기준</span>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={200} minWidth={1} minHeight={1}>
             <BarChart data={bannerData} layout="vertical">
               <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} allowDecimals={false} />
               <YAxis

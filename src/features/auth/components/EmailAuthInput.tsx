@@ -23,7 +23,7 @@ const EmailAuthInput: React.FC<EmailAuthInputProps> = ({
       <div className="flex gap-2">
         <input
           type="email"
-          placeholder="email"
+          placeholder="이메일을 입력하세요"
           className={`${INPUT_BASE_CLASS} w-full flex-1`}
           value={email}
           onChange={e => onEmailChange(e.target.value)}

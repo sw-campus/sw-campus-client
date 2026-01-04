@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import 'swiper/css'
@@ -59,7 +57,7 @@ export default function LargeBanner() {
       <Swiper
         modules={[Pagination, Autoplay]}
         slidesPerView={1}
-        loop={banners.length > 1}
+        loop={true}
         pagination={{ clickable: true }}
         autoplay={{
           delay: 3000,

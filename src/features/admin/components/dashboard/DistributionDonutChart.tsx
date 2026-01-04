@@ -39,7 +39,7 @@ export function DistributionDonutChart({ data, isLoading }: DistributionDonutCha
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center gap-4">
         <div className="h-[200px] w-[200px] shrink-0">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
             <PieChart>
               <Pie data={data} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={2} dataKey="value">
                 {data.map(entry => (

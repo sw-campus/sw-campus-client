@@ -1,3 +1,4 @@
+import type { LectureCreateRequest } from '@/features/lecture/types/lecture-request.type'
 import { api } from '@/lib/axios'
 import type { PageResponse } from '@/types/api.type'
 
@@ -59,4 +60,41 @@ export async function approveLecture(lectureId: number): Promise<void> {
  */
 export async function rejectLecture(lectureId: number): Promise<void> {
   await api.patch(`/admin/lectures/${lectureId}/reject`)
+}
+
+/**
+ * 관리자용 강의 수정 API params
+ */
+export type AdminUpdateLectureParams = {
+  lectureId: number
+  payload: LectureCreateRequest
+  lectureImageFile?: File | null
+  teacherImageFiles?: File[]
+}
+
+/**
+ * 관리자용 강의 수정 API
+ * @param params - 강의 수정 파라미터
+ */
+export async function adminUpdateLecture({
+  lectureId,
+  payload,
+  lectureImageFile,
+  teacherImageFiles,
+}: AdminUpdateLectureParams): Promise<void> {
+  const formData = new FormData()
+  const payloadJson = JSON.stringify(payload)
+  formData.append('lecture', new Blob([payloadJson], { type: 'application/json' }))
+
+  if (lectureImageFile) {
+    formData.append('image', lectureImageFile)
+  }
+
+  if (teacherImageFiles && teacherImageFiles.length > 0) {
+    teacherImageFiles.forEach(file => {
+      formData.append('teacherImages', file)
+    })
+  }
+
+  await api.put(`/admin/lectures/${lectureId}`, formData)
 }

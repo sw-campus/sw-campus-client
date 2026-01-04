@@ -12,6 +12,11 @@ const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID
 export const metadata: Metadata = {
   title: '소프트웨어캠퍼스',
   description: '소프트웨어캠퍼스',
+  icons: {
+    icon: '/icons/icon.png',
+    shortcut: '/icons/favicon.ico',
+    apple: '/icons/apple-icon.png',
+  },
 }
 
 export const viewport: Viewport = {
@@ -37,7 +42,9 @@ export default function RootLayout({
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', '${GA_TRACKING_ID}');
+              gtag('config', '${GA_TRACKING_ID}', {
+              cookie_domain: window.location.hostname === 'localhost' ? 'none' : 'auto',
+              });
             `}
           </Script>
         </>

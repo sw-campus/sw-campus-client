@@ -13,6 +13,7 @@ import type { LectureAuthStatus, LectureSummary } from '../../types/lecture.type
 import { ApprovalFilter } from '../common/ApprovalFilter'
 import { ApprovalPagination } from '../common/ApprovalPagination'
 import { APPROVAL_STAT_COLORS, ColorfulStatCard } from '../common/ColorfulStatCard'
+import { AdminLectureEditModal } from './AdminLectureEditModal'
 import { AdminLectureRegisterModal } from './AdminLectureRegisterModal'
 import { LectureDetailModal } from './LectureDetailModal'
 import { LectureTable } from './LectureTable'
@@ -26,6 +27,8 @@ export function LectureApprovalPage() {
   const [selectedItem, setSelectedItem] = useState<LectureSummary | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingLectureId, setEditingLectureId] = useState<number | null>(null)
 
   // 필터 상태를 API 호출용으로 변환
   const apiStatus: LectureAuthStatus | undefined = statusFilter === 'ALL' ? undefined : statusFilter
@@ -62,6 +65,16 @@ export function LectureApprovalPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false)
     setSelectedItem(null)
+  }
+
+  const handleEdit = (lectureId: number) => {
+    setEditingLectureId(lectureId)
+    setIsEditModalOpen(true)
+  }
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false)
+    setEditingLectureId(null)
   }
 
   const handleStatusChange = (status: ApprovalStatusFilter) => {
@@ -119,11 +132,19 @@ export function LectureApprovalPage() {
         onClose={handleCloseModal}
         onApprove={handleApprove}
         onReject={handleReject}
+        onEdit={handleEdit}
         isApproving={approveMutation.isPending}
         isRejecting={rejectMutation.isPending}
       />
 
       <AdminLectureRegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
+
+      <AdminLectureEditModal
+        open={isEditModalOpen}
+        onOpenChange={open => !open && handleEditModalClose()}
+        lectureId={editingLectureId}
+        onSuccess={handleEditModalClose}
+      />
     </div>
   )
 }

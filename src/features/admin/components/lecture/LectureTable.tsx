@@ -96,7 +96,7 @@ export function LectureTable({ lectures, isLoading, currentPage, pageSize, onVie
                 <TableCell>
                   <StatusBadge status={lecture.lectureAuthStatus} />
                 </TableCell>
-                <TableCell className="text-muted-foreground">{formatDate(lecture.createdAt)}</TableCell>
+                <TableCell className="text-muted-foreground">{formatDate(lecture.lastUpdatedAt)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

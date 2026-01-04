@@ -67,7 +67,7 @@ export default function SmallBanner() {
         onBeforeInit={swiper => {
           swiperRef.current = swiper
         }}
-        loop={banners.length > 3}
+        loop={true}
         spaceBetween={16}
         slidesPerView={3}
         breakpoints={{

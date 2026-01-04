@@ -32,6 +32,7 @@ export function useSignupOrganizationForm() {
     name,
     nickname,
     phone,
+    organizationId,
     organizationName,
     certificateImage,
 
@@ -45,6 +46,7 @@ export function useSignupOrganizationForm() {
     setName,
     setNickname,
     setPhone,
+    setOrganizationId,
     setOrganizationName,
     setCertificateImage,
   } = useSignupStore()
@@ -174,6 +176,18 @@ export function useSignupOrganizationForm() {
     toast.message('재직증명서 인증 기능은 아직 연결되지 않았어요.')
   }
 
+  // 기존 기관 선택
+  const handleSelectExistingOrg = (orgId: number, orgName: string) => {
+    setOrganizationId(orgId)
+    setOrganizationName(orgName)
+  }
+
+  // 새 기관명 직접 입력
+  const handleInputNewOrg = (orgName: string) => {
+    setOrganizationId(null) // 새 기관이므로 ID는 null
+    setOrganizationName(orgName)
+  }
+
   // 회원가입
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -216,6 +230,11 @@ export function useSignupOrganizationForm() {
         return
       }
 
+      if (!organizationName?.trim()) {
+        toast.error('기관명을 입력해 주세요.')
+        return
+      }
+
       const payload = {
         email: email || '',
         password: password || '',
@@ -223,6 +242,7 @@ export function useSignupOrganizationForm() {
         nickname: normalizedNickname,
         phone: phone.trim(),
         location,
+        organizationId,
         organizationName: organizationName || '',
         certificateImage,
       }
@@ -261,6 +281,7 @@ export function useSignupOrganizationForm() {
     name,
     nickname,
     phone,
+    organizationId,
     organizationName,
     certificateImage,
     isSubmitting,
@@ -271,7 +292,8 @@ export function useSignupOrganizationForm() {
     setName,
     setNickname: handleNicknameChange,
     setPhone,
-    setOrganizationName,
+    handleSelectExistingOrg,
+    handleInputNewOrg,
 
     isNicknameChecking,
     nicknameCheckState,

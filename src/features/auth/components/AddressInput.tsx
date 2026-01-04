@@ -9,10 +9,22 @@ import { useSignupStore } from '@/store/signupStore'
 
 type AddressInputProps = {
   autoOpen?: boolean
+  variant?: 'dark' | 'light'
 }
 
-export default function AddressInput({ autoOpen = false }: AddressInputProps) {
+// 마이페이지용 밝은 테마 스타일
+const INPUT_LIGHT_CLASS =
+  'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
+
+export default function AddressInput({ autoOpen = false, variant = 'dark' }: AddressInputProps) {
   const { address, detailAddress, setDetailAddress } = useSignupStore()
+
+  const inputClass = variant === 'light' ? INPUT_LIGHT_CLASS : `${INPUT_BASE_CLASS} w-full flex-1`
+  const labelClass = variant === 'light' ? 'mb-1 block text-sm font-medium text-gray-800' : 'mb-1 block text-white/75'
+  const buttonClass =
+    variant === 'light'
+      ? 'h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800'
+      : 'h-10 rounded-md bg-white/85 px-4 font-semibold text-black transition hover:bg-white'
 
   const handleSearchAddress = () => {
     if (typeof window === 'undefined') return
@@ -62,20 +74,10 @@ export default function AddressInput({ autoOpen = false }: AddressInputProps) {
 
   return (
     <div className="mb-3">
-      <label className="mb-1 block text-white/75">주소</label>
+      <label className={labelClass}>주소</label>
       <div className="mb-2 flex gap-2">
-        <input
-          type="text"
-          placeholder="주소"
-          className={`${INPUT_BASE_CLASS} w-full flex-1`}
-          value={address ?? ''}
-          readOnly
-        />
-        <button
-          type="button"
-          onClick={handleSearchAddress}
-          className="h-10 rounded-md bg-white/85 px-4 font-semibold text-black transition hover:bg-white"
-        >
+        <input type="text" placeholder="주소" className={inputClass} value={address ?? ''} readOnly />
+        <button type="button" onClick={handleSearchAddress} className={buttonClass}>
           검색
         </button>
       </div>
@@ -83,7 +85,7 @@ export default function AddressInput({ autoOpen = false }: AddressInputProps) {
       <input
         type="text"
         placeholder="상세 주소"
-        className={`${INPUT_BASE_CLASS} w-full`}
+        className={inputClass}
         value={detailAddress ?? ''}
         onChange={e => setDetailAddress(e.target.value)}
       />

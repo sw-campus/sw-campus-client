@@ -23,7 +23,6 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
           : new Date(stat.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
       visitors: stat.totalUsers,
       newVisitors: stat.newUsers,
-      pageViews: stat.pageViews,
     })) ?? []
 
   const getPeriodLabel = (p: Period) => {
@@ -79,7 +78,7 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
       </CardHeader>
       <CardContent>
         {chartData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={200} minWidth={1} minHeight={1}>
             <ComposedChart data={chartData}>
               <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis
@@ -104,17 +103,7 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
                   borderRadius: '8px',
                 }}
                 formatter={(value, name) => {
-                  let label = ''
-                  switch (name) {
-                    case 'visitors':
-                      label = '방문자'
-                      break
-                    case 'newVisitors':
-                      label = '신규 방문자'
-                      break
-                    default:
-                      label = '페이지뷰'
-                  }
+                  const label = name === 'visitors' ? '방문자' : '신규 방문자'
                   return [`${value ?? 0}`, label]
                 }}
               />

@@ -135,25 +135,17 @@ export default function Header({
               <FiUser />
             </HeaderIconAction>
 
-            {userType !== 'ADMIN' && (
+            {userType !== 'ADMIN' && userType !== 'ORGANIZATION' && (
               <HeaderIconAction kind="link" ariaLabel="위시리스트" tooltip="장바구니" href="/cart/compare">
                 <BsCart4 />
               </HeaderIconAction>
             )}
           </>
         ) : (
-          <>
-            {/* 로그인 안된 경우 */}
-            <HeaderIconAction kind="link" ariaLabel="로그인" tooltip="로그인" href="/login">
-              <FiLogIn />
-            </HeaderIconAction>
-            <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href="/login">
-              <FiUser />
-            </HeaderIconAction>
-            <HeaderIconAction kind="link" ariaLabel="위시리스트" tooltip="장바구니" href="/login">
-              <BsCart4 />
-            </HeaderIconAction>
-          </>
+          // 로그인 안된 경우: 로그인 아이콘만 표시
+          <HeaderIconAction kind="link" ariaLabel="로그인" tooltip="로그인" href="/login">
+            <FiLogIn />
+          </HeaderIconAction>
         )}
       </div>
 
