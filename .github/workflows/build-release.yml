@@ -5,6 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      skip_manifest:
+        description: 'Skip manifest update'
+        required: false
+        default: 'false'
+        type: boolean
 
 permissions:
   contents: write
