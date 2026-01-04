@@ -66,6 +66,16 @@ export const CURRICULUM_LEVEL_LABEL: Record<string, string> = {
 }
 
 /**
+ * 강사 정보
+ */
+export interface TeacherInfo {
+  teacherId: number
+  teacherName: string
+  teacherDescription: string | null
+  teacherImageUrl: string | null
+}
+
+/**
  * Lecture 상세 정보
  */
 export interface LectureDetail {
@@ -109,6 +119,7 @@ export interface LectureDetail {
   averageScore: number | null
   reviewCount: number | null
   curriculums: CurriculumInfo[]
+  teachers: TeacherInfo[]
 }
 
 /**

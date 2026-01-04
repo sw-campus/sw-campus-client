@@ -16,8 +16,6 @@ type LoginFormCardProps = {
   isLoading: boolean
   onChangeEmail: (v: string) => void
   onChangePassword: (v: string) => void
-  rememberMe?: boolean
-  onChangeRememberMe?: (v: boolean) => void
   onSubmit: (e: FormEvent<HTMLFormElement>) => void | Promise<void>
   onOAuthStart: (provider: 'google' | 'github') => void
   signupHref: string
@@ -30,8 +28,6 @@ export function LoginFormCard({
   isLoading,
   onChangeEmail,
   onChangePassword,
-  rememberMe = false,
-  onChangeRememberMe,
   onSubmit,
   onOAuthStart,
   signupHref,
@@ -78,19 +74,10 @@ export function LoginFormCard({
         />
       </div>
 
-      {/* 자동 로그인 + 아이디/비번 찾기 + 회원가입 */}
+      {/* 비번 찾기 + 회원가입 */}
       <div className="mb-4 flex items-center justify-between text-white/65">
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            className="h-4 w-4 accent-white"
-            checked={!!rememberMe}
-            onChange={e => onChangeRememberMe?.(e.target.checked)}
-          />
-          자동 로그인
-        </label>
         <button type="button" onClick={onFindAccountClick} className="underline-offset-2 hover:underline">
-          아이디/비밀번호 찾기
+          비밀번호 찾기
         </button>
 
         <Link href={signupHref} className="underline-offset-2 hover:underline">

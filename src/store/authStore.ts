@@ -10,6 +10,7 @@ interface AuthState {
   userName: string | null
   nickname: string | null
   userType: 'ORGANIZATION' | 'PERSONAL' | 'ADMIN' | null
+  hasHydrated: boolean
 
   // actions
   login: (name: string) => void
@@ -18,6 +19,7 @@ interface AuthState {
   setNickname: (nickname: string | null) => void
   logout: () => void
   resetAuth: () => void
+  setHasHydrated: (state: boolean) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -28,6 +30,7 @@ export const useAuthStore = create<AuthState>()(
       userName: null,
       nickname: null,
       userType: null,
+      hasHydrated: false,
 
       login: (name: string) =>
         set({
@@ -64,10 +67,15 @@ export const useAuthStore = create<AuthState>()(
           nickname: null,
           userType: null,
         }),
+
+      setHasHydrated: (state: boolean) => set({ hasHydrated: state }),
     }),
 
     {
       name: 'auth-storage', // localStorage key
+      onRehydrateStorage: () => state => {
+        state?.setHasHydrated(true)
+      },
     },
   ) as unknown as StateCreator<AuthState>,
 )

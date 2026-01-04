@@ -59,6 +59,30 @@ export async function createReview(
 }
 
 /**
+ * 리뷰 작성 가능 여부 확인 API (eligibility)
+ * - hasNickname: 닉네임 설정 여부
+ * - hasCertificate: 수료증 인증 여부
+ * - canWrite: 기존 후기가 없는지 (이미 작성했으면 false)
+ */
+export interface ReviewEligibility {
+  hasNickname: boolean
+  hasCertificate: boolean
+  canWrite: boolean
+}
+
+export async function checkReviewEligibility(lectureId: string | number): Promise<ReviewEligibility> {
+  try {
+    const { data } = await api.get<ReviewEligibility>(`/reviews/eligibility`, {
+      params: { lectureId },
+    })
+    return data
+  } catch {
+    // 에러 시 기본값 반환 (로그인 필요 등)
+    return { hasNickname: false, hasCertificate: false, canWrite: false }
+  }
+}
+
+/**
  * 수료증 인증/작성 가능 여부를 확인하기 위해 마이페이지 리뷰 조회를 시도합니다.
  * - 200 OK 응답이면 인증된(또는 작성 가능) 상태로 간주합니다.
  * - 404/403 등 오류면 미인증으로 간주합니다.

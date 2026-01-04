@@ -61,7 +61,7 @@ export function StarRating({
   )
 }
 
-export function Section({ title, children, action }: { title: string; children: ReactNode; action?: ReactNode }) {
+export function Section({ title, children, action }: { title: ReactNode; children: ReactNode; action?: ReactNode }) {
   return (
     <div className="space-y-4 pt-2">
       <div className="flex items-center justify-between">

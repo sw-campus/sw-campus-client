@@ -42,6 +42,20 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
     }
   }
 
+  const getBannerTypeLabel = (type: string) => {
+    const t = type.toLowerCase()
+    switch (t) {
+      case 'big':
+        return '대형'
+      case 'middle':
+        return '중형'
+      case 'small':
+        return '소형'
+      default:
+        return type
+    }
+  }
+
   const periodLabel = getPeriodLabel(period)
 
   const RankBadge = ({ rank }: { rank: number }) => (
@@ -117,7 +131,9 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                       <TableCell className="max-w-0">
                         <div className="truncate" title={banner.bannerName || `배너 #${banner.bannerId}`}>
                           {banner.bannerName || `배너 #${banner.bannerId}`}
-                          <span className="text-muted-foreground ml-1 text-xs">({banner.bannerType})</span>
+                          <span className="text-muted-foreground ml-1 text-xs">
+                            ({getBannerTypeLabel(banner.bannerType)})
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell className="text-right font-semibold">{banner.clickCount.toLocaleString()}</TableCell>
@@ -243,7 +259,9 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                         {banner.bannerName || `배너 #${banner.bannerId}`}
                       </div>
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{banner.bannerType}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {getBannerTypeLabel(banner.bannerType)}
+                    </TableCell>
                     <TableCell className="text-right font-semibold">{banner.clickCount.toLocaleString()}</TableCell>
                   </TableRow>
                 ))

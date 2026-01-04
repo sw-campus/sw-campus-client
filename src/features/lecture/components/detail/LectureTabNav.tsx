@@ -53,8 +53,8 @@ export default function LectureTabNav() {
   }, [])
 
   return (
-    <div className="w-full">
-      <nav className="no-scrollbar flex w-full items-center gap-6 overflow-x-auto py-5">
+    <div className="sticky top-0 z-40 rounded-t-2xl bg-white/70 ring-1 ring-white/30 backdrop-blur-xl">
+      <nav className="no-scrollbar flex w-full items-center gap-2 overflow-x-auto px-4 py-3 sm:gap-4 sm:px-6">
         {TABS.map(tab => (
           <button
             key={tab.id}
@@ -64,8 +64,8 @@ export default function LectureTabNav() {
             className={cn(
               'group relative shrink-0 rounded-xl px-4 py-2 text-base transition-all duration-200 sm:px-5 sm:text-lg',
               activeTab === tab.id
-                ? 'bg-white/80 font-extrabold text-gray-900 shadow-sm ring-1 ring-gray-200'
-                : 'font-semibold text-gray-500 hover:text-gray-700',
+                ? 'bg-white font-extrabold text-gray-900 shadow-sm ring-1 ring-gray-200'
+                : 'font-semibold text-gray-500 hover:bg-gray-100/50 hover:text-gray-700',
             )}
           >
             <span>{tab.label}</span>

@@ -5,6 +5,7 @@ type OrganizationAsideProps = {
   onClickOrgInfo: () => void
   onClickLectureManage: () => void
   onClickMyInfo: () => void
+  isApproved?: boolean
 }
 
 export default function OrganizationAside({
@@ -12,6 +13,7 @@ export default function OrganizationAside({
   onClickOrgInfo,
   onClickLectureManage,
   onClickMyInfo,
+  isApproved = false,
 }: OrganizationAsideProps) {
   const getButtonClass = (isActive: boolean) =>
     isActive
@@ -42,13 +44,15 @@ export default function OrganizationAside({
           >
             내 정보 관리
           </button>
-          <button
-            onClick={onClickLectureManage}
-            aria-current={active === 'lectureManage' ? 'page' : undefined}
-            className={getMobileButtonClass(active === 'lectureManage')}
-          >
-            강의 관리
-          </button>
+          {isApproved && (
+            <button
+              onClick={onClickLectureManage}
+              aria-current={active === 'lectureManage' ? 'page' : undefined}
+              className={getMobileButtonClass(active === 'lectureManage')}
+            >
+              강의 관리
+            </button>
+          )}
         </nav>
       </div>
 
@@ -73,13 +77,15 @@ export default function OrganizationAside({
             내 정보 관리
           </button>
 
-          <button
-            onClick={onClickLectureManage}
-            className={getButtonClass(active === 'lectureManage')}
-            aria-current={active === 'lectureManage' ? 'page' : undefined}
-          >
-            강의 관리
-          </button>
+          {isApproved && (
+            <button
+              onClick={onClickLectureManage}
+              className={getButtonClass(active === 'lectureManage')}
+              aria-current={active === 'lectureManage' ? 'page' : undefined}
+            >
+              강의 관리
+            </button>
+          )}
         </nav>
       </aside>
     </>

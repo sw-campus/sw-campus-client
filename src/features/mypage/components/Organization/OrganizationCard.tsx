@@ -152,11 +152,11 @@ export function OrganizationCard({ onEditClick }: OrganizationCardProps) {
                   </div>
                   <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
                     <span className="w-20 shrink-0 text-sm font-medium text-gray-500">연락처</span>
-                    <span className="text-sm text-gray-900">{org.phone}</span>
+                    <span className="text-sm text-gray-900">{org.phone || '-'}</span>
                   </div>
                   <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
                     <span className="w-20 shrink-0 text-sm font-medium text-gray-500">주소</span>
-                    <span className="text-sm text-gray-900">{org.location}</span>
+                    <span className="text-sm text-gray-900">{org.location || '-'}</span>
                   </div>
                   <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
                     <span className="w-20 shrink-0 text-sm font-medium text-gray-500">홈페이지</span>

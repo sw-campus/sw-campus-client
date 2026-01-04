@@ -4,7 +4,6 @@ import { FormEvent, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { createJSONStorage } from 'zustand/middleware'
 
 import { login as loginApi } from '@/features/auth/authApi'
 import { getProfile } from '@/features/mypage/api/survey.api'
@@ -18,7 +17,6 @@ export function useLoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [rememberMe, setRememberMe] = useState<boolean>(false)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -35,20 +33,6 @@ export function useLoginForm() {
 
       const userName = parseUserName(data, email.split('@')[0])
       const userType = parseUserType(data)
-
-      // persist 저장소를 자동로그인 여부에 따라 전환
-      try {
-        const persistApi = (useAuthStore as unknown as { persist?: { setOptions?: Function } }).persist
-        persistApi?.setOptions?.({
-          storage: createJSONStorage(() => (rememberMe ? localStorage : sessionStorage)),
-        })
-        if (!rememberMe && typeof window !== 'undefined') {
-          // 기존 localStorage 잔여분 정리
-          window.localStorage.removeItem('auth-storage')
-        }
-      } catch {
-        // noop
-      }
 
       setAuthUserType(userType)
       setLogin(userName)
@@ -86,8 +70,6 @@ export function useLoginForm() {
     isLoading,
     setEmail,
     setPassword,
-    rememberMe,
-    setRememberMe,
     handleSubmit,
   }
 }

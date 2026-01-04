@@ -95,6 +95,12 @@ export const login = async (payload: { email: string; password: string }) => {
   return res.data
 }
 
+// 임시 비밀번호 발급 요청
+export const requestTemporaryPassword = async (payload: { name: string; phone: string; email: string }) => {
+  const res = await api.post('/auth/password/temporary', payload)
+  return res.data
+}
+
 // 로그아웃
 export const logout = async () => {
   const res = await api.post(

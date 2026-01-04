@@ -32,50 +32,9 @@ export default function LectureDetailPage({ lectureId }: Props) {
     enabled: !!data?.orgId,
   })
 
-  // 더미 데이터 (로딩/에러/데이터 없음 시)
-  const mock: LectureDetail = {
-    id: lectureId,
-    orgId: 1,
-    title: '지역사회 지역혁신프로젝트 기업연계형 SW 직무교육 1기',
-    orgName: '한국소프트웨어인재개발원',
-    tags: ['KDT', '인재추천', '입반선발'],
-    lectureLoc: 'OFFLINE',
-    categoryName: '백엔드',
-    thumbnailUrl: '',
-    recruitType: 'CARD_REQUIRED',
-    summary:
-      'KDT(우수형) 백엔드 부트캠프입니다.\n취업을 위한 인재추천, 입반선발 전형이 있으며, 선발전형 통과테스트가 있습니다.',
-    schedule: {
-      recruitPeriod: '2025-12-28',
-      coursePeriod: { start: '2025-12-30', end: '2026-07-28' },
-      days: '월, 화, 수, 목, 금',
-      time: '09:00 - 19:00',
-      totalHours: 60,
-      totalDays: 20,
-    },
-    support: {
-      tuition: 2800000,
-      stipend: '훈련장려금 월 11만 6천원',
-      extraSupport: '특별훈련수당 월 20만원',
-    },
-    location: '서울시 금천구',
-    recruitStatus: 'RECRUITING',
-    photos: ['', '', '', ''],
-    steps: ['서류심사', '면접', '최종합격'],
-    benefits: ['인재추천', '인턴십 진행'],
-    goal: '',
-    maxCapacity: 0,
-    equipment: { pc: '', merit: '' },
-    services: { books: false, resume: false, mockInterview: false, employmentHelp: false, afterCompletion: false },
-    project: { num: 0, time: 0, team: '', tool: '', mentor: false },
-    curriculum: [],
-    teachers: [],
-    quals: [],
-  }
+  const lecture = data
 
-  const lecture = data ?? mock
-
-  // Gemini 요약 Query
+  // Gemini 요약 Query (캐싱 적용)
   const { data: aiSummary, isLoading: isAiLoading } = useQuery({
     queryKey: ['lectureSummary', lectureId, lecture?.title],
     queryFn: async () => {
@@ -85,17 +44,37 @@ export default function LectureDetailPage({ lectureId }: Props) {
       return generateGeminiSummary(lecture)
     },
     enabled: !!lecture,
-    staleTime: Infinity,
+    staleTime: Infinity, // 영구 캐싱 (fresh 상태 유지)
+    gcTime: 60 * 60 * 1000, // 1시간 동안 메모리 유지
   })
 
   // 실제 표시할 요약: AI 요약 우선, 없으면 기본(매퍼) 요약
-  const displaySummary = aiSummary ?? lecture.summary
+  const displaySummary = aiSummary ?? lecture?.summary ?? ''
 
+  // 로딩 중
   if (isLoading) {
-    return <div className="text-muted-foreground py-20 text-center">로딩 중...</div>
+    return (
+      <div className="custom-container">
+        <div className="custom-card">
+          <div className="flex items-center justify-center py-20">
+            <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+          </div>
+        </div>
+      </div>
+    )
   }
-  if (isError) {
-    return <div className="text-destructive py-20 text-center">데이터를 불러오지 못했습니다.</div>
+
+  // 에러 또는 데이터 없음
+  if (isError || !lecture) {
+    return (
+      <div className="custom-container">
+        <div className="custom-card">
+          <div className="text-muted-foreground py-20 text-center">
+            <p className="text-lg">강의 정보를 찾을 수 없습니다.</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -134,10 +113,12 @@ export default function LectureDetailPage({ lectureId }: Props) {
                 </CardContent>
               </Card>
 
-              {/* 본문 카드 (통합) */}
-              <Card className="rounded-2xl bg-white/70 ring-1 ring-white/30 backdrop-blur-xl">
+              {/* 탭 네비게이션 (Sticky) - 카드와 붙어서 보이도록 */}
+              <LectureTabNav />
+
+              {/* 본문 카드 (통합) - 탭과 붙어서 보이도록 상단 모서리 제거 */}
+              <Card className="rounded-t-none rounded-b-2xl bg-white/70 ring-1 ring-white/30 backdrop-blur-xl">
                 <CardContent className="space-y-16 p-6 md:p-8">
-                  <LectureTabNav />
                   {/* 모집개요 */}
                   <div id="overview" className="scroll-mt-28">
                     <LectureOverview
@@ -146,6 +127,7 @@ export default function LectureDetailPage({ lectureId }: Props) {
                       displaySummary={displaySummary}
                       isLoading={isLoading}
                       isAiLoading={isAiLoading}
+                      isAiSummary={!!aiSummary}
                     />
                   </div>
 

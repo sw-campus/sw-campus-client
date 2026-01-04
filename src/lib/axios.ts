@@ -184,8 +184,9 @@ export async function ensureSessionActive(): Promise<boolean> {
       const nickname = typeof profile?.nickname === 'string' && profile.nickname.length > 0 ? profile.nickname : null
       if (!state.nickname && nickname) state.setNickname(nickname)
 
-      const roleOrType = (profile?.userType ?? profile?.role ?? '')
-      if (roleOrType === 'ORGANIZATION' || roleOrType === 'organization') state.setUserType('ORGANIZATION')
+      const roleOrType = (profile?.userType ?? profile?.role ?? '').toUpperCase()
+      if (roleOrType === 'ADMIN') state.setUserType('ADMIN')
+      else if (roleOrType === 'ORGANIZATION') state.setUserType('ORGANIZATION')
       else if (roleOrType) state.setUserType('PERSONAL')
     } catch {
       // ignore
