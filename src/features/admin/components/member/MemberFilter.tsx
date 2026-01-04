@@ -70,29 +70,31 @@ export function MemberFilter({
   }
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      {/* Role Filter Tabs */}
-      <div className="flex gap-2">
-        {ROLE_OPTIONS.map(option => {
-          const isActive = currentRole === option.value
-          const Icon = option.icon
+    <div className="flex flex-col gap-4">
+      {/* Role Filter Tabs - Horizontal Scroll on Mobile */}
+      <div className="-mx-4 overflow-x-auto px-4 scrollbar-hide sm:mx-0 sm:px-0">
+        <div className="flex gap-1.5 whitespace-nowrap sm:gap-2">
+          {ROLE_OPTIONS.map(option => {
+            const isActive = currentRole === option.value
+            const Icon = option.icon
 
-          return (
-            <button
-              key={option.value}
-              onClick={() => onRoleChange(option.value)}
-              className={cn(
-                'flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
-                isActive
-                  ? option.activeClass
-                  : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              {option.label}
-            </button>
-          )
-        })}
+            return (
+              <button
+                key={option.value}
+                onClick={() => onRoleChange(option.value)}
+                className={cn(
+                  'flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all duration-200 sm:gap-2 sm:px-4 sm:text-sm',
+                  isActive
+                    ? option.activeClass
+                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
+                )}
+              >
+                <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                {option.label}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Search Input */}

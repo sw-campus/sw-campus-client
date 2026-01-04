@@ -13,7 +13,7 @@ export function NavigationMenuMobileOverlay({ open, onClose, items }: Props) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm md:hidden" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden" onClick={onClose}>
       <div
         className="absolute top-0 left-0 h-full w-[85%] max-w-sm overflow-y-auto bg-white p-6 shadow-xl"
         onClick={e => e.stopPropagation()}

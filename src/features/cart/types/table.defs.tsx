@@ -59,13 +59,13 @@ export function dataRow({
   return (
     <TableRow key={rowKey}>
       <TableCell
-        className={cn('bg-muted/10 px-6 py-4 align-top text-base font-semibold whitespace-normal', labelColClassName)}
+        className={cn('sticky left-0 z-20 bg-background border-r px-2 py-2 align-top text-xs font-semibold whitespace-normal sm:px-4 sm:py-3 sm:text-sm md:px-6 md:py-4 md:text-base', labelColClassName)}
       >
         {label}
       </TableCell>
       <TableCell
         className={cn(
-          'px-6 py-4 align-top text-base whitespace-normal',
+          'px-2 py-2 align-top text-xs whitespace-normal sm:px-4 sm:py-3 sm:text-sm md:px-6 md:py-4 md:text-base',
           valueAlign === 'center' ? 'text-center' : 'text-left',
           !isLeftSelected && 'text-muted-foreground',
         )}
@@ -75,7 +75,7 @@ export function dataRow({
       {dividerCell()}
       <TableCell
         className={cn(
-          'px-6 py-4 align-top text-base whitespace-normal',
+          'px-2 py-2 align-top text-xs whitespace-normal sm:px-4 sm:py-3 sm:text-sm md:px-6 md:py-4 md:text-base',
           valueAlign === 'center' ? 'text-center' : 'text-left',
           !isRightSelected && 'text-muted-foreground',
         )}
