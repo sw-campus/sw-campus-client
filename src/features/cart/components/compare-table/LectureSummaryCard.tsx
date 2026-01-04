@@ -36,7 +36,7 @@ export function LectureSummaryCard({
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, filter: 'blur(2px)' }}
         transition={reduceMotion ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
-        className="relative flex flex-col items-center gap-3 px-6 py-8 text-center"
+        className="relative flex flex-col items-center gap-2 px-2 py-4 text-center md:gap-3 md:px-6 md:py-8"
       >
         {/* 닫기 버튼 */}
         {hasSelection ? (
@@ -47,14 +47,14 @@ export function LectureSummaryCard({
             initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
             animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 0.12, ease: 'easeOut' }}
-            className="bg-background text-muted-foreground hover:text-foreground absolute top-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full border"
+            className="bg-background text-muted-foreground hover:text-foreground absolute top-1 right-1 inline-flex h-7 w-7 items-center justify-center rounded-full border md:top-3 md:right-3 md:h-9 md:w-9"
           >
-            <FiX />
+            <FiX className="h-4 w-4 md:h-5 md:w-5" />
           </motion.button>
         ) : null}
 
         {/* 이미지 */}
-        <div className="bg-muted/30 relative h-24 w-24 overflow-hidden rounded-full">
+        <div className="bg-muted/30 relative h-16 w-16 overflow-hidden rounded-full md:h-24 md:w-24">
           {thumbnailUrl ? (
             <Image
               src={thumbnailUrl}
@@ -70,21 +70,21 @@ export function LectureSummaryCard({
         <div className="space-y-1">
           <div
             className={cn(
-              '[display:-webkit-box] overflow-hidden text-xl leading-snug font-bold break-keep [-webkit-box-orient:vertical] [-webkit-line-clamp:2]',
+              '[display:-webkit-box] overflow-hidden text-sm leading-snug font-bold break-keep [-webkit-box-orient:vertical] [-webkit-line-clamp:2] md:text-xl',
               !hasSelection && 'text-muted-foreground',
             )}
           >
             {hasSelection ? title : '미선택'}
           </div>
-          {!hasSelection && <div className="text-muted-foreground text-sm opacity-60">강의를 선택해 주세요</div>}
+          {!hasSelection && <div className="text-muted-foreground text-xs opacity-60 md:text-sm">강의를 선택해 주세요</div>}
         </div>
 
         {hasSelection ? (
-          <Button asChild className="mt-2 w-40">
+          <Button asChild size="sm" className="mt-1 h-8 w-full text-xs md:mt-2 md:h-10 md:w-40 md:text-sm">
             <Link href={`/lectures/${lectureId}`}>자세히 보기</Link>
           </Button>
         ) : (
-          <Button disabled className="mt-2 w-40">
+          <Button disabled size="sm" className="mt-1 h-8 w-full text-xs md:mt-2 md:h-10 md:w-40 md:text-sm">
             자세히 보기
           </Button>
         )}

@@ -14,11 +14,12 @@ import {
 } from '@/features/cart/types/table.defs'
 import type { ComparisonResult } from '@/features/lecture/actions/gemini'
 import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
+import { cn } from '@/lib/utils'
 
 function sectionRow(label: string, rowKey: string) {
   return (
     <TableRow key={rowKey}>
-      <TableCell colSpan={4} className="bg-accent/10 text-accent-foreground px-6 py-3 text-sm font-semibold">
+      <TableCell colSpan={4} className="bg-accent/10 text-accent-foreground px-2 py-2 text-xs font-semibold md:px-6 md:py-3 md:text-sm">
         {label}
       </TableCell>
     </TableRow>
@@ -40,7 +41,7 @@ function renderCurriculumLevel(level: string) {
 
   if (normalized === 'BASIC') {
     return (
-      <Badge variant="curriculumBasic" className="px-3 py-1 text-sm">
+      <Badge variant="curriculumBasic" className="px-2 py-0.5 text-xs md:px-3 md:py-1 md:text-sm">
         {label}
       </Badge>
     )
@@ -48,14 +49,14 @@ function renderCurriculumLevel(level: string) {
 
   if (normalized === 'ADVANCED') {
     return (
-      <Badge variant="curriculumAdvanced" className="px-3 py-1 text-sm">
+      <Badge variant="curriculumAdvanced" className="px-2 py-0.5 text-xs md:px-3 md:py-1 md:text-sm">
         {label}
       </Badge>
     )
   }
 
   return (
-    <Badge variant="outline" className="px-3 py-1 text-sm">
+    <Badge variant="outline" className="px-2 py-0.5 text-xs md:px-3 md:py-1 md:text-sm">
       {label}
     </Badge>
   )
@@ -105,13 +106,13 @@ export function CompareTable({
   }
 
   return (
-    <div className="border-border rounded-md border">
-      <Table className="table-fixed break-keep">
+    <div className="border-border rounded-md border text-left">
+      <Table className="table-fixed break-keep min-w-[600px] md:min-w-0">
         <colgroup>
           <col className={labelColClassName} />
-          <col />
+          <col className="min-w-[140px]" />
           <col className="w-px" />
-          <col />
+          <col className="min-w-[140px]" />
         </colgroup>
         <TableBody className="[&_tr:nth-child(even)]:bg-muted/30 [&_td]:leading-relaxed [&_tr:nth-child(odd)]:bg-white">
           {COMPARE_SECTIONS.flatMap(section => [
