@@ -1,5 +1,7 @@
 'use client'
 
+import { useRef, useState, useEffect } from 'react'
+
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { AiCommentRow } from '@/features/cart/components/AiCommentRow'
@@ -105,9 +107,39 @@ export function CompareTable({
     }
   }
 
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [showScrollHint, setShowScrollHint] = useState(true)
+
+  // 스크롤 힐트 숨기기 - 스크롤 시
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    const handleScroll = () => {
+      if (el.scrollLeft > 20) {
+        setShowScrollHint(false)
+      }
+    }
+
+    el.addEventListener('scroll', handleScroll)
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <div className="border-border rounded-md border text-left">
-      <Table className="table-fixed break-keep min-w-[600px] md:min-w-0">
+    <div className="relative">
+      {/* 모바일 스크롤 힐트 */}
+      {showScrollHint && (
+        <div className="pointer-events-none absolute right-0 top-0 z-10 flex h-full items-center md:hidden">
+          <div className="flex h-full w-8 items-center justify-center bg-gradient-to-l from-white/90 to-transparent">
+            <span className="animate-pulse text-xs text-gray-400">←</span>
+          </div>
+        </div>
+      )}
+      <div
+        ref={scrollRef}
+        className="scrollbar-hide overflow-x-auto rounded-md border border-border"
+      >
+        <Table className="table-fixed break-keep min-w-[500px] md:min-w-0">
         <colgroup>
           <col className={labelColClassName} />
           <col className="min-w-[140px]" />
@@ -226,5 +258,6 @@ export function CompareTable({
         </TableBody>
       </Table>
     </div>
+  </div>
   )
 }

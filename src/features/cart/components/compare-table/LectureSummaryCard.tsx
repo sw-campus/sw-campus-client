@@ -36,7 +36,7 @@ export function LectureSummaryCard({
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, filter: 'blur(2px)' }}
         transition={reduceMotion ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
-        className="relative flex flex-col items-center gap-2 px-2 py-4 text-center md:gap-3 md:px-6 md:py-8"
+        className="relative flex flex-col items-center gap-1.5 px-2 py-3 text-center md:gap-3 md:px-6 md:py-8"
       >
         {/* 닫기 버튼 */}
         {hasSelection ? (
@@ -47,14 +47,14 @@ export function LectureSummaryCard({
             initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
             animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 0.12, ease: 'easeOut' }}
-            className="bg-background text-muted-foreground hover:text-foreground absolute top-1 right-1 inline-flex h-7 w-7 items-center justify-center rounded-full border md:top-3 md:right-3 md:h-9 md:w-9"
+            className="bg-background text-muted-foreground hover:text-foreground absolute top-0.5 right-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border md:top-3 md:right-3 md:h-9 md:w-9"
           >
-            <FiX className="h-4 w-4 md:h-5 md:w-5" />
+            <FiX className="h-3.5 w-3.5 md:h-5 md:w-5" />
           </motion.button>
         ) : null}
 
         {/* 이미지 */}
-        <div className="bg-muted/30 relative h-16 w-16 overflow-hidden rounded-full md:h-24 md:w-24">
+        <div className="bg-muted/30 relative h-12 w-12 overflow-hidden rounded-full md:h-24 md:w-24">
           {thumbnailUrl ? (
             <Image
               src={thumbnailUrl}

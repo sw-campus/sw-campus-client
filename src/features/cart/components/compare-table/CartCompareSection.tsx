@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 
 const LABEL_COL_GRID_CLASS = 'grid-cols-2 md:grid-cols-[13.75rem_minmax(0,1fr)_1px_minmax(0,1fr)]'
-const LABEL_COL_TABLE_CLASS = 'w-[7rem] md:w-[13.75rem]'
+const LABEL_COL_TABLE_CLASS = 'w-[5.5rem] md:w-[13.75rem]'
 
 export default function CartCompareSection() {
   const router = useRouter()
@@ -122,10 +122,17 @@ export default function CartCompareSection() {
       />
 
       <Card>
-        <CardHeader>
+        <CardHeader className="hidden md:block">
           <CardTitle className="text-base">과정비교 페이지</CardTitle>
           <div className="text-muted-foreground text-sm">
             사이드바에서 강의를 드래그해서 왼쪽/오른쪽 영역에 놓으면 비교표가 업데이트됩니다.
+          </div>
+        </CardHeader>
+        {/* 모바일 헤더 */}
+        <CardHeader className="pb-2 md:hidden">
+          <CardTitle className="text-sm">과정 비교</CardTitle>
+          <div className="text-muted-foreground text-xs">
+            장바구니에서 강의를 선택하여 비교하세요
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
