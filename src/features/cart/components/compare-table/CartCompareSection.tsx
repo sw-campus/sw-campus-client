@@ -200,14 +200,14 @@ export default function CartCompareSection() {
               />
             </div>
           </div>
-            <CompareTable
-              leftTitle={left?.title}
-              rightTitle={right?.title}
-              leftDetail={leftDetailResolved}
-              rightDetail={rightDetailResolved}
-              labelColClassName={LABEL_COL_TABLE_CLASS}
-              aiResult={aiResult}
-            />
+          <CompareTable
+            leftTitle={left?.title}
+            rightTitle={right?.title}
+            leftDetail={leftDetailResolved}
+            rightDetail={rightDetailResolved}
+            labelColClassName={LABEL_COL_TABLE_CLASS}
+            aiResult={aiResult}
+          />
 
           {/* AI 최종 추천 */}
           {aiResult && (

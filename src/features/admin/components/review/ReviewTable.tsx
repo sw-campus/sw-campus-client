@@ -98,7 +98,7 @@ export function ReviewTable({ reviews, isLoading, currentPage, pageSize, onViewD
                   <TableCell className="text-muted-foreground max-w-[100px] truncate text-xs sm:max-w-none sm:text-sm" title={review.lectureName}>
                     {review.lectureName}
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-xs sm:text-sm">{review.score.toFixed(1)}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs sm:text-sm">{`${review.score.toFixed(1)}점`}</TableCell>
                   <TableCell>
                     <StatusBadge status={review.reviewApprovalStatus} />
                   </TableCell>

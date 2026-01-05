@@ -4,6 +4,18 @@
 @import 'tw-animate-css';
 
 @theme inline {
+  /* ========================================
+   * Z-Index 토큰 (레이어 스태킹 순서)
+   * - UI 요소 간의 일관된 z-index 관리를 위해 의미 있는 이름 사용
+   * - 숫자가 높을수록 더 앞에 표시됨
+   * ======================================== */
+  --z-dropdown: 50;      /* 드롭다운 메뉴, 툴팁 */
+  --z-sticky: 100;       /* 스티키 헤더, 사이드바 */
+  --z-fixed: 200;        /* 고정 네비게이션 (LectureTabNav 등) */
+  --z-modal: 500;        /* 모달, 다이얼로그 */
+  --z-toast: 1000;       /* 토스트 알림 */
+  --z-max: 9999;         /* 최상위 (긴급/특수 상황에만 사용) */
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
