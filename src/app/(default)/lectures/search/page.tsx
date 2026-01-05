@@ -405,7 +405,7 @@ function SearchContent() {
               <div className="py-10 text-center text-sm">검색 결과가 없습니다.</div>
             ) : (
               <>
-                <LectureList lectures={lectures} />
+                <LectureList lectures={lectures} maxColumns={3} />
 
                 {/* 페이지네이션 */}
                 {pageInfo.totalPages > 1 && (
