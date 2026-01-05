@@ -20,10 +20,7 @@ const surveySchema = z.object({
   wantedJobs: z.string().min(1, '희망 직무를 입력해주세요.'),
   licenses: z.string().min(1, '자격증을 입력해주세요.'),
   hasGovCard: z.boolean(),
-  affordableAmount: z
-    .union([z.number(), z.string()])
-    .transform(v => (typeof v === 'string' ? Number(v) : v))
-    .refine(v => Number.isFinite(v) && v >= 0, '가능 금액은 0 이상 숫자여야 합니다.'),
+  affordableAmount: z.number().min(0, '가능 금액은 0 이상 숫자여야 합니다.'),
 })
 type SurveyFormValues = z.infer<typeof surveySchema>
 

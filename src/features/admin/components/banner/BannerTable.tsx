@@ -70,59 +70,61 @@ export function BannerTable({ banners, isLoading, isToggling, onViewDetail, onTo
 
   return (
     <Card className="bg-card">
-      <CardHeader>
-        <CardTitle className="text-foreground">배너 목록</CardTitle>
+      <CardHeader className="pb-3 sm:pb-6">
+        <CardTitle className="text-foreground text-base sm:text-lg">배너 목록</CardTitle>
       </CardHeader>
-      <CardContent>
-        <Table className="table-fixed">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[60px]">NO</TableHead>
-              <TableHead className="w-[100px]">타입</TableHead>
-              <TableHead className="w-[30%]">강의명</TableHead>
-              <TableHead className="w-[200px]">기간</TableHead>
-              <TableHead className="w-[110px] text-center">기간상태</TableHead>
-              <TableHead className="w-[90px] text-center">활성화</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {banners.map((banner, index) => {
-              const periodStatus = getBannerPeriodStatus(banner.startDate, banner.endDate)
-              return (
-                <TableRow
-                  key={banner.id}
-                  onClick={() => onViewDetail(banner)}
-                  className="hover:bg-muted/50 cursor-pointer transition-colors"
-                >
-                  <TableCell className="text-muted-foreground">{index + 1}</TableCell>
-                  <TableCell>
-                    <TypeBadge type={banner.type} />
-                  </TableCell>
-                  <TableCell className="text-foreground truncate font-medium" title={banner.lectureName}>
-                    {banner.lectureName}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground truncate">
-                    {formatDate(banner.startDate)} ~ {formatDate(banner.endDate)}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Badge variant="secondary" className={cn('font-medium', BANNER_PERIOD_STATUS_COLOR[periodStatus])}>
-                      {BANNER_PERIOD_STATUS_LABEL[periodStatus]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div onClick={e => e.stopPropagation()}>
-                      <Switch
-                        checked={banner.isActive}
-                        disabled={isToggling}
-                        onCheckedChange={checked => onToggle(banner.id, checked)}
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
+      <CardContent className="px-3 pb-3 sm:px-6 sm:pb-6">
+        <div className="-mx-3 overflow-x-auto sm:mx-0">
+          <Table className="min-w-[550px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[40px] text-xs sm:w-[60px] sm:text-sm">NO</TableHead>
+                <TableHead className="w-[60px] text-xs sm:w-[100px] sm:text-sm">타입</TableHead>
+                <TableHead className="min-w-[100px] text-xs sm:text-sm">강의명</TableHead>
+                <TableHead className="w-[120px] text-xs sm:w-[200px] sm:text-sm">기간</TableHead>
+                <TableHead className="w-[70px] text-center text-xs sm:w-[110px] sm:text-sm">기간상태</TableHead>
+                <TableHead className="w-[60px] text-center text-xs sm:w-[90px] sm:text-sm">활성화</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {banners.map((banner, index) => {
+                const periodStatus = getBannerPeriodStatus(banner.startDate, banner.endDate)
+                return (
+                  <TableRow
+                    key={banner.id}
+                    onClick={() => onViewDetail(banner)}
+                    className="hover:bg-muted/50 cursor-pointer transition-colors"
+                  >
+                    <TableCell className="text-muted-foreground text-xs sm:text-sm">{index + 1}</TableCell>
+                    <TableCell>
+                      <TypeBadge type={banner.type} />
+                    </TableCell>
+                    <TableCell className="text-foreground max-w-[100px] truncate text-xs font-medium sm:max-w-none sm:text-sm" title={banner.lectureName}>
+                      {banner.lectureName}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground truncate text-xs sm:text-sm">
+                      {formatDate(banner.startDate)} ~ {formatDate(banner.endDate)}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="secondary" className={cn('font-medium', BANNER_PERIOD_STATUS_COLOR[periodStatus])}>
+                        {BANNER_PERIOD_STATUS_LABEL[periodStatus]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div onClick={e => e.stopPropagation()}>
+                        <Switch
+                          checked={banner.isActive}
+                          disabled={isToggling}
+                          onCheckedChange={checked => onToggle(banner.id, checked)}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   )

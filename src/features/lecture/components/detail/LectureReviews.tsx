@@ -25,21 +25,21 @@ function ReviewCard({ review }: { review: Review }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
-    <Card className="bg-card/40 border-0 p-5 shadow-sm backdrop-blur-xl transition-all duration-200 hover:shadow-md">
+    <Card className="bg-card/40 border-0 p-4 shadow-sm backdrop-blur-xl transition-all duration-200 hover:shadow-md sm:p-5">
       {/* Header */}
-      <div className="mb-3 flex items-start justify-between">
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-0">
         <div className="flex items-center gap-3">
-          <FaUser />
+          <FaUser className="h-4 w-4 shrink-0 text-gray-400" />
           <div>
             <p className="text-foreground text-sm font-semibold">{review.nickname}</p>
             <p className="text-muted-foreground text-xs">{formatDate(review.createdAt)}</p>
           </div>
         </div>
-        <StarRating score={review.score} showScore />
+        <StarRating score={review.score} showScore size="sm" />
       </div>
 
       {/* Comment */}
-      <p className="text-muted-foreground mb-4 text-sm leading-relaxed">{review.comment}</p>
+      <p className="text-muted-foreground mb-4 text-xs leading-relaxed sm:text-sm">{review.comment}</p>
 
       {/* Toggle Button */}
       <button
@@ -60,22 +60,22 @@ function ReviewCard({ review }: { review: Review }) {
 
       {/* Detail Scores */}
       {isExpanded && (
-        <div className="mt-4 space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="mt-3 space-y-2.5 rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:mt-4 sm:space-y-3 sm:p-4">
           {review.detailScores.map(detail => (
-            <div key={detail.category} className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-800">
+            <div key={detail.category} className="space-y-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-gray-800 sm:text-sm">
                   {CATEGORY_LABELS[detail.category] || detail.category}
                 </span>
-                <div className="flex items-center gap-1.5">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="min-w-8 text-right text-sm font-bold text-yellow-500">
+                <div className="flex shrink-0 items-center gap-1">
+                  <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 sm:h-4 sm:w-4" />
+                  <span className="min-w-6 text-right text-xs font-bold text-yellow-500 sm:min-w-8 sm:text-sm">
                     {detail.score.toFixed(1)}
                   </span>
                 </div>
               </div>
               {detail.comment && (
-                <p className="rounded-md bg-gray-50 px-3 py-2 text-sm leading-relaxed text-gray-600">
+                <p className="rounded-md bg-gray-50 px-2.5 py-1.5 text-xs leading-relaxed text-gray-600 sm:px-3 sm:py-2 sm:text-sm">
                   {detail.comment}
                 </p>
               )}

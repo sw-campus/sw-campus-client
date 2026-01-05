@@ -6,7 +6,7 @@ import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query'
 import { LuCheck, LuClock, LuList, LuX } from 'react-icons/lu'
 
 import type { ApprovalStatus, ApprovalStatusFilter, MutationOptions, PageResponse } from '../../types/approval.type'
-import { StatCard } from '../StatCard'
+import { APPROVAL_STAT_COLORS, ColorfulStatCard } from './ColorfulStatCard'
 import { ApprovalFilter } from './ApprovalFilter'
 import { ApprovalPagination } from './ApprovalPagination'
 
@@ -111,14 +111,30 @@ export function ApprovalPage<TItem>({
   const { data: rejectedData } = useDataQuery('REJECTED', '')
 
   const stats = [
-    { title: '전체', value: allData?.page?.totalElements ?? allData?.content?.length ?? 0, icon: LuList },
-    { title: '승인 대기', value: pendingData?.page?.totalElements ?? pendingData?.content?.length ?? 0, icon: LuClock },
+    {
+      title: '전체',
+      value: allData?.page?.totalElements ?? allData?.content?.length ?? 0,
+      icon: LuList,
+      bgColor: APPROVAL_STAT_COLORS.total,
+    },
+    {
+      title: '승인 대기',
+      value: pendingData?.page?.totalElements ?? pendingData?.content?.length ?? 0,
+      icon: LuClock,
+      bgColor: APPROVAL_STAT_COLORS.pending,
+    },
     {
       title: '승인 완료',
       value: approvedData?.page?.totalElements ?? approvedData?.content?.length ?? 0,
       icon: LuCheck,
+      bgColor: APPROVAL_STAT_COLORS.approved,
     },
-    { title: '반려', value: rejectedData?.page?.totalElements ?? rejectedData?.content?.length ?? 0, icon: LuX },
+    {
+      title: '반려',
+      value: rejectedData?.page?.totalElements ?? rejectedData?.content?.length ?? 0,
+      icon: LuX,
+      bgColor: APPROVAL_STAT_COLORS.rejected,
+    },
   ]
 
   const handleViewDetail = (item: TItem) => {
@@ -159,7 +175,13 @@ export function ApprovalPage<TItem>({
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map(stat => (
-          <StatCard key={stat.title} title={stat.title} value={stat.value} icon={stat.icon} />
+          <ColorfulStatCard
+            key={stat.title}
+            title={stat.title}
+            value={stat.value}
+            icon={stat.icon}
+            bgColor={stat.bgColor}
+          />
         ))}
       </div>
 

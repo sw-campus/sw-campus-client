@@ -62,12 +62,12 @@ export default function LectureIntro({ lecture }: Props) {
                 return (
                   <div
                     key={idx}
-                    className="flex items-start gap-4 rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:ring-orange-100"
+                    className="flex items-start gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:ring-orange-100 sm:gap-4 sm:px-5 sm:py-4"
                   >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xs font-bold text-orange-600 sm:h-7 sm:w-7 sm:text-sm">
                       {idx + 1}
                     </div>
-                    <p className="text-base leading-relaxed text-gray-900">{cleanLine}</p>
+                    <p className="text-sm leading-relaxed text-gray-900 sm:text-base">{cleanLine}</p>
                   </div>
                 )
               })}

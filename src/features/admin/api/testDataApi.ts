@@ -26,6 +26,7 @@ export interface TestDataSummaryResponse {
   counts: {
     organizations: number
     lectures: number
+    teachers: number
     members: number
     certificates: number
     reviews: number

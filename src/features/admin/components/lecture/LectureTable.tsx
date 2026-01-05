@@ -65,42 +65,44 @@ export function LectureTable({ lectures, isLoading, currentPage, pageSize, onVie
 
   return (
     <Card className="bg-card">
-      <CardHeader>
-        <CardTitle className="text-foreground">강의 목록</CardTitle>
+      <CardHeader className="pb-3 sm:pb-6">
+        <CardTitle className="text-foreground text-base sm:text-lg">강의 목록</CardTitle>
       </CardHeader>
-      <CardContent>
-        <Table className="table-fixed">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[60px]">NO</TableHead>
-              <TableHead className="w-[200px]">기관명</TableHead>
-              <TableHead>강의명</TableHead>
-              <TableHead className="w-[110px]">상태</TableHead>
-              <TableHead className="w-[120px]">신청일</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {lectures.map((lecture, index) => (
-              <TableRow
-                key={lecture.lectureId}
-                onClick={() => onViewDetail(lecture)}
-                className="hover:bg-muted/50 cursor-pointer transition-colors"
-              >
-                <TableCell className="text-muted-foreground">{getRowNumber(index)}</TableCell>
-                <TableCell className="text-muted-foreground truncate" title={lecture.orgName}>
-                  {lecture.orgName}
-                </TableCell>
-                <TableCell className="text-foreground truncate font-medium" title={lecture.lectureName}>
-                  {lecture.lectureName}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={lecture.lectureAuthStatus} />
-                </TableCell>
-                <TableCell className="text-muted-foreground">{formatDate(lecture.lastUpdatedAt)}</TableCell>
+      <CardContent className="px-3 pb-3 sm:px-6 sm:pb-6">
+        <div className="-mx-3 overflow-x-auto sm:mx-0">
+          <Table className="min-w-[500px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[40px] text-xs sm:w-[60px] sm:text-sm">NO</TableHead>
+                <TableHead className="w-[100px] text-xs sm:w-[200px] sm:text-sm">기관명</TableHead>
+                <TableHead className="min-w-[120px] text-xs sm:text-sm">강의명</TableHead>
+                <TableHead className="w-[70px] text-xs sm:w-[110px] sm:text-sm">상태</TableHead>
+                <TableHead className="w-[80px] text-xs sm:w-[120px] sm:text-sm">신청일</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {lectures.map((lecture, index) => (
+                <TableRow
+                  key={lecture.lectureId}
+                  onClick={() => onViewDetail(lecture)}
+                  className="hover:bg-muted/50 cursor-pointer transition-colors"
+                >
+                  <TableCell className="text-muted-foreground text-xs sm:text-sm">{getRowNumber(index)}</TableCell>
+                  <TableCell className="text-muted-foreground max-w-[100px] truncate text-xs sm:max-w-[200px] sm:text-sm" title={lecture.orgName}>
+                    {lecture.orgName}
+                  </TableCell>
+                  <TableCell className="text-foreground max-w-[120px] truncate text-xs font-medium sm:max-w-none sm:text-sm" title={lecture.lectureName}>
+                    {lecture.lectureName}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={lecture.lectureAuthStatus} />
+                  </TableCell>
+                  <TableCell className="text-muted-foreground whitespace-nowrap text-xs sm:text-sm">{formatDate(lecture.lastUpdatedAt)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   )

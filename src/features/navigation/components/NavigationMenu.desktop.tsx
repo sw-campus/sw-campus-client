@@ -39,7 +39,7 @@ const menuVariants: Variants = {
 export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMouseLeave, onNavigate }: Props) {
   return (
     <motion.div
-      className="hidden md:block"
+      className="hidden lg:block"
       initial="closed"
       animate={showDesktop ? 'open' : 'closed'}
       variants={menuVariants}

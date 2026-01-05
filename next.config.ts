@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'sw-campus-public-prod-afe42bff.s3.amazonaws.com',
+        hostname: 'sw-campus-public-prod-afe42bff.s3.ap-northeast-2.amazonaws.com',
         port: '',
         pathname: '/**',
       },
