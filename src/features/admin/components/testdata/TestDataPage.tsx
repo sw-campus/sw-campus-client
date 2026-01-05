@@ -66,6 +66,7 @@ export function TestDataPage() {
                   <p className="text-muted-foreground text-xs">선생님</p>
                   <p className="text-foreground text-xl font-bold">{summary.counts.teachers}</p>
                 </div>
+
                 <div className="bg-muted rounded-lg p-3 text-center">
                   <p className="text-muted-foreground text-xs">회원</p>
                   <p className="text-foreground text-xl font-bold">{summary.counts.members}</p>
