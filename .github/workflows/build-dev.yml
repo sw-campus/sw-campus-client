@@ -45,13 +45,14 @@ jobs:
           TAG=${{ steps.meta.outputs.tag }}
 
           # NEXT_PUBLIC_ variables only for build
+          # develop 환경: VM IP + 서버 포트로 직접 연결
           docker build \
-            --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} \
+            --build-arg NEXT_PUBLIC_API_URL="http://172.30.1.83:8080/api" \
             --build-arg NEXT_PUBLIC_S3_HOSTNAME=${{ secrets.NEXT_PUBLIC_S3_HOSTNAME }} \
             --build-arg NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID }} \
             --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }} \
             --build-arg NEXT_PUBLIC_GITHUB_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GITHUB_CLIENT_ID }} \
-            --build-arg NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }} \
+            --build-arg NEXT_PUBLIC_BASE_URL="http://172.30.1.83:3000" \
             -t $IMAGE:$TAG .
             
           docker push $IMAGE:$TAG
@@ -72,6 +73,7 @@ jobs:
           sed -i '/repository: ghcr.io\/sw-campus\/sw-campus-client$/,/pullPolicy:/ s|tag: ".*"|tag: "'$TAG'"|' k8s/environments/develop/values.yaml
 
       - name: Create Pull Request to manifest repo
+        id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.MANIFEST_REPO_TOKEN }}
@@ -85,4 +87,12 @@ jobs:
             - **Image**: `ghcr.io/sw-campus/sw-campus-client:${{ steps.meta.outputs.tag }}`
             - **Commit**: ${{ github.sha }}
           delete-branch: true
+
+      - name: Merge PR
+        if: steps.cpr.outputs.pull-request-number
+        run: |
+          cd manifest
+          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} --squash --delete-branch
+        env:
+          GH_TOKEN: ${{ secrets.MANIFEST_REPO_TOKEN }}
 
