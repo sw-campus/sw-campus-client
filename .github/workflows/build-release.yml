@@ -16,10 +16,6 @@ permissions:
   contents: write
   packages: write
 
-concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   build:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
@@ -31,7 +27,6 @@ jobs:
         with:
           token: ${{ secrets.RELEASE }}
           fetch-depth: 0
-          ref: main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -100,10 +95,7 @@ jobs:
           # Commit version bump
           git add package.json
           git commit -m "chore: bump version to ${{ steps.version.outputs.version }} [skip ci]"
-
-          # Pull latest changes and rebase before push
-          git pull --rebase origin main
-          git push origin main
+          git push
 
           # Create and push tag (delete if exists)
           git tag -d "$VERSION_TAG" 2>/dev/null || true
