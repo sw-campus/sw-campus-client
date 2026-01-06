@@ -15,6 +15,7 @@ interface AiFloatingButtonProps {
   onAnalyze: () => void
   onClear?: () => void
   disabledReason?: string
+  className?: string
 }
 
 export function AiFloatingButton({
@@ -24,6 +25,7 @@ export function AiFloatingButton({
   onAnalyze,
   onClear,
   disabledReason = '두 강의를 모두 선택해주세요',
+  className,
 }: AiFloatingButtonProps) {
   const [mounted, setMounted] = useState(false)
   const [showCelebration, setShowCelebration] = useState(false)
@@ -89,7 +91,7 @@ export function AiFloatingButton({
           whileTap={{ scale: 0.95 }}
           className={cn(
             // Position
-            'fixed right-10 bottom-10 z-100',
+            'fixed right-10 bottom-10 z-[100]',
             'flex flex-col items-center justify-center',
             'h-[90px] w-[90px] rounded-full',
             // Default State (Ready)
@@ -102,6 +104,7 @@ export function AiFloatingButton({
             'transition-all duration-300 hover:scale-110 hover:shadow-[0_0_40px_rgba(236,72,153,0.7)] active:scale-95',
             'disabled:pointer-events-none disabled:opacity-0',
             (isEnabled || hasResult) && !isLoading ? 'cursor-pointer' : 'cursor-default',
+            className,
           )}
         >
           {/* 1. Loading State */}

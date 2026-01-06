@@ -4,6 +4,18 @@
 @import 'tw-animate-css';
 
 @theme inline {
+  /* ========================================
+   * Z-Index 토큰 (레이어 스태킹 순서)
+   * - UI 요소 간의 일관된 z-index 관리를 위해 의미 있는 이름 사용
+   * - 숫자가 높을수록 더 앞에 표시됨
+   * ======================================== */
+  --z-dropdown: 50;      /* 드롭다운 메뉴, 툴팁 */
+  --z-sticky: 100;       /* 스티키 헤더, 사이드바 */
+  --z-fixed: 200;        /* 고정 네비게이션 (LectureTabNav 등) */
+  --z-modal: 500;        /* 모달, 다이얼로그 */
+  --z-toast: 1000;       /* 토스트 알림 */
+  --z-max: 9999;         /* 최상위 (긴급/특수 상황에만 사용) */
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -113,9 +125,19 @@ html {
     opacity: 1;
   }
   .custom-container {
-    @apply relative flex flex-1 flex-col gap-4 py-8;
+    @apply relative flex flex-1 flex-col gap-4 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 md:px-8;
   }
   .custom-card {
-    @apply mx-auto w-full max-w-7xl rounded-3xl border border-white/10 bg-white/40 p-8 shadow-xl backdrop-blur-xl;
+    @apply mx-auto w-full max-w-7xl overflow-x-auto rounded-2xl border border-white/10 bg-white/40 p-4 shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-6 md:p-8;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

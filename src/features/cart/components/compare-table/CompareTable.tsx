@@ -1,5 +1,7 @@
 'use client'
 
+import { useRef, useState, useEffect } from 'react'
+
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { AiCommentRow } from '@/features/cart/components/AiCommentRow'
@@ -14,11 +16,12 @@ import {
 } from '@/features/cart/types/table.defs'
 import type { ComparisonResult } from '@/features/lecture/actions/gemini'
 import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
+import { cn } from '@/lib/utils'
 
 function sectionRow(label: string, rowKey: string) {
   return (
     <TableRow key={rowKey}>
-      <TableCell colSpan={4} className="bg-accent/10 text-accent-foreground px-6 py-3 text-sm font-semibold">
+      <TableCell colSpan={4} className="bg-accent/10 text-accent-foreground px-2 py-2 text-xs font-semibold md:px-6 md:py-3 md:text-sm">
         {label}
       </TableCell>
     </TableRow>
@@ -40,7 +43,7 @@ function renderCurriculumLevel(level: string) {
 
   if (normalized === 'BASIC') {
     return (
-      <Badge variant="curriculumBasic" className="px-3 py-1 text-sm">
+      <Badge variant="curriculumBasic" className="px-2 py-0.5 text-xs md:px-3 md:py-1 md:text-sm">
         {label}
       </Badge>
     )
@@ -48,14 +51,14 @@ function renderCurriculumLevel(level: string) {
 
   if (normalized === 'ADVANCED') {
     return (
-      <Badge variant="curriculumAdvanced" className="px-3 py-1 text-sm">
+      <Badge variant="curriculumAdvanced" className="px-2 py-0.5 text-xs md:px-3 md:py-1 md:text-sm">
         {label}
       </Badge>
     )
   }
 
   return (
-    <Badge variant="outline" className="px-3 py-1 text-sm">
+    <Badge variant="outline" className="px-2 py-0.5 text-xs md:px-3 md:py-1 md:text-sm">
       {label}
     </Badge>
   )
@@ -104,14 +107,44 @@ export function CompareTable({
     }
   }
 
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [showScrollHint, setShowScrollHint] = useState(true)
+
+  // 스크롤 힐트 숨기기 - 스크롤 시
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    const handleScroll = () => {
+      if (el.scrollLeft > 20) {
+        setShowScrollHint(false)
+      }
+    }
+
+    el.addEventListener('scroll', handleScroll)
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <div className="border-border rounded-md border">
-      <Table className="table-fixed break-keep">
+    <div className="relative">
+      {/* 모바일 스크롤 힐트 */}
+      {showScrollHint && (
+        <div className="pointer-events-none absolute right-0 top-0 z-10 flex h-full items-center md:hidden">
+          <div className="flex h-full w-8 items-center justify-center bg-gradient-to-l from-white/90 to-transparent">
+            <span className="animate-pulse text-xs text-gray-400">←</span>
+          </div>
+        </div>
+      )}
+      <div
+        ref={scrollRef}
+        className="scrollbar-hide overflow-x-auto rounded-md border border-border"
+      >
+        <Table className="table-fixed break-keep min-w-[500px] md:min-w-0">
         <colgroup>
           <col className={labelColClassName} />
-          <col />
+          <col className="min-w-[140px]" />
           <col className="w-px" />
-          <col />
+          <col className="min-w-[140px]" />
         </colgroup>
         <TableBody className="[&_tr:nth-child(even)]:bg-muted/30 [&_td]:leading-relaxed [&_tr:nth-child(odd)]:bg-white">
           {COMPARE_SECTIONS.flatMap(section => [
@@ -225,5 +258,6 @@ export function CompareTable({
         </TableBody>
       </Table>
     </div>
+  </div>
   )
 }

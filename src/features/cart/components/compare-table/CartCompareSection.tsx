@@ -26,8 +26,8 @@ import { getDragLectureId } from '@/features/cart/utils/cartCompareDnd'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 
-const LABEL_COL_GRID_CLASS = 'md:grid-cols-[13.75rem_1fr_1px_1fr]'
-const LABEL_COL_TABLE_CLASS = 'w-[13.75rem]'
+const LABEL_COL_GRID_CLASS = 'grid-cols-2 md:grid-cols-[13.75rem_minmax(0,1fr)_1px_minmax(0,1fr)]'
+const LABEL_COL_TABLE_CLASS = 'w-[5.5rem] md:w-[13.75rem]'
 
 export default function CartCompareSection() {
   const router = useRouter()
@@ -111,7 +111,7 @@ export default function CartCompareSection() {
   }
 
   return (
-    <div className="mx-auto grid w-full gap-4 overflow-x-hidden py-6 md:grid-cols-[280px_1fr]">
+    <div className="mx-auto grid w-full gap-4 py-4 pb-40 md:py-6 lg:grid-cols-[280px_minmax(0,1fr)]">
       <CartItemSidebar
         items={items}
         isLoading={isLoading}
@@ -122,14 +122,21 @@ export default function CartCompareSection() {
       />
 
       <Card>
-        <CardHeader>
+        <CardHeader className="hidden md:block">
           <CardTitle className="text-base">과정비교 페이지</CardTitle>
           <div className="text-muted-foreground text-sm">
             사이드바에서 강의를 드래그해서 왼쪽/오른쪽 영역에 놓으면 비교표가 업데이트됩니다.
           </div>
         </CardHeader>
+        {/* 모바일 헤더 */}
+        <CardHeader className="pb-2 md:hidden">
+          <CardTitle className="text-sm">과정 비교</CardTitle>
+          <div className="text-muted-foreground text-xs">
+            장바구니에서 강의를 선택하여 비교하세요
+          </div>
+        </CardHeader>
         <CardContent className="space-y-3">
-          <div className={cn('grid grid-cols-1 overflow-hidden rounded-md', LABEL_COL_GRID_CLASS)}>
+          <div className={cn('grid rounded-md', LABEL_COL_GRID_CLASS)}>
             <div aria-hidden className="bg-muted/10 hidden md:block" />
             <div
               className={cn(isLeftOver && 'bg-muted/20')}
@@ -223,6 +230,7 @@ export default function CartCompareSection() {
         onAnalyze={handleAiAnalyze}
         onClear={handleClearAi}
         disabledReason={getDisabledReason()}
+        className="bottom-36 md:bottom-10"
       />
 
       <Dialog open={isSurveyDialogOpen} onOpenChange={setIsSurveyDialogOpen}>
