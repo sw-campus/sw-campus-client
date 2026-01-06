@@ -18,11 +18,11 @@ export function MyPageDashboard() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-6">
+    <div className="flex flex-1 flex-col gap-4 sm:gap-6">
       {/* Header */}
       <div>
-        <h1 className="text-foreground text-2xl font-bold">마이페이지</h1>
-        <p className="text-muted-foreground mt-1 text-sm">내 정보와 활동을 관리하세요</p>
+        <h1 className="text-foreground text-xl font-bold sm:text-2xl">마이페이지</h1>
+        <p className="text-muted-foreground mt-1 text-xs sm:text-sm">내 정보와 활동을 관리하세요</p>
       </div>
 
       {/* Main Grid */}

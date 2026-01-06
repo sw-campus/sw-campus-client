@@ -160,6 +160,8 @@ export default function LectureDetailPage({ lectureId }: Props) {
               <LectureSidebar lecture={lecture} />
             </aside>
           </div>
+          {/* 모바일 하단 고정바 공간 확보 */}
+          <div className="h-20 lg:hidden" />
         </div>
       </div>
     </div>

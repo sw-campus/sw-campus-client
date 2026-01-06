@@ -53,7 +53,7 @@ export default function SignupOrganizationFormView() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-xl rounded-3xl border border-white/15 bg-white/10 p-8 text-white shadow-xl backdrop-blur-xl"
+      className="w-full max-w-xl rounded-2xl border border-white/15 bg-white/10 p-5 text-white shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-8"
     >
       {/* 이메일 + 인증 */}
       <EmailAuthInput

@@ -70,32 +70,33 @@ export default function Header({
   }
 
   return (
-    <header className="sticky top-0 z-50 mx-auto mt-6 flex w-full max-w-7xl items-center justify-between rounded-full border border-white/15 bg-white/10 px-10 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-xl">
-      <div className="flex flex-1 items-center gap-8">
+    <header className="sticky top-0 z-50 mx-auto mt-4 flex w-full max-w-7xl items-center justify-between rounded-full border border-white/15 bg-white/10 px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:mt-6 sm:px-6 md:px-10 md:py-4">
+      <div className="flex flex-1 items-center gap-3 sm:gap-6 md:gap-8">
         {/* 햄버거 버튼 */}
-        <button type="button" className="text-white md:hidden" onClick={onOpenNav}>
+        <button type="button" className="text-white lg:hidden" onClick={onOpenNav}>
           <FiMenu size={22} />
         </button>
 
         {/* 로고 */}
-        <Link href={userType === 'ADMIN' ? '/admin' : '/'} className="flex items-center gap-3">
+        <Link href={userType === 'ADMIN' ? '/admin' : '/'} className="flex items-center gap-2 sm:gap-3">
           <Image
             src="/images/logo.png"
             alt="SOFTWARE CAMPUS 로고"
             width={48}
             height={48}
-            className="shrink-0 object-contain"
+            className="h-10 w-10 shrink-0 object-contain sm:h-12 sm:w-12"
             priority
           />
 
-          <div className="flex h-12 translate-y-px flex-col justify-center leading-none font-extrabold tracking-tight text-white">
+          {/* 로고 텍스트: 작은 화면에서 숨김 */}
+          <div className="hidden h-12 translate-y-px flex-col justify-center leading-none font-extrabold tracking-tight text-white sm:flex">
             <span>SOFTWARE</span>
             <span>CAMPUS</span>
           </div>
         </Link>
       </div>
 
-      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 font-semibold text-white md:flex">
+      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 font-semibold text-white lg:flex">
         {categories.map(category => (
           <Link
             key={category.categoryId}
@@ -113,13 +114,14 @@ export default function Header({
       </nav>
 
       {/* 아이콘 */}
-      <div className="flex items-center gap-6 text-xl text-white">
+      <div className="flex items-center gap-3 text-lg text-white sm:gap-4 sm:text-xl md:gap-6">
         {!hasHydrated ? (
           // 하이드레이션 전에는 아무것도 표시하지 않음
-          <div className="h-6 w-24" />
+          <div className="h-6 w-12 sm:w-24" />
         ) : isLoggedIn ? (
           <>
-            <span className="text-base font-medium">{nickname}님</span>
+            {/* 닉네임: 모바일에서 숨김 */}
+            <span className="hidden text-sm font-medium sm:inline sm:text-base">{nickname}님</span>
 
             <HeaderIconAction
               kind="button"

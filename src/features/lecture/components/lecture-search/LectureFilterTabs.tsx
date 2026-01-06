@@ -8,7 +8,8 @@ interface LectureFilterTabsProps {
 
 export function LectureFilterTabs({ categories, selected, onSelect }: LectureFilterTabsProps) {
   return (
-    <div className="mb-6 flex gap-3 whitespace-nowrap">
+    <div className="mb-4 -mx-4 px-4 overflow-x-auto scrollbar-hide sm:mx-0 sm:px-0 sm:mb-6">
+      <div className="flex gap-2 whitespace-nowrap sm:gap-3">
       {categories.map(c => {
         const active = c === selected
         return (
@@ -23,6 +24,7 @@ export function LectureFilterTabs({ categories, selected, onSelect }: LectureFil
           </button>
         )
       })}
+      </div>
     </div>
   )
 }

@@ -95,14 +95,14 @@ export default function MidBanner() {
                 const external = isExternalLink(href)
 
                 const content = (
-                  <div className="relative h-[190px] w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+                  <div className="relative h-[160px] w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg sm:h-[190px]">
                     {banner.imageUrl ? (
                       <Image
                         src={banner.imageUrl}
                         alt={banner.lectureName}
                         fill
                         sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover"
+                        className="object-cover object-center"
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center">

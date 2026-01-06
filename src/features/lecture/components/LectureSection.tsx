@@ -80,7 +80,7 @@ export default function LectureSection() {
         <div className="bg-accent/5 pointer-events-none absolute -bottom-20 -left-20 h-96 w-96 rounded-full blur-3xl" />
 
         {/* 제목 */}
-        <motion.h2 className="relative z-10 mb-6 text-2xl font-bold text-white" variants={itemVariants}>
+        <motion.h2 className="relative z-10 mb-4 text-xl font-bold text-white sm:mb-6 sm:text-2xl" variants={itemVariants}>
           분야별 부트캠프
         </motion.h2>
 

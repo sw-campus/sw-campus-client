@@ -59,13 +59,16 @@ export function dataRow({
   return (
     <TableRow key={rowKey}>
       <TableCell
-        className={cn('bg-muted/10 px-6 py-4 align-top text-base font-semibold whitespace-normal', labelColClassName)}
+        className={cn(
+          'sticky left-0 z-20 bg-background border-r px-2 py-2 align-top text-xs font-semibold whitespace-normal md:px-6 md:py-4 md:text-base',
+          labelColClassName,
+        )}
       >
         {label}
       </TableCell>
       <TableCell
         className={cn(
-          'px-6 py-4 align-top text-base whitespace-normal',
+          'px-2 py-2 align-top text-xs whitespace-normal md:px-6 md:py-4 md:text-base',
           valueAlign === 'center' ? 'text-center' : 'text-left',
           !isLeftSelected && 'text-muted-foreground',
         )}
@@ -75,7 +78,7 @@ export function dataRow({
       {dividerCell()}
       <TableCell
         className={cn(
-          'px-6 py-4 align-top text-base whitespace-normal',
+          'px-2 py-2 align-top text-xs whitespace-normal md:px-6 md:py-4 md:text-base',
           valueAlign === 'center' ? 'text-center' : 'text-left',
           !isRightSelected && 'text-muted-foreground',
         )}
@@ -186,7 +189,12 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
       {
         key: 'location',
         label: '교육장소',
-        value: d => `${formatLectureLoc(d?.lectureLoc)}${d?.location ? ` (${d.location})` : ''}`,
+        value: d => (
+          <div className="line-clamp-2 text-[11px] md:line-clamp-none md:text-base">
+            {formatLectureLoc(d?.lectureLoc)}
+            {d?.location ? ` (${d.location})` : ''}
+          </div>
+        ),
       },
       { key: 'teachers', label: '강사명', value: d => formatList(d?.teachers?.map(t => t.name)) },
     ],
@@ -204,12 +212,28 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
   {
     key: 'benefits',
     title: '추가 제공 항목',
-    rows: centerRows([{ key: 'benefits', label: '추가 혜택', value: d => formatList(d?.benefits) }]),
+    rows: centerRows([
+      {
+        key: 'benefits',
+        label: '추가 혜택',
+        value: d => (
+          <div className="line-clamp-3 text-[11px] md:line-clamp-none md:text-base">{formatList(d?.benefits)}</div>
+        ),
+      },
+    ]),
   },
   {
     key: 'goal',
     title: '훈련목표',
-    rows: centerRows([{ key: 'goal', label: '목표', value: d => formatText(d?.goal) }]),
+    rows: centerRows([
+      {
+        key: 'goal',
+        label: '목표',
+        value: d => (
+          <div className="line-clamp-3 text-[11px] md:line-clamp-none md:text-base">{formatText(d?.goal)}</div>
+        ),
+      },
+    ]),
   },
   {
     key: 'quals',
