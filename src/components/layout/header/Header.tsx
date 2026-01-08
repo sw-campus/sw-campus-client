@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { BsCart4 } from 'react-icons/bs'
+import { PiRobotDuotone } from 'react-icons/pi'
 import { FiLogIn, FiUser, FiMenu, FiLogOut } from 'react-icons/fi'
 
 import { HeaderIconAction } from '@/components/layout/header/HeaderIconAction'
@@ -138,8 +138,8 @@ export default function Header({
             </HeaderIconAction>
 
             {userType !== 'ADMIN' && userType !== 'ORGANIZATION' && (
-              <HeaderIconAction kind="link" ariaLabel="위시리스트" tooltip="장바구니" href="/cart/compare">
-                <BsCart4 />
+              <HeaderIconAction kind="link" ariaLabel="AI 심층 비교" tooltip="AI 심층 비교" href="/cart/compare">
+                <PiRobotDuotone />
               </HeaderIconAction>
             )}
           </>

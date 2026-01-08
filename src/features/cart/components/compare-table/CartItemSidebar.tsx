@@ -4,7 +4,8 @@ import { useState } from 'react'
 
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
-import { FiChevronDown, FiChevronUp, FiShoppingCart } from 'react-icons/fi'
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
+import { PiRobotDuotone } from 'react-icons/pi'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { CartItem } from '@/features/cart/types/cart.type'
@@ -31,9 +32,9 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
       {isLoading ? (
         <div className="text-muted-foreground text-sm">불러오는 중...</div>
       ) : isError ? (
-        <div className="text-muted-foreground text-sm">장바구니 목록을 불러오지 못했습니다.</div>
+        <div className="text-muted-foreground text-sm">AI 심층 비교 목록을 불러오지 못했습니다.</div>
       ) : items.length === 0 ? (
-        <div className="text-muted-foreground text-sm">장바구니가 비어있습니다.</div>
+        <div className="text-muted-foreground text-sm">AI 심층 비교 목록이 비어있습니다.</div>
       ) : (
         items.map(item => (
           <motion.div
@@ -99,8 +100,8 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
           className="flex w-full items-center justify-between gap-4 p-4"
         >
           <div className="flex items-center gap-2 whitespace-nowrap">
-            <FiShoppingCart className="h-5 w-5 shrink-0 text-gray-500" />
-            <span className="text-base font-semibold">장바구니</span>
+            <PiRobotDuotone className="h-5 w-5 shrink-0 text-gray-500" />
+            <span className="text-base font-semibold">AI 심층 비교</span>
             {availableCount > 0 && (
               <span className="shrink-0 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-600">
                 {availableCount}개 선택 가능
@@ -145,8 +146,8 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
           className="flex w-full items-center justify-between gap-4 p-4"
         >
           <div className="flex items-center gap-2 whitespace-nowrap">
-            <FiShoppingCart className="h-5 w-5 shrink-0 text-gray-500" />
-            <span className="text-base font-semibold">장바구니</span>
+            <PiRobotDuotone className="h-5 w-5 shrink-0 text-gray-500" />
+            <span className="text-base font-semibold">AI 심층 비교</span>
             {availableCount > 0 && (
               <span className="shrink-0 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-600">
                 {availableCount}개 선택 가능

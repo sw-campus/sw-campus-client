@@ -89,7 +89,7 @@ export default function LectureSidebar({ lecture }: Props) {
                 size="lg"
                 className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50"
               >
-                장바구니
+                AI 심층 비교
               </AddToCartButton>
               <Button
                 variant="outline"

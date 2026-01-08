@@ -25,7 +25,7 @@ export function LogoutDialog({ open, onOpenChange, onConfirm, confirmDisabled, h
         <DialogHeader className="gap-5">
           <DialogTitle>로그아웃</DialogTitle>
           <DialogDescription>
-            {hasCartItems ? '장바구니에 있는 항목은 7일간 유지됩니다.' : '로그아웃 하시겠습니까?'}
+            {hasCartItems ? 'AI 심층 비교에 있는 항목은 7일간 유지됩니다.' : '로그아웃 하시겠습니까?'}
           </DialogDescription>
         </DialogHeader>
 

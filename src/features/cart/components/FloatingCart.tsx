@@ -59,12 +59,12 @@ export default function FloatingCart() {
             ))}
           </div>
 
-          {/* 우측 화살표 */}
+          {/* 과정비교 버튼 */}
           <button
             onClick={() => router.push('/cart/compare')}
-            className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black shadow-lg transition-transform hover:scale-105 active:scale-95"
+            className="ml-auto shrink-0 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-black shadow-lg transition-transform hover:scale-105 active:scale-95"
           >
-            <Image src="/images/cart/move_cart.png" alt="장바구니로 이동" width={25} height={25} />
+            과정비교가기
           </button>
         </motion.div>
       )}

@@ -132,7 +132,7 @@ export default function CartCompareSection() {
         <CardHeader className="pb-2 md:hidden">
           <CardTitle className="text-sm">과정 비교</CardTitle>
           <div className="text-muted-foreground text-xs">
-            장바구니에서 강의를 선택하여 비교하세요
+            AI 심층 비교 목록에서 강의를 선택하세요
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
