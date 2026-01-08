@@ -89,10 +89,10 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
           ))}
         </div>
 
-        {/* 장바구니 버튼 */}
+        {/* AI 심층 분석 버튼 */}
         <div className="mt-auto">
           <AddToCartButton item={{ lectureId: id }} className="w-full rounded-lg py-2">
-            Add to cart
+            AI 심층 분석
           </AddToCartButton>
         </div>
       </div>
