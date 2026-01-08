@@ -70,6 +70,7 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
 
       <Field>
         <FieldLabel>대표 이미지</FieldLabel>
+        <FieldDescription>권장 사이즈: 1152x432px (16:6 비율)</FieldDescription>
         <FieldContent>
           <Controller
             control={control}
