@@ -48,14 +48,6 @@ export default function LectureSidebar({ lecture }: Props) {
       {/* 모바일: 하단 고정 바 */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95 p-3 backdrop-blur-xl lg:hidden">
         <div className="mx-auto flex max-w-md items-center gap-2">
-          <AddToCartButton
-            item={{ lectureId: String(lecture.id) }}
-            variant="outline"
-            size="lg"
-            className="h-12 shrink-0 rounded-xl border-gray-200 px-4"
-          >
-            🛒
-          </AddToCartButton>
           <Button
             size="lg"
             className="h-12 flex-1 rounded-xl bg-orange-400 text-base font-bold text-white shadow-lg shadow-orange-200 hover:bg-orange-500 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none"
