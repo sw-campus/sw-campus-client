@@ -7,6 +7,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { toDigitsOnly } from '@/features/lecture/utils/inputFormat'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 type Props = {
@@ -48,14 +49,16 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
             name="totalTimes"
             render={({ field }) => (
               <Input
-                type="number"
+                type="text"
                 inputMode="numeric"
-                min={1}
-                step={1}
+                pattern="[0-9]*"
                 placeholder="예) 960"
                 {...field}
-                value={String(field.value ?? 1)}
-                onChange={e => field.onChange(e.target.value === '' ? 1 : Number(e.target.value))}
+                value={field.value === null || field.value === undefined ? '' : String(field.value)}
+                onChange={e => {
+                  const next = toDigitsOnly(e.target.value)
+                  field.onChange(next === '' ? null : Number(next))
+                }}
               />
             )}
           />
