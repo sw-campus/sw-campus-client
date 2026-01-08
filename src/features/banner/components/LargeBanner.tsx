@@ -32,7 +32,7 @@ export default function LargeBanner() {
   // 로딩 중이거나 데이터 없으면 빈 상태 표시
   if (isLoading) {
     return (
-      <div className="bg-muted mx-auto mt-4 flex h-[140px] w-full max-w-7xl items-center justify-center overflow-hidden rounded-2xl sm:mt-6 sm:h-[180px] sm:rounded-3xl md:h-[210px]">
+      <div className="bg-muted mx-auto mt-4 flex h-[140px] w-full max-w-7xl items-center justify-center overflow-hidden rounded-2xl sm:mt-6 sm:h-[180px] sm:rounded-3xl md:h-[310px]">
         <div className="text-muted-foreground text-sm sm:text-base">배너 로딩 중...</div>
       </div>
     )
@@ -69,14 +69,14 @@ export default function LargeBanner() {
           const external = isExternalLink(href)
 
           const content = (
-            <div className="relative h-[140px] w-full overflow-hidden sm:h-[180px] md:h-[210px]">
+            <div className="relative h-[140px] w-full overflow-hidden sm:h-[180px] md:h-[310px]">
               {banner.imageUrl ? (
                 <Image
                   src={banner.imageUrl}
                   alt={banner.lectureName}
                   fill
                   sizes="(max-width: 1280px) 100vw, 1280px"
-                  className="object-cover object-center"
+                  className="object-contain object-center"
                   priority={index === 0}
                 />
               ) : (
