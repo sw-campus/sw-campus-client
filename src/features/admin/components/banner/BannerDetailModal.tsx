@@ -60,7 +60,10 @@ export function BannerDetailModal({
         <div className="space-y-6">
           {/* 이미지 */}
           {banner.imageUrl && (
-            <div className="relative w-full overflow-hidden rounded-lg border">
+            <div
+              className="relative w-full overflow-hidden rounded-lg border"
+              style={{ backgroundColor: banner.backgroundColor || '#f3f4f6' }}
+            >
               <Image
                 src={banner.imageUrl}
                 alt={banner.lectureName}
@@ -106,6 +109,16 @@ export function BannerDetailModal({
                 <a href={banner.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                   {banner.url}
                 </a>
+              </div>
+            )}
+
+            {banner.backgroundColor && (
+              <div>
+                <div className="text-muted-foreground text-sm">배경색</div>
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-6 rounded border" style={{ backgroundColor: banner.backgroundColor }} />
+                  <span className="text-foreground font-mono">{banner.backgroundColor}</span>
+                </div>
               </div>
             )}
 

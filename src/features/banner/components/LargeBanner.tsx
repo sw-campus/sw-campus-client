@@ -69,14 +69,17 @@ export default function LargeBanner() {
           const external = isExternalLink(href)
 
           const content = (
-            <div className="relative h-[140px] w-full overflow-hidden sm:h-[180px] md:h-[210px]">
+            <div
+              className="relative h-[140px] w-full overflow-hidden sm:h-[180px] md:h-[210px]"
+              style={{ backgroundColor: banner.backgroundColor || '#f3f4f6' }}
+            >
               {banner.imageUrl ? (
                 <Image
                   src={banner.imageUrl}
                   alt={banner.lectureName}
                   fill
                   sizes="(max-width: 1280px) 100vw, 1280px"
-                  className="object-cover object-center"
+                  className="object-contain object-center"
                   priority={index === 0}
                 />
               ) : (

@@ -7,6 +7,7 @@ import {
   fetchPopularSearchTerms,
   fetchTopBanners,
   fetchTopLectures,
+  fetchTrafficSources,
 } from '../api/analyticsApi'
 
 export const analyticsKeys = {
@@ -18,6 +19,7 @@ export const analyticsKeys = {
   popularLectures: (days: number, limit: number) => [...analyticsKeys.all, 'popularLectures', days, limit] as const,
   popularSearchTerms: (days: number, limit: number) =>
     [...analyticsKeys.all, 'popularSearchTerms', days, limit] as const,
+  trafficSources: (days: number, limit: number) => [...analyticsKeys.all, 'trafficSources', days, limit] as const,
 }
 
 export function useAnalyticsReportQuery(days: number = 7) {
@@ -64,6 +66,14 @@ export function usePopularSearchTermsQuery(days: number = 7, limit: number = 10)
   return useQuery({
     queryKey: analyticsKeys.popularSearchTerms(days, limit),
     queryFn: () => fetchPopularSearchTerms(days, limit),
+    staleTime: 1000 * 60 * 5,
+  })
+}
+
+export function useTrafficSourcesQuery(days: number = 7, limit: number = 10) {
+  return useQuery({
+    queryKey: analyticsKeys.trafficSources(days, limit),
+    queryFn: () => fetchTrafficSources(days, limit),
     staleTime: 1000 * 60 * 5,
   })
 }

@@ -81,14 +81,17 @@ export default function SmallBanner() {
           const external = isExternalLink(href)
 
           const content = (
-            <div className="relative h-[200px] w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow">
+            <div
+              className="relative h-[200px] w-full overflow-hidden rounded-2xl border border-gray-200 shadow"
+              style={{ backgroundColor: banner.backgroundColor || '#ffffff' }}
+            >
               {banner.imageUrl ? (
                 <Image
                   src={banner.imageUrl}
                   alt={banner.lectureName}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover"
+                  className="object-contain"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-gray-100">
