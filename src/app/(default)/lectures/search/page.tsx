@@ -377,7 +377,7 @@ function SearchContent() {
               </Button>
             </div>
             <Select value={selectedSort} onValueChange={value => setSelectedSort(value)}>
-              <SelectTrigger className={`${filterSelectTriggerClass} w-full sm:w-[150px]`}>
+              <SelectTrigger className={`${filterSelectTriggerClass} w-full sm:w-[180px]`}>
                 <SelectValue placeholder="정렬" />
               </SelectTrigger>
               <SelectContent>
