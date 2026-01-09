@@ -74,24 +74,17 @@ export function BannerForm({
 
   const debouncedKeyword = useDebounce(searchKeyword, 300)
 
-  // 이미지에서 색상 추출
-  const extractColors = async (file: File) => {
+  // 이미지 URL에서 색상 추출
+  const extractColors = async (imageUrl: string) => {
     setIsExtractingColors(true)
     try {
       const img = new Image()
       img.crossOrigin = 'Anonymous'
-      const objectUrl = URL.createObjectURL(file)
 
       await new Promise<void>((resolve, reject) => {
-        img.onload = () => {
-          URL.revokeObjectURL(objectUrl)
-          resolve()
-        }
-        img.onerror = () => {
-          URL.revokeObjectURL(objectUrl)
-          reject(new Error('Failed to load image'))
-        }
-        img.src = objectUrl
+        img.onload = () => resolve()
+        img.onerror = () => reject(new Error('Failed to load image'))
+        img.src = imageUrl
       })
 
       const colorThief = new ColorThief()
@@ -110,6 +103,15 @@ export function BannerForm({
       setIsExtractingColors(false)
     }
   }
+
+  // 컴포넌트 언마운트 시 생성된 이미지 미리보기 URL을 해제하여 메모리 누수를 방지합니다.
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl)
+      }
+    }
+  }, [imagePreviewUrl])
 
   // 초기 배너 데이터로 폼 초기화 (수정 모드)
   useEffect(() => {
@@ -161,7 +163,7 @@ export function BannerForm({
       // 이미지 미리보기 URL 생성
       const previewUrl = URL.createObjectURL(file)
       setImagePreviewUrl(previewUrl)
-      extractColors(file)
+      extractColors(previewUrl)
     }
   }
 
