@@ -88,16 +88,24 @@ export function LectureTable({ lectures, isLoading, currentPage, pageSize, onVie
                   className="hover:bg-muted/50 cursor-pointer transition-colors"
                 >
                   <TableCell className="text-muted-foreground text-xs sm:text-sm">{getRowNumber(index)}</TableCell>
-                  <TableCell className="text-muted-foreground max-w-[100px] truncate text-xs sm:max-w-[200px] sm:text-sm" title={lecture.orgName}>
+                  <TableCell
+                    className="text-muted-foreground max-w-[100px] truncate text-xs sm:max-w-[200px] sm:text-sm"
+                    title={lecture.orgName}
+                  >
                     {lecture.orgName}
                   </TableCell>
-                  <TableCell className="text-foreground max-w-[120px] truncate text-xs font-medium sm:max-w-none sm:text-sm" title={lecture.lectureName}>
+                  <TableCell
+                    className="text-foreground max-w-[120px] truncate text-xs font-medium sm:max-w-[300px] sm:text-sm"
+                    title={lecture.lectureName}
+                  >
                     {lecture.lectureName}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={lecture.lectureAuthStatus} />
                   </TableCell>
-                  <TableCell className="text-muted-foreground whitespace-nowrap text-xs sm:text-sm">{formatDate(lecture.lastUpdatedAt)}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs whitespace-nowrap sm:text-sm">
+                    {formatDate(lecture.lastUpdatedAt)}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
