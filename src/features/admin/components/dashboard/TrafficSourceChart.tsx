@@ -99,13 +99,32 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
   const { data, isLoading } = useTrafficSourcesQuery(period, 10)
   const [expanded, setExpanded] = useState(false)
 
-  const chartData =
-    data?.map((item, index) => ({
-      name: getReadableSourceName(item.source, item.medium),
-      value: item.sessions,
-      users: item.users,
-      color: COLORS[index % COLORS.length],
-    })) ?? []
+  // 같은 이름의 소스끼리 합산
+  const chartData = (() => {
+    if (!data) return []
+
+    const grouped = new Map<string, { sessions: number; users: number }>()
+
+    for (const item of data) {
+      const name = getReadableSourceName(item.source, item.medium)
+      const existing = grouped.get(name)
+      if (existing) {
+        existing.sessions += item.sessions
+        existing.users += item.users
+      } else {
+        grouped.set(name, { sessions: item.sessions, users: item.users })
+      }
+    }
+
+    return Array.from(grouped.entries())
+      .map(([name, stats], index) => ({
+        name,
+        value: stats.sessions,
+        users: stats.users,
+        color: COLORS[index % COLORS.length],
+      }))
+      .sort((a, b) => b.value - a.value) // 세션 수로 내림차순 정렬
+  })()
 
   if (isLoading) {
     return (
