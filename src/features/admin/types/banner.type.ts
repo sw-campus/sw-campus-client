@@ -18,6 +18,7 @@ export interface Banner {
   type: BannerType
   url: string | null
   imageUrl: string
+  backgroundColor: string | null
   startDate: string
   endDate: string
   isActive: boolean
@@ -50,6 +51,7 @@ export interface CreateBannerRequest {
   type: BannerType
   url?: string
   imageUrl?: string
+  backgroundColor?: string
   startDate: string
   endDate: string
 }

@@ -1,8 +1,9 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
+import ColorThief from 'colorthief'
 
 import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
@@ -38,6 +39,13 @@ export interface BannerFormProps {
   imageRequired?: boolean
 }
 
+/**
+ * RGB 배열을 HEX 문자열로 변환
+ */
+function rgbToHex(rgb: [number, number, number]): string {
+  return '#' + rgb.map(x => x.toString(16).padStart(2, '0')).join('')
+}
+
 export function BannerForm({
   initialBanner,
   isSubmitting,
@@ -51,6 +59,10 @@ export function BannerForm({
   const [searchKeyword, setSearchKeyword] = useState('')
   const [selectedLecture, setSelectedLecture] = useState<{ id: number; name: string } | null>(null)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [extractedColors, setExtractedColors] = useState<string[]>([])
+  const [selectedColor, setSelectedColor] = useState<string>('')
+  const [isExtractingColors, setIsExtractingColors] = useState(false)
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState<Omit<CreateBannerRequest, 'lectureId'>>({
@@ -61,6 +73,46 @@ export function BannerForm({
   })
 
   const debouncedKeyword = useDebounce(searchKeyword, 300)
+
+  // 이미지에서 색상 추출
+  const extractColors = useCallback(
+    async (file: File) => {
+      setIsExtractingColors(true)
+      try {
+        const img = new Image()
+        img.crossOrigin = 'Anonymous'
+        const objectUrl = URL.createObjectURL(file)
+
+        await new Promise<void>((resolve, reject) => {
+          img.onload = () => {
+            URL.revokeObjectURL(objectUrl)
+            resolve()
+          }
+          img.onerror = () => {
+            URL.revokeObjectURL(objectUrl)
+            reject(new Error('Failed to load image'))
+          }
+          img.src = objectUrl
+        })
+
+        const colorThief = new ColorThief()
+        const palette = colorThief.getPalette(img, 5) as [number, number, number][]
+        const hexColors = palette.map(rgbToHex)
+        setExtractedColors(hexColors)
+
+        // 첫 번째 색상 자동 선택
+        if (hexColors.length > 0 && !selectedColor) {
+          setSelectedColor(hexColors[0])
+        }
+      } catch (error) {
+        console.error('Failed to extract colors:', error)
+        setExtractedColors([])
+      } finally {
+        setIsExtractingColors(false)
+      }
+    },
+    [selectedColor],
+  )
 
   // 초기 배너 데이터로 폼 초기화 (수정 모드)
   useEffect(() => {
@@ -74,6 +126,9 @@ export function BannerForm({
         endDate: initialBanner.endDate.split('T')[0],
       })
       setImageFile(null)
+      if (initialBanner.backgroundColor) {
+        setSelectedColor(initialBanner.backgroundColor)
+      }
     }
   }, [initialBanner])
 
@@ -96,6 +151,7 @@ export function BannerForm({
         ...formData,
         lectureId: selectedLecture.id,
         lectureName: selectedLecture.name,
+        backgroundColor: selectedColor || undefined,
       },
       imageFile,
     )
@@ -105,6 +161,10 @@ export function BannerForm({
     const file = e.target.files?.[0]
     if (file) {
       setImageFile(file)
+      // 이미지 미리보기 URL 생성
+      const previewUrl = URL.createObjectURL(file)
+      setImagePreviewUrl(previewUrl)
+      extractColors(file)
     }
   }
 
@@ -192,13 +252,75 @@ export function BannerForm({
           required={imageRequired && !isEditMode}
         />
         {imageFile ? (
-          <div className="text-muted-foreground truncate text-xs">
-            {isEditMode ? '새 이미지: ' : '선택: '}
-            {imageFile.name}
+          <div className="space-y-2">
+            <div className="text-muted-foreground truncate text-xs">
+              {isEditMode ? '새 이미지: ' : '선택: '}
+              {imageFile.name}
+            </div>
+            {/* 이미지 미리보기 */}
+            {imagePreviewUrl && (
+              <div
+                className="relative h-40 w-full overflow-hidden rounded-lg border"
+                style={{ backgroundColor: selectedColor || '#f3f4f6' }}
+              >
+                <img src={imagePreviewUrl} alt="미리보기" className="h-full w-full object-contain" />
+              </div>
+            )}
           </div>
         ) : isEditMode && initialBanner?.imageUrl ? (
-          <div className="text-muted-foreground truncate text-xs">현재 이미지 유지</div>
+          <div className="space-y-2">
+            <div className="text-muted-foreground truncate text-xs">현재 이미지 유지</div>
+            {/* 기존 이미지 미리보기 */}
+            <div
+              className="relative h-40 w-full overflow-hidden rounded-lg border"
+              style={{ backgroundColor: initialBanner.backgroundColor || '#f3f4f6' }}
+            >
+              <img src={initialBanner.imageUrl} alt="현재 이미지" className="h-full w-full object-contain" />
+            </div>
+          </div>
         ) : null}
+      </div>
+
+      {/* 배경색 선택 */}
+      <div className="space-y-2">
+        <Label>배경색 (이미지 여백 채우기)</Label>
+        {isExtractingColors ? (
+          <div className="text-muted-foreground text-sm">색상 추출 중...</div>
+        ) : extractedColors.length > 0 ? (
+          <div className="space-y-2">
+            <div className="text-muted-foreground text-xs">추출된 색상에서 선택하세요:</div>
+            <div className="flex flex-wrap gap-2">
+              {extractedColors.map((color, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setSelectedColor(color)}
+                  className={`h-10 w-10 rounded-md border-2 transition-all ${
+                    selectedColor === color
+                      ? 'scale-110 border-blue-500 ring-2 ring-blue-300'
+                      : 'border-gray-300 hover:scale-105'
+                  }`}
+                  style={{ backgroundColor: color }}
+                  title={color}
+                />
+              ))}
+            </div>
+          </div>
+        ) : selectedColor || (isEditMode && initialBanner?.backgroundColor) ? null : (
+          <div className="text-muted-foreground text-sm">이미지를 선택하면 주요 색상이 자동 추출됩니다.</div>
+        )}
+        <div className="flex items-center gap-2">
+          <Input
+            type="text"
+            placeholder="#FFFFFF"
+            value={selectedColor}
+            onChange={e => setSelectedColor(e.target.value)}
+            className="w-32"
+          />
+          {selectedColor && (
+            <div className="h-8 w-8 rounded border border-gray-300" style={{ backgroundColor: selectedColor }} />
+          )}
+        </div>
       </div>
 
       {/* 링크 URL */}
@@ -258,6 +380,7 @@ export function toApiRequest(formData: BannerFormData): CreateBannerRequest {
     type: formData.type,
     url: formData.url,
     lectureId: formData.lectureId!,
+    backgroundColor: formData.backgroundColor,
     startDate: toStartOfDayISO(formData.startDate),
     endDate: toEndOfDayISO(formData.endDate),
   }
