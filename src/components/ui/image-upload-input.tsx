@@ -12,7 +12,7 @@ export function ImageUploadInput({
   onFileChange,
   buttonText = '업로드',
   accept = 'image/*',
-  previewSize = 40,
+  previewSize = 80,
   disabled,
 }: {
   currentUrl?: string
@@ -55,7 +55,8 @@ export function ImageUploadInput({
             alt="미리보기"
             width={previewSize}
             height={previewSize}
-            className="h-10 w-10 rounded border object-cover"
+            className="rounded border object-cover"
+            style={{ width: previewSize, height: previewSize }}
             unoptimized
           />
         ) : currentUrl && isImageUrl(currentUrl) ? (
@@ -64,11 +65,12 @@ export function ImageUploadInput({
             alt="미리보기"
             width={previewSize}
             height={previewSize}
-            className="h-10 w-10 rounded border object-cover"
+            className="rounded border object-cover"
+            style={{ width: previewSize, height: previewSize }}
             unoptimized
           />
         ) : (
-          <div className="h-10 w-10 rounded border bg-gray-50" />
+          <div className="rounded border bg-gray-50" style={{ width: previewSize, height: previewSize }} />
         )}
         <span className="text-muted-foreground text-sm">{hasPreview ? '미리보기' : '선택된 파일 없음'}</span>
       </div>

@@ -128,3 +128,24 @@ export async function fetchPopularSearchTerms(days: number = 7, limit: number = 
   })
   return data
 }
+
+// =========================
+// 트래픽 소스
+// =========================
+
+export interface TrafficSource {
+  source: string
+  medium: string
+  sessions: number
+  users: number
+}
+
+/**
+ * 트래픽 소스 조회 (source/medium 기준)
+ */
+export async function fetchTrafficSources(days: number = 7, limit: number = 10): Promise<TrafficSource[]> {
+  const { data } = await api.get<TrafficSource[]>(`/admin/analytics/traffic-sources`, {
+    params: { days, limit },
+  })
+  return data
+}

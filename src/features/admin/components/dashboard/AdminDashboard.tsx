@@ -13,6 +13,7 @@ import { EngagementCard } from './EngagementCard'
 import { EventStatsSection } from './EventStatsSection'
 import { PopularSearchTermsCard } from './PopularSearchTermsCard'
 import { StatCard } from './StatCard'
+import { TrafficSourceChart } from './TrafficSourceChart'
 import { VisitorLineChart } from './VisitorLineChart'
 import { PeriodToggle, type Period } from './shared/PeriodToggle'
 
@@ -80,8 +81,8 @@ export function AdminDashboard() {
       {/* Section 2: 트렌드 - 방문자 차트 (전체 너비) */}
       <VisitorLineChart report={analyticsReport} isLoading={isAnalyticsLoading} period={period} />
 
-      {/* Section 3: 참여도 & 분포 - 3열 그리드 */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      {/* Section 3: 참여도 & 분포 - 4열 그리드 */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* 참여도 카드 */}
         <EngagementCard
           period={period}
@@ -92,6 +93,8 @@ export function AdminDashboard() {
         />
         {/* 디바이스 분포 */}
         <DeviceDonutChart data={analyticsReport?.deviceStats} isLoading={isAnalyticsLoading} />
+        {/* 트래픽 소스 */}
+        <TrafficSourceChart period={period} />
         {/* 회원 분포 */}
         <DistributionDonutChart data={distributionData} isLoading={isLoading} />
       </div>
