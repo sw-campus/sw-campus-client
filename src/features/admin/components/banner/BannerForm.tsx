@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import ColorThief from 'colorthief'
@@ -75,44 +75,41 @@ export function BannerForm({
   const debouncedKeyword = useDebounce(searchKeyword, 300)
 
   // 이미지에서 색상 추출
-  const extractColors = useCallback(
-    async (file: File) => {
-      setIsExtractingColors(true)
-      try {
-        const img = new Image()
-        img.crossOrigin = 'Anonymous'
-        const objectUrl = URL.createObjectURL(file)
+  const extractColors = async (file: File) => {
+    setIsExtractingColors(true)
+    try {
+      const img = new Image()
+      img.crossOrigin = 'Anonymous'
+      const objectUrl = URL.createObjectURL(file)
 
-        await new Promise<void>((resolve, reject) => {
-          img.onload = () => {
-            URL.revokeObjectURL(objectUrl)
-            resolve()
-          }
-          img.onerror = () => {
-            URL.revokeObjectURL(objectUrl)
-            reject(new Error('Failed to load image'))
-          }
-          img.src = objectUrl
-        })
-
-        const colorThief = new ColorThief()
-        const palette = colorThief.getPalette(img, 5) as [number, number, number][]
-        const hexColors = palette.map(rgbToHex)
-        setExtractedColors(hexColors)
-
-        // 첫 번째 색상 자동 선택
-        if (hexColors.length > 0 && !selectedColor) {
-          setSelectedColor(hexColors[0])
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl)
+          resolve()
         }
-      } catch (error) {
-        console.error('Failed to extract colors:', error)
-        setExtractedColors([])
-      } finally {
-        setIsExtractingColors(false)
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl)
+          reject(new Error('Failed to load image'))
+        }
+        img.src = objectUrl
+      })
+
+      const colorThief = new ColorThief()
+      const palette = colorThief.getPalette(img, 5) as [number, number, number][]
+      const hexColors = palette.map(rgbToHex)
+      setExtractedColors(hexColors)
+
+      // 첫 번째 색상 자동 선택
+      if (hexColors.length > 0 && !selectedColor) {
+        setSelectedColor(hexColors[0])
       }
-    },
-    [selectedColor],
-  )
+    } catch (error) {
+      console.error('Failed to extract colors:', error)
+      setExtractedColors([])
+    } finally {
+      setIsExtractingColors(false)
+    }
+  }
 
   // 초기 배너 데이터로 폼 초기화 (수정 모드)
   useEffect(() => {
