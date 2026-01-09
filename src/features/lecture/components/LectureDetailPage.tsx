@@ -90,7 +90,7 @@ export default function LectureDetailPage({ lectureId }: Props) {
                   alt="대표 이미지"
                   fill
                   sizes="(max-width: 1024px) 100vw, 1152px"
-                  className="object-cover"
+                  className="object-contain"
                   priority
                 />
               ) : (

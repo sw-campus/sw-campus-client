@@ -222,14 +222,16 @@ export function LectureCreateScheduleFields() {
             name="totalDays"
             render={({ field }) => (
               <Input
-                type="number"
+                type="text"
                 inputMode="numeric"
-                min={1}
-                step={1}
+                pattern="[0-9]*"
                 placeholder="예) 12"
                 {...field}
-                value={String(field.value ?? 1)}
-                onChange={e => field.onChange(e.target.value === '' ? 1 : Number(e.target.value))}
+                value={field.value === null || field.value === undefined ? '' : String(field.value)}
+                onChange={e => {
+                  const next = toDigitsOnly(e.target.value)
+                  field.onChange(next === '' ? null : Number(next))
+                }}
               />
             )}
           />

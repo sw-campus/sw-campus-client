@@ -69,7 +69,10 @@ export default function LargeBanner() {
           const external = isExternalLink(href)
 
           const content = (
-            <div className="relative h-[140px] w-full overflow-hidden sm:h-[180px] md:h-[310px]">
+            <div
+              className="relative h-[140px] w-full overflow-hidden sm:h-[180px] md:h-[310px]"
+              style={{ backgroundColor: banner.backgroundColor || '#f3f4f6' }}
+            >
               {banner.imageUrl ? (
                 <Image
                   src={banner.imageUrl}

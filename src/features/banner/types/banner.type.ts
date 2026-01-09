@@ -20,6 +20,7 @@ export interface Banner {
   type: BannerType
   url: string | null
   imageUrl: string | null
+  backgroundColor: string | null
   startDate: string
   endDate: string
   isActive: boolean
