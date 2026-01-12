@@ -53,6 +53,9 @@ export function ReviewManagementSection() {
   const [selectedCertificate, setSelectedCertificate] = useState<CompletedLecture | null>(null)
   const [certImageUploading, setCertImageUploading] = useState(false)
   const [certImageError, setCertImageError] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [fullImageUrl, setFullImageUrl] = useState<string | null>(null)
 
   // Load lectures on mount
   useEffect(() => {
@@ -135,13 +138,13 @@ export function ReviewManagementSection() {
   const getStatusLabel = (lectureId: number, canWriteReview: boolean): string => {
     if (canWriteReview) return '작성 가능'
     const status = reviewStatuses.get(lectureId)
-    if (status === 'APPROVED') return '승인 완료'
-    if (status === 'REJECTED') return '반려'
-    return '승인 대기'
+    if (status === 'APPROVED') return '승인됨'
+    if (status === 'REJECTED') return '반려됨'
+    return '대기중'
   }
 
   const getStatusBadgeClass = (lectureId: number, canWriteReview: boolean): string => {
-    if (canWriteReview) return ''
+    if (canWriteReview) return 'bg-gray-400 text-white'
     const status = reviewStatuses.get(lectureId)
     if (status === 'APPROVED') return 'bg-emerald-500 text-white'
     if (status === 'REJECTED') return 'bg-rose-500 text-white'
@@ -182,20 +185,38 @@ export function ReviewManagementSection() {
     return status !== 'APPROVED'
   }
 
-  const handleCertImageUpload = async (file: File) => {
-    if (!selectedCertificate) return
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file)
+    setCertImageError(null)
+    // 미리보기 URL 생성
+    const url = URL.createObjectURL(file)
+    setPreviewUrl(url)
+  }
+
+  const handleCancelFileSelect = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+    }
+    setSelectedFile(null)
+    setPreviewUrl(null)
+    setCertImageError(null)
+  }
+
+  const handleCertImageUpload = async () => {
+    if (!selectedCertificate || !selectedFile) return
 
     try {
       setCertImageUploading(true)
       setCertImageError(null)
 
       const { updateCertificateImage } = await import('@/features/certificate/api/certificate.api')
-      await updateCertificateImage(selectedCertificate.certificateId, file)
+      await updateCertificateImage(selectedCertificate.certificateId, selectedFile)
 
       // 목록 갱신
       await refreshLectures()
       setCertImageOpen(false)
       setSelectedCertificate(null)
+      handleCancelFileSelect()
       toast.success('수료증 이미지가 수정되었습니다.')
     } catch {
       setCertImageError('수료증 이미지 수정에 실패했습니다.')
@@ -399,6 +420,7 @@ export function ReviewManagementSection() {
           if (!open) {
             setSelectedCertificate(null)
             setCertImageError(null)
+            handleCancelFileSelect()
           }
         }}
       >
@@ -427,11 +449,33 @@ export function ReviewManagementSection() {
                 </div>
               </div>
 
-              {/* 현재 이미지 */}
-              {selectedCertificate.certificateImageUrl && (
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-gray-700">현재 수료증 이미지</p>
-                  <div className="relative overflow-hidden rounded-lg border bg-gray-100">
+              {/* 이미지 표시: 새 이미지 미리보기 또는 현재 이미지 */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-700">
+                  {previewUrl ? '새 수료증 이미지 (미리보기)' : '수료증 이미지'}
+                </p>
+                {previewUrl ? (
+                  <div
+                    className="relative cursor-pointer overflow-hidden rounded-lg border-2 border-blue-300 bg-blue-50 transition hover:opacity-90"
+                    onClick={() => setFullImageUrl(previewUrl)}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={previewUrl}
+                      alt="새 수료증 미리보기"
+                      className="h-auto max-h-64 w-full object-contain"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition hover:bg-black/10">
+                      <span className="rounded bg-black/50 px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100">
+                        클릭하여 원본 보기
+                      </span>
+                    </div>
+                  </div>
+                ) : selectedCertificate.certificateImageUrl ? (
+                  <div
+                    className="relative cursor-pointer overflow-hidden rounded-lg border bg-gray-100 transition hover:opacity-90"
+                    onClick={() => setFullImageUrl(selectedCertificate.certificateImageUrl!)}
+                  >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={selectedCertificate.certificateImageUrl}
@@ -439,8 +483,14 @@ export function ReviewManagementSection() {
                       className="h-auto max-h-64 w-full object-contain"
                     />
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="flex h-32 items-center justify-center rounded-lg border bg-gray-50 text-sm text-gray-400">
+                    이미지 없음
+                  </div>
+                )}
+                {previewUrl && <p className="text-xs text-gray-600">{selectedFile?.name}</p>}
+                <p className="text-xs text-gray-400">이미지를 클릭하면 원본 크기로 볼 수 있습니다</p>
+              </div>
 
               {/* 수정 불가 안내 (APPROVED) */}
               {!canEditCertificate(selectedCertificate.certificateStatus) && (
@@ -450,36 +500,76 @@ export function ReviewManagementSection() {
               {/* 이미지 수정 폼 (PENDING/REJECTED만) */}
               {canEditCertificate(selectedCertificate.certificateStatus) && (
                 <div className="space-y-3">
-                  <p className="text-sm font-medium text-gray-700">새 이미지 업로드</p>
-                  <div className="flex items-center gap-3">
-                    <label
-                      htmlFor="cert-image-input"
-                      className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 transition hover:border-gray-400 hover:bg-gray-100"
-                    >
-                      <LuUpload className="h-4 w-4" />
-                      <span>이미지 선택</span>
-                    </label>
-                    <input
-                      id="cert-image-input"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      disabled={certImageUploading}
-                      onChange={e => {
-                        const file = e.target.files?.[0]
-                        if (file) {
-                          void handleCertImageUpload(file)
-                        }
-                        e.target.value = ''
-                      }}
-                    />
-                    {certImageUploading && <span className="text-sm text-gray-500">업로드 중...</span>}
-                  </div>
+                  {/* 파일 선택 버튼 (파일 미선택 시) */}
+                  {!previewUrl && (
+                    <div className="flex items-center gap-3">
+                      <label
+                        htmlFor="cert-image-input"
+                        className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 transition hover:border-gray-400 hover:bg-gray-100"
+                      >
+                        <LuUpload className="h-4 w-4" />
+                        <span>이미지 변경</span>
+                      </label>
+                      <input
+                        id="cert-image-input"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={certImageUploading}
+                        onChange={e => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            handleFileSelect(file)
+                          }
+                          e.target.value = ''
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* 업로드/취소 버튼 (파일 선택 후) */}
+                  {previewUrl && (
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1"
+                        disabled={certImageUploading}
+                        onClick={handleCancelFileSelect}
+                      >
+                        취소
+                      </Button>
+                      <Button
+                        type="button"
+                        className="flex-1 bg-gray-900 text-white hover:bg-gray-800"
+                        disabled={certImageUploading}
+                        onClick={() => void handleCertImageUpload()}
+                      >
+                        {certImageUploading ? '업로드 중...' : '업로드'}
+                      </Button>
+                    </div>
+                  )}
+
                   {certImageError && <p className="text-sm text-red-600">{certImageError}</p>}
                   <p className="text-xs text-gray-500">* 이미지를 수정하면 관리자 재승인이 필요합니다.</p>
                 </div>
               )}
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 원본 이미지 보기 모달 */}
+      <Dialog open={!!fullImageUrl} onOpenChange={open => !open && setFullImageUrl(null)}>
+        <DialogContent className="max-h-[90vh] max-w-[90vw] overflow-auto p-2">
+          {fullImageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={fullImageUrl}
+              alt="수료증 원본 이미지"
+              className="h-auto w-full object-contain"
+              onClick={() => setFullImageUrl(null)}
+            />
           )}
         </DialogContent>
       </Dialog>

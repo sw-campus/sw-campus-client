@@ -290,20 +290,22 @@ export function ReviewForm({
         </div>
       )}
 
-      <Button
-        type="button"
-        onClick={() => {
-          if (effectiveReadOnly) {
-            onClose?.()
-            return
-          }
-          void onSave()
-        }}
-        disabled={loading || (!effectiveReadOnly && saveMutation.isPending)}
-        className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
-      >
-        {loading ? '불러오는 중...' : effectiveReadOnly ? '닫기' : saveMutation.isPending ? '저장 중...' : '저장'}
-      </Button>
+      {/* 승인된 리뷰 안내 (readOnly 모드) */}
+      {effectiveReadOnly && !loading && (
+        <p className="text-sm text-gray-500">승인된 리뷰는 수정할 수 없습니다.</p>
+      )}
+
+      {/* 저장 버튼 (수정 가능할 때만 표시) */}
+      {!effectiveReadOnly && (
+        <Button
+          type="button"
+          onClick={() => void onSave()}
+          disabled={loading || saveMutation.isPending}
+          className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+        >
+          {loading ? '불러오는 중...' : saveMutation.isPending ? '저장 중...' : '저장'}
+        </Button>
+      )}
 
       {!reviewId && <p className="text-xs text-gray-500"></p>}
     </div>
