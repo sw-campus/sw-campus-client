@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { SocialLoginButtons } from '@/features/auth/components/SocialLoginButton'
+import type { Provider } from '@/features/auth/hooks/useOAuthUrls'
 
 const INPUT_BASE_CLASS =
   'h-10 w-full rounded-md border border-white/15 bg-white/10 px-3 text-white placeholder:text-white/45 outline-none focus:border-white/35 focus:bg-white/15'
@@ -17,7 +18,7 @@ type LoginFormCardProps = {
   onChangeEmail: (v: string) => void
   onChangePassword: (v: string) => void
   onSubmit: (e: FormEvent<HTMLFormElement>) => void | Promise<void>
-  onOAuthStart: (provider: 'google' | 'github' | 'kakao') => void
+  onOAuthStart: (provider: Provider) => void
   signupHref: string
   onFindAccountClick: () => void
 }

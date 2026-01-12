@@ -2,7 +2,7 @@
 
 import { toast } from 'sonner'
 
-type Provider = 'google' | 'github' | 'kakao'
+export type Provider = 'google' | 'github' | 'kakao'
 
 export function useOAuthUrls() {
   // OAuth (Google / GitHub / Kakao)

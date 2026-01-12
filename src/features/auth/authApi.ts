@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { api } from '@/lib/axios'
+import type { Provider } from './hooks/useOAuthUrls'
 
 interface OAuthLoginResponse {
   name?: string
@@ -151,7 +152,7 @@ export const organizationSignupSchema = baseSignupSchema.extend({
 })
 
 // OAuth 로그인 (Google / GitHub / Kakao)
-export const oauthLogin = async (provider: 'google' | 'github' | 'kakao', code: string): Promise<OAuthLoginResponse> => {
+export const oauthLogin = async (provider: Provider, code: string): Promise<OAuthLoginResponse> => {
   const safeCode = encodeURIComponent(code)
   const res = await api.post<OAuthLoginResponse>(`/auth/oauth/${provider}`, {
     code: safeCode,
