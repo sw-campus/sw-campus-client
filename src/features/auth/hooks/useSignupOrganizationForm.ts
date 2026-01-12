@@ -13,12 +13,10 @@ import {
   signupOrganization,
   signupSchema,
 } from '@/features/auth/authApi'
-import { useAuthStore } from '@/store/authStore'
 import { useSignupStore } from '@/store/signupStore'
 
 export function useSignupOrganizationForm() {
   const router = useRouter()
-  const { login: setLogin } = useAuthStore()
 
   const {
     address,
@@ -49,6 +47,7 @@ export function useSignupOrganizationForm() {
     setOrganizationId,
     setOrganizationName,
     setCertificateImage,
+    reset,
   } = useSignupStore()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -256,10 +255,10 @@ export function useSignupOrganizationForm() {
 
       await signupOrganization(parsed.data)
 
-      const headerName = organizationName.trim()
+      // 폼 상태 초기화
+      reset()
 
-      if (headerName) setLogin(headerName)
-
+      toast.success('회원가입이 완료되었습니다. 로그인해 주세요.')
       router.push('/login')
     } catch (error: unknown) {
       console.error('Organization signup error:', error)
