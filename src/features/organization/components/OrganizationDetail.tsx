@@ -20,6 +20,7 @@ import {
 } from '@/features/lecture/api/reviewApi.types'
 import { LectureList } from '@/features/lecture/components/LectureList'
 import { formatDate, StarRating } from '@/features/lecture/components/detail/DetailShared'
+import PhotoSlider from '@/features/lecture/components/detail/PhotoSlider'
 import type { Lecture } from '@/features/lecture/types/lecture.type'
 
 import type { OrganizationDetail as OrganizationDetailType } from '../types/organization.type'
@@ -364,21 +365,8 @@ export function OrganizationDetail({ organization, lectures = [] }: Organization
               {facilityImages.length > 0 && (
                 <section>
                   <h2 className="text-foreground mb-5 text-xl font-bold">{organization.name}의 현장이에요.</h2>
-                  <div className="grid w-full grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
-                    {facilityImages.map((url, index) => (
-                      <div
-                        key={url}
-                        className="group bg-muted relative aspect-square overflow-hidden rounded-xl shadow-sm transition-all duration-200 hover:shadow-lg"
-                      >
-                        <Image
-                          src={url}
-                          alt={`${organization.name} 현장 이미지 ${index + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 50vw, 20vw"
-                          className="object-cover object-center transition-transform duration-300 group-hover:scale-110"
-                        />
-                      </div>
-                    ))}
+                  <div className="mx-auto max-w-4xl">
+                    <PhotoSlider photos={facilityImages} />
                   </div>
                 </section>
               )}
