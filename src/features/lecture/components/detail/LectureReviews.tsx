@@ -39,7 +39,9 @@ function ReviewCard({ review }: { review: Review }) {
       </div>
 
       {/* Comment */}
-      <p className="text-muted-foreground mb-4 text-xs leading-relaxed sm:text-sm">{review.comment}</p>
+      <p className="text-muted-foreground mb-4 text-xs leading-relaxed sm:text-sm">
+        {review.comment || <span className="text-gray-400 italic">총평 없음</span>}
+      </p>
 
       {/* Toggle Button */}
       <button

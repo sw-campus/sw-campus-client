@@ -44,7 +44,7 @@ const detailScoreSchema = z.object({
       message: '카테고리 값이 올바르지 않습니다.',
     }),
   score: z.number().int().min(1, '점수는 1점 이상이어야 합니다').max(5, '점수는 5점 이하여야 합니다'),
-  comment: z.string().trim().min(20, '세부 의견은 20자 이상이어야 합니다').max(500, '세부 의견은 최대 500자입니다'),
+  comment: z.string().trim().min(10, '세부 의견은 10자 이상이어야 합니다').max(500, '세부 의견은 최대 500자입니다'),
 })
 
 const updateReviewSchema = z.object({
@@ -281,7 +281,7 @@ export function ReviewForm({
                   }
                   rows={2}
                   className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-800 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
-                  placeholder="세부 의견을 입력하세요"
+                  placeholder="세부 의견을 입력하세요 (10자 이상)"
                   disabled={effectiveReadOnly || loading || saveMutation.isPending}
                 />
               </div>
