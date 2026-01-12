@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import AddressInput from '@/features/auth/components/AddressInput'
 import { api } from '@/lib/axios'
+import { useAuthStore } from '@/store/authStore'
 import { useSignupStore } from '@/store/signupStore'
 
 const profileSchema = z.object({
@@ -67,6 +68,7 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
   const [showAddressEditor, setShowAddressEditor] = useState(false)
 
   const { setAddress, setDetailAddress, address, detailAddress } = useSignupStore()
+  const { setNickname } = useAuthStore()
   const [profileEmail, setProfileEmail] = useState<string>('')
   const [profileName, setProfileName] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
@@ -165,6 +167,8 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
         phone: values.phone,
         location,
       })
+      // 전역 상태 업데이트 (헤더 닉네임 반영)
+      setNickname(values.nickname)
       toast.success('저장되었습니다.')
       if (onSuccess) {
         onSuccess()

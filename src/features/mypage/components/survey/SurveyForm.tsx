@@ -18,7 +18,7 @@ const surveySchema = z.object({
   major: z.string().min(1, '전공을 입력해주세요.'),
   bootcampCompleted: z.boolean(),
   wantedJobs: z.string().min(1, '희망 직무를 입력해주세요.'),
-  licenses: z.string().min(1, '자격증을 입력해주세요.'),
+  licenses: z.string().optional(),
   hasGovCard: z.boolean(),
   affordableAmount: z.number().min(0, '가능 금액은 0 이상 숫자여야 합니다.'),
 })
@@ -164,7 +164,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
 
             <div>
               <label htmlFor="licenses" className="mb-1 block text-sm font-medium text-gray-800">
-                자격증<span className="text-red-500">*</span>
+                자격증 (선택)
               </label>
               <textarea id="licenses" rows={3} {...register('licenses')} className={TEXTAREA_CLASS} />
               {errors.licenses && <p className="mt-1 text-xs text-red-600">{errors.licenses.message}</p>}

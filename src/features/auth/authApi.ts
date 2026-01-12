@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { api } from '@/lib/axios'
+
 import type { Provider } from './hooks/useOAuthUrls'
 
 interface OAuthLoginResponse {
@@ -18,9 +19,9 @@ export const checkEmailStatus = async (email: string) => {
   return res.data
 }
 
-// 이메일 인증 메일 보내기
+// 이메일 인증 메일 보내기 (타임아웃 30초 - 이메일 발송이 오래 걸릴 수 있음)
 export const sendEmailAuth = async (email: string, signupType: 'personal' | 'organization' = 'personal') => {
-  const res = await api.post('/auth/email/send', { email, signupType })
+  const res = await api.post('/auth/email/send', { email, signupType }, { timeout: 30_000 })
   return res.data
 }
 

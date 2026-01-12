@@ -52,6 +52,8 @@ function getReadableSourceName(source: string, medium: string): string {
 
     // 레퍼럴
     'accounts.google.com/referral': '구글 계정',
+    'pcmap.place.naver.com/referral': '네이버 지도',
+    't1.daumcdn.net/referral': '카카오/다음',
 
     // 미설정
     '(not set)/(not set)': '기타',

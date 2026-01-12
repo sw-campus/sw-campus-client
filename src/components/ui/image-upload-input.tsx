@@ -29,7 +29,9 @@ export function ImageUploadInput({
   const isImageUrl = (url: string | undefined | null) => {
     if (!url) return false
     if (url.startsWith('blob:')) return true
-    return /(\.png|\.jpg|\.jpeg|\.gif|\.webp|\.bmp|\.svg)$/i.test(url)
+    // S3 등 쿼리 파라미터가 붙은 URL에서 확장자 체크를 위해 쿼리 제거
+    const urlWithoutQuery = url.split('?')[0]
+    return /(\.png|\.jpg|\.jpeg|\.gif|\.webp|\.bmp|\.svg)$/i.test(urlWithoutQuery)
   }
 
   return (
