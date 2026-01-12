@@ -32,8 +32,9 @@ export function ImageUploadInput({
     // S3 등 쿼리 파라미터가 붙은 URL에서 확장자 체크를 위해 쿼리 제거
     const urlWithoutQuery = url.split('?')[0]
     if (/(\.png|\.jpg|\.jpeg|\.gif|\.webp|\.bmp|\.svg)$/i.test(urlWithoutQuery)) return true
-    // http/https URL이면 이미지로 간주 (S3 presigned URL 등)
-    if (/^https?:\/\//i.test(url)) return true
+    // 확장자가 없는 경우 S3/CloudFront 등 신뢰할 수 있는 이미지 호스팅 도메인만 허용
+    const trustedImageHosts = ['s3.amazonaws.com', 's3.ap-northeast-2.amazonaws.com', 'cloudfront.net']
+    if (trustedImageHosts.some(host => url.includes(host))) return true
     return false
   }
 
