@@ -483,9 +483,8 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                     <TableHead className="hidden w-16 sm:table-cell">No.</TableHead>
                     <TableHead>강의명</TableHead>
                     <TableHead className="hidden w-24 sm:table-cell">수료증</TableHead>
-                    <TableHead className="hidden w-27.5 sm:table-cell">후기 상태</TableHead>
-                    <TableHead className="hidden w-[7.5rem] md:table-cell">수료일</TableHead>
-                    <TableHead className="hidden w-25 text-center sm:table-cell">관리</TableHead>
+                    <TableHead className="hidden w-24 sm:table-cell">후기</TableHead>
+                    <TableHead className="hidden w-20 text-center sm:table-cell">관리</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -497,18 +496,35 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                         {/* 모바일 추가 정보 및 액션 */}
                         <div className="mt-1 flex items-center justify-between sm:hidden">
                           <div className="flex items-center gap-2">
+                            <Badge className={`rounded-full border ${getCertStatusColor(l.certificateStatus)}`} variant="outline">
+                              {getCertStatusLabel(l.certificateStatus)}
+                            </Badge>
                             {l.canWriteReview ? (
                               <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                                작성 가능
+                                후기 가능
                               </Badge>
                             ) : (
                               <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                                {approvedLectureIds.has(l.lectureId) ? '승인됨' : '작성완료'}
+                                {approvedLectureIds.has(l.lectureId) ? '후기 승인' : '후기 완료'}
                               </Badge>
                             )}
-                            <span className="text-muted-foreground text-xs">{formatDate(l.certifiedAt)}</span>
                           </div>
                           <div className="flex items-center gap-1">
+                            {/* 수료증 버튼 */}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              aria-label={canEditCertificate(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
+                              onClick={() => {
+                                setSelectedCertificate(l)
+                                setCertImageError(null)
+                                setCertImageOpen(true)
+                              }}
+                            >
+                              <LuImage className="h-4 w-4" />
+                            </Button>
+                            {/* 후기 버튼 */}
                             {l.canWriteReview ? (
                               <Button
                                 variant="ghost"
@@ -542,32 +558,11 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                           </div>
                         </div>
                       </TableCell>
-                      {/* 수료증 상태 및 이미지 버튼 */}
+                      {/* 수료증 상태 */}
                       <TableCell className="hidden sm:table-cell">
-                        <div className="flex items-center gap-2">
-                          <Badge className={`rounded-full border ${getCertStatusColor(l.certificateStatus)}`} variant="outline">
-                            {getCertStatusLabel(l.certificateStatus)}
-                          </Badge>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => {
-                                  setSelectedCertificate(l)
-                                  setCertImageError(null)
-                                  setCertImageOpen(true)
-                                }}
-                              >
-                                <LuImage className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {canEditCertificate(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
+                        <Badge className={`rounded-full border ${getCertStatusColor(l.certificateStatus)}`} variant="outline">
+                          {getCertStatusLabel(l.certificateStatus)}
+                        </Badge>
                       </TableCell>
                       {/* 후기 상태 */}
                       <TableCell className="hidden sm:table-cell">
@@ -581,11 +576,30 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                           </Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-muted-foreground hidden md:table-cell">
-                        {formatDate(l.certifiedAt)}
-                      </TableCell>
+                      {/* 관리: 수료증 + 후기 버튼 */}
                       <TableCell className="hidden text-center sm:table-cell">
                         <div className="flex justify-center gap-1">
+                          {/* 수료증 버튼 */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => {
+                                  setSelectedCertificate(l)
+                                  setCertImageError(null)
+                                  setCertImageOpen(true)
+                                }}
+                              >
+                                <LuImage className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {canEditCertificate(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
+                            </TooltipContent>
+                          </Tooltip>
+                          {/* 후기 버튼 */}
                           {l.canWriteReview ? (
                             <Tooltip>
                               <TooltipTrigger asChild>
