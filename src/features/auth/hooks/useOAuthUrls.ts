@@ -2,15 +2,16 @@
 
 import { toast } from 'sonner'
 
-type Provider = 'google' | 'github'
+type Provider = 'google' | 'github' | 'kakao'
 
 export function useOAuthUrls() {
-  // OAuth (Google / GitHub)
+  // OAuth (Google / GitHub / Kakao)
   const oauthRedirectUri = (() => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? (typeof window !== 'undefined' ? window.location.origin : '')
     return {
       google: `${baseUrl}/auth/oauth/callback/google`,
       github: `${baseUrl}/auth/oauth/callback/github`,
+      kakao: `${baseUrl}/auth/oauth/callback/kakao`,
     }
   })()
 
@@ -60,8 +61,27 @@ export function useOAuthUrls() {
     return url.toString()
   })()
 
+  const kakaoAuthUrl = (() => {
+    const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID
+    if (!clientId) return null
+
+    const url = new URL('https://kauth.kakao.com/oauth/authorize')
+    url.searchParams.set('client_id', clientId)
+    url.searchParams.set('redirect_uri', oauthRedirectUri.kakao)
+    url.searchParams.set('response_type', 'code')
+    const state = createOAuthState('kakao')
+    if (state) url.searchParams.set('state', state)
+
+    return url.toString()
+  })()
+
   const handleOAuthStart = (provider: Provider) => {
-    const target = provider === 'google' ? googleAuthUrl : githubAuthUrl
+    const targets = {
+      google: googleAuthUrl,
+      github: githubAuthUrl,
+      kakao: kakaoAuthUrl,
+    }
+    const target = targets[provider]
 
     if (!target) {
       toast.error('OAuth 환경변수(NEXT_PUBLIC_*_CLIENT_ID)가 설정되지 않았어요.')
@@ -75,6 +95,7 @@ export function useOAuthUrls() {
     oauthRedirectUri,
     googleAuthUrl,
     githubAuthUrl,
+    kakaoAuthUrl,
     handleOAuthStart,
   }
 }

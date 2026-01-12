@@ -17,7 +17,7 @@ type LoginFormCardProps = {
   onChangeEmail: (v: string) => void
   onChangePassword: (v: string) => void
   onSubmit: (e: FormEvent<HTMLFormElement>) => void | Promise<void>
-  onOAuthStart: (provider: 'google' | 'github') => void
+  onOAuthStart: (provider: 'google' | 'github' | 'kakao') => void
   signupHref: string
   onFindAccountClick: () => void
 }
@@ -95,7 +95,7 @@ export function LoginFormCard({
       </button>
 
       {/* 소셜 로그인 */}
-      <SocialLoginButtons onGoogle={() => onOAuthStart('google')} onGithub={() => onOAuthStart('github')} />
+      <SocialLoginButtons onGoogle={() => onOAuthStart('google')} onGithub={() => onOAuthStart('github')} onKakao={() => onOAuthStart('kakao')} />
     </form>
   )
 }

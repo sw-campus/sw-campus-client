@@ -20,7 +20,7 @@ export default function OAuthCallbackPage() {
   useEffect(() => {
     const run = async () => {
       const providerParam = (params?.provider ?? '').toString()
-      const provider = providerParam === 'google' || providerParam === 'github' ? providerParam : null
+      const provider = providerParam === 'google' || providerParam === 'github' || providerParam === 'kakao' ? providerParam : null
 
       if (!provider) {
         toast.error('지원하지 않는 OAuth 제공자입니다.')
