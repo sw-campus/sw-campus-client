@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
+import { updateCertificateImage } from '@/features/certificate/api/certificate.api'
 import { api } from '@/lib/axios'
 
 type PersonalMainProps = {
@@ -250,6 +251,14 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     return status !== 'APPROVED'
   }
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      void handleCertImageUpload(file)
+    }
+    e.target.value = ''
+  }
+
   const handleCertImageUpload = async (file: File) => {
     if (!selectedCertificate) return
 
@@ -257,15 +266,17 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
       setCertImageUploading(true)
       setCertImageError(null)
 
-      const { updateCertificateImage } = await import('@/features/certificate/api/certificate.api')
       await updateCertificateImage(selectedCertificate.certificateId, file)
 
       // 목록 갱신
-      const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
-      setLectures(Array.isArray(data) ? data : [])
-
-      setCertImageOpen(false)
-      setSelectedCertificate(null)
+      try {
+        const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
+        setLectures(Array.isArray(data) ? data : [])
+        setCertImageOpen(false)
+        setSelectedCertificate(null)
+      } catch {
+        setCertImageError('이미지 업로드에 성공했으나, 목록 갱신에 실패했습니다. 페이지를 새로고침 해주세요.')
+      }
     } catch (err) {
       if (isAxiosError(err)) {
         const message = (err.response?.data as { message?: string })?.message
@@ -773,13 +784,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                       accept="image/*"
                       className="hidden"
                       disabled={certImageUploading}
-                      onChange={e => {
-                        const file = e.target.files?.[0]
-                        if (file) {
-                          void handleCertImageUpload(file)
-                        }
-                        e.target.value = ''
-                      }}
+                      onChange={handleFileSelect}
                     />
                     {certImageUploading && (
                       <span className="text-sm text-gray-500">업로드 중...</span>
