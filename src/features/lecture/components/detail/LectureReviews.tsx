@@ -38,8 +38,10 @@ function ReviewCard({ review }: { review: Review }) {
         <StarRating score={review.score} showScore size="sm" />
       </div>
 
-      {/* Comment */}
-      <p className="text-muted-foreground mb-4 text-xs leading-relaxed sm:text-sm">{review.comment}</p>
+      {/* Comment - 총평이 있을 때만 표시 */}
+      {review.comment && (
+        <p className="text-muted-foreground mb-4 text-xs leading-relaxed sm:text-sm">{review.comment}</p>
+      )}
 
       {/* Toggle Button */}
       <button
@@ -200,8 +202,8 @@ export default function LectureReviews({ lectureId }: Props) {
           return
         }
 
-        if (c.length < 20) {
-          toast.error(`${label} 의견을 20자 이상 작성해 주세요.`)
+        if (c.length < 10) {
+          toast.error(`${label} 의견을 10자 이상 작성해 주세요.`)
           return
         }
       }
