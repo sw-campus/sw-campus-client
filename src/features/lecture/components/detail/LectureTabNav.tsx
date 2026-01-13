@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+
 import { createPortal } from 'react-dom'
 
 import { cn } from '@/lib/utils'
@@ -96,7 +97,7 @@ export default function LectureTabNav() {
       if (placeholderRef.current) {
         const rect = placeholderRef.current.getBoundingClientRect()
         setIsFixed(rect.top <= 0)
-        
+
         // 2. 위치 업데이트 (가로 스크롤 시에도 올바른 위치 유지)
         setTabPosition({
           left: rect.left + window.scrollX,
@@ -149,7 +150,7 @@ export default function LectureTabNav() {
             'group relative shrink-0 rounded-xl px-4 py-2 text-base transition-all duration-200 sm:px-5 sm:text-lg',
             activeTab === tab.id
               ? 'bg-white font-extrabold text-gray-900 shadow-sm ring-1 ring-gray-200'
-              : 'font-semibold text-gray-500 hover:bg-gray-100/50 hover:text-gray-700',
+              : 'font-semibold text-gray-700 hover:bg-gray-100 hover:text-gray-900',
           )}
         >
           <span>{tab.label}</span>
@@ -170,9 +171,7 @@ export default function LectureTabNav() {
       */}
       <div ref={placeholderRef} className={isFixed ? 'h-[56px]' : ''}>
         {!isFixed && (
-          <div className="rounded-t-2xl bg-white/90 ring-1 ring-white/30 backdrop-blur-xl">
-            {tabContent}
-          </div>
+          <div className="rounded-t-2xl bg-white/90 ring-1 ring-white/30 backdrop-blur-xl">{tabContent}</div>
         )}
       </div>
 
@@ -182,18 +181,20 @@ export default function LectureTabNav() {
         - 부모 요소의 overflow, transform 등에 영향받지 않음
         - z-[var(--z-fixed)]: globals.css에 정의된 고정 요소용 z-index 토큰 사용
       */}
-      {mounted && isFixed && createPortal(
-        <div 
-          className="fixed top-0 z-[var(--z-fixed)] rounded-t-2xl border-b border-gray-200/50 bg-white/95 shadow-sm backdrop-blur-xl"
-          style={{
-            left: `${tabPosition.left}px`,
-            width: `${tabPosition.width}px`,
-          }}
-        >
-          {tabContent}
-        </div>,
-        document.body
-      )}
+      {mounted &&
+        isFixed &&
+        createPortal(
+          <div
+            className="fixed top-0 z-[var(--z-fixed)] rounded-t-2xl border-b border-gray-200/50 bg-white/95 shadow-sm backdrop-blur-xl"
+            style={{
+              left: `${tabPosition.left}px`,
+              width: `${tabPosition.width}px`,
+            }}
+          >
+            {tabContent}
+          </div>,
+          document.body,
+        )}
     </>
   )
 }
