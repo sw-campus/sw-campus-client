@@ -202,8 +202,8 @@ export default function LectureReviews({ lectureId }: Props) {
           return
         }
 
-        if (c.length < 20) {
-          toast.error(`${label} 의견을 20자 이상 작성해 주세요.`)
+        if (c.length < 10) {
+          toast.error(`${label} 의견을 10자 이상 작성해 주세요.`)
           return
         }
       }
