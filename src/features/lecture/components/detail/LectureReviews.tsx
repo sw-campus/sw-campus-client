@@ -38,10 +38,10 @@ function ReviewCard({ review }: { review: Review }) {
         <StarRating score={review.score} showScore size="sm" />
       </div>
 
-      {/* Comment */}
-      <p className="text-muted-foreground mb-4 text-xs leading-relaxed sm:text-sm">
-        {review.comment || <span className="text-gray-400 italic">총평 없음</span>}
-      </p>
+      {/* Comment - 총평이 있을 때만 표시 */}
+      {review.comment && (
+        <p className="text-muted-foreground mb-4 text-xs leading-relaxed sm:text-sm">{review.comment}</p>
+      )}
 
       {/* Toggle Button */}
       <button
