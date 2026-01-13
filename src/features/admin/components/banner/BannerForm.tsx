@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useRef, useState, useEffect } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
@@ -274,7 +275,7 @@ export function BannerForm({
               className="relative h-40 w-full overflow-hidden rounded-lg border"
               style={{ backgroundColor: initialBanner.backgroundColor || '#f3f4f6' }}
             >
-              <img src={initialBanner.imageUrl} alt="현재 이미지" className="h-full w-full object-contain" />
+              <Image src={initialBanner.imageUrl} alt="현재 이미지" fill className="object-contain" />
             </div>
           </div>
         ) : null}
