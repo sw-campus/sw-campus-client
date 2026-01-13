@@ -17,7 +17,7 @@ export default function SocialIcons({ onGoogle, onGithub }: SocialIconsProps) {
           onGoogle?.()
         }}
         aria-label="Google로 가입"
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 transition hover:scale-105 hover:bg-white/15"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white transition hover:scale-105 hover:bg-gray-50"
       >
         <FaGoogle className="text-red-500" size={18} />
       </button>
@@ -29,9 +29,9 @@ export default function SocialIcons({ onGoogle, onGithub }: SocialIconsProps) {
           onGithub?.()
         }}
         aria-label="GitHub로 가입"
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 transition hover:scale-105 hover:bg-white/15"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white transition hover:scale-105 hover:bg-gray-50"
       >
-        <FaGithub className="text-white" size={18} />
+        <FaGithub className="text-gray-900" size={18} />
       </button>
     </div>
   )

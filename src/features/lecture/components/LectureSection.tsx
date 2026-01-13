@@ -80,8 +80,11 @@ export default function LectureSection() {
         <div className="bg-accent/5 pointer-events-none absolute -bottom-20 -left-20 h-96 w-96 rounded-full blur-3xl" />
 
         {/* 제목 */}
-        <motion.h2 className="relative z-10 mb-4 text-xl font-bold text-white sm:mb-6 sm:text-2xl" variants={itemVariants}>
-          분야별 부트캠프
+        <motion.h2
+          className="relative z-10 mb-4 text-xl font-bold text-gray-900 sm:mb-6 sm:text-2xl"
+          variants={itemVariants}
+        >
+          {selectedCategoryName || '분야별'} 부트캠프
         </motion.h2>
 
         {/* 카테고리 탭 */}
@@ -123,7 +126,7 @@ export default function LectureSection() {
                 <div className="bg-muted/50 rounded-full p-4">
                   <span className="text-2xl">🔍</span>
                 </div>
-                <span>해당 분야의 강의가 없습니다.</span>
+                <span>모집중인 강의가 없습니다.</span>
               </motion.div>
             )}
           </AnimatePresence>
