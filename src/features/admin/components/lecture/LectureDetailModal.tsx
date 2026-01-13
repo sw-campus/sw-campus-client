@@ -1,7 +1,5 @@
 'use client'
 
-import Image from 'next/image'
-
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -185,12 +183,10 @@ export function LectureDetailModal({
                   {detail.teachers.map(teacher => (
                     <div key={teacher.teacherId} className="bg-muted flex items-start gap-4 rounded-md px-4 py-3">
                       {teacher.teacherImageUrl && (
-                        <Image
+                        <img
                           src={teacher.teacherImageUrl}
                           alt={teacher.teacherName}
-                          width={64}
-                          height={64}
-                          className="shrink-0 rounded-full object-cover"
+                          className="h-16 w-16 shrink-0 rounded-full object-cover"
                         />
                       )}
                       <div className="flex flex-col gap-1">
