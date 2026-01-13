@@ -34,6 +34,8 @@ function getReadableSourceName(source: string, medium: string): string {
     // 소셜 미디어 광고
     'ig/paid': '인스타그램 광고',
     'instagram/paid': '인스타그램 광고',
+    'ig/social': '인스타그램',
+    'instagram/social': '인스타그램',
     'fb/paid': '페이스북 광고',
     'facebook/paid': '페이스북 광고',
 
