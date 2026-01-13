@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
 import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
@@ -200,7 +199,7 @@ function TeacherItem({ control, index, totalCount, onMove, onRemove }: TeacherIt
         <div className="flex items-center gap-3">
           {teacherImageUrl ? (
             <>
-              <Image src={teacherImageUrl} alt="강사 이미지" width={40} height={40} className="rounded-full object-cover" />
+              <img src={teacherImageUrl} alt="강사 이미지" className="size-10 rounded-full object-cover" />
               <span className="text-muted-foreground text-sm">기존 이미지 사용</span>
             </>
           ) : (
@@ -310,12 +309,10 @@ function TeacherSearchModal({ onSelect, onClose, existingTeacherIds }: TeacherSe
                     onClick={() => onSelect(teacher)}
                   >
                     {teacher.teacherImageUrl ? (
-                      <Image
+                      <img
                         src={teacher.teacherImageUrl}
                         alt={teacher.teacherName}
-                        width={40}
-                        height={40}
-                        className="shrink-0 rounded-full object-cover"
+                        className="size-10 shrink-0 rounded-full object-cover"
                       />
                     ) : (
                       <div className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-medium">

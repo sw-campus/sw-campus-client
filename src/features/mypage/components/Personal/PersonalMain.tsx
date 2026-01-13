@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 import { isAxiosError } from 'axios'
@@ -753,11 +752,10 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-gray-700">현재 수료증 이미지</p>
                   <div className="relative overflow-hidden rounded-lg border bg-gray-100">
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={selectedCertificate.certificateImageUrl}
                       alt="수료증 이미지"
-                      width={500}
-                      height={300}
                       className="h-auto max-h-64 w-full object-contain"
                     />
                   </div>

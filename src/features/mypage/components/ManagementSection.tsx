@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 import { LuImage, LuPencil, LuStar, LuUpload } from 'react-icons/lu'
@@ -477,11 +476,10 @@ export function ReviewManagementSection() {
                     className="relative cursor-pointer overflow-hidden rounded-lg border bg-gray-100 transition hover:opacity-90"
                     onClick={() => setFullImageUrl(selectedCertificate.certificateImageUrl!)}
                   >
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={selectedCertificate.certificateImageUrl}
                       alt="수료증 이미지"
-                      width={500}
-                      height={300}
                       className="h-auto max-h-64 w-full object-contain"
                     />
                   </div>
