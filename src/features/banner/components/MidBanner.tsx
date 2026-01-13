@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
+import { Autoplay } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import SmallBanner from '@/features/banner/components/SmallBanner'
@@ -81,7 +82,12 @@ export default function MidBanner() {
               onBeforeInit={swiper => {
                 swiperRef.current = swiper
               }}
+              modules={[Autoplay]}
               loop={true}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+              }}
               spaceBetween={16}
               slidesPerView={2}
               breakpoints={{
