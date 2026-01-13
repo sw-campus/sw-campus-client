@@ -123,7 +123,7 @@ export function OrganizationCard({ onEditClick }: OrganizationCardProps) {
               <div className="flex shrink-0 flex-col items-center gap-2">
                 <div className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-xl border bg-white p-2 shadow-sm">
                   {org.logoUrl ? (
-                    <Image src={org.logoUrl} alt="logo" width={128} height={128} className="object-contain" />
+                    <Image src={org.logoUrl} alt="logo" fill className="object-contain" />
                   ) : (
                     <span className="text-muted-foreground text-xs">No Logo</span>
                   )}
