@@ -4,8 +4,11 @@ import { useMemo, useState } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, Star } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { FaUser } from 'react-icons/fa'
 import { toast } from 'sonner'
+
+import { useAuthStore } from '@/store/authStore'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -91,6 +94,8 @@ function ReviewCard({ review }: { review: Review }) {
 
 export default function LectureReviews({ lectureId }: Props) {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const isLoggedIn = useAuthStore(state => state.isLoggedIn)
 
   // 모달 상태
   const [openVerify, setOpenVerify] = useState(false)
@@ -128,6 +133,12 @@ export default function LectureReviews({ lectureId }: Props) {
 
   // 후기 작성 버튼 클릭
   const handleWriteClick = async () => {
+    // 로그인 여부 먼저 체크
+    if (!isLoggedIn) {
+      router.push('/login')
+      return
+    }
+
     const eligibility = await checkReviewEligibility(lectureId)
 
     if (!eligibility.canWrite) {

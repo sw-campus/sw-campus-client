@@ -71,6 +71,12 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
   // lectureId별 승인(버튼 라벨 전환용)
   const [approvedLectureIds, setApprovedLectureIds] = useState<Set<number>>(new Set())
 
+  // 강의 목록 새로고침 함수 (중복 로직 추출)
+  const refetchLectures = async () => {
+    const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
+    setLectures(Array.isArray(data) ? data : [])
+  }
+
   // Create review modal state (ReviewForm 재사용)
   const [createOpen, setCreateOpen] = useState(false)
   const [createLectureId, setCreateLectureId] = useState<number | null>(null)
@@ -270,8 +276,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
 
       // 목록 갱신
       try {
-        const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
-        setLectures(Array.isArray(data) ? data : [])
+        await refetchLectures()
         setCertImageOpen(false)
         setSelectedCertificate(null)
       } catch {
@@ -469,8 +474,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                     try {
                       setLecturesLoading(true)
                       setLecturesError(null)
-                      const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
-                      setLectures(Array.isArray(data) ? data : [])
+                      await refetchLectures()
                     } catch {
                       setLecturesError('강의 목록을 불러오지 못했습니다.')
                     } finally {
@@ -701,8 +705,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                 // 목록 갱신
                 try {
                   setLecturesLoading(true)
-                  const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
-                  setLectures(Array.isArray(data) ? data : [])
+                  await refetchLectures()
                 } finally {
                   setLecturesLoading(false)
                 }
