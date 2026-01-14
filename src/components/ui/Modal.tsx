@@ -44,7 +44,7 @@ export default function Modal({ isOpen, onClose, title, maxWidthClass = 'max-w-2
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-[200] grid place-items-center bg-black/50 backdrop-blur-sm"
       aria-modal="true"
       role="dialog"
       onMouseDown={onOverlayClick}
