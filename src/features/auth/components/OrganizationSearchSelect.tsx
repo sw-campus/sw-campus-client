@@ -8,7 +8,7 @@ import { useOrganizationsQuery } from '@/features/organization/hooks/useOrganiza
 import { cn } from '@/lib/utils'
 
 const INPUT_BASE_CLASS =
-  'h-10 rounded-md border border-white/15 bg-white/10 px-3 text-white placeholder:text-white/45 outline-none focus:border-white/35 focus:bg-white/15'
+  'h-10 rounded-md border border-gray-200 bg-gray-50 px-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100'
 
 type OrganizationSearchSelectProps = {
   organizationId: number | null
@@ -66,11 +66,11 @@ export default function OrganizationSearchSelect({
 
   return (
     <div data-org-search-select className={cn('relative mb-4', className)}>
-      <label className="mb-1 block text-white/75">기관명</label>
+      <label className="mb-1 block text-gray-700">기관명</label>
 
       {/* 입력 필드 */}
       <div className="relative">
-        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/50" />
+        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
         <input
           type="text"
           placeholder="기관명을 검색하거나 입력해주세요"
@@ -82,19 +82,19 @@ export default function OrganizationSearchSelect({
       </div>
 
       {/* 선택된 기관 표시 */}
-      {organizationId && <p className="mt-1 text-xs text-green-400">✓ 기존 기관 선택됨: {organizationName}</p>}
+      {organizationId && <p className="mt-1 text-xs text-green-600">✓ 기존 기관 선택됨: {organizationName}</p>}
       {!organizationId && keyword.trim() && (
-        <p className="mt-1 text-xs text-yellow-400">새 기관으로 등록됩니다: {keyword}</p>
+        <p className="mt-1 text-xs text-yellow-600">새 기관으로 등록됩니다: {keyword}</p>
       )}
 
       {/* 검색 결과 드롭다운 */}
       {showDropdown && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-white/20 bg-gray-900/95 shadow-lg backdrop-blur-xl">
+        <div className="absolute z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg">
           <div className="max-h-[200px] overflow-y-auto p-1">
-            {isLoading && <div className="py-3 text-center text-sm text-white/50">검색 중...</div>}
+            {isLoading && <div className="py-3 text-center text-sm text-gray-500">검색 중...</div>}
 
             {!isLoading && (!orgData || orgData.length === 0) && (
-              <div className="py-3 text-center text-sm text-white/50">
+              <div className="py-3 text-center text-sm text-gray-500">
                 검색 결과가 없습니다. 새 기관으로 등록됩니다.
               </div>
             )}
@@ -103,12 +103,17 @@ export default function OrganizationSearchSelect({
               <div
                 key={org.id}
                 className={cn(
-                  'flex cursor-pointer items-center rounded-md px-2 py-2 text-sm text-white transition hover:bg-white/10',
-                  organizationId === org.id && 'bg-white/20',
+                  'flex cursor-pointer items-center rounded-md px-2 py-2 text-sm text-gray-900 transition hover:bg-gray-100',
+                  organizationId === org.id && 'bg-orange-50',
                 )}
                 onClick={() => handleSelectOrg(org.id, org.name)}
               >
-                <Check className={cn('mr-2 h-4 w-4', organizationId === org.id ? 'opacity-100' : 'opacity-0')} />
+                <Check
+                  className={cn(
+                    'mr-2 h-4 w-4 text-orange-500',
+                    organizationId === org.id ? 'opacity-100' : 'opacity-0',
+                  )}
+                />
                 <span>{org.name}</span>
               </div>
             ))}

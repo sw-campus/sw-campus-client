@@ -35,7 +35,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
     <>
       {/* 비밀번호 */}
       <div className="mb-4">
-        <label className="mb-1 block text-white/75">비밀번호</label>
+        <label className="mb-1 block text-gray-700">비밀번호</label>
         <input
           type="password"
           placeholder="비밀번호를 입력하세요"
@@ -47,7 +47,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
 
       {/* 비밀번호 확인 + 확인 버튼 */}
       <div className="mb-4">
-        <label className="mb-1 block text-white/75">비밀번호 확인</label>
+        <label className="mb-1 block text-gray-700">비밀번호 확인</label>
         <div className="flex gap-2">
           <input
             type="password"
@@ -59,7 +59,7 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
           <button
             type="button"
             onClick={onCheckPasswordMatch}
-            className="h-10 rounded-md bg-white/85 px-4 font-semibold text-black transition hover:bg-white"
+            className="h-10 rounded-md bg-orange-500 px-4 font-semibold text-white transition hover:bg-orange-600"
           >
             확인
           </button>

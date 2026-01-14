@@ -40,7 +40,7 @@ export default function SignupPersonalFormView() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-xl rounded-2xl border border-white/15 bg-white/10 p-5 text-white shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-8"
+      className="w-full max-w-xl rounded-2xl border border-gray-200 bg-white/90 p-5 text-gray-900 shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-8"
     >
       {/* 이메일 + 인증 */}
       <EmailAuthInput
@@ -88,7 +88,7 @@ export default function SignupPersonalFormView() {
       {/* 회원가입 버튼 */}
       <button
         type="submit"
-        className="mt-6 h-10 w-full rounded-md bg-white/85 font-semibold text-black transition hover:bg-white"
+        className="mt-6 h-10 w-full rounded-md bg-orange-500 font-semibold text-white transition hover:bg-orange-600"
       >
         회원가입
       </button>

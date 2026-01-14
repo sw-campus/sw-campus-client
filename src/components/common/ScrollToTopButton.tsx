@@ -42,7 +42,7 @@ export function ScrollToTopButton() {
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="pointer-events-auto ml-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/20"
+            className="pointer-events-auto ml-auto flex h-12 w-12 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 shadow-lg transition-colors hover:bg-gray-50 hover:text-orange-500"
             aria-label="상단으로 이동"
             title="상단으로 이동"
           >
