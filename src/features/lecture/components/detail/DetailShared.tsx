@@ -78,7 +78,7 @@ export function Section({ title, children, action }: { title: ReactNode; childre
 
 export function InfoBox({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-gray-50/50 p-6">
+    <div className="rounded-2xl border border-gray-200 bg-gray-50/50 p-6 shadow-sm">
       <div className="space-y-3">{children}</div>
     </div>
   )
@@ -111,7 +111,7 @@ export function RequirementItem({
 }) {
   const isRequired = type === 'REQUIRED'
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-white/60 px-4 py-3 backdrop-blur transition-colors hover:bg-white/80">
+    <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-colors hover:bg-gray-50">
       <Badge
         className={`shrink-0 rounded-md border px-2.5 py-1 text-xs font-bold shadow-sm ${
           isRequired
