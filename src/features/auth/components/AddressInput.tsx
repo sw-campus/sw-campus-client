@@ -20,11 +20,11 @@ export default function AddressInput({ autoOpen = false, variant = 'dark' }: Add
   const { address, detailAddress, setDetailAddress } = useSignupStore()
 
   const inputClass = variant === 'light' ? INPUT_LIGHT_CLASS : `${INPUT_BASE_CLASS} w-full flex-1`
-  const labelClass = variant === 'light' ? 'mb-1 block text-sm font-medium text-gray-800' : 'mb-1 block text-white/75'
+  const labelClass = variant === 'light' ? 'mb-1 block text-sm font-medium text-gray-800' : 'mb-1 block text-gray-700'
   const buttonClass =
     variant === 'light'
       ? 'h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800'
-      : 'h-10 rounded-md bg-white/85 px-4 font-semibold text-black transition hover:bg-white'
+      : 'h-10 rounded-md bg-orange-500 px-4 font-semibold text-white transition hover:bg-orange-600'
 
   const handleSearchAddress = () => {
     if (typeof window === 'undefined') return

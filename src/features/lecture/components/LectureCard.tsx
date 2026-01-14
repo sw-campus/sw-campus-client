@@ -30,7 +30,7 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
   return (
     <MotionLink
       href={`/lectures/${id}`}
-      className="group border-border/50 bg-card/40 text-card-foreground hover:border-accent hover:shadow-accent/10 relative flex h-full flex-col overflow-hidden rounded-xl border p-4 shadow-sm backdrop-blur-2xl transition-all duration-300 hover:shadow-2xl sm:p-5 md:p-6"
+      className="group text-card-foreground relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white/80 p-4 shadow-sm backdrop-blur-2xl transition-all duration-300 hover:border-orange-300 hover:shadow-xl hover:shadow-orange-100/50 sm:p-5 md:p-6"
       initial="rest"
       whileHover="hover"
       animate="rest"
@@ -60,7 +60,9 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
 
         <div className="mb-4 h-19">
           {/* 제목 */}
-          <h3 className="mb-2 line-clamp-2 text-lg leading-6 font-extrabold tracking-tight sm:text-xl sm:leading-7 md:text-2xl">{title}</h3>
+          <h3 className="mb-2 line-clamp-2 text-lg leading-6 font-extrabold tracking-tight sm:text-xl sm:leading-7 md:text-2xl">
+            {title}
+          </h3>
 
           {/* 기관명 */}
           <p className="text-muted-foregroundtruncate line-clamp-1 text-sm leading-5">{organization}</p>

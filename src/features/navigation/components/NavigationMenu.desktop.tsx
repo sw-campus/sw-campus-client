@@ -65,7 +65,7 @@ export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMous
                         <div className="flex flex-col gap-2 p-4">
                           <Link
                             href={item.href}
-                            className="hover:text-accent-foreground mb-2 font-semibold whitespace-nowrap"
+                            className="hover:text-accent-foreground mb-2 font-semibold whitespace-nowrap text-gray-900"
                           >
                             전체
                           </Link>
@@ -73,7 +73,7 @@ export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMous
                             <Link
                               href={child.href}
                               key={child.title}
-                              className="hover:text-accent-foreground text-sm whitespace-nowrap"
+                              className="hover:text-accent-foreground text-sm whitespace-nowrap text-gray-700"
                             >
                               {child.title}
                             </Link>

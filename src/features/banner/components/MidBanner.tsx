@@ -85,7 +85,7 @@ export default function MidBanner() {
               modules={[Autoplay]}
               loop={true}
               autoplay={{
-                delay: 3000,
+                delay: 5000,
                 disableOnInteraction: false,
               }}
               spaceBetween={16}
