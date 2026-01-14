@@ -58,7 +58,11 @@ export function EngagementCard({ averageEngagementTime, pageViews, sessions, per
           <div className="flex flex-col items-center justify-center gap-1">
             <div className="text-muted-foreground flex items-center gap-1.5">
               <LuEye className="h-4 w-4" />
-              <span className="text-xs">누적 페이지뷰</span>
+              <span className="text-center text-xs">
+                누적
+                <br />
+                페이지뷰
+              </span>
             </div>
             <span className="text-foreground text-xl font-semibold">{pageViews.toLocaleString()}</span>
           </div>

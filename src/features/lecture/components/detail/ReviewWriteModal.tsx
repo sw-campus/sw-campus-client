@@ -59,7 +59,7 @@ export function ReviewWriteModal({
               </div>
             </div>
             <textarea
-              placeholder="리뷰를 써 주세요. (20자 이상)"
+              placeholder="리뷰를 써 주세요. (10자 이상)"
               value={detailScores[cat].comment}
               onChange={e => onDetailCommentChange(cat, e.target.value)}
               className="h-24 w-full resize-y rounded-md border border-gray-200 px-3 py-2 text-sm"
@@ -68,9 +68,9 @@ export function ReviewWriteModal({
         ))}
 
         <div className="space-y-2">
-          <span className="text-sm font-semibold text-gray-800">총평</span>
+          <span className="text-sm font-semibold text-gray-800">총평 (선택)</span>
           <textarea
-            placeholder="리뷰를 써 주세요. (20자 이상)"
+            placeholder="총평을 입력하세요. (선택사항)"
             value={overallComment}
             onChange={e => onOverallCommentChange(e.target.value)}
             className="h-24 w-full resize-y rounded-md border border-gray-200 px-3 py-2 text-sm"

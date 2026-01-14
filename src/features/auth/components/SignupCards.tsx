@@ -19,7 +19,7 @@ export default function SignupCards() {
         imageAlt="개인회원 가입 이미지"
         onClick={() => router.push('/signup/personal/agreements')}
       >
-        <SocialIcons onGoogle={() => handleOAuthStart('google')} onGithub={() => handleOAuthStart('github')} />
+        <SocialIcons onGoogle={() => handleOAuthStart('google')} onGithub={() => handleOAuthStart('github')} onKakao={() => handleOAuthStart('kakao')} />
       </SignupCard>
 
       <SignupCard

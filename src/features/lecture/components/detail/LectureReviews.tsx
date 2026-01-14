@@ -4,8 +4,11 @@ import { useMemo, useState } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, Star } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { FaUser } from 'react-icons/fa'
 import { toast } from 'sonner'
+
+import { useAuthStore } from '@/store/authStore'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -38,8 +41,10 @@ function ReviewCard({ review }: { review: Review }) {
         <StarRating score={review.score} showScore size="sm" />
       </div>
 
-      {/* Comment */}
-      <p className="text-muted-foreground mb-4 text-xs leading-relaxed sm:text-sm">{review.comment}</p>
+      {/* Comment - 총평이 있을 때만 표시 */}
+      {review.comment && (
+        <p className="text-muted-foreground mb-4 text-xs leading-relaxed sm:text-sm">{review.comment}</p>
+      )}
 
       {/* Toggle Button */}
       <button
@@ -89,6 +94,8 @@ function ReviewCard({ review }: { review: Review }) {
 
 export default function LectureReviews({ lectureId }: Props) {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const isLoggedIn = useAuthStore(state => state.isLoggedIn)
 
   // 모달 상태
   const [openVerify, setOpenVerify] = useState(false)
@@ -126,6 +133,12 @@ export default function LectureReviews({ lectureId }: Props) {
 
   // 후기 작성 버튼 클릭
   const handleWriteClick = async () => {
+    // 로그인 여부 먼저 체크
+    if (!isLoggedIn) {
+      router.push('/login')
+      return
+    }
+
     const eligibility = await checkReviewEligibility(lectureId)
 
     if (!eligibility.canWrite) {
@@ -200,8 +213,8 @@ export default function LectureReviews({ lectureId }: Props) {
           return
         }
 
-        if (c.length < 20) {
-          toast.error(`${label} 의견을 20자 이상 작성해 주세요.`)
+        if (c.length < 10) {
+          toast.error(`${label} 의견을 10자 이상 작성해 주세요.`)
           return
         }
       }
