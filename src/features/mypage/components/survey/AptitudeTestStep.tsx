@@ -1,0 +1,320 @@
+'use client'
+
+import { useCallback, useEffect, useState } from 'react'
+
+import { AnimatePresence, motion } from 'framer-motion'
+import { Brain, ChevronLeft, ChevronRight, Lightbulb, Target } from 'lucide-react'
+import { toast } from 'sonner'
+
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+
+import {
+  ALL_APTITUDE_QUESTIONS,
+  PART1_QUESTIONS,
+  PART2_QUESTIONS,
+  PART3_QUESTIONS,
+  PART_COUNTS,
+} from '../../constants/surveyQuestions'
+import { useSubmitAptitudeTestMutation } from '../../hooks/useSurvey'
+import type { JobTypeCode, SubmitAptitudeTestRequest } from '../../types/survey.type'
+import { APTITUDE_TEST_STORAGE_KEY } from '../../types/survey.type'
+
+interface AptitudeTestStepProps {
+  onComplete: () => void
+  onSkip: () => void
+  onProgressChange?: (answered: number) => void
+}
+
+interface DraftAnswers {
+  part1: Record<string, number>
+  part2: Record<string, number>
+  part3: Record<string, JobTypeCode>
+  currentQuestionIndex: number
+}
+
+const DEFAULT_DRAFT: DraftAnswers = {
+  part1: {},
+  part2: {},
+  part3: {},
+  currentQuestionIndex: 0,
+}
+
+export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: AptitudeTestStepProps) {
+  const submitAptitudeTest = useSubmitAptitudeTestMutation()
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [answers, setAnswers] = useState<DraftAnswers>(DEFAULT_DRAFT)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // localStorage에서 임시 저장 데이터 로드
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(APTITUDE_TEST_STORAGE_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved) as DraftAnswers
+        setAnswers(parsed)
+        setCurrentIndex(parsed.currentQuestionIndex || 0)
+      }
+    } catch {
+      // 파싱 실패 시 기본값 사용
+    }
+  }, [])
+
+  // 진행률을 상위 컴포넌트에 전달
+  useEffect(() => {
+    const answered =
+      Object.keys(answers.part1).length +
+      Object.keys(answers.part2).length +
+      Object.keys(answers.part3).length
+    onProgressChange?.(answered)
+  }, [answers, onProgressChange])
+
+  // 답변 변경 시 localStorage에 자동 저장
+  const saveToStorage = useCallback((newAnswers: DraftAnswers) => {
+    try {
+      localStorage.setItem(APTITUDE_TEST_STORAGE_KEY, JSON.stringify(newAnswers))
+    } catch {
+      // 저장 실패 무시
+    }
+  }, [])
+
+  const currentQuestion = ALL_APTITUDE_QUESTIONS[currentIndex]
+  const progress = ((currentIndex + 1) / PART_COUNTS.total) * 100
+
+  const getCurrentAnswer = useCallback(() => {
+    if (!currentQuestion) return undefined
+    const { id, part } = currentQuestion
+    if (part === 1) return answers.part1[id]
+    if (part === 2) return answers.part2[id]
+    if (part === 3) return answers.part3[id]
+    return undefined
+  }, [currentQuestion, answers])
+
+  const handleSelectAnswer = useCallback(
+    (value: number | JobTypeCode) => {
+      if (!currentQuestion) return
+
+      const { id, part } = currentQuestion
+      const newAnswers = { ...answers }
+
+      if (part === 1) {
+        newAnswers.part1 = { ...answers.part1, [id]: value as number }
+      } else if (part === 2) {
+        newAnswers.part2 = { ...answers.part2, [id]: value as number }
+      } else {
+        newAnswers.part3 = { ...answers.part3, [id]: value as JobTypeCode }
+      }
+
+      newAnswers.currentQuestionIndex = currentIndex
+      setAnswers(newAnswers)
+      saveToStorage(newAnswers)
+
+      // 자동으로 다음 문항으로 이동 (마지막 문항 제외)
+      if (currentIndex < PART_COUNTS.total - 1) {
+        setTimeout(() => {
+          setCurrentIndex((prev) => prev + 1)
+          newAnswers.currentQuestionIndex = currentIndex + 1
+          saveToStorage(newAnswers)
+        }, 300)
+      }
+    },
+    [currentQuestion, answers, currentIndex, saveToStorage]
+  )
+
+  const handlePrev = useCallback(() => {
+    if (currentIndex > 0) {
+      const newIndex = currentIndex - 1
+      setCurrentIndex(newIndex)
+      const newAnswers = { ...answers, currentQuestionIndex: newIndex }
+      setAnswers(newAnswers)
+      saveToStorage(newAnswers)
+    }
+  }, [currentIndex, answers, saveToStorage])
+
+  const handleNext = useCallback(() => {
+    if (currentIndex < PART_COUNTS.total - 1) {
+      const newIndex = currentIndex + 1
+      setCurrentIndex(newIndex)
+      const newAnswers = { ...answers, currentQuestionIndex: newIndex }
+      setAnswers(newAnswers)
+      saveToStorage(newAnswers)
+    }
+  }, [currentIndex, answers, saveToStorage])
+
+  const isAllAnswered = useCallback(() => {
+    const part1Complete = PART1_QUESTIONS.every((q) => answers.part1[q.id] !== undefined)
+    const part2Complete = PART2_QUESTIONS.every((q) => answers.part2[q.id] !== undefined)
+    const part3Complete = PART3_QUESTIONS.every((q) => answers.part3[q.id] !== undefined)
+    return part1Complete && part2Complete && part3Complete
+  }, [answers])
+
+  const handleSubmit = async () => {
+    if (!isAllAnswered()) {
+      toast.error('모든 문항에 답변해주세요.')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const request: SubmitAptitudeTestRequest = {
+        part1Answers: answers.part1,
+        part2Answers: answers.part2,
+        part3Answers: answers.part3,
+      }
+      await submitAptitudeTest.mutateAsync(request)
+      toast.success('성향 테스트가 완료되었습니다.')
+      onComplete()
+    } catch (error) {
+      toast.error('제출 중 오류가 발생했습니다.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Part 정보
+  const getPartInfo = (part: number) => {
+    switch (part) {
+      case 1:
+        return { icon: Brain, label: 'Part 1: 논리 및 사고력', color: 'text-blue-600' }
+      case 2:
+        return { icon: Lightbulb, label: 'Part 2: 끈기 및 학습 태도', color: 'text-green-600' }
+      case 3:
+        return { icon: Target, label: 'Part 3: 직무 성향', color: 'text-purple-600' }
+      default:
+        return { icon: Brain, label: '', color: '' }
+    }
+  }
+
+  const partInfo = currentQuestion ? getPartInfo(currentQuestion.part) : null
+  const PartIcon = partInfo?.icon || Brain
+
+  return (
+    <div className="space-y-6">
+      {/* 헤더 */}
+      <div className="text-center">
+        <h2 className="text-xl font-semibold text-gray-900">개발자 성향 테스트</h2>
+        <p className="mt-1 text-sm text-gray-500">
+          15문항 / 약 5분 소요 / 건너뛰기 가능
+        </p>
+      </div>
+
+      {/* 진행률 */}
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">진행률</span>
+          <span className="font-medium text-amber-600">
+            {currentIndex + 1} / {PART_COUNTS.total}
+          </span>
+        </div>
+        <Progress value={progress} className="h-2" />
+      </div>
+
+      {/* Part 표시 */}
+      {partInfo && (
+        <div className={`flex items-center gap-2 ${partInfo.color}`}>
+          <PartIcon className="h-5 w-5" />
+          <span className="font-medium">{partInfo.label}</span>
+        </div>
+      )}
+
+      {/* 문항 */}
+      <AnimatePresence mode="wait">
+        {currentQuestion && (
+          <motion.div
+            key={currentQuestion.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-4"
+          >
+            <div className="rounded-xl bg-gray-50 p-6">
+              <p className="whitespace-pre-line text-lg font-medium text-gray-900">
+                Q{currentIndex + 1}. {currentQuestion.question}
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {currentQuestion.options.map((option, index) => {
+                const isSelected = getCurrentAnswer() === option.value
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleSelectAnswer(option.value)}
+                    className={`w-full rounded-xl border-2 p-4 text-left transition-all ${
+                      isSelected
+                        ? 'border-amber-500 bg-amber-50'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-medium ${
+                          isSelected
+                            ? 'bg-amber-500 text-white'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {index + 1}
+                      </div>
+                      <span className={isSelected ? 'text-amber-900' : 'text-gray-700'}>
+                        {option.label}
+                      </span>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 네비게이션 */}
+      <div className="flex items-center justify-between pt-4">
+        <Button
+          variant="outline"
+          onClick={handlePrev}
+          disabled={currentIndex === 0}
+          className="gap-2"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          이전
+        </Button>
+
+        <div className="flex gap-2">
+          {currentIndex === PART_COUNTS.total - 1 ? (
+            <Button
+              onClick={handleSubmit}
+              disabled={!isAllAnswered() || isSubmitting}
+              className="bg-amber-500 hover:bg-amber-600"
+            >
+              {isSubmitting ? '제출 중...' : '결과 확인'}
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={handleNext}
+              disabled={getCurrentAnswer() === undefined}
+              className="gap-2"
+            >
+              다음
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* 건너뛰기 */}
+      <div className="border-t border-gray-200 pt-4 text-center">
+        <button
+          type="button"
+          onClick={onSkip}
+          className="text-sm text-gray-500 underline hover:text-gray-700"
+        >
+          나중에 하기 (기초 설문만으로도 AI 추천을 받을 수 있습니다)
+        </button>
+      </div>
+    </div>
+  )
+}
