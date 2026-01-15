@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 
 import DynamicBackground from '@/components/common/DynamicBackground'
+import KakaoChannelButton from '@/components/common/KakaoChannelButton'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -55,6 +56,7 @@ export default function RootLayout({
         <QueryClientProviderWrapper>
           {children}
           <Toaster richColors closeButton position="bottom-center" />
+          <KakaoChannelButton />
         </QueryClientProviderWrapper>
       </body>
     </html>

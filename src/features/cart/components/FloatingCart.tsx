@@ -29,13 +29,13 @@ export default function FloatingCart() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 120 }}
-          className="fixed bottom-6 left-1/2 z-999 flex w-[95%] -translate-x-1/2 items-center gap-4 overflow-x-auto rounded-full border border-white/40 bg-white/40 px-6 py-4 shadow-xl backdrop-blur-xl md:w-auto md:max-w-[90%] md:min-w-[43.75rem]"
+          className="fixed bottom-6 left-1/2 z-999 flex w-[90%] -translate-x-1/2 items-center gap-2 overflow-x-auto rounded-full border border-white/40 bg-white/40 px-4 py-2 shadow-xl backdrop-blur-xl md:w-auto md:max-w-[90%] md:min-w-[43.75rem] md:gap-4 md:px-6 md:py-4"
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             {items.map(item => (
               <div key={item.lectureId} className="relative shrink-0">
                 {/* 이미지 */}
-                <div className="relative h-14 w-14 overflow-hidden rounded-full border border-white/60 shadow-sm">
+                <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/60 shadow-sm md:h-14 md:w-14">
                   {item.thumbnailUrl ? (
                     <Image
                       src={item.thumbnailUrl}
@@ -62,7 +62,7 @@ export default function FloatingCart() {
           {/* 과정비교 버튼 */}
           <button
             onClick={() => router.push('/cart/compare')}
-            className="ml-auto shrink-0 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-black shadow-lg transition-transform hover:scale-105 active:scale-95"
+            className="bg-accent ml-auto shrink-0 rounded-full px-4 py-2 text-sm font-semibold text-black shadow-lg transition-transform hover:scale-105 active:scale-95"
           >
             과정비교가기
           </button>
