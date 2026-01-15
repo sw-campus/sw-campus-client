@@ -90,8 +90,8 @@ export function AiFloatingButton({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className={cn(
-            // Position
-            'fixed right-10 bottom-10 z-[100]',
+            // Position: 모바일에서는 카트 위에, PC에서는 카카오 버튼 오른쪽에 배치
+            'fixed right-4 bottom-36 z-[100] md:right-10 md:bottom-12',
             'flex flex-col items-center justify-center',
             'h-[90px] w-[90px] rounded-full',
             // Default State (Ready)
