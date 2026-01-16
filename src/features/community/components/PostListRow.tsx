@@ -25,12 +25,12 @@ export function PostListRow({ post }: PostListRowProps) {
     <div className="block w-full">
       <Link
         href={`/community/${post.id}`}
-        className="group flex h-32 w-full items-center gap-5 rounded-xl border border-gray-200 bg-white/70 p-4 shadow-sm backdrop-blur-xl transition-all hover:border-orange-200 hover:bg-orange-50/30 hover:shadow-md"
+        className="group flex h-40 w-full items-center gap-5 rounded-xl border border-gray-200 bg-white/70 p-4 shadow-sm backdrop-blur-xl transition-all hover:border-orange-200 hover:bg-orange-50/30 hover:shadow-md"
       >
         {/* 썸네일 (고정 크기) */}
         <div className="hidden flex-shrink-0 sm:block">
           {post.thumbnailUrl ? (
-            <div className="relative h-24 w-32 overflow-hidden rounded-lg bg-gray-100">
+            <div className="relative h-32 w-48 overflow-hidden rounded-lg bg-gray-100">
               <Image
                 src={post.thumbnailUrl}
                 alt={post.title}
@@ -39,8 +39,8 @@ export function PostListRow({ post }: PostListRowProps) {
               />
             </div>
           ) : (
-            <div className="flex h-24 w-32 items-center justify-center rounded-lg bg-gradient-to-br from-orange-50 to-orange-100">
-              <FiImage className="h-8 w-8 text-orange-200" />
+            <div className="flex h-32 w-48 items-center justify-center rounded-lg bg-gradient-to-br from-orange-50 to-orange-100">
+              <FiImage className="h-10 w-10 text-orange-200" />
             </div>
           )}
         </div>
