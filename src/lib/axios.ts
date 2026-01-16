@@ -148,13 +148,22 @@ function clearAuthState(options: ClearAuthOptions = {}) {
 function isAuthPublicFlowRequest(url: string): boolean {
   // 회원가입/인증/중복검사 등: 로그인 상태가 없어도 호출되는 엔드포인트
   // - 여기서 401이 나더라도 "세션 만료"로 간주해 /login으로 보내면 UX가 깨짐
-  return /\/auth\/(email|signup|oauth)/i.test(url) || /\/members\/nickname\/check/i.test(url)
+  // - 메인 페이지에서 사용하는 공개 API들도 포함 (카테고리, 배너, 강의 목록 등)
+  return (
+    /\/auth\/(email|signup|oauth)/i.test(url) ||
+    /\/members\/nickname\/check/i.test(url) ||
+    /\/categories/i.test(url) ||
+    /\/banners/i.test(url) ||
+    /\/lectures/i.test(url)
+  )
 }
 
 function isOnAuthPublicPage(): boolean {
   if (typeof window === 'undefined') return false
   const path = window.location?.pathname ?? ''
-  return path.startsWith('/signup') || path.startsWith('/login')
+  // 메인 페이지와 인증 관련 페이지는 공개 페이지로 간주
+  // - API 하나라도 빠뜨려도 메인 페이지는 절대 /login으로 튕기지 않음
+  return path === '/' || path.startsWith('/signup') || path.startsWith('/login')
 }
 
 // Header 등에서 사용: 포커스/탭 복귀 시 세션을 조용히 점검
