@@ -217,6 +217,7 @@ export default function CartCompareSection() {
               rightTitle={right?.title ?? 'B과정'}
               leftId={leftId}
               rightId={rightId}
+              recommendationLevel={aiResult.recommendationLevel}
             />
           )}
         </CardContent>

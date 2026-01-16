@@ -124,7 +124,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                   </TableRow>
                 ) : (
                   banners.map((banner, idx) => (
-                    <TableRow key={banner.bannerId}>
+                    <TableRow key={`${banner.bannerId}-${idx}`}>
                       <TableCell className="font-medium">
                         <RankBadge rank={idx + 1} />
                       </TableCell>
@@ -185,7 +185,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                   </TableRow>
                 ) : (
                   lectures.map((lecture, idx) => (
-                    <TableRow key={lecture.lectureId}>
+                    <TableRow key={`${lecture.lectureId}-${idx}`}>
                       <TableCell className="font-medium">
                         <RankBadge rank={idx + 1} />
                       </TableCell>
@@ -250,7 +250,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                 </TableRow>
               ) : (
                 allBanners.map((banner, idx) => (
-                  <TableRow key={banner.bannerId}>
+                  <TableRow key={`${banner.bannerId}-${idx}`}>
                     <TableCell>
                       <RankBadge rank={idx + 1} />
                     </TableCell>
@@ -302,7 +302,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                 </TableRow>
               ) : (
                 allLectures.map((lecture, idx) => (
-                  <TableRow key={lecture.lectureId}>
+                  <TableRow key={`${lecture.lectureId}-${idx}`}>
                     <TableCell>
                       <RankBadge rank={idx + 1} />
                     </TableCell>

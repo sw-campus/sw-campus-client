@@ -7,6 +7,21 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true, // 빌드 시 TypeScript 에러 무시
   },
+  experimental: {
+    // Barrel import 최적화 - 직접 import로 자동 변환하여 번들 사이즈 감소
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-icons',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-tooltip',
+      'date-fns',
+      'lodash',
+    ],
+  },
   images: {
     remotePatterns: [
       {
