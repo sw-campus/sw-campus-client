@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 
+import { usePublishedQuestionSetQuery } from '../../hooks/useSurvey'
 import type { RecommendedJob, SurveyResponse } from '../../types/survey.type'
 import {
   BUDGET_RANGE_LABELS,
@@ -37,6 +38,10 @@ export function SurveyResultsStep({
   const basicSurvey = survey?.basicSurvey
   const results = survey?.results
   const status = survey?.status
+
+  // 발행된 성향 테스트 문항 세트 조회 (문항 수 표시용)
+  const { data: aptitudeQuestionSet } = usePublishedQuestionSetQuery('APTITUDE')
+  const questionCount = aptitudeQuestionSet?.questions?.length ?? 0
 
   const handleRetakeClick = () => {
     if (status?.hasAptitudeTest) {
@@ -125,7 +130,7 @@ export function SurveyResultsStep({
             성향 테스트를 완료하면 맞춤 직무를 추천받을 수 있어요!
           </h3>
           <p className="mt-1 text-sm text-gray-600">
-            15문항 / 약 5분 소요 / AI 정밀 추천 활성화
+            {questionCount > 0 ? `${questionCount}문항` : '문항'} / 약 1분 소요 / AI 정밀 추천 활성화
           </p>
           <Button
             onClick={handleRetakeClick}
