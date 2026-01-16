@@ -13,5 +13,8 @@ export const SURVEY_MESSAGES = {
     SAVE_FAILED: '저장 중 오류가 발생했습니다.',
     SUBMIT_FAILED: '제출 중 오류가 발생했습니다.',
     INCOMPLETE_ANSWERS: '모든 문항에 답변해주세요.',
+    NETWORK_ERROR: '네트워크 연결을 확인해주세요.',
+    UNAUTHORIZED: '로그인이 필요합니다.',
+    SERVER_ERROR: '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
   },
 } as const

@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AxiosError } from 'axios'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -46,7 +47,8 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
     resolver: zodResolver(basicSurveySchema),
     mode: 'onChange',
     defaultValues: {
-      major: existingData?.major ?? '',
+      hasMajor: existingData?.majorInfo?.hasMajor ?? false,
+      majorName: existingData?.majorInfo?.majorName ?? null,
       hasProgrammingExperience: existingData?.programmingExperience?.hasExperience ?? false,
       bootcampName: existingData?.programmingExperience?.bootcampName ?? null,
       preferredLearningMethod: existingData?.preferredLearningMethod ?? 'MIXED',
@@ -56,8 +58,16 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
     },
   })
 
+  const hasMajor = watch('hasMajor')
   const hasProgrammingExperience = watch('hasProgrammingExperience')
   const desiredJobs = watch('desiredJobs')
+
+  // 전공 유무 체크 해제 시 majorName 초기화
+  useEffect(() => {
+    if (!hasMajor) {
+      setValue('majorName', null)
+    }
+  }, [hasMajor, setValue])
 
   // 프로그래밍 경험 체크 해제 시 bootcampName 초기화
   useEffect(() => {
@@ -77,7 +87,10 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
     try {
       // Transform flat form values to nested API request structure
       await saveBasicSurvey.mutateAsync({
-        major: values.major,
+        majorInfo: {
+          hasMajor: values.hasMajor,
+          majorName: values.majorName,
+        },
         programmingExperience: {
           hasExperience: values.hasProgrammingExperience,
           bootcampName: values.bootcampName,
@@ -90,7 +103,20 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
       toast.success(SURVEY_MESSAGES.SUCCESS.BASIC_SAVED)
       onComplete()
     } catch (error) {
-      toast.error(SURVEY_MESSAGES.ERROR.SAVE_FAILED)
+      if (error instanceof AxiosError) {
+        const status = error.response?.status
+        if (!error.response) {
+          toast.error(SURVEY_MESSAGES.ERROR.NETWORK_ERROR)
+        } else if (status === 401 || status === 403) {
+          toast.error(SURVEY_MESSAGES.ERROR.UNAUTHORIZED)
+        } else if (status && status >= 500) {
+          toast.error(SURVEY_MESSAGES.ERROR.SERVER_ERROR)
+        } else {
+          toast.error(SURVEY_MESSAGES.ERROR.SAVE_FAILED)
+        }
+      } else {
+        toast.error(SURVEY_MESSAGES.ERROR.SAVE_FAILED)
+      }
     }
   }
 
@@ -100,19 +126,52 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Q1: 전공 */}
-      <div className="space-y-2">
-        <Label htmlFor="major" className="text-base font-medium">
-          전공 <span className="text-red-500">*</span>
+      {/* Q1: 전공 유무 */}
+      <div className="space-y-3">
+        <Label className="text-base font-medium">
+          전공 유무 <span className="text-red-500">*</span>
         </Label>
-        <Input
-          id="major"
-          {...register('major')}
-          placeholder="예: 컴퓨터공학, 경영학, 디자인 등"
-          className="h-11"
+        <Controller
+          name="hasMajor"
+          control={control}
+          render={({ field }) => (
+            <div className="flex items-center gap-6">
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  type="radio"
+                  checked={field.value === true}
+                  onChange={() => field.onChange(true)}
+                  className="h-4 w-4 text-amber-500 focus:ring-amber-500"
+                />
+                <span>전공 있음</span>
+              </label>
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  type="radio"
+                  checked={field.value === false}
+                  onChange={() => field.onChange(false)}
+                  className="h-4 w-4 text-amber-500 focus:ring-amber-500"
+                />
+                <span>전공 없음 (비전공)</span>
+              </label>
+            </div>
+          )}
         />
-        {errors.major && (
-          <p className="text-sm text-red-500">{errors.major.message}</p>
+        {hasMajor && (
+          <div className="ml-6 mt-3">
+            <Label htmlFor="majorName" className="text-sm text-gray-600">
+              전공명 <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="majorName"
+              {...register('majorName')}
+              placeholder="예: 컴퓨터공학, 경영학, 디자인 등"
+              className="mt-1 h-10"
+            />
+            {errors.majorName && (
+              <p className="mt-1 text-sm text-red-500">{errors.majorName.message}</p>
+            )}
+          </div>
         )}
       </div>
 

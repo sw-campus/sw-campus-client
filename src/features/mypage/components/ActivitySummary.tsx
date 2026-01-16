@@ -8,17 +8,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { api } from '@/lib/axios'
 
+import { useSurveyStatusQuery } from '../hooks/useSurvey'
+
 type CompletedLecture = {
   certificateId: number
   lectureId: number
   lectureName: string
   canWriteReview: boolean
   reviewId?: number
-}
-
-type SurveyResponse = {
-  surveyId: number | null
-  exists?: boolean | null
 }
 
 type ReviewResponse = {
@@ -30,19 +27,25 @@ type ActivitySummaryProps = {
 }
 
 export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
-  const [stats, setStats] = useState({
+  const [lectureStats, setLectureStats] = useState({
     completedLectures: 0,
     approvedReviews: 0,
-    surveyCompleted: false,
   })
-  const [loading, setLoading] = useState(true)
+  const [lectureLoading, setLectureLoading] = useState(true)
+
+  // 설문 상태는 React Query로 관리 (모달에서 변경 시 자동 반영)
+  const { data: surveyStatus, isLoading: surveyLoading } = useSurveyStatusQuery()
+  const hasBasicSurvey = surveyStatus?.hasBasicSurvey ?? false
+  const hasAptitudeTest = surveyStatus?.hasAptitudeTest ?? false
+
+  const loading = lectureLoading || surveyLoading
 
   useEffect(() => {
     let mounted = true
 
-    const loadStats = async () => {
+    const loadLectureStats = async () => {
       try {
-        setLoading(true)
+        setLectureLoading(true)
 
         // 수료 강의 목록
         const lecturesRes = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
@@ -66,31 +69,20 @@ export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
           approvedCount = results.filter(Boolean).length
         }
 
-        // 설문 완료 여부
-        let surveyDone = false
-        try {
-          const surveyRes = await api.get<SurveyResponse>('/mypage/survey')
-          const surveyId = surveyRes.data?.surveyId
-          surveyDone = surveyRes.data?.exists === true || (surveyId !== null && surveyId !== undefined)
-        } catch {
-          // ignore
-        }
-
         if (mounted) {
-          setStats({
+          setLectureStats({
             completedLectures: completedCount,
             approvedReviews: approvedCount,
-            surveyCompleted: surveyDone,
           })
         }
       } catch {
         // ignore
       } finally {
-        if (mounted) setLoading(false)
+        if (mounted) setLectureLoading(false)
       }
     }
 
-    loadStats()
+    loadLectureStats()
     return () => {
       mounted = false
     }
@@ -113,7 +105,7 @@ export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
               <div className="text-muted-foreground">
                 <LuAward className="h-5 w-5" />
               </div>
-              <span className="text-foreground text-xl font-bold">{stats.completedLectures}개</span>
+              <span className="text-foreground text-xl font-bold">{lectureStats.completedLectures}개</span>
               <span className="text-muted-foreground text-xs">수료 강의</span>
             </div>
 
@@ -122,20 +114,43 @@ export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
               <div className="text-muted-foreground">
                 <LuBadgeCheck className="h-5 w-5" />
               </div>
-              <span className="text-foreground text-xl font-bold">{stats.approvedReviews}개</span>
+              <span className="text-foreground text-xl font-bold">{lectureStats.approvedReviews}개</span>
               <span className="text-muted-foreground text-xs">승인된 후기</span>
             </div>
 
-            {/* 설문 - 수정 버튼 포함 */}
+            {/* 설문 - 프로그레스 바 + 수정 버튼 */}
             <div className="flex flex-col items-center gap-1 text-center">
               <div className="text-muted-foreground">
                 <LuClipboardCheck className="h-5 w-5" />
               </div>
-              <span
-                className={`text-xl font-bold ${stats.surveyCompleted ? 'text-green-600' : 'text-muted-foreground'}`}
-              >
-                {stats.surveyCompleted ? '완료' : '미작성'}
-              </span>
+              {/* 프로그레스 바 + 상태 텍스트 (한 줄) */}
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div
+                    className={`h-3 w-5 rounded ${
+                      hasBasicSurvey
+                        ? hasAptitudeTest
+                          ? 'bg-green-500'
+                          : 'bg-amber-500'
+                        : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                  />
+                  <div
+                    className={`h-3 w-5 rounded ${hasAptitudeTest ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+                  />
+                </div>
+                <span
+                  className={`text-lg font-bold ${
+                    hasAptitudeTest
+                      ? 'text-green-600'
+                      : hasBasicSurvey
+                        ? 'text-amber-600'
+                        : 'text-muted-foreground'
+                  }`}
+                >
+                  {hasAptitudeTest ? '2단계' : hasBasicSurvey ? '1단계' : '미작성'}
+                </span>
+              </div>
               <div className="flex items-center gap-1">
                 <span className="text-muted-foreground text-xs">설문</span>
                 {onEditSurvey && (

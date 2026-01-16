@@ -1,8 +1,18 @@
 'use client'
 
+import { useState } from 'react'
+
 import { Code2, Database, Layers, Palette, Pencil, RefreshCw, Sparkles } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 import type { RecommendedJob, SurveyResponse } from '../../types/survey.type'
 import {
@@ -23,9 +33,25 @@ export function SurveyResultsStep({
   onEditBasic,
   onRetakeAptitude,
 }: SurveyResultsStepProps) {
+  const [showRetakeConfirm, setShowRetakeConfirm] = useState(false)
   const basicSurvey = survey?.basicSurvey
   const results = survey?.results
   const status = survey?.status
+
+  const handleRetakeClick = () => {
+    if (status?.hasAptitudeTest) {
+      // 이미 테스트를 완료한 경우 확인 모달 표시
+      setShowRetakeConfirm(true)
+    } else {
+      // 처음 테스트하는 경우 바로 시작
+      onRetakeAptitude()
+    }
+  }
+
+  const handleConfirmRetake = () => {
+    setShowRetakeConfirm(false)
+    onRetakeAptitude()
+  }
 
   // 추천 직무 아이콘
   const getRecommendedJobIcon = (job: RecommendedJob | undefined) => {
@@ -102,7 +128,7 @@ export function SurveyResultsStep({
             15문항 / 약 5분 소요 / AI 정밀 추천 활성화
           </p>
           <Button
-            onClick={onRetakeAptitude}
+            onClick={handleRetakeClick}
             className="mt-4 bg-amber-500 hover:bg-amber-600"
           >
             <Sparkles className="mr-2 h-4 w-4" />
@@ -171,7 +197,11 @@ export function SurveyResultsStep({
             <dl className="space-y-3">
               <div className="flex justify-between">
                 <dt className="text-sm text-gray-500">전공</dt>
-                <dd className="text-sm font-medium text-gray-900">{basicSurvey.major}</dd>
+                <dd className="text-sm font-medium text-gray-900">
+                  {basicSurvey.majorInfo?.hasMajor
+                    ? basicSurvey.majorInfo.majorName
+                    : '비전공'}
+                </dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-sm text-gray-500">프로그래밍 경험</dt>
@@ -209,7 +239,7 @@ export function SurveyResultsStep({
         <div className="text-center">
           <Button
             variant="outline"
-            onClick={onRetakeAptitude}
+            onClick={handleRetakeClick}
             className="gap-2 text-gray-600"
           >
             <RefreshCw className="h-4 w-4" />
@@ -220,6 +250,27 @@ export function SurveyResultsStep({
           </p>
         </div>
       )}
+
+      {/* 성향 테스트 재응시 확인 모달 */}
+      <Dialog open={showRetakeConfirm} onOpenChange={setShowRetakeConfirm}>
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>성향 테스트를 다시 하시겠습니까?</DialogTitle>
+            <DialogDescription>
+              테스트를 다시 진행하면 기존 결과(추천 직무)가 새 결과로 덮어씌워집니다.
+              이 작업은 되돌릴 수 없습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRetakeConfirm(false)}>
+              취소
+            </Button>
+            <Button onClick={handleConfirmRetake}>
+              다시 테스트하기
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

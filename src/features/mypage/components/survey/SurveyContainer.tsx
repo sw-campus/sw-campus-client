@@ -38,7 +38,8 @@ export function SurveyContainer({ embedded = false, onComplete }: SurveyContaine
     if (hasAptitudeTest) {
       setCurrentStep('results')
     } else if (hasBasicSurvey) {
-      setCurrentStep('aptitude')
+      // 기초 설문만 완료된 경우 results 화면에서 성향 테스트 유도
+      setCurrentStep('results')
     } else {
       setCurrentStep('basic')
     }
@@ -111,6 +112,20 @@ export function SurveyContainer({ embedded = false, onComplete }: SurveyContaine
 
   const currentStepIndex = steps.findIndex((s) => s.id === currentStep)
 
+  // 각 스텝의 실제 완료 상태
+  const getStepCompletionStatus = (stepId: string) => {
+    switch (stepId) {
+      case 'basic':
+        return hasBasicSurvey
+      case 'aptitude':
+        return hasAptitudeTest
+      case 'results':
+        return hasAptitudeTest // 성향 테스트까지 완료해야 결과도 완료
+      default:
+        return false
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -138,10 +153,11 @@ export function SurveyContainer({ embedded = false, onComplete }: SurveyContaine
           {steps.map((step, index) => {
             const Icon = step.icon
             const isActive = index === currentStepIndex
-            const isCompleted = index < currentStepIndex
+            // 실제 완료 상태 기준으로 표시 (현재 화면 위치가 아닌 실제 데이터 기준)
+            const isCompleted = getStepCompletionStatus(step.id)
             // 클릭 가능 여부: 성향 테스트 중일 때만 기초 설문으로 돌아갈 수 있음
             // (결과 화면에서는 기존 수정/다시하기 버튼 사용)
-            const isClickable = currentStep === 'aptitude' && isCompleted
+            const isClickable = currentStep === 'aptitude' && isCompleted && step.id === 'basic'
 
             const handleStepClick = () => {
               if (isClickable && !isActive) {

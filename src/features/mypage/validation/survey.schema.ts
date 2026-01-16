@@ -16,10 +16,8 @@ export const jobTypeCodeSchema = z.enum(['F', 'B', 'D'])
  * 기초 설문 폼 스키마
  */
 export const basicSurveySchema = z.object({
-  major: z
-    .string()
-    .min(1, '전공을 입력해주세요.')
-    .max(100, '전공은 100자 이내로 입력해주세요.'),
+  hasMajor: z.boolean(),
+  majorName: z.string().max(100, '전공은 100자 이내로 입력해주세요.').nullable(),
   hasProgrammingExperience: z.boolean(),
   bootcampName: z.string().nullable(),
   preferredLearningMethod: learningMethodSchema,
@@ -29,6 +27,30 @@ export const basicSurveySchema = z.object({
   desiredJobOther: z.string().nullable(),
   affordableBudgetRange: budgetRangeSchema,
 }).refine(
+  (data) => {
+    // 전공이 있는 경우 majorName이 필수
+    if (data.hasMajor && (!data.majorName || data.majorName.trim() === '')) {
+      return false
+    }
+    return true
+  },
+  {
+    message: '전공명을 입력해주세요.',
+    path: ['majorName'],
+  }
+).refine(
+  (data) => {
+    // 전공이 없는 경우 majorName이 없어야 함
+    if (!data.hasMajor && data.majorName) {
+      return false
+    }
+    return true
+  },
+  {
+    message: '전공이 없는 경우 전공명을 입력할 수 없습니다.',
+    path: ['majorName'],
+  }
+).refine(
   (data) => {
     // 프로그래밍 경험이 있으면 bootcampName이 있어야 함 (선택사항이지만 권장)
     // 여기서는 경험 있음 선택 시에만 bootcampName 입력 가능하도록

@@ -10,13 +10,18 @@ export type RecommendedJob = 'FRONTEND' | 'BACKEND' | 'DATA' | 'FULLSTACK'
 export type JobTypeCode = 'F' | 'B' | 'D'
 
 // Basic Survey
+export interface MajorInfo {
+  hasMajor: boolean
+  majorName: string | null
+}
+
 export interface ProgrammingExperience {
   hasExperience: boolean
   bootcampName: string | null
 }
 
 export interface BasicSurvey {
-  major: string
+  majorInfo: MajorInfo
   programmingExperience: ProgrammingExperience
   preferredLearningMethod: LearningMethod
   desiredJobs: DesiredJob[]
@@ -55,13 +60,18 @@ export interface SurveyResponse {
   completedAt: string | null
 }
 
+export interface MajorInfoResponse {
+  hasMajor: boolean
+  majorName: string | null
+}
+
 export interface ProgrammingExperienceResponse {
   hasExperience: boolean
   bootcampName: string | null
 }
 
 export interface BasicSurveyResponse {
-  major: string
+  majorInfo: MajorInfoResponse
   programmingExperience: ProgrammingExperienceResponse
   preferredLearningMethod: LearningMethod
   desiredJobs: DesiredJob[]
@@ -74,13 +84,18 @@ export interface SurveyResultsResponse {
 }
 
 // Request Types
+export interface MajorInfoRequest {
+  hasMajor: boolean
+  majorName: string | null
+}
+
 export interface ProgrammingExperienceRequest {
   hasExperience: boolean
   bootcampName: string | null
 }
 
 export interface SaveBasicSurveyRequest {
-  major: string
+  majorInfo: MajorInfoRequest
   programmingExperience: ProgrammingExperienceRequest
   preferredLearningMethod: LearningMethod
   desiredJobs: DesiredJob[]

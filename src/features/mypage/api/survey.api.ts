@@ -28,6 +28,12 @@ export async function getMySurvey(): Promise<SurveyResponse | null> {
 }
 
 /**
+ * 설문조사 전체 조회 (호환성 alias)
+ * @see getMySurvey
+ */
+export const getSurvey = getMySurvey
+
+/**
  * 기초 설문 저장
  * POST /api/v1/members/me/survey/basic
  */
