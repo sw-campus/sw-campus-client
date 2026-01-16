@@ -3,6 +3,8 @@ import { AxiosError } from 'axios'
 import { api } from '@/lib/axios'
 
 import type {
+  QuestionSetResponse,
+  QuestionSetType,
   SaveBasicSurveyRequest,
   SubmitAptitudeTestRequest,
   SurveyResponse,
@@ -70,6 +72,21 @@ export async function getSurveyResults(): Promise<SurveyResultsResponse> {
  */
 export async function getSurveyStatus(): Promise<SurveyStatus> {
   const { data } = await api.get<SurveyStatus>('/members/me/survey/status')
+  return data
+}
+
+/**
+ * 발행된 문항 세트 조회
+ * GET /api/v1/members/me/survey/question-sets/{type}
+ * @param type - 문항 세트 타입 (BASIC | APTITUDE)
+ * @returns 발행된 문항 세트 (없으면 null)
+ */
+export async function getPublishedQuestionSet(
+  type: QuestionSetType
+): Promise<QuestionSetResponse | null> {
+  const { data } = await api.get<QuestionSetResponse | null>(
+    `/members/me/survey/question-sets/${type}`
+  )
   return data
 }
 

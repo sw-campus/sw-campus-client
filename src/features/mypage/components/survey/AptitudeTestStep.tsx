@@ -1,10 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { AxiosError } from 'axios'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Brain, ChevronLeft, Lightbulb, Target } from 'lucide-react'
+import { Brain, ChevronLeft, Lightbulb, Loader2, Target } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -12,15 +12,14 @@ import { Progress } from '@/components/ui/progress'
 
 import { SURVEY_MESSAGES } from '../../constants/surveyMessages'
 import {
-  ALL_APTITUDE_QUESTIONS,
-  PART1_QUESTIONS,
-  PART2_QUESTIONS,
-  PART3_QUESTIONS,
-  PART_COUNTS,
+  ALL_APTITUDE_QUESTIONS as FALLBACK_QUESTIONS,
+  PART1_QUESTIONS as FALLBACK_PART1,
+  PART2_QUESTIONS as FALLBACK_PART2,
+  PART3_QUESTIONS as FALLBACK_PART3,
 } from '../../constants/surveyQuestions'
-import { useSubmitAptitudeTestMutation } from '../../hooks/useSurvey'
-import type { JobTypeCode, SubmitAptitudeTestRequest } from '../../types/survey.type'
-import { APTITUDE_TEST_STORAGE_KEY } from '../../types/survey.type'
+import { usePublishedQuestionSetQuery, useSubmitAptitudeTestMutation } from '../../hooks/useSurvey'
+import type { AptitudeQuestion, JobTypeCode, SubmitAptitudeTestRequest } from '../../types/survey.type'
+import { APTITUDE_TEST_STORAGE_KEY, mapQuestionSetToAptitudeQuestions } from '../../types/survey.type'
 
 /** 다음 문항으로 자동 이동하는 딜레이 (ms) */
 const AUTO_ADVANCE_DELAY_MS = 300
@@ -47,10 +46,28 @@ const DEFAULT_DRAFT: DraftAnswers = {
 
 export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: AptitudeTestStepProps) {
   const submitAptitudeTest = useSubmitAptitudeTestMutation()
+  const { data: questionSet, isLoading: isLoadingQuestions } = usePublishedQuestionSetQuery('APTITUDE')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<DraftAnswers>(DEFAULT_DRAFT)
   const [isTransitioning, setIsTransitioning] = useState(false) // 전환 중 클릭 비활성화
   const isInitializedRef = useRef(false)
+
+  // 서버에서 가져온 문항 또는 fallback 사용
+  const allQuestions = useMemo<AptitudeQuestion[]>(() => {
+    const dynamicQuestions = mapQuestionSetToAptitudeQuestions(questionSet ?? null)
+    return dynamicQuestions ?? FALLBACK_QUESTIONS
+  }, [questionSet])
+
+  // Part별 문항 분류 (isAllAnswered에서 사용)
+  const { part1Questions, part2Questions, part3Questions } = useMemo(() => {
+    return {
+      part1Questions: allQuestions.filter((q) => q.part === 1),
+      part2Questions: allQuestions.filter((q) => q.part === 2),
+      part3Questions: allQuestions.filter((q) => q.part === 3),
+    }
+  }, [allQuestions])
+
+  const totalQuestions = allQuestions.length
 
   // localStorage에서 임시 저장 데이터 로드
   useEffect(() => {
@@ -86,8 +103,8 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
     }
   }, [])
 
-  const currentQuestion = ALL_APTITUDE_QUESTIONS[currentIndex]
-  const progress = ((currentIndex + 1) / PART_COUNTS.total) * 100
+  const currentQuestion = allQuestions[currentIndex]
+  const progress = totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0
 
   const getCurrentAnswer = useCallback(() => {
     if (!currentQuestion) return undefined
@@ -119,7 +136,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
       })
 
       // 자동으로 다음 문항으로 이동 (마지막 문항 제외)
-      if (currentIndex < PART_COUNTS.total - 1) {
+      if (currentIndex < totalQuestions - 1) {
         setIsTransitioning(true)
         setTimeout(() => {
           setCurrentIndex((prev) => {
@@ -139,7 +156,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
         }, AUTO_ADVANCE_DELAY_MS)
       }
     },
-    [currentQuestion, currentIndex, isTransitioning, saveToLocalStorage]
+    [currentQuestion, currentIndex, isTransitioning, saveToLocalStorage, totalQuestions]
   )
 
   const handlePrev = useCallback(() => {
@@ -149,11 +166,11 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
   }, [currentIndex])
 
   const isAllAnswered = useCallback(() => {
-    const part1Complete = PART1_QUESTIONS.every((q) => answers.part1[q.id] !== undefined)
-    const part2Complete = PART2_QUESTIONS.every((q) => answers.part2[q.id] !== undefined)
-    const part3Complete = PART3_QUESTIONS.every((q) => answers.part3[q.id] !== undefined)
+    const part1Complete = part1Questions.every((q) => answers.part1[q.id] !== undefined)
+    const part2Complete = part2Questions.every((q) => answers.part2[q.id] !== undefined)
+    const part3Complete = part3Questions.every((q) => answers.part3[q.id] !== undefined)
     return part1Complete && part2Complete && part3Complete
-  }, [answers])
+  }, [answers, part1Questions, part2Questions, part3Questions])
 
   const handleSubmit = async () => {
     if (!isAllAnswered()) {
@@ -207,13 +224,23 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
   const partInfo = currentQuestion ? getPartInfo(currentQuestion.part) : null
   const PartIcon = partInfo?.icon || Brain
 
+  // 로딩 상태
+  if (isLoadingQuestions) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+        <p className="mt-4 text-gray-500">문항을 불러오는 중...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* 헤더 */}
       <div className="text-center">
         <h2 className="text-xl font-semibold text-gray-900">개발자 성향 테스트</h2>
         <p className="mt-1 text-sm text-gray-500">
-          15문항 / 약 5분 소요 / 건너뛰기 가능
+          {totalQuestions}문항 / 약 1분 소요 / 건너뛰기 가능
         </p>
       </div>
 
@@ -222,7 +249,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
         <div className="flex justify-between text-sm">
           <span className="text-gray-500">진행률</span>
           <span className="font-medium text-amber-600">
-            {currentIndex + 1} / {PART_COUNTS.total}
+            {currentIndex + 1} / {totalQuestions}
           </span>
         </div>
         <Progress value={progress} className="h-2" />
@@ -305,7 +332,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
         </Button>
 
         {/* 마지막 문항에서만 결과 확인 버튼 표시 */}
-        {currentIndex === PART_COUNTS.total - 1 && (
+        {currentIndex === totalQuestions - 1 && (
           <Button
             onClick={handleSubmit}
             disabled={!isAllAnswered() || submitAptitudeTest.isPending}

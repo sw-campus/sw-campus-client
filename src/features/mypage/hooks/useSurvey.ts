@@ -4,12 +4,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import {
   getMySurvey,
+  getPublishedQuestionSet,
   getSurveyResults,
   getSurveyStatus,
   saveBasicSurvey,
   submitAptitudeTest,
 } from '../api/survey.api'
 import type {
+  QuestionSetResponse,
+  QuestionSetType,
   SaveBasicSurveyRequest,
   SubmitAptitudeTestRequest,
   SurveyResponse,
@@ -23,6 +26,7 @@ export const surveyKeys = {
   detail: () => [...surveyKeys.all, 'detail'] as const,
   results: () => [...surveyKeys.all, 'results'] as const,
   status: () => [...surveyKeys.all, 'status'] as const,
+  questionSet: (type: QuestionSetType) => [...surveyKeys.all, 'questionSet', type] as const,
 }
 
 /**
@@ -56,6 +60,20 @@ export function useSurveyStatusQuery() {
     queryKey: surveyKeys.status(),
     queryFn: getSurveyStatus,
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * 발행된 문항 세트 조회 훅
+ * @param type - 문항 세트 타입 (BASIC | APTITUDE)
+ * @param enabled - 쿼리 활성화 여부
+ */
+export function usePublishedQuestionSetQuery(type: QuestionSetType, enabled = true) {
+  return useQuery<QuestionSetResponse | null, Error>({
+    queryKey: surveyKeys.questionSet(type),
+    queryFn: () => getPublishedQuestionSet(type),
+    enabled,
+    staleTime: 10 * 60 * 1000, // 10분 (문항 세트는 자주 변경되지 않음)
   })
 }
 

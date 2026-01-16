@@ -141,3 +141,98 @@ export const RECOMMENDED_JOB_LABELS: Record<RecommendedJob, string> = {
 
 // LocalStorage keys
 export const APTITUDE_TEST_STORAGE_KEY = 'sw-campus-aptitude-test-draft'
+
+// ============================================
+// Question Set Types (서버에서 문항 세트 조회)
+// ============================================
+
+export type QuestionSetType = 'BASIC' | 'APTITUDE'
+export type QuestionType = 'RADIO' | 'CHECKBOX' | 'TEXT'
+export type QuestionPart = 'PART1' | 'PART2' | 'PART3' | null
+
+export interface OptionResponse {
+  optionId: number
+  optionOrder: number
+  optionText: string
+  optionValue: string
+}
+
+export interface QuestionResponse {
+  questionId: number
+  questionOrder: number
+  questionText: string
+  questionType: QuestionType
+  isRequired: boolean
+  fieldKey: string
+  part: QuestionPart
+  options: OptionResponse[]
+}
+
+export interface QuestionSetResponse {
+  questionSetId: number
+  name: string
+  description: string | null
+  type: QuestionSetType
+  version: number
+  questions: QuestionResponse[]
+}
+
+// ============================================
+// Aptitude Test Question Types (컴포넌트용)
+// ============================================
+
+export interface AptitudeQuestion {
+  id: string
+  part: 1 | 2 | 3
+  question: string
+  options: AptitudeOption[]
+}
+
+export interface AptitudeOption {
+  value: number | JobTypeCode
+  label: string
+}
+
+/**
+ * 서버 응답을 컴포넌트용 AptitudeQuestion 배열로 변환
+ */
+export function mapQuestionSetToAptitudeQuestions(
+  questionSet: QuestionSetResponse | null
+): AptitudeQuestion[] | null {
+  if (!questionSet) return null
+
+  return questionSet.questions
+    .filter((q) => q.part !== null) // APTITUDE type은 항상 part가 있음
+    .sort((a, b) => a.questionOrder - b.questionOrder)
+    .map((q) => ({
+      id: q.fieldKey,
+      part: partToNumber(q.part!),
+      question: q.questionText,
+      options: q.options
+        .sort((a, b) => a.optionOrder - b.optionOrder)
+        .map((opt) => ({
+          value: parseOptionValue(opt.optionValue, q.part!),
+          label: opt.optionText,
+        })),
+    }))
+}
+
+function partToNumber(part: QuestionPart): 1 | 2 | 3 {
+  switch (part) {
+    case 'PART1':
+      return 1
+    case 'PART2':
+      return 2
+    case 'PART3':
+      return 3
+    default:
+      return 1
+  }
+}
+
+function parseOptionValue(value: string, part: QuestionPart): number | JobTypeCode {
+  if (part === 'PART3') {
+    return value as JobTypeCode
+  }
+  return parseInt(value, 10)
+}

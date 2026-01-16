@@ -41,7 +41,7 @@ function toAiSurveyInput(survey: SurveyResponse, profile: ProfileResponse): AiSu
     },
     preferredLearningMethod: survey.basicSurvey?.preferredLearningMethod ?? 'MIXED',
     desiredJobs: survey.basicSurvey?.desiredJobs ?? [],
-    affordableBudgetRange: survey.basicSurvey?.affordableBudgetRange ?? 'RANGE_100_200',
+    affordableBudgetRange: survey.basicSurvey?.affordableBudgetRange ?? 'RANGE_50_100',
     recommendedJob: survey.results?.recommendedJob,
     userLocation: profile.location,
     recommendationLevel: level,

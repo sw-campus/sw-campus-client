@@ -51,7 +51,7 @@ export function AptitudeContinueModal({
               </li>
               <li className="flex items-center gap-2">
                 <Clock className="h-4 w-4 flex-shrink-0" />
-                <span>소요 시간: 약 3~5분</span>
+                <span>소요 시간: 약 1분</span>
               </li>
             </ul>
           </div>
