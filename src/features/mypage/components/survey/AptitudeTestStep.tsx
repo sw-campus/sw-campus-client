@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 
+import { SURVEY_MESSAGES } from '../../constants/surveyMessages'
 import {
   ALL_APTITUDE_QUESTIONS,
   PART1_QUESTIONS,
@@ -69,14 +70,19 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
     onProgressChange?.(answered)
   }, [answers, onProgressChange])
 
-  // 답변 변경 시 localStorage에 자동 저장
-  const saveToStorage = useCallback((newAnswers: DraftAnswers) => {
-    try {
-      localStorage.setItem(APTITUDE_TEST_STORAGE_KEY, JSON.stringify(newAnswers))
-    } catch {
-      // 저장 실패 무시
+  // currentIndex 변경 시 localStorage에 저장 (race condition 방지)
+  useEffect(() => {
+    if (Object.keys(answers.part1).length > 0 ||
+        Object.keys(answers.part2).length > 0 ||
+        Object.keys(answers.part3).length > 0) {
+      const toSave = { ...answers, currentQuestionIndex: currentIndex }
+      try {
+        localStorage.setItem(APTITUDE_TEST_STORAGE_KEY, JSON.stringify(toSave))
+      } catch {
+        // 저장 실패 무시
+      }
     }
-  }, [])
+  }, [currentIndex, answers])
 
   const currentQuestion = ALL_APTITUDE_QUESTIONS[currentIndex]
   const progress = ((currentIndex + 1) / PART_COUNTS.total) * 100
@@ -95,51 +101,40 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
       if (!currentQuestion) return
 
       const { id, part } = currentQuestion
-      const newAnswers = { ...answers }
 
-      if (part === 1) {
-        newAnswers.part1 = { ...answers.part1, [id]: value as number }
-      } else if (part === 2) {
-        newAnswers.part2 = { ...answers.part2, [id]: value as number }
-      } else {
-        newAnswers.part3 = { ...answers.part3, [id]: value as JobTypeCode }
-      }
-
-      newAnswers.currentQuestionIndex = currentIndex
-      setAnswers(newAnswers)
-      saveToStorage(newAnswers)
+      setAnswers((prev) => {
+        const newAnswers = { ...prev }
+        if (part === 1) {
+          newAnswers.part1 = { ...prev.part1, [id]: value as number }
+        } else if (part === 2) {
+          newAnswers.part2 = { ...prev.part2, [id]: value as number }
+        } else {
+          newAnswers.part3 = { ...prev.part3, [id]: value as JobTypeCode }
+        }
+        return newAnswers
+      })
 
       // 자동으로 다음 문항으로 이동 (마지막 문항 제외)
       if (currentIndex < PART_COUNTS.total - 1) {
         setTimeout(() => {
           setCurrentIndex((prev) => prev + 1)
-          newAnswers.currentQuestionIndex = currentIndex + 1
-          saveToStorage(newAnswers)
         }, 300)
       }
     },
-    [currentQuestion, answers, currentIndex, saveToStorage]
+    [currentQuestion, currentIndex]
   )
 
   const handlePrev = useCallback(() => {
     if (currentIndex > 0) {
-      const newIndex = currentIndex - 1
-      setCurrentIndex(newIndex)
-      const newAnswers = { ...answers, currentQuestionIndex: newIndex }
-      setAnswers(newAnswers)
-      saveToStorage(newAnswers)
+      setCurrentIndex((prev) => prev - 1)
     }
-  }, [currentIndex, answers, saveToStorage])
+  }, [currentIndex])
 
   const handleNext = useCallback(() => {
     if (currentIndex < PART_COUNTS.total - 1) {
-      const newIndex = currentIndex + 1
-      setCurrentIndex(newIndex)
-      const newAnswers = { ...answers, currentQuestionIndex: newIndex }
-      setAnswers(newAnswers)
-      saveToStorage(newAnswers)
+      setCurrentIndex((prev) => prev + 1)
     }
-  }, [currentIndex, answers, saveToStorage])
+  }, [currentIndex])
 
   const isAllAnswered = useCallback(() => {
     const part1Complete = PART1_QUESTIONS.every((q) => answers.part1[q.id] !== undefined)
@@ -150,7 +145,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
 
   const handleSubmit = async () => {
     if (!isAllAnswered()) {
-      toast.error('모든 문항에 답변해주세요.')
+      toast.error(SURVEY_MESSAGES.ERROR.INCOMPLETE_ANSWERS)
       return
     }
 
@@ -162,10 +157,10 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
         part3Answers: answers.part3,
       }
       await submitAptitudeTest.mutateAsync(request)
-      toast.success('성향 테스트가 완료되었습니다.')
+      toast.success(SURVEY_MESSAGES.SUCCESS.APTITUDE_COMPLETED)
       onComplete()
     } catch (error) {
-      toast.error('제출 중 오류가 발생했습니다.')
+      toast.error(SURVEY_MESSAGES.ERROR.SUBMIT_FAILED)
     } finally {
       setIsSubmitting(false)
     }
@@ -239,7 +234,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
                 const isSelected = getCurrentAnswer() === option.value
                 return (
                   <button
-                    key={index}
+                    key={option.value}
                     type="button"
                     onClick={() => handleSelectAnswer(option.value)}
                     className={`w-full rounded-xl border-2 p-4 text-left transition-all ${

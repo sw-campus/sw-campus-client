@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
+import { SURVEY_MESSAGES } from '../../constants/surveyMessages'
 import { useSaveBasicSurveyMutation } from '../../hooks/useSurvey'
 import type {
   BasicSurveyResponse,
@@ -86,10 +87,10 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
         desiredJobOther: values.desiredJobOther,
         affordableBudgetRange: values.affordableBudgetRange,
       })
-      toast.success('기초 설문이 저장되었습니다.')
+      toast.success(SURVEY_MESSAGES.SUCCESS.BASIC_SAVED)
       onComplete()
     } catch (error) {
-      toast.error('저장 중 오류가 발생했습니다.')
+      toast.error(SURVEY_MESSAGES.ERROR.SAVE_FAILED)
     }
   }
 

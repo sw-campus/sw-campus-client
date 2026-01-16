@@ -5,6 +5,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, FileText, Target } from 'lucide-react'
 
+import {
+  STEP_QUESTION_COUNTS,
+  TOTAL_SURVEY_QUESTIONS,
+} from '../../constants/surveyQuestions'
 import { useSurveyQuery } from '../../hooks/useSurvey'
 import { APTITUDE_TEST_STORAGE_KEY } from '../../types/survey.type'
 
@@ -14,14 +18,6 @@ import { BasicSurveyStep } from './BasicSurveyStep'
 import { SurveyResultsStep } from './SurveyResultsStep'
 
 export type SurveyStep = 'basic' | 'aptitude' | 'results'
-
-// 스텝별 문항 수 설정 (새 스텝 추가 시 여기만 수정)
-const STEP_QUESTION_COUNTS: Record<Exclude<SurveyStep, 'results'>, number> = {
-  basic: 5,
-  aptitude: 15,
-}
-
-const TOTAL_QUESTIONS = Object.values(STEP_QUESTION_COUNTS).reduce((a, b) => a + b, 0)
 
 interface SurveyContainerProps {
   embedded?: boolean
@@ -34,40 +30,38 @@ export function SurveyContainer({ embedded = false, onComplete }: SurveyContaine
   const [showContinueModal, setShowContinueModal] = useState(false)
   const [aptitudeProgress, setAptitudeProgress] = useState(0)
 
-  // 설문 상태에 따라 초기 스텝 결정
+  // 설문 상태에 따라 초기 스텝 결정 (primitive 값으로 의존성 분리하여 무한 루프 방지)
+  const hasBasicSurvey = survey?.status?.hasBasicSurvey ?? false
+  const hasAptitudeTest = survey?.status?.hasAptitudeTest ?? false
+
   useEffect(() => {
-    if (survey?.status) {
-      if (survey.status.hasAptitudeTest) {
-        setCurrentStep('results')
-      } else if (survey.status.hasBasicSurvey) {
-        setCurrentStep('aptitude')
-      } else {
-        setCurrentStep('basic')
-      }
+    if (hasAptitudeTest) {
+      setCurrentStep('results')
+    } else if (hasBasicSurvey) {
+      setCurrentStep('aptitude')
+    } else {
+      setCurrentStep('basic')
     }
-  }, [survey?.status])
+  }, [hasBasicSurvey, hasAptitudeTest])
 
   // 전체 진행률 계산 (실제 완료 여부 기준, 동적 계산)
   const calculateOverallProgress = useCallback(() => {
-    const hasBasic = survey?.status?.hasBasicSurvey ?? false
-    const hasAptitude = survey?.status?.hasAptitudeTest ?? false
-
     // 완료된 문항 수 계산
     let completedQuestions = 0
 
-    if (hasBasic) {
+    if (hasBasicSurvey) {
       completedQuestions += STEP_QUESTION_COUNTS.basic
     }
 
-    if (hasAptitude) {
+    if (hasAptitudeTest) {
       completedQuestions += STEP_QUESTION_COUNTS.aptitude
     } else if (currentStep === 'aptitude') {
       // 성향 테스트 진행 중: 답변한 문항 수 반영
       completedQuestions += aptitudeProgress
     }
 
-    return (completedQuestions / TOTAL_QUESTIONS) * 100
-  }, [survey?.status, currentStep, aptitudeProgress])
+    return (completedQuestions / TOTAL_SURVEY_QUESTIONS) * 100
+  }, [hasBasicSurvey, hasAptitudeTest, currentStep, aptitudeProgress])
 
   const handleBasicComplete = useCallback(() => {
     refetch()

@@ -198,3 +198,17 @@ export const PART_COUNTS = {
   part3: PART3_QUESTIONS.length,
   total: ALL_APTITUDE_QUESTIONS.length,
 }
+
+// 기초 설문 문항 수
+export const BASIC_SURVEY_QUESTION_COUNT = 5
+
+// 스텝별 문항 수 (진행률 계산용)
+export const STEP_QUESTION_COUNTS = {
+  basic: BASIC_SURVEY_QUESTION_COUNT,
+  aptitude: ALL_APTITUDE_QUESTIONS.length,
+} as const
+
+export const TOTAL_SURVEY_QUESTIONS = Object.values(STEP_QUESTION_COUNTS).reduce(
+  (a, b) => a + b,
+  0
+)
