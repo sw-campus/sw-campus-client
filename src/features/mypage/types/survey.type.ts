@@ -107,6 +107,7 @@ export interface SubmitAptitudeTestRequest {
   part1Answers: Record<string, number>
   part2Answers: Record<string, number>
   part3Answers: Record<string, JobTypeCode>
+  questionSetVersion: number
 }
 
 // Display labels

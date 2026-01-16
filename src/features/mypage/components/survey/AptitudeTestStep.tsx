@@ -35,6 +35,7 @@ interface DraftAnswers {
   part2: Record<string, number>
   part3: Record<string, JobTypeCode>
   currentQuestionIndex: number
+  questionSetVersion: number | null
 }
 
 const DEFAULT_DRAFT: DraftAnswers = {
@@ -42,6 +43,7 @@ const DEFAULT_DRAFT: DraftAnswers = {
   part2: {},
   part3: {},
   currentQuestionIndex: 0,
+  questionSetVersion: null,
 }
 
 export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: AptitudeTestStepProps) {
@@ -84,6 +86,19 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
       isInitializedRef.current = true
     }
   }, [])
+
+  // 문항 세트 버전 저장 (처음 시작할 때만)
+  useEffect(() => {
+    if (!isInitializedRef.current || !questionSet) return
+
+    // 이미 버전이 저장되어 있지 않은 경우에만 저장
+    setAnswers((prev) => {
+      if (prev.questionSetVersion !== null) return prev
+      const newAnswers = { ...prev, questionSetVersion: questionSet.version }
+      saveToLocalStorage(newAnswers)
+      return newAnswers
+    })
+  }, [questionSet, saveToLocalStorage])
 
   // 진행률을 상위 컴포넌트에 전달
   useEffect(() => {
@@ -178,11 +193,19 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
       return
     }
 
+    // 저장된 버전 또는 현재 questionSet 버전 사용
+    const version = answers.questionSetVersion ?? questionSet?.version
+    if (!version) {
+      toast.error('문항 세트 정보를 불러올 수 없습니다.')
+      return
+    }
+
     try {
       const request: SubmitAptitudeTestRequest = {
         part1Answers: answers.part1,
         part2Answers: answers.part2,
         part3Answers: answers.part3,
+        questionSetVersion: version,
       }
       await submitAptitudeTest.mutateAsync(request)
       // 성공 시 localStorage 정리
