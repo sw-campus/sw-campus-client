@@ -53,6 +53,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
   const [answers, setAnswers] = useState<DraftAnswers>(DEFAULT_DRAFT)
   const [isTransitioning, setIsTransitioning] = useState(false) // 전환 중 클릭 비활성화
   const isInitializedRef = useRef(false)
+  const versionCheckedRef = useRef(false) // 버전 체크 완료 여부
 
   // 서버에서 가져온 문항 또는 fallback 사용
   const allQuestions = useMemo<AptitudeQuestion[]>(() => {
@@ -98,28 +99,30 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
 
   // 문항 세트 버전 확인 및 저장
   useEffect(() => {
-    if (!isInitializedRef.current || !questionSet) return
+    if (!isInitializedRef.current || !questionSet || versionCheckedRef.current) return
 
-    setAnswers((prev) => {
-      // 저장된 버전이 없으면 현재 버전 저장
-      if (prev.questionSetVersion === null) {
-        const newAnswers = { ...prev, questionSetVersion: questionSet.version }
-        saveToLocalStorage(newAnswers)
-        return newAnswers
-      }
+    const savedVersion = answers.questionSetVersion
 
-      // 저장된 버전과 현재 발행된 버전이 다르면 진행 상황 초기화
-      if (prev.questionSetVersion !== questionSet.version) {
-        const resetAnswers = { ...DEFAULT_DRAFT, questionSetVersion: questionSet.version }
-        saveToLocalStorage(resetAnswers)
-        setCurrentIndex(0)
-        toast.info('문항이 변경되어 처음부터 다시 시작합니다.')
-        return resetAnswers
-      }
+    // 저장된 버전이 없으면 현재 버전 저장
+    if (savedVersion === null) {
+      const newAnswers = { ...answers, questionSetVersion: questionSet.version }
+      setAnswers(newAnswers)
+      saveToLocalStorage(newAnswers)
+      versionCheckedRef.current = true
+      return
+    }
 
-      return prev
-    })
-  }, [questionSet, saveToLocalStorage])
+    // 저장된 버전과 현재 발행된 버전이 다르면 진행 상황 초기화
+    if (savedVersion !== questionSet.version) {
+      const resetAnswers = { ...DEFAULT_DRAFT, questionSetVersion: questionSet.version }
+      setAnswers(resetAnswers)
+      saveToLocalStorage(resetAnswers)
+      setCurrentIndex(0)
+      toast.info('문항이 변경되어 처음부터 다시 시작합니다.')
+    }
+
+    versionCheckedRef.current = true
+  }, [questionSet, answers.questionSetVersion, saveToLocalStorage])
 
   // 진행률을 상위 컴포넌트에 전달
   useEffect(() => {
