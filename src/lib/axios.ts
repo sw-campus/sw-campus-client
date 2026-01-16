@@ -1,4 +1,4 @@
-import axios, { AxiosHeaders } from 'axios'
+import axios, { AxiosHeaders, type AxiosRequestConfig } from 'axios'
 import { toast } from 'sonner'
 
 import { useAuthStore } from '@/store/authStore'
@@ -145,17 +145,28 @@ function clearAuthState(options: ClearAuthOptions = {}) {
   }
 }
 
-function isAuthPublicFlowRequest(url: string): boolean {
-  // 회원가입/인증/중복검사 등: 로그인 상태가 없어도 호출되는 엔드포인트
-  // - 여기서 401이 나더라도 "세션 만료"로 간주해 /login으로 보내면 UX가 깨짐
-  // - 메인 페이지에서 사용하는 공개 API들도 포함 (카테고리, 배너, 강의 목록 등)
-  return (
+function isAuthPublicFlowRequest(config?: AxiosRequestConfig): boolean {
+  const url = config?.url ?? ''
+  const method = (config?.method || 'get').toLowerCase()
+
+  // 인증/회원가입 플로우는 항상 공개
+  if (
     /\/auth\/(email|signup|oauth)/i.test(url) ||
-    /\/members\/nickname\/check/i.test(url) ||
-    /\/categories/i.test(url) ||
-    /\/banners/i.test(url) ||
-    /\/lectures/i.test(url)
-  )
+    /\/members\/nickname\/check/i.test(url)
+  ) {
+    return true
+  }
+
+  // ✅ GET 요청에 한해서만 공개 API 허용
+  if (method === 'get') {
+    return (
+      /\/categories/i.test(url) ||
+      /\/banners/i.test(url) ||
+      /\/lectures/i.test(url)
+    )
+  }
+
+  return false
 }
 
 function isOnAuthPublicPage(): boolean {
@@ -260,7 +271,7 @@ api.interceptors.response.use(
     const errorCode = error.response.data?.code
     const requestUrl: string = error.config?.url ?? ''
 
-    const suppressUnauthorizedRedirect = isOnAuthPublicPage() || isAuthPublicFlowRequest(requestUrl)
+    const suppressUnauthorizedRedirect = isOnAuthPublicPage() || isAuthPublicFlowRequest(error.config)
 
     // ✅ 토큰 만료/인증 실패 → 자동 로그아웃 (확장된 상태/에러코드)
     // refresh/login/logout 호출 중에는 무시하여 루프 방지
