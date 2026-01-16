@@ -71,6 +71,15 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
 
   const totalQuestions = allQuestions.length
 
+  // localStorage에 저장하는 헬퍼 함수
+  const saveToLocalStorage = useCallback((data: DraftAnswers) => {
+    try {
+      localStorage.setItem(APTITUDE_TEST_STORAGE_KEY, JSON.stringify(data))
+    } catch {
+      // 저장 실패 무시
+    }
+  }, [])
+
   // localStorage에서 임시 저장 데이터 로드
   useEffect(() => {
     try {
@@ -108,15 +117,6 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
       Object.keys(answers.part3).length
     onProgressChange?.(answered)
   }, [answers, onProgressChange])
-
-  // localStorage에 저장하는 헬퍼 함수
-  const saveToLocalStorage = useCallback((data: DraftAnswers) => {
-    try {
-      localStorage.setItem(APTITUDE_TEST_STORAGE_KEY, JSON.stringify(data))
-    } catch {
-      // 저장 실패 무시
-    }
-  }, [])
 
   const currentQuestion = allQuestions[currentIndex]
   const progress = totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0
