@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { LuImage, LuPencil, LuStar, LuUpload } from 'react-icons/lu'
 import { toast } from 'sonner'
 
@@ -11,31 +12,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import type { CertificateStatus, CompletedLecture } from '@/features/mypage/api/completedLectures.api'
 import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
-import { api } from '@/lib/axios'
-
-type CertificateStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
-
-type CompletedLecture = {
-  certificateId: number
-  lectureId: number
-  lectureName: string
-  lectureImageUrl?: string
-  organizationName: string
-  certifiedAt: string
-  canWriteReview: boolean
-  reviewId?: number
-  certificateImageUrl?: string
-  certificateStatus?: CertificateStatus
-}
-
-type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+import {
+  completedLecturesQueryKey,
+  useCompletedLecturesQuery,
+  useReviewStatusesQuery,
+} from '@/features/mypage/hooks/useCompletedLecturesQuery'
 
 export function ReviewManagementSection() {
-  // Reviews state
-  const [lectures, setLectures] = useState<CompletedLecture[] | null>(null)
-  const [lecturesLoading, setLecturesLoading] = useState(true)
-  const [reviewStatuses, setReviewStatuses] = useState<Map<number, ReviewStatus>>(new Map())
+  const queryClient = useQueryClient()
+
+  // React Query hooks - 캐싱으로 중복 호출 방지
+  const { data: lectures, isLoading: lecturesLoading } = useCompletedLecturesQuery()
+  const { data: reviewStatuses, isLoading: reviewStatusesLoading } = useReviewStatusesQuery(lectures)
+
+  const isLoading = lecturesLoading || reviewStatusesLoading
 
   // Edit review modal
   const [editOpen, setEditOpen] = useState(false)
@@ -57,87 +49,9 @@ export function ReviewManagementSection() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fullImageUrl, setFullImageUrl] = useState<string | null>(null)
 
-  // Load lectures on mount
-  useEffect(() => {
-    let cancelled = false
-
-    const fetchLectures = async () => {
-      try {
-        setLecturesLoading(true)
-        const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
-        if (!cancelled) setLectures(Array.isArray(data) ? data : [])
-      } catch {
-        if (!cancelled) toast.error('강의 목록을 불러오지 못했습니다.')
-      } finally {
-        if (!cancelled) setLecturesLoading(false)
-      }
-    }
-
-    fetchLectures()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  // Hydrate review statuses
-  useEffect(() => {
-    if (!lectures || lectures.length === 0) return
-
-    let cancelled = false
-
-    const hydrateStatuses = async () => {
-      const targetLectures = lectures.filter(l => !l.canWriteReview)
-      if (targetLectures.length === 0) return
-
-      try {
-        const results = await Promise.all(
-          targetLectures.map(async l => {
-            try {
-              const { data } = await api.get<{ approvalStatus?: string }>(
-                `/mypage/completed-lectures/${l.lectureId}/review`,
-              )
-              const statusStr = String(data?.approvalStatus ?? '').toUpperCase()
-              let status: ReviewStatus = 'PENDING'
-              if (statusStr === 'APPROVED') status = 'APPROVED'
-              else if (statusStr === 'REJECTED') status = 'REJECTED'
-              return { lectureId: l.lectureId, status }
-            } catch {
-              return { lectureId: l.lectureId, status: 'PENDING' as ReviewStatus }
-            }
-          }),
-        )
-
-        if (cancelled) return
-        setReviewStatuses(prev => {
-          const next = new Map(prev)
-          for (const r of results) {
-            next.set(r.lectureId, r.status)
-          }
-          return next
-        })
-      } catch {
-        // ignore
-      }
-    }
-
-    hydrateStatuses()
-    return () => {
-      cancelled = true
-    }
-  }, [lectures])
-
-  const formatDate = (iso?: string) => {
-    if (!iso) return ''
-    try {
-      return new Date(iso).toLocaleDateString()
-    } catch {
-      return iso
-    }
-  }
-
   const getStatusLabel = (lectureId: number, canWriteReview: boolean): string => {
     if (canWriteReview) return '작성 가능'
-    const status = reviewStatuses.get(lectureId)
+    const status = reviewStatuses?.get(lectureId)
     if (status === 'APPROVED') return '승인됨'
     if (status === 'REJECTED') return '반려됨'
     return '대기중'
@@ -145,14 +59,14 @@ export function ReviewManagementSection() {
 
   const getStatusBadgeClass = (lectureId: number, canWriteReview: boolean): string => {
     if (canWriteReview) return 'bg-gray-400 text-white'
-    const status = reviewStatuses.get(lectureId)
+    const status = reviewStatuses?.get(lectureId)
     if (status === 'APPROVED') return 'bg-emerald-500 text-white'
     if (status === 'REJECTED') return 'bg-rose-500 text-white'
     return 'bg-amber-500 text-white' // PENDING
   }
 
   const isReadOnly = (lectureId: number): boolean => {
-    const status = reviewStatuses.get(lectureId)
+    const status = reviewStatuses?.get(lectureId)
     return status === 'APPROVED' || status === 'REJECTED'
   }
 
@@ -212,8 +126,8 @@ export function ReviewManagementSection() {
       const { updateCertificateImage } = await import('@/features/certificate/api/certificate.api')
       await updateCertificateImage(selectedCertificate.certificateId, selectedFile)
 
-      // 목록 갱신
-      await refreshLectures()
+      // 캐시 무효화로 목록 갱신
+      await queryClient.invalidateQueries({ queryKey: completedLecturesQueryKey })
       setCertImageOpen(false)
       setSelectedCertificate(null)
       handleCancelFileSelect()
@@ -226,13 +140,7 @@ export function ReviewManagementSection() {
   }
 
   const refreshLectures = async () => {
-    try {
-      setLecturesLoading(true)
-      const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
-      setLectures(Array.isArray(data) ? data : [])
-    } finally {
-      setLecturesLoading(false)
-    }
+    await queryClient.invalidateQueries({ queryKey: completedLecturesQueryKey })
   }
 
   return (
@@ -241,7 +149,7 @@ export function ReviewManagementSection() {
         <CardTitle className="text-foreground text-lg">내 후기 관리</CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
-        {lecturesLoading ? (
+        {isLoading ? (
           <div className="flex h-32 items-center justify-center">
             <span className="text-muted-foreground text-sm">불러오는 중...</span>
           </div>
