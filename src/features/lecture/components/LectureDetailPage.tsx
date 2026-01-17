@@ -33,7 +33,10 @@ export default function LectureDetailPage({ lectureId }: Props) {
     queries: [
       {
         queryKey: ['organization', data?.orgId],
-        queryFn: () => fetchOrganizationDetail(data!.orgId),
+        queryFn: async () => {
+          if (!data?.orgId) return null
+          return fetchOrganizationDetail(data.orgId)
+        },
         enabled: !!data?.orgId,
       },
       {
