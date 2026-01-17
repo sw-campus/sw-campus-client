@@ -1,11 +1,11 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { getLectureDetail, type LectureDetail } from '@/features/lecture/api/lectureApi'
+import { getLectureDetail } from '@/features/lecture/api/lectureApi'
 import { fetchOrganizationDetail } from '@/features/organization/api/organizationApi'
 
 import LectureCurriculum from './detail/LectureCurriculum'
@@ -26,26 +26,28 @@ export default function LectureDetailPage({ lectureId }: Props) {
     staleTime: 1000 * 60,
   })
 
-  const { data: org } = useQuery({
-    queryKey: ['organization', data?.orgId],
-    queryFn: () => fetchOrganizationDetail(data!.orgId),
-    enabled: !!data?.orgId,
-  })
-
   const lecture = data
 
-  // Gemini 요약 Query (캐싱 적용)
-  const { data: aiSummary, isLoading: isAiLoading } = useQuery({
-    queryKey: ['lectureSummary', lectureId, lecture?.title],
-    queryFn: async () => {
-      if (!lecture) return null
-      // Server Action 호출
-      const { generateGeminiSummary } = await import('@/features/lecture/actions/gemini')
-      return generateGeminiSummary(lecture)
-    },
-    enabled: !!lecture,
-    staleTime: Infinity, // 영구 캐싱 (fresh 상태 유지)
-    gcTime: 60 * 60 * 1000, // 1시간 동안 메모리 유지
+  // 종속 쿼리 병렬 실행 (organization, aiSummary)
+  const [{ data: org, isLoading: isOrgLoading }, { data: aiSummary, isLoading: isAiLoading }] = useQueries({
+    queries: [
+      {
+        queryKey: ['organization', data?.orgId],
+        queryFn: () => fetchOrganizationDetail(data!.orgId),
+        enabled: !!data?.orgId,
+      },
+      {
+        queryKey: ['lectureSummary', lectureId, data?.title],
+        queryFn: async () => {
+          if (!data) return null
+          const { generateGeminiSummary } = await import('@/features/lecture/actions/gemini')
+          return generateGeminiSummary(data)
+        },
+        enabled: !!data,
+        staleTime: Infinity,
+        gcTime: 60 * 60 * 1000,
+      },
+    ],
   })
 
   // 실제 표시할 요약: AI 요약 우선, 없으면 기본(매퍼) 요약
@@ -126,6 +128,7 @@ export default function LectureDetailPage({ lectureId }: Props) {
                       org={org}
                       displaySummary={displaySummary}
                       isLoading={isLoading}
+                      isOrgLoading={isOrgLoading}
                       isAiLoading={isAiLoading}
                       isAiSummary={!!aiSummary}
                     />
