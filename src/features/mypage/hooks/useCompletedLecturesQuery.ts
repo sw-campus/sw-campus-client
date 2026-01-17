@@ -27,7 +27,7 @@ export function useCompletedLecturesQuery() {
 }
 
 export const reviewStatusesQueryKey = (lectures: CompletedLecture[]) =>
-  ['mypage', 'reviewStatuses', lectures.map(l => l.lectureId).join(',')] as const
+  ['mypage', 'reviewStatuses', lectures.map(l => l.lectureId).sort((a, b) => a - b).join(',')] as const
 
 /**
  * 리뷰 상태 조회 hook

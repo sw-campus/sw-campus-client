@@ -38,7 +38,8 @@ export async function getReviewStatus(lectureId: number): Promise<ReviewStatus> 
     if (statusStr === 'APPROVED') return 'APPROVED'
     if (statusStr === 'REJECTED') return 'REJECTED'
     return 'PENDING'
-  } catch {
+  } catch (error) {
+    console.error(`리뷰 상태 조회 실패 (lectureId: ${lectureId}):`, error)
     return 'PENDING'
   }
 }
