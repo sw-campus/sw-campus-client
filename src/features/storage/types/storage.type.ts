@@ -6,6 +6,7 @@ export type StorageCategory =
   | 'thumbnails'
   | 'certificates'
   | 'members'
+  | 'posts'
 
 export interface PresignedUrlRequest {
   fileName: string
