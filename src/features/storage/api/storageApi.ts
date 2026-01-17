@@ -18,31 +18,36 @@ import { api } from '@/lib/axios'
 export const storageApi = {
   // 단일 업로드를 위한 Presigned URL 발급
   getPresignedUrl: async (params: PresignedUrlRequest): Promise<PresignedUrlResponse> => {
-    const { data } = await api.post<PresignedUrlResponse>('/api/storage/presigned/single', params)
-    return data
+    const { data } = await api.post<{ uploadUrl: string; key: string; expiresIn: number }>('/storage/presigned-urls/upload', params)
+    // 백엔드 응답을 클라이언트 형식으로 변환
+    return {
+      presignedUrl: data.uploadUrl,
+      key: data.key,
+      url: `https://${process.env.NEXT_PUBLIC_S3_HOSTNAME}/${data.key}`,
+    }
   },
 
   // 멀티파트 업로드 시작 (Init)
   initMultipartUpload: async (params: MultipartInitRequest): Promise<MultipartInitResponse> => {
-    const { data } = await api.post<MultipartInitResponse>('/api/storage/presigned/multipart/init', params)
+    const { data } = await api.post<MultipartInitResponse>('/storage/presigned/multipart/init', params)
     return data
   },
 
   // 멀티파트 파트별 Presigned URL 발급
   getMultipartParts: async (params: MultipartPartRequest): Promise<MultipartPartResponse> => {
-    const { data } = await api.post<MultipartPartResponse>('/api/storage/presigned/multipart/parts', params)
+    const { data } = await api.post<MultipartPartResponse>('/storage/presigned/multipart/parts', params)
     return data
   },
 
   // 멀티파트 업로드 완료
   completeMultipartUpload: async (params: MultipartCompleteRequest): Promise<MultipartCompleteResponse> => {
-    const { data } = await api.post<MultipartCompleteResponse>('/api/storage/presigned/multipart/complete', params)
+    const { data } = await api.post<MultipartCompleteResponse>('/storage/presigned/multipart/complete', params)
     return data
   },
 
   // 멀티파트 업로드 중단
   abortMultipartUpload: async (params: { uploadId: string; key: string }): Promise<void> => {
-    await api.post('/api/storage/presigned/multipart/abort', params)
+    await api.post('/storage/presigned/multipart/abort', params)
   },
 
   // S3에 직접 파일 업로드
@@ -73,6 +78,19 @@ export const storageApi = {
   getPresignedGetUrls: async (keys: string[]): Promise<PresignedGetUrlBatchResponse> => {
     const request: PresignedGetUrlBatchRequest = { keys }
     const { data } = await api.post<PresignedGetUrlBatchResponse>('/storage/presigned-urls/batch', request)
+    return data
+  },
+
+  // 이미지 직접 업로드 (FormData)
+  uploadImage: async (file: File, category: string = 'posts'): Promise<{ url: string; key: string }> => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const { data } = await api.post<{ url: string; key: string }>(`/storage/upload?category=${category}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
     return data
   },
 }

@@ -11,75 +11,78 @@ interface PostCardProps {
 }
 
 /**
- * 게시글 카드 컴포넌트
- * - 썸네일, 제목, 작성자, 통계 정보 표시
+ * 게시글 카드 컴포넌트 (Velog 스타일)
+ * - 썸네일, 제목, 본문 미리보기, 작성자 정보
  */
 export function PostCard({ post }: PostCardProps) {
   const formattedDate = new Intl.DateTimeFormat('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
+    month: 'short',
+    day: 'numeric',
   }).format(post.createdAt)
 
   return (
     <Link
       href={`/community/${post.id}`}
-      className="group block overflow-hidden rounded-2xl border border-gray-200 bg-white/70 shadow-md backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-lg"
+      className="group flex w-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
     >
       {/* 썸네일 */}
-      {post.thumbnailUrl ? (
-        <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-100">
+        {post.thumbnailUrl ? (
           <Image
             src={post.thumbnailUrl}
             alt={post.title}
             fill
-            className="object-cover transition-transform group-hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
-        </div>
-      ) : (
-        <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
-          <FiImage className="h-12 w-12 text-orange-200" />
-        </div>
-      )}
-
-      {/* 컨텐츠 */}
-      <div className="p-4">
-        {/* 카테고리 & 태그 */}
-        <div className="mb-2 flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
+            <FiImage className="h-12 w-12 text-orange-200" />
+          </div>
+        )}
+        {/* 카테고리 뱃지 */}
+        <div className="absolute top-3 left-3">
+          <span className="rounded-full bg-orange-500 px-2.5 py-1 text-xs font-medium text-white shadow-sm">
             {post.categoryName}
           </span>
-          {post.tags.slice(0, 2).map(tag => (
-            <span key={tag} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-              #{tag}
-            </span>
-          ))}
         </div>
+      </div>
 
+      {/* 컨텐츠 */}
+      <div className="flex flex-1 flex-col p-4">
         {/* 제목 */}
-        <h3 className="mb-2 line-clamp-2 text-base font-semibold text-gray-900 group-hover:text-orange-600">
+        <h3 className="mb-2 line-clamp-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-orange-600">
           {post.title}
         </h3>
 
-        {/* 작성자 & 날짜 */}
-        <p className="mb-3 text-sm text-gray-500">
-          {post.authorNickname} · {formattedDate}
-        </p>
+        {/* 부트캠프 성장일기: 강의명, 훈련기관명 태그 */}
+        {post.categoryName === '부트캠프 성장일기' && post.tags.length > 0 && (
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            {post.tags.slice(0, 2).map(tag => (
+              <span key={tag} className="text-xs text-gray-500">
+                #{tag.length > 10 ? tag.slice(0, 10) + '...' : tag}
+              </span>
+            ))}
+          </div>
+        )}
 
-        {/* 통계 */}
-        <div className="flex items-center gap-4 text-xs text-gray-500">
-          <span className="flex items-center gap-1">
-            <FiEye className="h-3.5 w-3.5" />
-            {post.viewCount}
-          </span>
-          <span className="flex items-center gap-1">
-            <FiHeart className="h-3.5 w-3.5" />
-            {post.likeCount}
-          </span>
-          <span className="flex items-center gap-1">
-            <FiMessageCircle className="h-3.5 w-3.5" />
-            {post.commentCount}
-          </span>
+        {/* 작성자 & 통계 */}
+        <div className="mt-auto flex items-center justify-between pt-3 text-sm text-gray-500">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-700">{post.authorNickname}</span>
+            <span className="text-gray-300">·</span>
+            <span>{formattedDate}</span>
+          </div>
+
+          <div className="flex items-center gap-3 text-xs">
+            <span className="flex items-center gap-1">
+              <FiHeart className="h-3.5 w-3.5" />
+              {post.likeCount}
+            </span>
+            <span className="flex items-center gap-1">
+              <FiMessageCircle className="h-3.5 w-3.5" />
+              {post.commentCount}
+            </span>
+          </div>
         </div>
       </div>
     </Link>

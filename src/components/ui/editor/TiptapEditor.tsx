@@ -1,10 +1,12 @@
 'use client'
 
+import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import Underline from '@tiptap/extension-underline'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import { useRef, useState } from 'react'
 import {
   Bold,
   Italic,
@@ -19,8 +21,11 @@ import {
   Undo,
   Redo,
   Link as LinkIcon,
+  ImageIcon,
+  Loader2,
 } from 'lucide-react'
 
+import { useImageUpload } from '@/features/storage/hooks/useImageUpload'
 import { cn } from '@/lib/utils'
 
 interface TiptapEditorProps {
@@ -38,6 +43,8 @@ export function TiptapEditor({
   className,
   minHeight = '300px',
 }: TiptapEditorProps) {
+  const imageInputRef = useRef<HTMLInputElement>(null)
+  const { uploadImage, isUploading, progress } = useImageUpload()
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -49,6 +56,13 @@ export function TiptapEditor({
         openOnClick: false,
         HTMLAttributes: {
           class: 'text-blue-500 underline',
+        },
+      }),
+      Image.configure({
+        inline: false,
+        allowBase64: false,
+        HTMLAttributes: {
+          class: 'rounded-lg max-w-full h-auto my-4',
         },
       }),
     ],
@@ -92,6 +106,21 @@ export function TiptapEditor({
 
     // update
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !editor) return
+
+    const result = await uploadImage(file, 'posts')
+    if (result) {
+      editor.chain().focus().setImage({ src: result.url }).run()
+    }
+
+    // Reset input
+    if (imageInputRef.current) {
+      imageInputRef.current.value = ''
+    }
   }
 
   return (
@@ -172,6 +201,23 @@ export function TiptapEditor({
           isActive={editor.isActive('link')}
           icon={<LinkIcon className="h-4 w-4" />}
           label="Link"
+        />
+
+        <div className="mx-1 h-5 w-px bg-gray-300" />
+
+        {/* 이미지 업로드 */}
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="hidden"
+          onChange={handleImageUpload}
+        />
+        <ToolbarButton
+          onClick={() => imageInputRef.current?.click()}
+          disabled={isUploading}
+          icon={isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+          label="Image"
         />
 
         <div className="mx-1 h-5 w-px bg-gray-300" />

@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { FiSearch, FiX, FiMapPin, FiCalendar } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { getLectureSearch } from '@/features/lecture/api/lecture.api'
 import type { LectureResponseDto } from '@/features/lecture/types/lecture-response.type'
 
@@ -92,15 +93,15 @@ export function LectureSearchModal({ isOpen, onClose, onSelect }: LectureSearchM
         {/* 검색 입력 */}
         <div className="border-b border-gray-100 px-6 py-4">
           <div className="flex gap-2">
-            <div className="relative flex-1">
-              <FiSearch className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
-              <input
+          <div className="relative flex-1">
+              <FiSearch className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400 z-10" />
+              <Input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="강의명을 입력하세요"
-                className="w-full rounded-lg border border-gray-300 py-2.5 pr-4 pl-10 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
+                className="pl-10 border-gray-300 focus:border-orange-500 focus:ring-orange-200"
                 autoFocus
               />
             </div>

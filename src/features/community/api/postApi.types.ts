@@ -118,4 +118,16 @@ export interface PostSearchParams {
   keyword?: string
   page?: number
   size?: number
+  sort?: string // 예: 'created_at,desc' 또는 'like_count,desc'
 }
+
+// 정렬 옵션
+export const POST_SORT_OPTIONS = [
+  { label: '최신순', value: 'created_at,desc' },
+  { label: '오래된순', value: 'created_at,asc' },
+  { label: '좋아요순', value: 'like_count,desc' },
+  { label: '조회수순', value: 'view_count,desc' },
+  { label: '댓글순', value: 'comment_count,desc' },
+] as const
+
+export const DEFAULT_POST_SORT = 'created_at,desc'

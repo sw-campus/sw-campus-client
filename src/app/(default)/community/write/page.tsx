@@ -19,7 +19,7 @@ export default function WritePostPage() {
   // 로그인 체크
   if (hasHydrated && !isLoggedIn) {
     return (
-      <main className="custom-container mx-auto max-w-4xl">
+      <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">로그인이 필요합니다</p>
           <Link href="/login" className="mt-4 inline-block text-orange-500 hover:underline">
@@ -39,7 +39,7 @@ export default function WritePostPage() {
   }
 
   return (
-    <main className="custom-container mx-auto max-w-4xl">
+    <main className="custom-container mx-auto max-w-6xl">
       {/* 뒤로가기 */}
       <Link href="/community" className="mb-6 inline-flex items-center gap-2 text-gray-600 hover:text-gray-900">
         <FiArrowLeft />

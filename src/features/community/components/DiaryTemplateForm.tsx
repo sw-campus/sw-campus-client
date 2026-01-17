@@ -2,6 +2,8 @@
 
 import { FiInfo } from 'react-icons/fi'
 
+import { TiptapEditor } from '@/components/ui/editor/TiptapEditor'
+
 // 부트캠프 성장일기 템플릿 필드 최소 글자 수
 export const DIARY_MIN_LENGTH = 20
 
@@ -55,6 +57,12 @@ interface DiaryTemplateFormProps {
  * 4가지 필수 질문에 대한 입력 폼을 제공합니다.
  */
 export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateFormProps) {
+  // HTML에서 텍스트만 추출하여 글자 수 계산
+  const getTextLength = (html: string): number => {
+    const text = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+    return text.length
+  }
+
   // 글자 수 표시 컴포넌트
   const CharCount = ({ current, min }: { current: number; min: number }) => (
     <span className={`text-xs ${current >= min ? 'text-green-600' : 'text-gray-400'}`}>
@@ -70,8 +78,7 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
         <div className="text-sm text-blue-800">
           <p className="font-medium">부트캠프 성장일기 작성 가이드</p>
           <p className="mt-1 text-blue-600">
-            아래 4가지 질문에 각각 {DIARY_MIN_LENGTH}자 이상 작성해주세요. 성실하게 작성한 일기는 다른 수강생들에게도 큰
-            도움이 됩니다!
+            아래 4가지 질문에 각각 {DIARY_MIN_LENGTH}자 이상 작성해주세요. 이미지를 삽입하려면 에디터 툴바의 이미지 버튼을 사용하세요!
           </p>
         </div>
       </div>
@@ -80,16 +87,14 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       <div>
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">{DIARY_QUESTIONS.learnedSkills.label} *</label>
-          <CharCount current={formData.learnedSkills.length} min={DIARY_MIN_LENGTH} />
+          <CharCount current={getTextLength(formData.learnedSkills)} min={DIARY_MIN_LENGTH} />
         </div>
-        <textarea
-          value={formData.learnedSkills}
-          onChange={e => onChange('learnedSkills', e.target.value)}
+        <TiptapEditor
+          content={formData.learnedSkills}
+          onChange={(content) => onChange('learnedSkills', content)}
           placeholder={DIARY_QUESTIONS.learnedSkills.placeholder}
-          rows={4}
-          className={`w-full resize-none rounded-lg border px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none ${
-            errors.learnedSkills ? 'border-red-500' : 'border-gray-300'
-          }`}
+          minHeight="120px"
+          className={errors.learnedSkills ? 'ring-2 ring-red-500' : ''}
         />
         {errors.learnedSkills && <p className="mt-1 text-sm text-red-500">{errors.learnedSkills}</p>}
       </div>
@@ -101,16 +106,14 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
             {DIARY_QUESTIONS.problemSolving.label} *
             <span className="ml-1 text-xs font-normal text-gray-500">{DIARY_QUESTIONS.problemSolving.sublabel}</span>
           </label>
-          <CharCount current={formData.problemSolving.length} min={DIARY_MIN_LENGTH} />
+          <CharCount current={getTextLength(formData.problemSolving)} min={DIARY_MIN_LENGTH} />
         </div>
-        <textarea
-          value={formData.problemSolving}
-          onChange={e => onChange('problemSolving', e.target.value)}
+        <TiptapEditor
+          content={formData.problemSolving}
+          onChange={(content) => onChange('problemSolving', content)}
           placeholder={DIARY_QUESTIONS.problemSolving.placeholder}
-          rows={6}
-          className={`w-full resize-none rounded-lg border px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none ${
-            errors.problemSolving ? 'border-red-500' : 'border-gray-300'
-          }`}
+          minHeight="150px"
+          className={errors.problemSolving ? 'ring-2 ring-red-500' : ''}
         />
         {errors.problemSolving && <p className="mt-1 text-sm text-red-500">{errors.problemSolving}</p>}
       </div>
@@ -119,16 +122,14 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       <div>
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">{DIARY_QUESTIONS.classReview.label} *</label>
-          <CharCount current={formData.classReview.length} min={DIARY_MIN_LENGTH} />
+          <CharCount current={getTextLength(formData.classReview)} min={DIARY_MIN_LENGTH} />
         </div>
-        <textarea
-          value={formData.classReview}
-          onChange={e => onChange('classReview', e.target.value)}
+        <TiptapEditor
+          content={formData.classReview}
+          onChange={(content) => onChange('classReview', content)}
           placeholder={DIARY_QUESTIONS.classReview.placeholder}
-          rows={4}
-          className={`w-full resize-none rounded-lg border px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none ${
-            errors.classReview ? 'border-red-500' : 'border-gray-300'
-          }`}
+          minHeight="120px"
+          className={errors.classReview ? 'ring-2 ring-red-500' : ''}
         />
         {errors.classReview && <p className="mt-1 text-sm text-red-500">{errors.classReview}</p>}
       </div>
@@ -137,16 +138,14 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       <div>
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">{DIARY_QUESTIONS.nextWeekPlan.label} *</label>
-          <CharCount current={formData.nextWeekPlan.length} min={DIARY_MIN_LENGTH} />
+          <CharCount current={getTextLength(formData.nextWeekPlan)} min={DIARY_MIN_LENGTH} />
         </div>
-        <textarea
-          value={formData.nextWeekPlan}
-          onChange={e => onChange('nextWeekPlan', e.target.value)}
+        <TiptapEditor
+          content={formData.nextWeekPlan}
+          onChange={(content) => onChange('nextWeekPlan', content)}
           placeholder={DIARY_QUESTIONS.nextWeekPlan.placeholder}
-          rows={4}
-          className={`w-full resize-none rounded-lg border px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none ${
-            errors.nextWeekPlan ? 'border-red-500' : 'border-gray-300'
-          }`}
+          minHeight="120px"
+          className={errors.nextWeekPlan ? 'ring-2 ring-red-500' : ''}
         />
         {errors.nextWeekPlan && <p className="mt-1 text-sm text-red-500">{errors.nextWeekPlan}</p>}
       </div>
@@ -160,31 +159,26 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
 export function validateDiaryForm(formData: DiaryFormData): Partial<Record<keyof DiaryFormData, string>> {
   const errors: Partial<Record<keyof DiaryFormData, string>> = {}
 
-  if (formData.learnedSkills.trim().length < DIARY_MIN_LENGTH) {
+  // HTML에서 텍스트만 추출하여 글자 수 계산
+  const getTextLength = (html: string): number => {
+    const text = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+    return text.length
+  }
+
+  if (getTextLength(formData.learnedSkills) < DIARY_MIN_LENGTH) {
     errors.learnedSkills = `${DIARY_MIN_LENGTH}자 이상 입력해주세요.`
   }
-  if (formData.problemSolving.trim().length < DIARY_MIN_LENGTH) {
+  if (getTextLength(formData.problemSolving) < DIARY_MIN_LENGTH) {
     errors.problemSolving = `${DIARY_MIN_LENGTH}자 이상 입력해주세요.`
   }
-  if (formData.classReview.trim().length < DIARY_MIN_LENGTH) {
+  if (getTextLength(formData.classReview) < DIARY_MIN_LENGTH) {
     errors.classReview = `${DIARY_MIN_LENGTH}자 이상 입력해주세요.`
   }
-  if (formData.nextWeekPlan.trim().length < DIARY_MIN_LENGTH) {
+  if (getTextLength(formData.nextWeekPlan) < DIARY_MIN_LENGTH) {
     errors.nextWeekPlan = `${DIARY_MIN_LENGTH}자 이상 입력해주세요.`
   }
 
   return errors
-}
-
-/**
- * 텍스트의 줄바꿈을 <br> 태그로 변환
- */
-function textToHtml(text: string): string {
-  return text
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-    .join('<br>')
 }
 
 /**
@@ -203,7 +197,7 @@ function buildSection(number: number, label: string, content: string, sublabel?:
     ${sublabelHtml}
   </h3>
   <div style="color: #374151; line-height: 1.75; padding-left: 32px;">
-    ${textToHtml(content)}
+    ${content}
   </div>
 </div>`
 }

@@ -29,7 +29,10 @@ export default function HeaderSection() {
     sort: 999,
     children: category.children.map(mapBoardToNav),
     type: 'BOARD' as const,
-    link: `/community?categoryId=${category.id}`,
+    // 각 카테고리별 링크로 분리 (자식이 없으면 해당 카테고리로, 있으면 전체 커뮤니티로)
+    link: category.children.length === 0 
+      ? `/community?categoryId=${category.id}` 
+      : '/community',
   })
 
   // 카테고리 병합

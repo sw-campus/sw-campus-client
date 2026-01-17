@@ -24,7 +24,7 @@ export default function EditPostPage() {
   // 로그인 체크
   if (hasHydrated && !isLoggedIn) {
     return (
-      <main className="custom-container mx-auto max-w-4xl">
+      <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">로그인이 필요합니다</p>
           <Link href="/login" className="mt-4 inline-block text-orange-500 hover:underline">
@@ -38,7 +38,7 @@ export default function EditPostPage() {
   // 로딩
   if (isLoading) {
     return (
-      <main className="custom-container mx-auto max-w-4xl">
+      <main className="custom-container mx-auto max-w-6xl">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-32 rounded bg-gray-200" />
           <div className="custom-card">
@@ -52,7 +52,7 @@ export default function EditPostPage() {
   // 에러 또는 권한 없음
   if (error || !post) {
     return (
-      <main className="custom-container mx-auto max-w-4xl">
+      <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">게시글을 찾을 수 없습니다</p>
           <Link href="/community" className="mt-4 inline-block text-orange-500 hover:underline">
@@ -66,7 +66,7 @@ export default function EditPostPage() {
   // 작성자가 아닌 경우
   if (!post.isAuthor) {
     return (
-      <main className="custom-container mx-auto max-w-4xl">
+      <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">수정 권한이 없습니다</p>
           <Link href={`/community/${postId}`} className="mt-4 inline-block text-orange-500 hover:underline">
@@ -97,7 +97,7 @@ export default function EditPostPage() {
   }
 
   return (
-    <main className="custom-container mx-auto max-w-4xl">
+    <main className="custom-container mx-auto max-w-6xl">
       {/* 뒤로가기 */}
       <Link
         href={`/community/${postId}`}

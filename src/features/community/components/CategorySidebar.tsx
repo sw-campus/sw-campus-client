@@ -179,7 +179,7 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
       </div>
 
       {/* 데스크탑: 사이드바 트리 */}
-      <aside className="hidden w-56 shrink-0 lg:block">
+      <aside className="hidden w-64 shrink-0 lg:block">
         <nav className="sticky top-24 space-y-1 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
           <h3 className="mb-3 px-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">카테고리</h3>
 

@@ -1,5 +1,8 @@
 'use client'
 
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
 interface DiaryTitleInputProps {
   month: number
   week: number
@@ -31,39 +34,41 @@ export function DiaryTitleInput({
       <div className="space-y-3">
         {/* 월/주차 선택 */}
         <div className="flex flex-wrap items-center gap-2">
-          <select
-            value={month}
-            onChange={e => onMonthChange(Number(e.target.value))}
-            className="rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
-          >
-            {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-              <option key={m} value={m}>
-                {m}월
-              </option>
-            ))}
-          </select>
-          <select
-            value={week}
-            onChange={e => onWeekChange(Number(e.target.value))}
-            className="rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
-          >
-            {Array.from({ length: 5 }, (_, i) => i + 1).map(w => (
-              <option key={w} value={w}>
-                {w}주차
-              </option>
-            ))}
-          </select>
+          <Select value={String(month)} onValueChange={(value) => onMonthChange(Number(value))}>
+            <SelectTrigger className="w-24 border-gray-300 bg-white hover:border-orange-300 focus:border-orange-500 focus:ring-orange-200">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                <SelectItem key={m} value={String(m)}>
+                  {m}월
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={String(week)} onValueChange={(value) => onWeekChange(Number(value))}>
+            <SelectTrigger className="w-24 border-gray-300 bg-white hover:border-orange-300 focus:border-orange-500 focus:ring-orange-200">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 5 }, (_, i) => i + 1).map(w => (
+                <SelectItem key={w} value={String(w)}>
+                  {w}주차
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <span className="text-gray-500">성장일기 -</span>
         </div>
 
         {/* 한 줄 소감 */}
-        <input
+        <Input
           type="text"
           value={summary}
           onChange={e => onSummaryChange(e.target.value)}
           placeholder="한 줄 소감을 입력하세요 (예: JWT 인증 구현 완료!)"
-          className={`w-full rounded-lg border px-4 py-2.5 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none ${
-            error ? 'border-red-500' : 'border-gray-300'
+          className={`border-gray-300 focus:border-orange-500 focus:ring-orange-200 ${
+            error ? 'border-red-500' : ''
           }`}
           maxLength={50}
         />

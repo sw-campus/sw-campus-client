@@ -30,7 +30,7 @@ export default function PostDetailPage() {
 
   if (isLoading) {
     return (
-      <main className="custom-container mx-auto max-w-4xl">
+      <main className="custom-container mx-auto max-w-6xl">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-32 rounded bg-gray-200" />
           <div className="h-12 w-full rounded bg-gray-200" />
@@ -43,7 +43,7 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <main className="custom-container mx-auto max-w-4xl">
+      <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">게시글을 찾을 수 없습니다</p>
           <Link href="/community" className="mt-4 inline-block text-orange-500 hover:underline">
@@ -63,7 +63,7 @@ export default function PostDetailPage() {
   }).format(post.createdAt)
 
   return (
-    <main className="custom-container mx-auto max-w-4xl">
+    <main className="custom-container mx-auto max-w-6xl">
       {/* 뒤로가기 */}
       <Link href="/community" className="mb-6 inline-flex items-center gap-2 text-gray-600 hover:text-gray-900">
         <FiArrowLeft />
@@ -71,7 +71,7 @@ export default function PostDetailPage() {
       </Link>
 
       {/* 게시글 카드 */}
-      <article className="custom-card">
+      <article className="custom-card w-[800px]">
         {/* 헤더 */}
         <header className="border-b border-gray-100 pb-6">
           <div className="mb-3 space-y-2">
@@ -120,19 +120,22 @@ export default function PostDetailPage() {
         {/* 본문 */}
         <div className="prose prose-gray mt-6 max-w-none" dangerouslySetInnerHTML={{ __html: post.body }} />
 
-        {/* 이미지 */}
-        {post.images.length > 0 && (
-          <div className="mt-6 flex flex-wrap gap-4">
-            {post.images.map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt={`첨부 이미지 ${index + 1}`}
-                className="max-h-96 rounded-lg object-contain"
-              />
-            ))}
-          </div>
-        )}
+        {/* 이미지 - 본문에 포함되지 않은 이미지만 표시 */}
+        {(() => {
+          const imagesNotInBody = post.images.filter(url => !post.body.includes(url))
+          return imagesNotInBody.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-4">
+              {imagesNotInBody.map((url, index) => (
+                <img
+                  key={index}
+                  src={url}
+                  alt={`첨부 이미지 ${index + 1}`}
+                  className="max-h-96 rounded-lg object-contain"
+                />
+              ))}
+            </div>
+          )
+        })()}
 
         {/* 액션 버튼 */}
         {isLoggedIn && (

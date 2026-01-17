@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 
 import { useForm, Controller } from 'react-hook-form'
-import { FiX } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { TiptapEditor } from '@/components/ui/editor/TiptapEditor'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import type { BoardCategory } from '../api/boardCategoryApi.types'
 import type { CreatePostRequest, PostDetail } from '../api/postApi.types'
@@ -49,8 +50,6 @@ export function PostForm({
   isSubmitting = false,
   submitLabel = '작성하기',
 }: PostFormProps) {
-  const [images, setImages] = useState<string[]>(initialData?.images || [])
-
   // 강의 선택 상태
   const [selectedLecture, setSelectedLecture] = useState<SelectedLecture | null>(null)
   const [isLectureModalOpen, setIsLectureModalOpen] = useState(false)
@@ -155,11 +154,19 @@ export function PostForm({
     const title = isBootcampDiaryCategory ? buildDiaryTitle(diaryMonth, diaryWeek, diarySummary) : data.title
     const body = isBootcampDiaryCategory ? buildDiaryBody(diaryForm) : data.body
 
+    // 본문에서 이미지 URL 추출 (썸네일용)
+    const extractedImages: string[] = []
+    const imgRegex = /<img[^>]+src="([^"]+)"/g
+    let match
+    while ((match = imgRegex.exec(body)) !== null) {
+      extractedImages.push(match[1])
+    }
+
     onSubmit({
       boardCategoryId: Number(data.boardCategoryId),
       title,
       body,
-      images: images.length > 0 ? images : undefined,
+      images: extractedImages.length > 0 ? extractedImages : undefined,
       tags: tags.length > 0 ? tags : undefined,
     })
   }
@@ -170,11 +177,6 @@ export function PostForm({
     if (diaryErrors[field]) {
       setDiaryErrors(prev => ({ ...prev, [field]: undefined }))
     }
-  }
-
-  // 이미지 삭제 핸들러
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index))
   }
 
   // 카테고리 선택 로직
@@ -229,18 +231,21 @@ export function PostForm({
 
       selects.push(
         <div key={i} className="min-w-[150px] flex-1">
-          <select
-            value={selectedId}
-            onChange={e => handleCategoryChange(i, e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
+          <Select
+            value={selectedId ? String(selectedId) : ''}
+            onValueChange={(value) => handleCategoryChange(i, value)}
           >
-            <option value="">{i === 0 ? '대분류 선택' : i === 1 ? '중분류 선택' : '소분류 선택'}</option>
-            {currentCats.map(cat => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="w-full border-gray-300 bg-white hover:border-orange-300 focus:border-orange-500 focus:ring-orange-200">
+              <SelectValue placeholder={i === 0 ? '대분류 선택' : i === 1 ? '중분류 선택' : '소분류 선택'} />
+            </SelectTrigger>
+            <SelectContent>
+              {currentCats.map(cat => (
+                <SelectItem key={cat.id} value={String(cat.id)}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>,
       )
 
@@ -299,7 +304,7 @@ export function PostForm({
             <label htmlFor="title" className="mb-2 block text-sm font-medium text-gray-700">
               제목 *
             </label>
-            <input
+            <Input
               id="title"
               type="text"
               {...register('title', {
@@ -307,7 +312,7 @@ export function PostForm({
                 maxLength: { value: 100, message: '제목은 100자 이내로 입력해주세요' },
               })}
               placeholder="제목을 입력해주세요"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
+              className="border-gray-300 focus:border-orange-500 focus:ring-orange-200"
             />
             {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>}
           </div>
@@ -342,27 +347,6 @@ export function PostForm({
           </div>
         )}
 
-        {/* 이미지 미리보기 */}
-        {images.length > 0 && (
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">첨부 이미지</label>
-            <div className="flex flex-wrap gap-3">
-              {images.map((url, index) => (
-                <div key={index} className="relative">
-                  <img src={url} alt={`첨부 이미지 ${index + 1}`} className="h-24 w-24 rounded-lg object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white shadow-md hover:bg-red-600"
-                  >
-                    <FiX className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* 태그 */}
         <div>
           <label htmlFor="tags" className="mb-2 block text-sm font-medium text-gray-700">
@@ -371,12 +355,12 @@ export function PostForm({
               <span className="ml-2 text-xs font-normal text-green-600">+ 강의명, 훈련기관 자동 추가</span>
             )}
           </label>
-          <input
+          <Input
             id="tags"
             type="text"
             {...register('tags')}
             placeholder="React, TypeScript, Next.js"
-            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
+            className="border-gray-300 focus:border-orange-500 focus:ring-orange-200"
           />
           {selectedLecture && (
             <div className="mt-2 flex flex-wrap gap-2">

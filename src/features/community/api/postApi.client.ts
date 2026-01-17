@@ -86,6 +86,9 @@ export async function getPosts(params: PostSearchParams = {}): Promise<PagedPost
   if (params.size !== undefined) {
     searchParams.set('size', params.size.toString())
   }
+  if (params.sort) {
+    searchParams.set('sort', params.sort)
+  }
 
   const queryString = searchParams.toString()
   const url = queryString ? `/posts?${queryString}` : '/posts'
