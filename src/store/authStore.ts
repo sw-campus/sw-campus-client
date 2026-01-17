@@ -73,6 +73,15 @@ export const useAuthStore = create<AuthState>()(
 
     {
       name: 'auth-storage', // localStorage key
+      // 🔒 보안: accessToken은 localStorage에 저장하지 않음 (XSS 방지)
+      // 페이지 새로고침 시 httpOnly refresh cookie로 자동 갱신됨
+      partialize: state => ({
+        isLoggedIn: state.isLoggedIn,
+        userName: state.userName,
+        nickname: state.nickname,
+        userType: state.userType,
+        // accessToken은 메모리에만 유지, localStorage에 저장 안 함
+      }),
       onRehydrateStorage: () => state => {
         state?.setHasHydrated(true)
       },
