@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -79,8 +79,8 @@ export default function CommunityPage() {
     router.push(queryString ? `/community?${queryString}` : '/community')
   }
 
-  // 선택된 카테고리 이름 찾기
-  const getSelectedCategoryName = () => {
+  // 선택된 카테고리 이름 찾기 - useMemo 사용
+  const selectedCategoryName = useMemo(() => {
     if (selectedCategoryId === null) return '전체 게시글'
     for (const parent of categories) {
       if (parent.id === selectedCategoryId) return parent.name
@@ -89,7 +89,7 @@ export default function CommunityPage() {
       }
     }
     return '전체 게시글'
-  }
+  }, [categories, selectedCategoryId])
 
   const pageInfo = data?.page
   const totalPages = pageInfo?.totalPages ?? 1
@@ -167,7 +167,7 @@ export default function CommunityPage() {
         <main className="min-w-0 flex-1">
           {/* 현재 카테고리 표시 */}
           <div className="mb-4 hidden items-center justify-between lg:flex">
-            <h2 className="text-lg font-semibold text-gray-900">{getSelectedCategoryName()}</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{selectedCategoryName}</h2>
             <span className="text-sm text-gray-500">{data?.page?.totalElements ?? 0}개의 게시글</span>
           </div>
 
