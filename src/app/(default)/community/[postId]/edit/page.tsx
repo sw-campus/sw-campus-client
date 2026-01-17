@@ -22,7 +22,20 @@ export default function EditPostPage() {
   const { mutate: updatePost, isPending } = useUpdatePost()
 
   // 로그인 체크
-  if (hasHydrated && !isLoggedIn) {
+  if (!hasHydrated) {
+    return (
+      <main className="custom-container mx-auto max-w-6xl">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 w-32 rounded bg-gray-200" />
+          <div className="custom-card">
+            <div className="h-96 w-full rounded bg-gray-200" />
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  if (!isLoggedIn) {
     return (
       <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">

@@ -237,7 +237,7 @@ export function TiptapEditor({
       </div>
 
       {/* Editor Content */}
-      <EditorContent editor={editor} className={cn('flex-grow cursor-text p-0', `min-h-[${minHeight}]`)} />
+      <EditorContent editor={editor} style={{ minHeight }} className="flex-grow cursor-text p-0" />
 
       {/* Styles for placeholder */}
       <style jsx global>{`

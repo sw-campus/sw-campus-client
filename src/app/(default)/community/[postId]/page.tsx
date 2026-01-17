@@ -1,8 +1,10 @@
 'use client'
 
+import { useMemo } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { FiArrowLeft, FiEdit2, FiTrash2, FiHeart, FiBookmark, FiEye, FiMessageCircle } from 'react-icons/fi'
+import DOMPurify from 'dompurify'
 
 import { Button } from '@/components/ui/button'
 import { useDeletePost } from '@/features/community/hooks/useDeletePost'
@@ -17,6 +19,22 @@ export default function PostDetailPage() {
   const { isLoggedIn } = useAuthStore()
   const { data: post, isLoading, error } = usePostDetail(postId)
   const { mutate: deletePost, isPending: isDeleting } = useDeletePost()
+
+  const imagesNotInBody = useMemo(() => {
+    if (!post) return []
+
+    const imgTagRegex = /<img[^>]*src="([^"]*)"[^>]*>/g
+    const bodyImageUrls = new Set<string>()
+    let match
+
+    while ((match = imgTagRegex.exec(post.body)) !== null) {
+      if (match[1]) {
+        bodyImageUrls.add(match[1])
+      }
+    }
+
+    return post.images.filter(url => !bodyImageUrls.has(url))
+  }, [post])
 
   const handleDelete = () => {
     if (!confirm('정말 삭제하시겠습니까?')) return
@@ -71,7 +89,7 @@ export default function PostDetailPage() {
       </Link>
 
       {/* 게시글 카드 */}
-      <article className="custom-card w-[800px]">
+      <article className="custom-card max-w-[800px] w-full">
         {/* 헤더 */}
         <header className="border-b border-gray-100 pb-6">
           <div className="mb-3 space-y-2">
@@ -118,24 +136,24 @@ export default function PostDetailPage() {
         </header>
 
         {/* 본문 */}
-        <div className="prose prose-gray mt-6 max-w-none" dangerouslySetInnerHTML={{ __html: post.body }} />
+        <div
+          className="prose prose-gray mt-6 max-w-none"
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.body) }}
+        />
 
         {/* 이미지 - 본문에 포함되지 않은 이미지만 표시 */}
-        {(() => {
-          const imagesNotInBody = post.images.filter(url => !post.body.includes(url))
-          return imagesNotInBody.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-4">
-              {imagesNotInBody.map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`첨부 이미지 ${index + 1}`}
-                  className="max-h-96 rounded-lg object-contain"
-                />
-              ))}
-            </div>
-          )
-        })()}
+        {imagesNotInBody.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-4">
+            {imagesNotInBody.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt={`첨부 이미지 ${index + 1}`}
+                className="max-h-96 rounded-lg object-contain"
+              />
+            ))}
+          </div>
+        )}
 
         {/* 액션 버튼 */}
         {isLoggedIn && (
