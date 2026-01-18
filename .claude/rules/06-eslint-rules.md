@@ -22,7 +22,7 @@ const eslintConfig = [
       }],
 
       // JavaScript
-      "no-console": ["error", {                            // console.log 금지
+      "no-console": ["warn", {                            // console.log 금지
         allow: ["warn", "error"],                          // warn, error 허용
       }],
       "prefer-const": "error",                             // const 우선
