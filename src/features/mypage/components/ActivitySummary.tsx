@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 import { LuAward, LuBadgeCheck, LuClipboardCheck, LuPencil } from 'react-icons/lu'
 
@@ -10,24 +10,22 @@ import {
   useCompletedLecturesQuery,
   useReviewStatusesQuery,
 } from '@/features/mypage/hooks/useCompletedLecturesQuery'
-import { api } from '@/lib/axios'
 
-type SurveyResponse = {
-  surveyId: number | null
-  exists?: boolean | null
-}
+import { useSurveyStatusQuery } from '../hooks/useSurvey'
 
 type ActivitySummaryProps = {
   onEditSurvey?: () => void
 }
 
 export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
-  const [surveyCompleted, setSurveyCompleted] = useState(false)
-  const [surveyLoading, setSurveyLoading] = useState(true)
-
   // React Query hooks - 캐싱으로 중복 호출 방지
   const { data: lectures, isLoading: lecturesLoading } = useCompletedLecturesQuery()
   const { data: reviewStatuses, isLoading: reviewStatusesLoading } = useReviewStatusesQuery(lectures)
+
+  // 설문 상태는 React Query로 관리 (모달에서 변경 시 자동 반영)
+  const { data: surveyStatus, isLoading: surveyLoading } = useSurveyStatusQuery()
+  const hasBasicSurvey = surveyStatus?.hasBasicSurvey ?? false
+  const hasAptitudeTest = surveyStatus?.hasAptitudeTest ?? false
 
   // 승인된 후기 수 계산
   const approvedReviews = useMemo(() => {
@@ -38,30 +36,6 @@ export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
     })
     return count
   }, [reviewStatuses])
-
-  // 설문 완료 여부 조회 (별도 API)
-  useEffect(() => {
-    let mounted = true
-
-    const loadSurvey = async () => {
-      try {
-        setSurveyLoading(true)
-        const surveyRes = await api.get<SurveyResponse>('/mypage/survey')
-        const surveyId = surveyRes.data?.surveyId
-        const surveyDone = surveyRes.data?.exists === true || (surveyId !== null && surveyId !== undefined)
-        if (mounted) setSurveyCompleted(surveyDone)
-      } catch {
-        // ignore
-      } finally {
-        if (mounted) setSurveyLoading(false)
-      }
-    }
-
-    loadSurvey()
-    return () => {
-      mounted = false
-    }
-  }, [])
 
   const loading = lecturesLoading || reviewStatusesLoading || surveyLoading
 
@@ -95,16 +69,39 @@ export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
               <span className="text-muted-foreground text-xs">승인된 후기</span>
             </div>
 
-            {/* 설문 - 수정 버튼 포함 */}
+            {/* 설문 - 프로그레스 바 + 수정 버튼 */}
             <div className="flex flex-col items-center gap-1 text-center">
               <div className="text-muted-foreground">
                 <LuClipboardCheck className="h-5 w-5" />
               </div>
-              <span
-                className={`text-xl font-bold ${surveyCompleted ? 'text-green-600' : 'text-muted-foreground'}`}
-              >
-                {surveyCompleted ? '완료' : '미작성'}
-              </span>
+              {/* 프로그레스 바 + 상태 텍스트 (한 줄) */}
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div
+                    className={`h-3 w-5 rounded ${
+                      hasBasicSurvey
+                        ? hasAptitudeTest
+                          ? 'bg-green-500'
+                          : 'bg-amber-500'
+                        : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                  />
+                  <div
+                    className={`h-3 w-5 rounded ${hasAptitudeTest ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+                  />
+                </div>
+                <span
+                  className={`text-lg font-bold ${
+                    hasAptitudeTest
+                      ? 'text-green-600'
+                      : hasBasicSurvey
+                        ? 'text-amber-600'
+                        : 'text-muted-foreground'
+                  }`}
+                >
+                  {hasAptitudeTest ? '2단계' : hasBasicSurvey ? '1단계' : '미작성'}
+                </span>
+              </div>
               <div className="flex items-center gap-1">
                 <span className="text-muted-foreground text-xs">설문</span>
                 {onEditSurvey && (

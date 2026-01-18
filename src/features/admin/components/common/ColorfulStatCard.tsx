@@ -50,3 +50,13 @@ export const BANNER_STAT_COLORS = {
   active: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
   ended: 'bg-gradient-to-br from-gray-400 to-gray-500',
 }
+
+/**
+ * 설문 문항 세트 관련 페이지용 색상 설정
+ */
+export const SURVEY_STAT_COLORS = {
+  total: 'bg-gradient-to-br from-slate-500 to-slate-600',
+  draft: 'bg-gradient-to-br from-amber-500 to-amber-600',
+  published: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
+  archived: 'bg-gradient-to-br from-gray-400 to-gray-500',
+}
