@@ -1,8 +1,9 @@
+/* eslint-disable @next/next/no-img-element -- 동적 외부 URL (기관 로고) 사용 */
 'use client'
 
 import { useEffect, useState } from 'react'
 
-import { LuBuilding, LuKey, LuPencil } from 'react-icons/lu'
+import { LuBuilding, LuPencil } from 'react-icons/lu'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,7 +11,6 @@ import { APPROVAL_STATUS, type ApprovalStatus } from '@/features/admin/types/app
 import { api } from '@/lib/axios'
 import { cn } from '@/lib/utils'
 
-import { PasswordChangeModal } from '../PasswordChangeModal'
 import { PasswordVerifyModal } from '../PasswordVerifyModal'
 
 type MyOrganizationResponse = {

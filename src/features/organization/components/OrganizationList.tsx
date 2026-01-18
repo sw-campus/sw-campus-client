@@ -52,7 +52,7 @@ export function OrganizationList() {
             </div>
           ) : (
             <div className="text-muted-foreground py-20 text-center">
-              <p className="text-lg">"{searchTerm}"에 대한 검색 결과가 없습니다.</p>
+              <p className="text-lg">&quot;{searchTerm}&quot;에 대한 검색 결과가 없습니다.</p>
               <p className="mt-2 text-sm">다른 검색어로 시도해보세요.</p>
             </div>
           ))}

@@ -164,7 +164,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     return lecture.reviewStatus === APPROVAL_STATUS.APPROVED
   }
 
-  const formatDate = (iso?: string) => {
+  const _formatDate = (iso?: string) => {
     if (!iso) return ''
     try {
       const d = new Date(iso)

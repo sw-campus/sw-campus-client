@@ -60,7 +60,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
   const [isPending, setIsPending] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [organizationId, setOrganizationId] = useState<number | null>(null)
+  const [_organizationId, setOrganizationId] = useState<number | null>(null)
   const [approvalStatus, setApprovalStatus] = useState<string>('')
 
   const methods = useForm<OrgInfoFormValues>({

@@ -13,7 +13,7 @@ type Side = 'left' | 'right'
 export function LectureSummaryCard({
   side,
   title,
-  orgName,
+  orgName: _orgName,
   thumbnailUrl,
   lectureId,
   onClear,

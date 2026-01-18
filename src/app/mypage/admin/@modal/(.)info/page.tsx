@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -9,11 +9,7 @@ import { PersonalInfoForm } from '@/features/mypage/components/Personal/Personal
 
 export default function AdminInfoModal() {
   const router = useRouter()
-  const [open, setOpen] = useState(false)
-
-  useEffect(() => {
-    setOpen(true)
-  }, [])
+  const [open, setOpen] = useState(true)
 
   const handleOpenChange = (next: boolean) => {
     if (!next) router.back()

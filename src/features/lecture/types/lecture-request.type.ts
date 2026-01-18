@@ -1,7 +1,6 @@
 import {
   EquipmentType,
   LectureDay,
-  LectureAuthStatus,
   LectureLocation,
   LocalDateString,
   LocalTimeString,
