@@ -7,6 +7,7 @@ import { LuCopy, LuGripVertical, LuPencil, LuPlus, LuRotateCcw, LuSend, LuTrash2
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { ConfirmationModal } from '@/components/common/ConfirmationModal'
 import {
   Dialog,
   DialogContent,
@@ -22,7 +23,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { formatDate } from '@/lib/date'
 import { cn } from '@/lib/utils'
 
-import { fetchQuestionCounts } from '../../api/surveyApi'
 import {
   useAddQuestionMutation,
   useCloneQuestionSetMutation,
@@ -55,6 +55,14 @@ interface NewQuestionForm {
   part: QuestionPart | ''
 }
 
+interface ConfirmModalState {
+  title: string
+  description: string
+  confirmText: string
+  variant: 'default' | 'destructive'
+  onConfirm: () => void
+}
+
 const initialNewQuestion: NewQuestionForm = {
   questionText: '',
   questionType: 'RADIO',
@@ -68,6 +76,7 @@ export function QuestionSetDetailModal({ questionSet, isOpen, onClose }: Questio
   const [editDescription, setEditDescription] = useState('')
   const [showAddQuestion, setShowAddQuestion] = useState(false)
   const [newQuestion, setNewQuestion] = useState<NewQuestionForm>(initialNewQuestion)
+  const [confirmModal, setConfirmModal] = useState<ConfirmModalState | null>(null)
 
   const { data: detail, isLoading } = useQuestionSetDetailQuery(questionSet?.questionSetId ?? 0)
   const updateMutation = useUpdateQuestionSetMutation()
@@ -113,55 +122,84 @@ export function QuestionSetDetailModal({ questionSet, isOpen, onClose }: Questio
   }
 
   const handleDelete = () => {
-    if (confirm('문항 세트를 삭제하시겠습니까? 모든 문항과 선택지도 함께 삭제됩니다.')) {
-      deleteMutation.mutate(questionSet.questionSetId, {
-        onSuccess: onClose,
-      })
-    }
+    setConfirmModal({
+      title: '문항 세트 삭제',
+      description: '문항 세트를 삭제하시겠습니까?\n모든 문항과 선택지도 함께 삭제됩니다.',
+      confirmText: '삭제',
+      variant: 'destructive',
+      onConfirm: () => {
+        deleteMutation.mutate(questionSet.questionSetId, {
+          onSuccess: () => {
+            setConfirmModal(null)
+            onClose()
+          },
+        })
+      },
+    })
   }
 
-  const handlePublish = async () => {
-    const DEFAULT_CONFIRM_MESSAGE = '문항 세트를 발행하시겠습니까? 발행 후에는 수정이 불가능합니다.'
+  const handlePublish = () => {
+    const DEFAULT_DESCRIPTION = '문항 세트를 발행하시겠습니까?\n발행 후에는 수정이 불가능합니다.'
 
     // APTITUDE 타입일 때 Part3 문항 수 확인하여 경고 메시지 결정
-    let confirmMessage = DEFAULT_CONFIRM_MESSAGE
+    let description = DEFAULT_DESCRIPTION
 
-    if (questionSet.type === 'APTITUDE') {
-      try {
-        const counts = await fetchQuestionCounts(questionSet.questionSetId)
-        const part3Count = counts.PART3 || 0
+    if (questionSet.type === 'APTITUDE' && detail?.questions) {
+      const part3Count = detail.questions.filter((q) => q.part === 'PART3').length
 
-        if (part3Count < 5) {
-          confirmMessage = `Part 3 문항이 ${part3Count}개입니다. 5개 미만이면 추천 직무 정확도가 낮아질 수 있습니다.\n\n계속 발행하시겠습니까?`
-        }
-      } catch {
-        // 문항 수 조회 실패 시 기본 확인 메시지 사용
+      if (part3Count < 5) {
+        description = `Part 3 문항이 ${part3Count}개입니다.\n5개 미만이면 추천 직무 정확도가 낮아질 수 있습니다.\n\n계속 발행하시겠습니까?`
       }
     }
 
-    if (!confirm(confirmMessage)) {
-      return
-    }
-
-    publishMutation.mutate(questionSet.questionSetId, {
-      onSuccess: onClose,
+    setConfirmModal({
+      title: '문항 세트 발행',
+      description,
+      confirmText: '발행',
+      variant: 'default',
+      onConfirm: () => {
+        publishMutation.mutate(questionSet.questionSetId, {
+          onSuccess: () => {
+            setConfirmModal(null)
+            onClose()
+          },
+        })
+      },
     })
   }
 
   const handleClone = () => {
-    if (confirm('문항 세트를 복제하시겠습니까? 새 버전이 DRAFT 상태로 생성됩니다.')) {
-      cloneMutation.mutate(questionSet.questionSetId, {
-        onSuccess: onClose,
-      })
-    }
+    setConfirmModal({
+      title: '문항 세트 복제',
+      description: '문항 세트를 복제하시겠습니까?\n새 버전이 DRAFT 상태로 생성됩니다.',
+      confirmText: '복제',
+      variant: 'default',
+      onConfirm: () => {
+        cloneMutation.mutate(questionSet.questionSetId, {
+          onSuccess: () => {
+            setConfirmModal(null)
+            onClose()
+          },
+        })
+      },
+    })
   }
 
   const handleRepublish = () => {
-    if (confirm('이 문항 세트를 다시 발행하시겠습니까? 현재 발행된 세트는 보관됩니다.')) {
-      republishMutation.mutate(questionSet.questionSetId, {
-        onSuccess: onClose,
-      })
-    }
+    setConfirmModal({
+      title: '문항 세트 재발행',
+      description: '이 문항 세트를 다시 발행하시겠습니까?\n현재 발행된 세트는 보관됩니다.',
+      confirmText: '재발행',
+      variant: 'default',
+      onConfirm: () => {
+        republishMutation.mutate(questionSet.questionSetId, {
+          onSuccess: () => {
+            setConfirmModal(null)
+            onClose()
+          },
+        })
+      },
+    })
   }
 
   const handleAddQuestion = () => {
@@ -486,6 +524,24 @@ export function QuestionSetDetailModal({ questionSet, isOpen, onClose }: Questio
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {confirmModal && (
+        <ConfirmationModal
+          isOpen={!!confirmModal}
+          onClose={() => setConfirmModal(null)}
+          onConfirm={confirmModal.onConfirm}
+          title={confirmModal.title}
+          description={confirmModal.description}
+          confirmText={confirmModal.confirmText}
+          variant={confirmModal.variant}
+          isLoading={
+            deleteMutation.isPending ||
+            publishMutation.isPending ||
+            cloneMutation.isPending ||
+            republishMutation.isPending
+          }
+        />
+      )}
     </Dialog>
   )
 }

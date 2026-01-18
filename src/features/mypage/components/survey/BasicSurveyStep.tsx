@@ -129,38 +129,32 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
       {/* Q1: 전공 유무 */}
       <div className="space-y-3">
         <Label className="text-base font-medium">
-          전공 유무 <span className="text-red-500">*</span>
+          전공 유무 <span className="text-destructive">*</span>
         </Label>
         <Controller
           name="hasMajor"
           control={control}
           render={({ field }) => (
-            <div className="flex items-center gap-6">
+            <RadioGroup
+              value={field.value ? 'true' : 'false'}
+              onValueChange={(value) => field.onChange(value === 'true')}
+              className="flex items-center gap-6"
+            >
               <label className="flex cursor-pointer items-center gap-2">
-                <input
-                  type="radio"
-                  checked={field.value === true}
-                  onChange={() => field.onChange(true)}
-                  className="h-4 w-4 text-amber-500 focus:ring-amber-500"
-                />
+                <RadioGroupItem value="true" />
                 <span>전공 있음</span>
               </label>
               <label className="flex cursor-pointer items-center gap-2">
-                <input
-                  type="radio"
-                  checked={field.value === false}
-                  onChange={() => field.onChange(false)}
-                  className="h-4 w-4 text-amber-500 focus:ring-amber-500"
-                />
+                <RadioGroupItem value="false" />
                 <span>전공 없음 (비전공)</span>
               </label>
-            </div>
+            </RadioGroup>
           )}
         />
         {hasMajor && (
           <div className="ml-6 mt-3">
-            <Label htmlFor="majorName" className="text-sm text-gray-600">
-              전공명 <span className="text-red-500">*</span>
+            <Label htmlFor="majorName" className="text-sm text-muted-foreground">
+              전공명 <span className="text-destructive">*</span>
             </Label>
             <Input
               id="majorName"
@@ -169,7 +163,7 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
               className="mt-1 h-10"
             />
             {errors.majorName && (
-              <p className="mt-1 text-sm text-red-500">{errors.majorName.message}</p>
+              <p className="mt-1 text-sm text-destructive">{errors.majorName.message}</p>
             )}
           </div>
         )}
@@ -178,37 +172,31 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
       {/* Q2: 프로그래밍 경험 */}
       <div className="space-y-3">
         <Label className="text-base font-medium">
-          프로그래밍 경험 유무 <span className="text-red-500">*</span>
+          프로그래밍 경험 유무 <span className="text-destructive">*</span>
         </Label>
         <Controller
           name="hasProgrammingExperience"
           control={control}
           render={({ field }) => (
-            <div className="flex items-center gap-6">
+            <RadioGroup
+              value={field.value ? 'true' : 'false'}
+              onValueChange={(value) => field.onChange(value === 'true')}
+              className="flex items-center gap-6"
+            >
               <label className="flex cursor-pointer items-center gap-2">
-                <input
-                  type="radio"
-                  checked={field.value === true}
-                  onChange={() => field.onChange(true)}
-                  className="h-4 w-4 text-amber-500 focus:ring-amber-500"
-                />
+                <RadioGroupItem value="true" />
                 <span>경험 있음</span>
               </label>
               <label className="flex cursor-pointer items-center gap-2">
-                <input
-                  type="radio"
-                  checked={field.value === false}
-                  onChange={() => field.onChange(false)}
-                  className="h-4 w-4 text-amber-500 focus:ring-amber-500"
-                />
+                <RadioGroupItem value="false" />
                 <span>경험 없음</span>
               </label>
-            </div>
+            </RadioGroup>
           )}
         />
         {hasProgrammingExperience && (
           <div className="ml-6 mt-3">
-            <Label htmlFor="bootcampName" className="text-sm text-gray-600">
+            <Label htmlFor="bootcampName" className="text-sm text-muted-foreground">
               부트캠프/교육과정명 (선택)
             </Label>
             <Input
@@ -224,7 +212,7 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
       {/* Q3: 선호 수업 방식 */}
       <div className="space-y-3">
         <Label className="text-base font-medium">
-          선호하는 수업 방식 <span className="text-red-500">*</span>
+          선호하는 수업 방식 <span className="text-destructive">*</span>
         </Label>
         <Controller
           name="preferredLearningMethod"
@@ -240,8 +228,8 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
                   key={method}
                   className={`flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-3 transition-colors ${
                     field.value === method
-                      ? 'border-amber-500 bg-amber-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-muted-foreground/50'
                   }`}
                 >
                   <RadioGroupItem value={method} />
@@ -256,8 +244,8 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
       {/* Q4: 희망 직무 */}
       <div className="space-y-3">
         <Label className="text-base font-medium">
-          희망 직무 <span className="text-red-500">*</span>
-          <span className="ml-2 text-sm font-normal text-gray-500">(복수 선택 가능)</span>
+          희망 직무 <span className="text-destructive">*</span>
+          <span className="ml-2 text-sm font-normal text-muted-foreground">(복수 선택 가능)</span>
         </Label>
         <Controller
           name="desiredJobs"
@@ -269,8 +257,8 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
                   key={job}
                   className={`flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-3 transition-colors ${
                     field.value.includes(job)
-                      ? 'border-amber-500 bg-amber-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-muted-foreground/50'
                   }`}
                 >
                   <Checkbox
@@ -290,7 +278,7 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
           )}
         />
         {errors.desiredJobs && (
-          <p className="text-sm text-red-500">{errors.desiredJobs.message}</p>
+          <p className="text-sm text-destructive">{errors.desiredJobs.message}</p>
         )}
         {desiredJobs.includes('OTHER') && (
           <div className="mt-3">
@@ -300,7 +288,7 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
               className="h-10"
             />
             {errors.desiredJobOther && (
-              <p className="mt-1 text-sm text-red-500">{errors.desiredJobOther.message}</p>
+              <p className="mt-1 text-sm text-destructive">{errors.desiredJobOther.message}</p>
             )}
           </div>
         )}
@@ -309,7 +297,7 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
       {/* Q5: 교육비 부담 가능 금액 */}
       <div className="space-y-3">
         <Label className="text-base font-medium">
-          교육비 자기 부담 가능 금액 <span className="text-red-500">*</span>
+          교육비 자기 부담 가능 금액 <span className="text-destructive">*</span>
         </Label>
         <Controller
           name="affordableBudgetRange"
@@ -325,8 +313,8 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
                   key={range}
                   className={`flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-3 transition-colors ${
                     field.value === range
-                      ? 'border-amber-500 bg-amber-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-muted-foreground/50'
                   }`}
                 >
                   <RadioGroupItem value={range} />
@@ -343,11 +331,11 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
         <Button
           type="submit"
           disabled={!isValid || saveBasicSurvey.isPending}
-          className="h-12 w-full bg-amber-500 text-white hover:bg-amber-600 disabled:bg-gray-200"
+          className="h-12 w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
         >
           {saveBasicSurvey.isPending ? '저장 중...' : '다음 단계로'}
         </Button>
-        <p className="mt-2 text-center text-sm text-gray-500">
+        <p className="mt-2 text-center text-sm text-muted-foreground">
           기초 설문을 완료하면 AI 기본 추천 기능을 사용할 수 있습니다.
         </p>
       </div>
