@@ -20,20 +20,14 @@ import {
 } from '@/features/admin/types/approval.type'
 import type { CompletedLecture } from '@/features/mypage/api/completedLectures.api'
 import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
-import {
-  completedLecturesQueryKey,
-  useCompletedLecturesQuery,
-  useReviewStatusesQuery,
-} from '@/features/mypage/hooks/useCompletedLecturesQuery'
+import { completedLecturesQueryKey, useCompletedLecturesQuery } from '@/features/mypage/hooks/useCompletedLecturesQuery'
 
 export function ReviewManagementSection() {
   const queryClient = useQueryClient()
 
   // React Query hooks - 캐싱으로 중복 호출 방지
-  const { data: lectures, isLoading: lecturesLoading } = useCompletedLecturesQuery()
-  const { data: reviewStatuses, isLoading: reviewStatusesLoading } = useReviewStatusesQuery(lectures)
-
-  const isLoading = lecturesLoading || reviewStatusesLoading
+  // reviewStatus가 응답에 포함되어 별도 API 호출 불필요
+  const { data: lectures, isLoading } = useCompletedLecturesQuery()
 
   // Edit review modal
   const [editOpen, setEditOpen] = useState(false)
@@ -55,21 +49,18 @@ export function ReviewManagementSection() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fullImageUrl, setFullImageUrl] = useState<string | null>(null)
 
-  const getStatusLabel = (lectureId: number, canWriteReview: boolean): string => {
-    if (canWriteReview) return '작성 가능'
-    const status = reviewStatuses?.get(lectureId)
-    return getApprovalStatusLabel(status)
+  const getStatusLabel = (lecture: CompletedLecture): string => {
+    if (lecture.canWriteReview) return '작성 가능'
+    return getApprovalStatusLabel(lecture.reviewStatus)
   }
 
-  const getStatusBadgeClass = (lectureId: number, canWriteReview: boolean): string => {
-    if (canWriteReview) return 'bg-gray-400 text-white'
-    const status = reviewStatuses?.get(lectureId)
-    return getApprovalStatusColor(status)
+  const getStatusBadgeClass = (lecture: CompletedLecture): string => {
+    if (lecture.canWriteReview) return 'bg-gray-400 text-white'
+    return getApprovalStatusColor(lecture.reviewStatus)
   }
 
-  const isReadOnly = (lectureId: number): boolean => {
-    const status = reviewStatuses?.get(lectureId)
-    return status === APPROVAL_STATUS.APPROVED || status === APPROVAL_STATUS.REJECTED
+  const isReadOnly = (lecture: CompletedLecture): boolean => {
+    return lecture.reviewStatus === APPROVAL_STATUS.APPROVED || lecture.reviewStatus === APPROVAL_STATUS.REJECTED
   }
 
   const handleFileSelect = (file: File) => {
@@ -156,9 +147,9 @@ export function ReviewManagementSection() {
                           </Badge>
                           <Badge
                             variant="secondary"
-                            className={`text-xs ${getStatusBadgeClass(l.lectureId, l.canWriteReview)}`}
+                            className={`text-xs ${getStatusBadgeClass(l)}`}
                           >
-                            {getStatusLabel(l.lectureId, l.canWriteReview)}
+                            {getStatusLabel(l)}
                           </Badge>
                         </div>
                       </TableCell>
@@ -172,9 +163,9 @@ export function ReviewManagementSection() {
                       <TableCell className="hidden sm:table-cell">
                         <Badge
                           variant="secondary"
-                          className={`text-xs ${getStatusBadgeClass(l.lectureId, l.canWriteReview)}`}
+                          className={`text-xs ${getStatusBadgeClass(l)}`}
                         >
-                          {getStatusLabel(l.lectureId, l.canWriteReview)}
+                          {getStatusLabel(l)}
                         </Badge>
                       </TableCell>
                       {/* 관리 버튼: 수료증 + 후기 */}
@@ -229,14 +220,14 @@ export function ReviewManagementSection() {
                                   onClick={() => {
                                     setSelectedReviewId(l.reviewId ?? null)
                                     setSelectedLectureId(l.lectureId)
-                                    setSelectedReviewReadOnly(isReadOnly(l.lectureId))
+                                    setSelectedReviewReadOnly(isReadOnly(l))
                                     setEditOpen(true)
                                   }}
                                 >
                                   <LuPencil className="h-4 w-4" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>{isReadOnly(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}</TooltipContent>
+                              <TooltipContent>{isReadOnly(l) ? '리뷰 조회' : '리뷰 수정'}</TooltipContent>
                             </Tooltip>
                           )}
                         </div>

@@ -13,7 +13,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   APPROVAL_STATUS,
-  APPROVAL_STATUS_COLOR,
   getApprovalStatusLabel,
   canEditByStatus,
   type ApprovalStatus,
@@ -63,6 +62,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     reviewId?: number
     certificateImageUrl?: string
     certificateStatus?: ApprovalStatus
+    reviewStatus?: ApprovalStatus
   }
 
   const [lectures, setLectures] = useState<CompletedLecture[] | null>(null)
@@ -74,9 +74,6 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
   const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null)
   const [selectedLectureId, setSelectedLectureId] = useState<number | null>(null)
   const [selectedReviewReadOnly, setSelectedReviewReadOnly] = useState(false)
-
-  // lectureId별 승인(버튼 라벨 전환용)
-  const [approvedLectureIds, setApprovedLectureIds] = useState<Set<number>>(new Set())
 
   // 강의 목록 새로고침 함수 (중복 로직 추출)
   const refetchLectures = async () => {
@@ -162,69 +159,10 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     }
   }, [activeSection])
 
-  useEffect(() => {
-    if (activeSection !== 'reviews') return
-    if (!lectures || lectures.length === 0) return
-
-    let cancelled = false
-
-    const parseApproved = (data: unknown): boolean => {
-      const approvalStatus = (data as { approvalStatus?: unknown })?.approvalStatus
-      if (typeof approvalStatus === 'string') {
-        return approvalStatus.toUpperCase() === APPROVAL_STATUS.APPROVED
-      }
-
-      const status =
-        (data as { status?: unknown; reviewStatus?: unknown })?.status ??
-        (data as { reviewStatus?: unknown })?.reviewStatus
-      const statusStr = typeof status === 'string' ? status : ''
-
-      const isApprovedBool =
-        (data as { isApproved?: unknown })?.isApproved === true || (data as { approved?: unknown })?.approved === true
-
-      return isApprovedBool || statusStr.toUpperCase() === APPROVAL_STATUS.APPROVED
-    }
-
-    const hydrateApproved = async () => {
-      const targetLectures = lectures.filter(l => !l.canWriteReview)
-      if (targetLectures.length === 0) return
-
-      try {
-        const results = await Promise.all(
-          targetLectures.map(async l => {
-            try {
-              const { data } = await api.get<unknown>(`/mypage/completed-lectures/${l.lectureId}/review`)
-              const rid = (data as { reviewId?: unknown })?.reviewId
-              return {
-                lectureId: l.lectureId,
-                reviewId: typeof rid === 'number' ? rid : Number(rid),
-                approved: parseApproved(data),
-              }
-            } catch {
-              return { lectureId: l.lectureId, reviewId: NaN, approved: false }
-            }
-          }),
-        )
-
-        if (cancelled) return
-        setApprovedLectureIds(prev => {
-          const next = new Set(prev)
-          for (const r of results) {
-            if (r.approved) next.add(r.lectureId)
-            else next.delete(r.lectureId)
-          }
-          return next
-        })
-      } catch {
-        // ignore
-      }
-    }
-
-    hydrateApproved()
-    return () => {
-      cancelled = true
-    }
-  }, [activeSection, lectures])
+  // 리뷰 승인 여부 확인 헬퍼 함수
+  const isReviewApproved = (lecture: CompletedLecture): boolean => {
+    return lecture.reviewStatus === APPROVAL_STATUS.APPROVED
+  }
 
   const formatDate = (iso?: string) => {
     if (!iso) return ''
@@ -512,7 +450,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                               </Badge>
                             ) : (
                               <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                                {approvedLectureIds.has(l.lectureId) ? '후기 승인' : '후기 완료'}
+                                {isReviewApproved(l) ? '후기 승인' : '후기 완료'}
                               </Badge>
                             )}
                           </div>
@@ -551,11 +489,11 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8"
-                                aria-label={approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
+                                aria-label={isReviewApproved(l) ? '리뷰 조회' : '리뷰 수정'}
                                 onClick={() => {
                                   setSelectedReviewId(l.reviewId ?? null)
                                   setSelectedLectureId(l.lectureId)
-                                  setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
+                                  setSelectedReviewReadOnly(Boolean(isReviewApproved(l)))
                                   setEditOpen(true)
                                 }}
                               >
@@ -579,7 +517,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                           </Badge>
                         ) : (
                           <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                            {approvedLectureIds.has(l.lectureId) ? '승인됨' : '작성완료'}
+                            {isReviewApproved(l) ? '승인됨' : '작성완료'}
                           </Badge>
                         )}
                       </TableCell>
@@ -635,7 +573,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                                   onClick={() => {
                                     setSelectedReviewId(l.reviewId ?? null)
                                     setSelectedLectureId(l.lectureId)
-                                    setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
+                                    setSelectedReviewReadOnly(Boolean(isReviewApproved(l)))
                                     setEditOpen(true)
                                   }}
                                 >
@@ -643,7 +581,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                {approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
+                                {isReviewApproved(l) ? '리뷰 조회' : '리뷰 수정'}
                               </TooltipContent>
                             </Tooltip>
                           )}

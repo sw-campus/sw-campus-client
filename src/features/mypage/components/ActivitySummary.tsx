@@ -7,10 +7,7 @@ import { LuAward, LuBadgeCheck, LuClipboardCheck, LuPencil } from 'react-icons/l
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { APPROVAL_STATUS } from '@/features/admin/types/approval.type'
-import {
-  useCompletedLecturesQuery,
-  useReviewStatusesQuery,
-} from '@/features/mypage/hooks/useCompletedLecturesQuery'
+import { useCompletedLecturesQuery } from '@/features/mypage/hooks/useCompletedLecturesQuery'
 
 import { useSurveyStatusQuery } from '../hooks/useSurvey'
 
@@ -21,24 +18,19 @@ type ActivitySummaryProps = {
 export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
   // React Query hooks - 캐싱으로 중복 호출 방지
   const { data: lectures, isLoading: lecturesLoading } = useCompletedLecturesQuery()
-  const { data: reviewStatuses, isLoading: reviewStatusesLoading } = useReviewStatusesQuery(lectures)
 
   // 설문 상태는 React Query로 관리 (모달에서 변경 시 자동 반영)
   const { data: surveyStatus, isLoading: surveyLoading } = useSurveyStatusQuery()
   const hasBasicSurvey = surveyStatus?.hasBasicSurvey ?? false
   const hasAptitudeTest = surveyStatus?.hasAptitudeTest ?? false
 
-  // 승인된 후기 수 계산
+  // 승인된 후기 수 계산 (응답의 reviewStatus 직접 사용)
   const approvedReviews = useMemo(() => {
-    if (!reviewStatuses) return 0
-    let count = 0
-    reviewStatuses.forEach(status => {
-      if (status === APPROVAL_STATUS.APPROVED) count++
-    })
-    return count
-  }, [reviewStatuses])
+    if (!lectures) return 0
+    return lectures.filter(l => l.reviewStatus === APPROVAL_STATUS.APPROVED).length
+  }, [lectures])
 
-  const loading = lecturesLoading || reviewStatusesLoading || surveyLoading
+  const loading = lecturesLoading || surveyLoading
 
   return (
     <Card className="bg-card">
