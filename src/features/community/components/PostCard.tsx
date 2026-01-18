@@ -2,9 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { FiEye, FiHeart, FiMessageCircle, FiImage } from 'react-icons/fi'
+import { FiEye, FiHeart, FiMessageCircle, FiImage, FiMapPin } from 'react-icons/fi'
 
 import type { Post } from '../api/postApi.types'
+import { ClickableTag } from './ClickableTag'
 
 interface PostCardProps {
   post: Post
@@ -23,7 +24,11 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <Link
       href={`/community/${post.id}`}
-      className="group flex w-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+      className={`group flex w-full flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg ${
+        post.pinned 
+          ? 'border-orange-200 ring-1 ring-orange-100' 
+          : 'border-gray-100'
+      }`}
     >
       {/* 썸네일 */}
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-100">
@@ -35,12 +40,23 @@ export function PostCard({ post }: PostCardProps) {
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
-            <FiImage className="h-12 w-12 text-orange-200" />
+          <div className={`flex h-full w-full items-center justify-center ${
+            post.pinned 
+              ? 'bg-gradient-to-br from-orange-100 to-orange-200' 
+              : 'bg-gradient-to-br from-orange-50 to-orange-100'
+          }`}>
+            <FiImage className={`h-12 w-12 ${post.pinned ? 'text-orange-400' : 'text-orange-200'}`} />
           </div>
         )}
-        {/* 카테고리 뱃지 */}
-        <div className="absolute top-3 left-3">
+        
+        {/* 배지 영역 */}
+        <div className="absolute top-3 left-3 flex gap-2">
+          {post.pinned && (
+            <span className="flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-bold text-orange-600 shadow-sm backdrop-blur-sm">
+              <FiMapPin className="h-3 w-3 fill-orange-600" />
+              공지
+            </span>
+          )}
           <span className="rounded-full bg-orange-500 px-2.5 py-1 text-xs font-medium text-white shadow-sm">
             {post.categoryName}
           </span>
@@ -58,9 +74,7 @@ export function PostCard({ post }: PostCardProps) {
         {post.categoryName === '부트캠프 성장일기' && post.tags.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-1.5">
             {post.tags.slice(0, 2).map(tag => (
-              <span key={tag} className="text-xs text-gray-500">
-                #{tag.length > 10 ? tag.slice(0, 10) + '...' : tag}
-              </span>
+              <ClickableTag key={tag} tag={tag} maxLength={10} />
             ))}
           </div>
         )}
@@ -68,7 +82,13 @@ export function PostCard({ post }: PostCardProps) {
         {/* 작성자 & 통계 */}
         <div className="mt-auto flex items-center justify-between pt-3 text-sm text-gray-500">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-700">{post.authorNickname}</span>
+            <Link
+              href={`/community/user/${post.authorId}`}
+              onClick={(e) => e.stopPropagation()}
+              className="font-medium text-gray-700 transition-colors hover:text-orange-600 hover:underline"
+            >
+              {post.authorNickname}
+            </Link>
             <span className="text-gray-300">·</span>
             <span>{formattedDate}</span>
           </div>

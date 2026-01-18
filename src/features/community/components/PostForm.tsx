@@ -16,6 +16,8 @@ import {
   validateDiaryForm,
   buildDiaryBody,
   initialDiaryFormData,
+  parseDiaryBody,
+  parseDiaryTitle,
   type DiaryFormData,
 } from './DiaryTemplateForm'
 import { DiaryTitleInput, buildDiaryTitle } from './DiaryTitleInput'
@@ -73,6 +75,7 @@ export function PostForm({
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm<PostFormData>({
     defaultValues: {
       title: initialData?.title || '',
@@ -81,6 +84,18 @@ export function PostForm({
       tags: initialData?.tags?.join(', ') || '',
     },
   })
+
+  // initialData가 비동기로 로드된 후 폼 값 업데이트
+  useEffect(() => {
+    if (initialData) {
+      reset({
+        title: initialData.title || '',
+        body: initialData.body || '',
+        boardCategoryId: initialData.categoryId || categories[0]?.id || 0,
+        tags: initialData.tags?.join(', ') || '',
+      })
+    }
+  }, [initialData, categories, reset])
 
   const watchedCategoryId = watch('boardCategoryId')
 
@@ -97,7 +112,27 @@ export function PostForm({
   }
 
   const bootcampDiaryCategoryId = findBootcampDiaryCategoryId(categories)
+  // 수정/작성 모드 모두에서 부트캠프 성장일기 템플릿 사용
   const isBootcampDiaryCategory = bootcampDiaryCategoryId !== null && watchedCategoryId === bootcampDiaryCategoryId
+
+  // 수정 모드에서 부트캠프 성장일기 기존 데이터 파싱
+  useEffect(() => {
+    if (initialData && isBootcampDiaryCategory) {
+      // 제목 파싱
+      const parsedTitle = parseDiaryTitle(initialData.title)
+      if (parsedTitle) {
+        setDiaryMonth(parsedTitle.month)
+        setDiaryWeek(parsedTitle.week)
+        setDiarySummary(parsedTitle.summary)
+      }
+      
+      // 본문 파싱
+      const parsedBody = parseDiaryBody(initialData.body)
+      if (parsedBody) {
+        setDiaryForm(parsedBody)
+      }
+    }
+  }, [initialData, isBootcampDiaryCategory])
 
   // 카테고리 변경 시 상태 초기화
   useEffect(() => {
@@ -264,7 +299,7 @@ export function PostForm({
         {/* 카테고리 선택 */}
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">카테고리 *</label>
-          <div className="flex flex-wrap gap-2">{renderCategorySelects()}</div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">{renderCategorySelects()}</div>
           <input
             type="hidden"
             {...register('boardCategoryId', {
@@ -376,7 +411,11 @@ export function PostForm({
 
         {/* 제출 버튼 */}
         <div className="flex justify-end gap-3">
-          <Button type="submit" disabled={isSubmitting} className="bg-orange-500 px-8 hover:bg-orange-600">
+          <Button 
+            type="submit" 
+            disabled={isSubmitting} 
+            className="h-12 w-full bg-orange-500 text-base active:scale-[0.98] hover:bg-orange-600 sm:h-10 sm:w-auto sm:px-8 sm:text-sm"
+          >
             {isSubmitting ? '처리 중...' : submitLabel}
           </Button>
         </div>

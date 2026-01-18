@@ -6,7 +6,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import Underline from '@tiptap/extension-underline'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import {
   Bold,
   Italic,
@@ -84,6 +84,13 @@ export function TiptapEditor({
     },
     immediatelyRender: false,
   })
+
+  // 외부에서 content가 변경될 때 에디터 업데이트 (수정 모드에서 기존 데이터 로드 시)
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content)
+    }
+  }, [editor, content])
 
   if (!editor) {
     return null

@@ -1,24 +1,33 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { FiArrowLeft, FiEdit2, FiTrash2, FiHeart, FiBookmark, FiEye, FiMessageCircle } from 'react-icons/fi'
+import { FiArrowLeft, FiEdit2, FiTrash2, FiHeart, FiBookmark, FiEye, FiMessageCircle, FiShare2, FiUser, FiCheck, FiMapPin } from 'react-icons/fi'
 import DOMPurify from 'dompurify'
 
 import { Button } from '@/components/ui/button'
 import { useDeletePost } from '@/features/community/hooks/useDeletePost'
 import { usePostDetail } from '@/features/community/hooks/usePostDetail'
+import { CommentSection } from '@/features/community/components/CommentSection'
+import { PostNavigation } from '@/features/community/components/PostNavigation'
+import { useToggleLike, useToggleBookmark, useTogglePin } from '@/features/community/hooks/usePostInteractions'
 import { useAuthStore } from '@/store/authStore'
+import { formatRelativeTime } from '@/lib/formatRelativeTime'
+import { ClickableTag } from '@/features/community/components/ClickableTag'
 
 export default function PostDetailPage() {
   const params = useParams()
   const router = useRouter()
   const postId = Number(params.postId)
 
-  const { isLoggedIn } = useAuthStore()
+  const { isLoggedIn, userType } = useAuthStore()
   const { data: post, isLoading, error } = usePostDetail(postId)
   const { mutate: deletePost, isPending: isDeleting } = useDeletePost()
+  const { mutate: toggleLike, isPending: isLiking } = useToggleLike(postId)
+  const { mutate: toggleBookmark, isPending: isBookmarking } = useToggleBookmark(postId)
+  const { mutate: togglePin, isPending: isPinning } = useTogglePin(postId)
+  const [isCopied, setIsCopied] = useState(false)
 
   const imagesNotInBody = useMemo(() => {
     if (!post) return []
@@ -44,6 +53,25 @@ export default function PostDetailPage() {
         router.push('/community')
       },
     })
+  }
+
+  const handleShare = async () => {
+    const url = window.location.href
+    try {
+      await navigator.clipboard.writeText(url)
+      setIsCopied(true)
+      setTimeout(() => setIsCopied(false), 2000)
+    } catch {
+      // 클립보드 API 미지원 시 fallback
+      const textArea = document.createElement('textarea')
+      textArea.value = url
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      setIsCopied(true)
+      setTimeout(() => setIsCopied(false), 2000)
+    }
   }
 
   if (isLoading) {
@@ -80,42 +108,82 @@ export default function PostDetailPage() {
     minute: '2-digit',
   }).format(post.createdAt)
 
+  const relativeTime = formatRelativeTime(post.createdAt)
+
   return (
     <main className="custom-container mx-auto max-w-6xl">
       {/* 뒤로가기 */}
-      <Link href="/community" className="mb-6 inline-flex items-center gap-2 text-gray-600 hover:text-gray-900">
+      <Link href="/community" className="mb-6 inline-flex items-center gap-2 text-gray-600 transition-colors hover:text-gray-900">
         <FiArrowLeft />
         목록으로
       </Link>
 
       {/* 게시글 카드 */}
-      <article className="custom-card max-w-[800px] w-full">
+      <article className="custom-card w-full max-w-3xl">
         {/* 헤더 */}
         <header className="border-b border-gray-100 pb-6">
           <div className="mb-3 space-y-2">
-            <div>
-              <span className="rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-700">
+            <div className="flex items-center gap-2">
+              {post.pinned && (
+                <span className="flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-sm font-bold text-orange-600">
+                  <FiMapPin className="h-4 w-4" />
+                  공지
+                </span>
+              )}
+              <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">
                 {post.categoryName}
               </span>
+              {/* 공유 버튼 */}
+              <button
+                onClick={handleShare}
+                className="ml-auto flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
+              >
+                {isCopied ? (
+                  <>
+                    <FiCheck className="h-4 w-4 text-green-500" />
+                    <span className="text-green-600">복사됨!</span>
+                  </>
+                ) : (
+                  <>
+                    <FiShare2 className="h-4 w-4" />
+                    <span>공유</span>
+                  </>
+                )}
+              </button>
             </div>
             {post.tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {post.tags.map(tag => (
-                  <span key={tag} className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-600">
-                    #{tag}
-                  </span>
+                  <ClickableTag key={tag} tag={tag} variant="chip" />
                 ))}
               </div>
             )}
           </div>
 
-          <h1 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl">{post.title}</h1>
+          <h1 className="mb-4 text-xl font-bold text-gray-900 sm:text-2xl md:text-3xl">{post.title}</h1>
 
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
+            {/* 작성자 정보 - 아바타 추가 */}
             <div className="flex items-center gap-3 text-sm text-gray-500">
-              <span className="font-medium text-gray-700">{post.authorNickname}</span>
-              <span>·</span>
-              <time>{formattedDate}</time>
+              <Link
+                href={`/community/user/${post.authorId}`}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-orange-200 transition-transform hover:scale-110"
+              >
+                <FiUser className="h-4 w-4 text-orange-600" />
+              </Link>
+              <div className="flex flex-col">
+                <Link
+                  href={`/community/user/${post.authorId}`}
+                  className="font-medium text-gray-700 transition-colors hover:text-orange-600 hover:underline"
+                >
+                  {post.authorNickname}
+                </Link>
+                <div className="flex items-center gap-1 text-xs text-gray-400">
+                  <span title={formattedDate}>{relativeTime}</span>
+                  <span className="hidden sm:inline">·</span>
+                  <time className="hidden sm:inline">{formattedDate}</time>
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -157,40 +225,75 @@ export default function PostDetailPage() {
 
         {/* 액션 버튼 */}
         {isLoggedIn && (
-          <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="gap-1">
+          <div className="mt-6 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:pt-6">
+          <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className={`h-10 flex-1 gap-1.5 transition-all active:scale-95 sm:h-9 sm:flex-none sm:hover:scale-105 ${post.isLiked ? 'border-red-200 bg-red-50 text-red-600' : ''}`}
+                onClick={() => toggleLike()}
+                disabled={isLiking}
+              >
                 <FiHeart className={post.isLiked ? 'fill-red-500 text-red-500' : ''} />
-                좋아요
+                <span>{post.isLiked ? '좋아요' : '좋아요'}</span>
+                {post.likeCount > 0 && <span>{post.likeCount}</span>}
               </Button>
-              <Button variant="outline" size="sm" className="gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className={`h-10 flex-1 gap-1.5 transition-all active:scale-95 sm:h-9 sm:flex-none sm:hover:scale-105 ${post.isBookmarked ? 'border-yellow-200 bg-yellow-50 text-yellow-600' : ''}`}
+                onClick={() => toggleBookmark()}
+                disabled={isBookmarking}
+              >
                 <FiBookmark className={post.isBookmarked ? 'fill-yellow-500 text-yellow-500' : ''} />
                 북마크
               </Button>
             </div>
 
-            {post.isAuthor && (
-              <div className="flex gap-2">
-                <Link href={`/community/${post.id}/edit`}>
-                  <Button variant="outline" size="sm" className="gap-1">
-                    <FiEdit2 />
-                    수정
-                  </Button>
-                </Link>
+            <div className="flex items-center justify-between gap-2 sm:justify-end">
+              {/* 관리자: 공지 고정/해제 */}
+              {userType === 'ADMIN' && (
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-1 text-red-500 hover:bg-red-50"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
+                  className={`h-10 gap-1 sm:h-9 ${post.pinned ? 'bg-orange-50 text-orange-600 border-orange-200' : 'text-gray-500 hover:text-orange-600'}`}
+                  onClick={() => togglePin()}
+                  disabled={isPinning}
                 >
-                  <FiTrash2 />
-                  삭제
+                  <FiMapPin className={post.pinned ? 'fill-orange-600' : ''} />
+                  {post.pinned ? '고정 해제' : '공지 고정'}
                 </Button>
-              </div>
-            )}
+              )}
+
+              {(post.isAuthor || userType === 'ADMIN') && (
+                <div className="flex gap-2">
+                  <Link href={`/community/${post.id}/edit`}>
+                    <Button variant="outline" size="sm" className="h-10 gap-1 active:scale-95 sm:h-9">
+                      <FiEdit2 />
+                      수정
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-10 gap-1 text-red-500 active:scale-95 hover:bg-red-50 sm:h-9"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                  >
+                    <FiTrash2 />
+                    삭제
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         )}
+
+        {/* 댓글 섹션 */}
+        <CommentSection postId={postId} />
+
+        {/* 이전/다음 게시글 네비게이션 */}
+        <PostNavigation postId={postId} />
       </article>
     </main>
   )

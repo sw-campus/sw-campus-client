@@ -16,6 +16,7 @@ export interface ApiPostResponse {
   createdAt: string
   hasImage: boolean
   thumbnailUrl: string | null
+  pinned: boolean
 }
 
 export interface ApiPostDetailResponse {
@@ -37,6 +38,7 @@ export interface ApiPostDetailResponse {
   bookmarked: boolean
   liked: boolean
   isAuthor: boolean
+  pinned: boolean
 }
 
 export interface ApiPageResponse<T> {
@@ -73,6 +75,7 @@ export interface Post {
   createdAt: Date
   hasImage: boolean
   thumbnailUrl: string | null
+  pinned: boolean
 }
 
 export interface PostDetail {
@@ -94,6 +97,7 @@ export interface PostDetail {
   isBookmarked: boolean
   isLiked: boolean
   isAuthor: boolean
+  pinned: boolean
 }
 
 // Request types
@@ -131,3 +135,15 @@ export const POST_SORT_OPTIONS = [
 ] as const
 
 export const DEFAULT_POST_SORT = 'created_at,desc'
+
+// 이전/다음 게시글
+export interface AdjacentPostItem {
+  id: number
+  title: string
+  categoryName: string
+}
+
+export interface AdjacentPosts {
+  previous: AdjacentPostItem | null
+  next: AdjacentPostItem | null
+}

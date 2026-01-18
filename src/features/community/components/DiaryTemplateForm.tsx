@@ -103,8 +103,8 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       <div>
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">
-            {DIARY_QUESTIONS.problemSolving.label} *
-            <span className="ml-1 text-xs font-normal text-gray-500">{DIARY_QUESTIONS.problemSolving.sublabel}</span>
+            {DIARY_QUESTIONS.problemSolving.label}{' '}
+            <span className="text-xs font-normal text-gray-500">{DIARY_QUESTIONS.problemSolving.sublabel}</span> *
           </label>
           <CharCount current={getTextLength(formData.problemSolving)} min={DIARY_MIN_LENGTH} />
         </div>
@@ -186,15 +186,14 @@ export function validateDiaryForm(formData: DiaryFormData): Partial<Record<keyof
  */
 function buildSection(number: number, label: string, content: string, sublabel?: string): string {
   const sublabelHtml = sublabel
-    ? `<span style="font-size: 0.75rem; color: #6b7280; font-weight: normal;">${sublabel}</span>`
+    ? ` <span style="font-size: 0.75rem; color: #6b7280; font-weight: normal;">${sublabel}</span>`
     : ''
 
   return `
 <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #f97316;">
   <h3 style="font-size: 1rem; font-weight: 600; color: #c2410c; margin: 0 0 12px 0; display: flex; align-items: baseline; gap: 8px;">
     <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #f97316; color: white; border-radius: 50%; font-size: 0.875rem; flex-shrink: 0;">${number}</span>
-    <span>${label.replace(/^\d+\.\s*/, '')}</span>
-    ${sublabelHtml}
+    <span>${label.replace(/^\d+\.\s*/, '')}${sublabelHtml}</span>
   </h3>
   <div style="color: #374151; line-height: 1.75; padding-left: 32px;">
     ${content}
@@ -215,3 +214,53 @@ export function buildDiaryBody(formData: DiaryFormData): string {
 </div>
 `.trim()
 }
+
+/**
+ * 기존 HTML 본문을 파싱하여 DiaryFormData로 변환
+ * 수정 모드에서 기존 데이터를 템플릿 폼에 채울 때 사용
+ */
+export function parseDiaryBody(html: string): DiaryFormData | null {
+  try {
+    // 각 섹션의 내용을 추출하는 패턴
+    // <div style="color: #374151; line-height: 1.75; padding-left: 32px;">...</div> 안의 내용 추출
+    const sectionPattern = /<div[^>]*style="[^"]*padding-left:\s*32px[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/g
+    const matches = [...html.matchAll(sectionPattern)]
+    
+    if (matches.length !== 4) {
+      return null // 4개의 섹션이 아니면 파싱 실패
+    }
+    
+    return {
+      learnedSkills: matches[0][1].trim(),
+      problemSolving: matches[1][1].trim(),
+      classReview: matches[2][1].trim(),
+      nextWeekPlan: matches[3][1].trim(),
+    }
+  } catch {
+    return null
+  }
+}
+
+/**
+ * 기존 제목을 파싱하여 월, 주차, 한줄소감으로 분리
+ * 제목 형식: "X월 Y주차 성장일기 - 한줄소감"
+ */
+export function parseDiaryTitle(title: string): { month: number; week: number; summary: string } | null {
+  try {
+    const pattern = /(\d+)월\s*(\d+)주차\s*성장일기\s*-\s*(.+)/
+    const match = title.match(pattern)
+    
+    if (!match) {
+      return null
+    }
+    
+    return {
+      month: parseInt(match[1], 10),
+      week: parseInt(match[2], 10),
+      summary: match[3].trim(),
+    }
+  } catch {
+    return null
+  }
+}
+

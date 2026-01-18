@@ -16,7 +16,7 @@ export default function EditPostPage() {
   const router = useRouter()
   const postId = Number(params.postId)
 
-  const { isLoggedIn, hasHydrated } = useAuthStore()
+  const { isLoggedIn, hasHydrated, userType } = useAuthStore()
   const { data: categories = [] } = useBoardCategories()
   const { data: post, isLoading, error } = usePostDetail(postId)
   const { mutate: updatePost, isPending } = useUpdatePost()
@@ -76,8 +76,8 @@ export default function EditPostPage() {
     )
   }
 
-  // 작성자가 아닌 경우
-  if (!post.isAuthor) {
+  // 작성자 또는 관리자가 아닌 경우
+  if (!post.isAuthor && userType !== 'ADMIN') {
     return (
       <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">

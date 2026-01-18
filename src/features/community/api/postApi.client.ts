@@ -27,6 +27,7 @@ function mapApiPostToPost(apiPost: ApiPostResponse): Post {
     createdAt: new Date(apiPost.createdAt),
     hasImage: apiPost.hasImage,
     thumbnailUrl: apiPost.thumbnailUrl,
+    pinned: apiPost.pinned,
   }
 }
 
@@ -50,6 +51,7 @@ function mapApiPostDetailToPostDetail(apiPost: ApiPostDetailResponse): PostDetai
     isBookmarked: apiPost.bookmarked,
     isLiked: apiPost.liked,
     isAuthor: apiPost.isAuthor,
+    pinned: apiPost.pinned,
   }
 }
 
@@ -139,4 +141,23 @@ export async function updatePost(postId: number, request: UpdatePostRequest): Pr
  */
 export async function deletePost(postId: number): Promise<void> {
   await api.delete(`/posts/${postId}`)
+}
+
+/**
+ * 이전/다음 게시글 조회 API
+ * GET /api/v1/posts/:postId/adjacent
+ */
+export async function getAdjacentPosts(postId: number): Promise<import('./postApi.types').AdjacentPosts> {
+  const { data } = await api.get<import('./postApi.types').AdjacentPosts>(`/posts/${postId}/adjacent`)
+  return data
+}
+
+/**
+ * 게시글 고정 토글 API
+ * POST /api/v1/posts/:postId/pin
+ * 관리자 권한 필요
+ */
+export async function togglePin(postId: number): Promise<{ pinned: boolean }> {
+  const { data } = await api.post<{ pinned: boolean }>(`/posts/${postId}/pin`)
+  return data
 }

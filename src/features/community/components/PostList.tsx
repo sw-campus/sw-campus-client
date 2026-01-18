@@ -91,6 +91,10 @@ export function PostList({ posts, isLoading = false }: PostListProps) {
     )
   }
 
+  // 고정 게시글과 일반 게시글 분리
+  const pinnedPosts = posts.filter(post => post.pinned)
+  const regularPosts = posts.filter(post => !post.pinned)
+
   return (
     <div className="w-full">
       {/* 보기 전환 버튼 */}
@@ -122,13 +126,28 @@ export function PostList({ posts, isLoading = false }: PostListProps) {
       {/* 게시글 목록 */}
       {viewType === 'card' ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map(post => (
+          {pinnedPosts.map(post => (
+            <PostCard key={post.id} post={post} />
+          ))}
+          {regularPosts.map(post => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>
       ) : (
         <div className="w-full space-y-3">
-          {posts.map(post => (
+          {/* 고정 게시글 */}
+          {pinnedPosts.length > 0 && (
+            <>
+              {pinnedPosts.map(post => (
+                <PostListRow key={post.id} post={post} />
+              ))}
+              {regularPosts.length > 0 && (
+                <div className="my-4 border-t border-dashed border-gray-200" />
+              )}
+            </>
+          )}
+          {/* 일반 게시글 */}
+          {regularPosts.map(post => (
             <PostListRow key={post.id} post={post} />
           ))}
         </div>

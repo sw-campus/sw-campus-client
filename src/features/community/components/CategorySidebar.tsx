@@ -109,11 +109,12 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
     const current = findCategoryAndParent(selectedCategoryId, categories)
 
     // 선택된 카테고리가 자식이 있으면 -> 그 자식들을 보여줌 (드릴다운)
+    // "← 부모" 버튼은 실제 부모로 이동해야 함
     if (current?.target.children && current.target.children.length > 0) {
       return {
-        parent: current.target,
+        parent: current.parent, // 실제 부모로 설정 (null이면 최상위로 돌아감)
         siblings: current.target.children,
-        showParentAsTab: true, // "전체" 탭 역할
+        currentCategory: current.target, // 현재 선택된 카테고리 정보 유지
       }
     }
 
@@ -132,8 +133,17 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
       {/* 모바일: 드릴다운 방식 탭 */}
       <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 lg:hidden">
         <div className="flex gap-2 pb-2">
-          {/* 상위로 가기 버튼 (부모가 있을 때만) */}
-          {mobileTabs.parent && (
+          {/* 상위로 가기 버튼 */}
+          {/* currentCategory가 있으면 (자식 카테고리를 보여주는 상태) 해당 카테고리명으로 표시 */}
+          {mobileTabs.currentCategory ? (
+            <button
+              type="button"
+              onClick={() => onSelect(mobileTabs.parent?.id ?? null)}
+              className="shrink-0 rounded-full border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-500 shadow-sm"
+            >
+              ← {mobileTabs.currentCategory.name}
+            </button>
+          ) : mobileTabs.parent ? (
             <button
               type="button"
               onClick={() => onSelect(mobileTabs.parent?.id ?? null)}
@@ -141,10 +151,8 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
             >
               ← {mobileTabs.parent.name}
             </button>
-          )}
-
-          {/* 현재 레벨의 "전체" (부모 카테고리 자체 선택) */}
-          {!mobileTabs.parent && (
+          ) : (
+            /* 최상위 레벨의 "전체" */
             <button
               type="button"
               onClick={() => onSelect(null)}

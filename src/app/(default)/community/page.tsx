@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { FiEdit3, FiFilter, FiX } from 'react-icons/fi'
+import { FiEdit3, FiFilter, FiX, FiTag } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -22,7 +22,9 @@ export default function CommunityPage() {
   const searchParams = useSearchParams()
   const categoryIdParam = searchParams.get('categoryId')
   const keywordParam = searchParams.get('keyword') ?? ''
+  const tagsParam = searchParams.get('tags')
   const selectedCategoryId = categoryIdParam ? Number(categoryIdParam) : null
+  const selectedTags = tagsParam ? [tagsParam] : undefined
 
   const [page, setPage] = useState(0)
   const [sort, setSort] = useState(DEFAULT_POST_SORT)
@@ -34,6 +36,7 @@ export default function CommunityPage() {
   const { data, isLoading } = usePosts({
     categoryId: selectedCategoryId ?? undefined,
     keyword: selectedLecture ? selectedLecture.name : (keywordParam || undefined),
+    tags: selectedTags,
     page,
     size: 12,
     sort,
@@ -48,6 +51,20 @@ export default function CommunityPage() {
   // 강의 필터 초기화
   const handleClearLectureFilter = () => {
     setSelectedLecture(null)
+    setPage(0)
+  }
+
+  // 태그 필터 초기화
+  const handleClearTagFilter = () => {
+    const params = new URLSearchParams()
+    if (selectedCategoryId !== null) {
+      params.set('categoryId', selectedCategoryId.toString())
+    }
+    if (keywordParam) {
+      params.set('keyword', keywordParam)
+    }
+    const queryString = params.toString()
+    router.push(queryString ? `/community?${queryString}` : '/community')
     setPage(0)
   }
 
@@ -101,16 +118,16 @@ export default function CommunityPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">커뮤니티</h1>
-            <p className="mt-1 text-gray-500">SW 캠퍼스 커뮤니티에서 자유롭게 소통하세요</p>
+            <p className="mt-1 text-sm text-gray-500 sm:text-base">SW 캠퍼스 커뮤니티에서 자유롭게 소통하세요</p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="w-36 sm:w-48">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="min-w-0 flex-1 sm:w-48 sm:flex-none">
               <SearchBar value={keywordParam} onChange={handleSearch} placeholder="검색..." />
             </div>
             {/* 정렬 */}
             <Select value={sort} onValueChange={(value) => { setSort(value); setPage(0) }}>
-              <SelectTrigger className="w-24 sm:w-32 border-gray-300 bg-white">
+              <SelectTrigger className="w-20 shrink-0 border-gray-300 bg-white text-xs sm:w-32 sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -123,14 +140,16 @@ export default function CommunityPage() {
             </Select>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setIsLectureModalOpen(true)}
-              className={`gap-2 ${selectedLecture ? 'border-orange-500 bg-orange-50 text-orange-700' : ''}`}
+              className={`h-9 shrink-0 gap-1 px-2 sm:h-10 sm:gap-2 sm:px-3 ${selectedLecture ? 'border-orange-500 bg-orange-50 text-orange-700' : ''}`}
             >
               <FiFilter className="h-4 w-4" />
               <span className="hidden sm:inline">강의</span>
             </Button>
+            {/* 데스크탑 글쓰기 버튼 */}
             {isLoggedIn && (
-              <Link href="/community/write">
+              <Link href="/community/write" className="hidden sm:block">
                 <Button className="gap-2 bg-orange-500 hover:bg-orange-600">
                   <FiEdit3 className="h-4 w-4" />
                   글쓰기
@@ -147,6 +166,22 @@ export default function CommunityPage() {
             <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-700">
               {selectedLecture.name}
               <button onClick={handleClearLectureFilter} className="ml-1 hover:text-orange-900">
+                <FiX className="h-3.5 w-3.5" />
+              </button>
+            </span>
+          </div>
+        )}
+
+        {/* 선택된 태그 필터 표시 */}
+        {tagsParam && (
+          <div className="mt-3 flex items-center gap-2">
+            <span className="flex items-center gap-1 text-sm text-gray-500">
+              <FiTag className="h-4 w-4" />
+              태그 필터:
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
+              #{tagsParam}
+              <button onClick={handleClearTagFilter} className="ml-1 hover:text-blue-900">
                 <FiX className="h-3.5 w-3.5" />
               </button>
             </span>
@@ -175,16 +210,16 @@ export default function CommunityPage() {
 
           {/* 페이지네이션 */}
           {totalPages > 1 && (
-            <div className="mt-8 flex flex-col items-center gap-4">
+            <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:gap-4">
               {/* 페이지네이션 버튼 */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5 sm:gap-1">
                 {/* 처음 */}
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setPage(0)}
                   disabled={page === 0}
-                  className="h-9 w-9"
+                  className="h-10 w-10 text-base sm:h-9 sm:w-9 sm:text-sm"
                   aria-label="첫 페이지로 이동"
                 >
                   «
@@ -195,15 +230,15 @@ export default function CommunityPage() {
                   size="sm"
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="h-9 w-9"
+                  className="h-10 w-10 text-base sm:h-9 sm:w-9 sm:text-sm"
                   aria-label="이전 페이지로 이동"
                 >
                   ‹
                 </Button>
 
-                {/* 페이지 번호 */}
+                {/* 페이지 번호 - 모바일에서 3개, 데스크탑에서 5개 */}
                 {(() => {
-                  const maxVisible = 5
+                  const maxVisible = typeof window !== 'undefined' && window.innerWidth < 640 ? 3 : 5
                   let start = Math.max(0, page - Math.floor(maxVisible / 2))
                   const end = Math.min(totalPages - 1, start + maxVisible - 1)
                   if (end - start + 1 < maxVisible) {
@@ -219,7 +254,7 @@ export default function CommunityPage() {
                       variant={pageNum === page ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => setPage(pageNum)}
-                      className={`h-9 w-9 ${
+                      className={`h-10 w-10 text-base sm:h-9 sm:w-9 sm:text-sm ${
                         pageNum === page
                           ? 'bg-gray-700 text-white hover:bg-gray-600'
                           : 'text-gray-600 hover:bg-gray-100'
@@ -236,7 +271,7 @@ export default function CommunityPage() {
                   size="sm"
                   onClick={() => setPage(p => p + 1)}
                   disabled={page >= totalPages - 1}
-                  className="h-9 w-9"
+                  className="h-10 w-10 text-base sm:h-9 sm:w-9 sm:text-sm"
                   aria-label="다음 페이지로 이동"
                 >
                   ›
@@ -247,15 +282,15 @@ export default function CommunityPage() {
                   size="sm"
                   onClick={() => setPage(totalPages - 1)}
                   disabled={page >= totalPages - 1}
-                  className="h-9 w-9"
+                  className="h-10 w-10 text-base sm:h-9 sm:w-9 sm:text-sm"
                   aria-label="마지막 페이지로 이동"
                 >
                   »
                 </Button>
               </div>
 
-              {/* Go to page */}
-              <div className="flex items-center gap-2">
+              {/* Go to page - 데스크탑에서만 */}
+              <div className="hidden items-center gap-2 sm:flex">
                 <span className="text-sm text-gray-500">Go to page:</span>
                 <Select
                   value={String(page + 1)}
@@ -277,6 +312,17 @@ export default function CommunityPage() {
           )}
         </main>
       </div>
+
+      {/* 모바일 플로팅 글쓰기 버튼 */}
+      {isLoggedIn && (
+        <Link
+          href="/community/write"
+          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg transition-all hover:bg-orange-600 active:scale-95 sm:hidden"
+          aria-label="글쓰기"
+        >
+          <FiEdit3 className="h-6 w-6" />
+        </Link>
+      )}
 
       {/* 강의 검색 모달 */}
       <LectureSearchModal
