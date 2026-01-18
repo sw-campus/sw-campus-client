@@ -28,6 +28,7 @@ import type { OrganizationDetail as OrganizationDetailType } from '../types/orga
 interface OrganizationDetailProps {
   organization: OrganizationDetailType
   lectures?: Lecture[]
+  isCoursesError?: boolean
 }
 
 function OrganizationReviewCard({ review }: { review: Review }) {
@@ -276,7 +277,7 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
   )
 }
 
-export function OrganizationDetail({ organization, lectures = [] }: OrganizationDetailProps) {
+export function OrganizationDetail({ organization, lectures = [], isCoursesError = false }: OrganizationDetailProps) {
   // Collect facility images that exist
   const facilityImages = [
     organization.facilityImageUrl,
@@ -391,7 +392,13 @@ export function OrganizationDetail({ organization, lectures = [] }: Organization
           {/* 등록된 프로그램 */}
           <TabsContent value="programs">
             <section>
-              {lectures.length > 0 ? (
+              {isCoursesError ? (
+                <Card className="bg-card/40 flex h-60 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl">
+                  <div className="mb-3 text-4xl">⚠️</div>
+                  <p className="text-destructive text-lg font-medium">프로그램 목록을 불러오는 데 실패했습니다.</p>
+                  <p className="text-muted-foreground mt-2 text-sm">잠시 후 다시 시도해주세요.</p>
+                </Card>
+              ) : lectures.length > 0 ? (
                 <LectureList lectures={lectures} />
               ) : (
                 <Card className="bg-card/40 flex h-60 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl">
