@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AxiosError } from 'axios'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -40,7 +40,6 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
     register,
     control,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors, isValid },
   } = useForm<BasicSurveyFormValues>({
@@ -58,9 +57,9 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
     },
   })
 
-  const hasMajor = watch('hasMajor')
-  const hasProgrammingExperience = watch('hasProgrammingExperience')
-  const desiredJobs = watch('desiredJobs')
+  const hasMajor = useWatch({ control, name: 'hasMajor' })
+  const hasProgrammingExperience = useWatch({ control, name: 'hasProgrammingExperience' })
+  const desiredJobs = useWatch({ control, name: 'desiredJobs' })
 
   // 전공 유무 체크 해제 시 majorName 초기화
   useEffect(() => {

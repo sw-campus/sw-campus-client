@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- 동적 외부 URL (강사 이미지) 사용 */
 'use client'
 
 import { Badge } from '@/components/ui/badge'

@@ -36,9 +36,6 @@ function CheckIcon({ checked }: { checked: boolean }) {
 }
 
 export default function LectureIntro({ lecture }: Props) {
-  // 지원 서비스 데이터 확인 (하나라도 true인지)
-  const hasAnyService = Object.values(lecture.services).some(Boolean)
-
   // 프로젝트 정보 확인
   const hasProjectInfo =
     lecture.project.num > 0 ||

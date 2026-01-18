@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { createPortal } from 'react-dom'
+
+import { useIsMounted } from '@/hooks/useIsMounted'
 
 interface ModalProps {
   isOpen: boolean
@@ -14,11 +16,7 @@ interface ModalProps {
 
 export default function Modal({ isOpen, onClose, title, maxWidthClass = 'max-w-2xl', children }: ModalProps) {
   const panelRef = useRef<HTMLDivElement | null>(null)
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const isMounted = useIsMounted()
 
   useEffect(() => {
     if (!isOpen) return
@@ -34,7 +32,7 @@ export default function Modal({ isOpen, onClose, title, maxWidthClass = 'max-w-2
     }
   }, [isOpen, onClose])
 
-  if (!isOpen || !mounted) return null
+  if (!isOpen || !isMounted) return null
 
   const onOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (panelRef.current && !panelRef.current.contains(e.target as Node)) {

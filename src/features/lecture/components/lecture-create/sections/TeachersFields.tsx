@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-img-element -- 동적 외부 URL 및 blob URL 미리보기 사용 */
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import { FiChevronDown, FiChevronUp, FiSearch, FiTrash2, FiUpload, FiX } from 'react-icons/fi'
@@ -19,7 +20,6 @@ import { cn } from '@/lib/utils'
 export function LectureCreateTeachersFields() {
   const {
     control,
-    clearErrors,
     formState: { errors },
   } = useFormContext<LectureFormValues>()
 

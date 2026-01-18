@@ -17,7 +17,6 @@ type MyOrganizationResponse = {
 export default function MyPage() {
   const router = useRouter()
   const { userType } = useAuthStore()
-  const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(true)
   const [activeTab, setActiveTab] = useState<'orgInfo' | 'lectureManage' | 'myInfo'>('orgInfo')
   const [isApproved, setIsApproved] = useState(false)
 

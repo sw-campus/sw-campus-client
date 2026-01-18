@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { Code2, Database, Layers, Palette, Pencil, RefreshCw, Sparkles } from 'lucide-react'
+import { Code2, Database, Layers, Palette, Pencil, RefreshCw, Sparkles, type LucideIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -27,6 +27,18 @@ interface SurveyResultsStepProps {
   survey: SurveyResponse | null | undefined
   onEditBasic: () => void
   onRetakeAptitude: () => void
+}
+
+const RECOMMENDED_JOB_ICONS: Record<RecommendedJob, LucideIcon> = {
+  FRONTEND: Palette,
+  BACKEND: Code2,
+  DATA: Database,
+  FULLSTACK: Layers,
+}
+
+function RecommendedJobIcon({ job, className }: { job: RecommendedJob | undefined; className?: string }) {
+  const Icon = job ? RECOMMENDED_JOB_ICONS[job] : Sparkles
+  return <Icon className={className} />
 }
 
 export function SurveyResultsStep({
@@ -58,22 +70,6 @@ export function SurveyResultsStep({
     onRetakeAptitude()
   }
 
-  // 추천 직무 아이콘
-  const getRecommendedJobIcon = (job: RecommendedJob | undefined) => {
-    switch (job) {
-      case 'FRONTEND':
-        return Palette
-      case 'BACKEND':
-        return Code2
-      case 'DATA':
-        return Database
-      case 'FULLSTACK':
-        return Layers
-      default:
-        return Sparkles
-    }
-  }
-
   // 추천 직무 설명
   const getRecommendedJobDescription = (job: RecommendedJob | undefined) => {
     switch (job) {
@@ -90,8 +86,6 @@ export function SurveyResultsStep({
     }
   }
 
-  const RecommendedJobIcon = getRecommendedJobIcon(results?.recommendedJob)
-
   return (
     <div className="space-y-8">
       {/* 헤더 */}
@@ -107,7 +101,7 @@ export function SurveyResultsStep({
         <div className="rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 p-6 text-white shadow-lg">
           <div className="flex items-start gap-4">
             <div className="rounded-xl bg-white/20 p-3">
-              <RecommendedJobIcon className="h-8 w-8" />
+              <RecommendedJobIcon job={results.recommendedJob} className="h-8 w-8" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-white/80">당신에게 추천하는 직무</p>
