@@ -7,7 +7,7 @@ import { LuSearch } from 'react-icons/lu'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
-import { LECTURE_AUTH_STATUS_FILTER_LABEL, type LectureAuthStatusFilter } from '../../types/lecture.type'
+import { LECTURE_AUTH_STATUS, LECTURE_AUTH_STATUS_FILTER_LABEL, type LectureAuthStatusFilter } from '../../types/lecture.type'
 
 interface LectureFilterProps {
   currentStatus: LectureAuthStatusFilter
@@ -18,9 +18,9 @@ interface LectureFilterProps {
 
 const filterOptions: { label: string; value: LectureAuthStatusFilter }[] = [
   { label: LECTURE_AUTH_STATUS_FILTER_LABEL.ALL, value: 'ALL' },
-  { label: LECTURE_AUTH_STATUS_FILTER_LABEL.PENDING, value: 'PENDING' },
-  { label: LECTURE_AUTH_STATUS_FILTER_LABEL.APPROVED, value: 'APPROVED' },
-  { label: LECTURE_AUTH_STATUS_FILTER_LABEL.REJECTED, value: 'REJECTED' },
+  { label: LECTURE_AUTH_STATUS_FILTER_LABEL.PENDING, value: LECTURE_AUTH_STATUS.PENDING },
+  { label: LECTURE_AUTH_STATUS_FILTER_LABEL.APPROVED, value: LECTURE_AUTH_STATUS.APPROVED },
+  { label: LECTURE_AUTH_STATUS_FILTER_LABEL.REJECTED, value: LECTURE_AUTH_STATUS.REJECTED },
 ]
 
 export function LectureFilter({ currentStatus, keyword, onStatusChange, onKeywordChange }: LectureFilterProps) {

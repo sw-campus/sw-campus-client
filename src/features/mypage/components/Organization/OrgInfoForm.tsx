@@ -12,6 +12,7 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import { ImageUploadInput } from '@/components/ui/image-upload-input'
+import type { ApprovalStatus } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 
 type MyOrganizationResponse = {
@@ -21,7 +22,7 @@ type MyOrganizationResponse = {
   representativeName: string
   phone: string
   location: string
-  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
+  approvalStatus: ApprovalStatus | string
   certificateKey: string
   govAuth: string
   facilityImageUrl: string
@@ -168,7 +169,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     const s = (status || '').toLowerCase()
     if (s === 'approved') return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
     if (s === 'rejected') return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
-    return { label: '승인 대기', dot: 'bg-amber-500', text: 'text-amber-700' }
+    return { label: '대기중', dot: 'bg-amber-500', text: 'text-amber-700' }
   }
 
   const formContent = (

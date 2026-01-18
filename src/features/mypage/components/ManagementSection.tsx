@@ -12,7 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import type { CertificateStatus, CompletedLecture } from '@/features/mypage/api/completedLectures.api'
+import {
+  APPROVAL_STATUS,
+  APPROVAL_STATUS_COLOR,
+  getApprovalStatusLabel,
+  canEditByStatus,
+} from '@/features/admin/types/approval.type'
+import type { CompletedLecture } from '@/features/mypage/api/completedLectures.api'
 import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
 import {
   completedLecturesQueryKey,
@@ -52,51 +58,18 @@ export function ReviewManagementSection() {
   const getStatusLabel = (lectureId: number, canWriteReview: boolean): string => {
     if (canWriteReview) return '작성 가능'
     const status = reviewStatuses?.get(lectureId)
-    if (status === 'APPROVED') return '승인됨'
-    if (status === 'REJECTED') return '반려됨'
-    return '대기중'
+    return getApprovalStatusLabel(status)
   }
 
   const getStatusBadgeClass = (lectureId: number, canWriteReview: boolean): string => {
     if (canWriteReview) return 'bg-gray-400 text-white'
     const status = reviewStatuses?.get(lectureId)
-    if (status === 'APPROVED') return 'bg-emerald-500 text-white'
-    if (status === 'REJECTED') return 'bg-rose-500 text-white'
-    return 'bg-amber-500 text-white' // PENDING
+    return APPROVAL_STATUS_COLOR[status as keyof typeof APPROVAL_STATUS_COLOR] ?? APPROVAL_STATUS_COLOR.PENDING
   }
 
   const isReadOnly = (lectureId: number): boolean => {
     const status = reviewStatuses?.get(lectureId)
-    return status === 'APPROVED' || status === 'REJECTED'
-  }
-
-  // Certificate status helpers
-  const getCertStatusLabel = (status?: CertificateStatus) => {
-    switch (status) {
-      case 'APPROVED':
-        return '승인됨'
-      case 'REJECTED':
-        return '반려됨'
-      case 'PENDING':
-      default:
-        return '대기중'
-    }
-  }
-
-  const getCertStatusBadgeClass = (status?: CertificateStatus) => {
-    switch (status) {
-      case 'APPROVED':
-        return 'bg-emerald-500 text-white'
-      case 'REJECTED':
-        return 'bg-rose-500 text-white'
-      case 'PENDING':
-      default:
-        return 'bg-amber-500 text-white'
-    }
-  }
-
-  const canEditCertificate = (status?: CertificateStatus) => {
-    return status !== 'APPROVED'
+    return status === APPROVAL_STATUS.APPROVED || status === APPROVAL_STATUS.REJECTED
   }
 
   const handleFileSelect = (file: File) => {
@@ -178,8 +151,8 @@ export function ReviewManagementSection() {
                         {l.lectureName}
                         {/* Mobile info */}
                         <div className="mt-1 flex items-center gap-2 sm:hidden">
-                          <Badge variant="secondary" className={`text-xs ${getCertStatusBadgeClass(l.certificateStatus)}`}>
-                            {getCertStatusLabel(l.certificateStatus)}
+                          <Badge variant="secondary" className={`text-xs ${APPROVAL_STATUS_COLOR[l.certificateStatus as keyof typeof APPROVAL_STATUS_COLOR] ?? APPROVAL_STATUS_COLOR.PENDING}`}>
+                            {getApprovalStatusLabel(l.certificateStatus)}
                           </Badge>
                           <Badge
                             variant="secondary"
@@ -191,8 +164,8 @@ export function ReviewManagementSection() {
                       </TableCell>
                       {/* 수료증 상태 */}
                       <TableCell className="hidden sm:table-cell">
-                        <Badge variant="secondary" className={`text-xs ${getCertStatusBadgeClass(l.certificateStatus)}`}>
-                          {getCertStatusLabel(l.certificateStatus)}
+                        <Badge variant="secondary" className={`text-xs ${APPROVAL_STATUS_COLOR[l.certificateStatus as keyof typeof APPROVAL_STATUS_COLOR] ?? APPROVAL_STATUS_COLOR.PENDING}`}>
+                          {getApprovalStatusLabel(l.certificateStatus)}
                         </Badge>
                       </TableCell>
                       {/* 후기 상태 */}
@@ -224,7 +197,7 @@ export function ReviewManagementSection() {
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              {canEditCertificate(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
+                              {canEditByStatus(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
                             </TooltipContent>
                           </Tooltip>
                           {/* 후기 버튼 */}
@@ -335,7 +308,7 @@ export function ReviewManagementSection() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-foreground text-xl font-bold">
-              {selectedCertificate && canEditCertificate(selectedCertificate.certificateStatus)
+              {selectedCertificate && canEditByStatus(selectedCertificate.certificateStatus)
                 ? '수료증 확인/수정'
                 : '수료증 확인'}
             </DialogTitle>
@@ -350,9 +323,9 @@ export function ReviewManagementSection() {
                   <span className="text-sm text-gray-600">수료증 상태:</span>
                   <Badge
                     variant="secondary"
-                    className={`text-xs ${getCertStatusBadgeClass(selectedCertificate.certificateStatus)}`}
+                    className={`text-xs ${APPROVAL_STATUS_COLOR[selectedCertificate.certificateStatus as keyof typeof APPROVAL_STATUS_COLOR] ?? APPROVAL_STATUS_COLOR.PENDING}`}
                   >
-                    {getCertStatusLabel(selectedCertificate.certificateStatus)}
+                    {getApprovalStatusLabel(selectedCertificate.certificateStatus)}
                   </Badge>
                 </div>
               </div>
@@ -401,12 +374,12 @@ export function ReviewManagementSection() {
               </div>
 
               {/* 수정 불가 안내 (APPROVED) */}
-              {!canEditCertificate(selectedCertificate.certificateStatus) && (
+              {!canEditByStatus(selectedCertificate.certificateStatus) && (
                 <p className="text-sm text-gray-500">승인된 수료증은 수정할 수 없습니다.</p>
               )}
 
               {/* 이미지 수정 폼 (PENDING/REJECTED만) */}
-              {canEditCertificate(selectedCertificate.certificateStatus) && (
+              {canEditByStatus(selectedCertificate.certificateStatus) && (
                 <div className="space-y-3">
                   {/* 파일 선택 버튼 (파일 미선택 시) */}
                   {!previewUrl && (
