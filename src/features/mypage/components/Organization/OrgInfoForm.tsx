@@ -60,7 +60,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
   const [isPending, setIsPending] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [_organizationId, setOrganizationId] = useState<number | null>(null)
   const [approvalStatus, setApprovalStatus] = useState<string>('')
 
   const methods = useForm<OrgInfoFormValues>({
@@ -105,7 +104,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
         const data = res.data
 
-        setOrganizationId(data.organizationId ?? null)
         setApprovalStatus(data.approvalStatus ?? '')
 
         methods.reset({
