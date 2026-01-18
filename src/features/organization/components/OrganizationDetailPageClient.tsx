@@ -16,10 +16,12 @@ export function OrganizationDetailPageClient({ organizationId }: OrganizationDet
   const { data: organization, isLoading: isOrgLoading } = useOrganizationDetailQuery(organizationId)
 
   // 기관별 강의 목록 조회
-  const { data: courses = [] } = useOrganizationLecturesQuery(organizationId)
+  const { data: courses = [], isLoading: isCoursesLoading } = useOrganizationLecturesQuery(organizationId)
+
+  const isLoading = isOrgLoading || isCoursesLoading
 
   // 로딩 중
-  if (isOrgLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
