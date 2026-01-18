@@ -1,6 +1,6 @@
-# CLAUDE.md
+# CLAUDE.md - Client
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with sw-campus-client.
 
 ## Development Commands
 
@@ -41,26 +41,11 @@ src/features/[feature]/
 
 Key features: `auth`, `lecture`, `organization`, `category`, `cart`, `storage`, `mypage`, `admin`
 
-### API Layer Pattern
-
-Backend and frontend types are separated using mappers:
-
-```typescript
-// Backend type (ApiLectureDetail) → Mapper → Frontend type (LectureDetail)
-export async function getLectureDetail(id: number): Promise<LectureDetail> {
-  const response = await axiosInstance.get(`/lectures/${id}`);
-  return mapApiLectureDetailToLectureDetail(response.data);
-}
-```
-
 ### State Management
 
-- **Zustand stores** (`src/store/`):
-  - `authStore` - Access token, login status, user type (PERSONAL/ORGANIZATION)
-  - `signupStore` - Multi-step signup form state
-  - `cartCompare.store` - Cart comparison state
-
-- **React Query** for server state with hooks in `features/[feature]/hooks/`
+- **Zustand stores** (`src/store/`): UI 상태 (모달, 장바구니 선택 등)
+- **React Query**: 서버 상태 (API 응답, 캐시)
+- **중요**: 서버 응답을 Zustand에 저장 금지
 
 ### Route Groups
 
@@ -76,23 +61,35 @@ src/app/
 
 ### Axios Instance (`src/lib/axios.ts`)
 
-- Request interceptor: Adds Bearer token from authStore
-- Response interceptor: Global error handling with Sonner toast
+- `withCredentials: true` 필수 (쿠키 인증)
+- Response interceptor에서 에러 toast 처리
+- 컴포넌트/훅에서 중복 toast 호출 금지
 
-### S3 File Uploads (`src/features/storage/`)
+### Server Components
 
-Supports single file and multipart uploads via presigned URLs.
-
-### Server Actions (`src/features/lecture/actions/gemini.ts`)
-
-- `generateGeminiSummary()` - AI lecture summarization
-- `compareCoursesWithAI()` - Comparative analysis
+- 서버 컴포넌트가 기본
+- `"use client"` 선언은 필요한 경우에만 (useState, onClick 등)
 
 ## Environment Variables
 
 - `NEXT_PUBLIC_API_URL` - Backend API endpoint (required)
-- `GEMINI_API_KEY` - For AI features
+- `GEMINI_API_KEY` - For AI features (server-only)
 
 ## Path Alias
 
 `@/*` maps to `./src/*`
+
+## Code Rules
+
+상세 규칙은 `.claude/rules/` 폴더에서 자동으로 로드됩니다:
+
+| 파일 | 내용 |
+|-----|------|
+| `01-project-structure.md` | 프로젝트 구조 |
+| `02-component-rules.md` | 컴포넌트 규칙 (서버/클라이언트) |
+| `03-state-management.md` | 상태 관리 (Query vs Zustand) |
+| `04-api-communication.md` | API 통신 규칙 |
+| `05-styling-rules.md` | TailwindCSS 스타일링 규칙 |
+| `06-eslint-rules.md` | ESLint 규칙 |
+| `07-performance-optimization.md` | 성능 최적화 |
+| `08-security.md` | 보안 규칙 |
