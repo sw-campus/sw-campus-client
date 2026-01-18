@@ -14,8 +14,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   APPROVAL_STATUS,
-  APPROVAL_STATUS_COLOR,
   getApprovalStatusLabel,
+  getApprovalStatusColor,
   canEditByStatus,
 } from '@/features/admin/types/approval.type'
 import type { CompletedLecture } from '@/features/mypage/api/completedLectures.api'
@@ -64,7 +64,7 @@ export function ReviewManagementSection() {
   const getStatusBadgeClass = (lectureId: number, canWriteReview: boolean): string => {
     if (canWriteReview) return 'bg-gray-400 text-white'
     const status = reviewStatuses?.get(lectureId)
-    return APPROVAL_STATUS_COLOR[status as keyof typeof APPROVAL_STATUS_COLOR] ?? APPROVAL_STATUS_COLOR.PENDING
+    return getApprovalStatusColor(status)
   }
 
   const isReadOnly = (lectureId: number): boolean => {
@@ -151,7 +151,7 @@ export function ReviewManagementSection() {
                         {l.lectureName}
                         {/* Mobile info */}
                         <div className="mt-1 flex items-center gap-2 sm:hidden">
-                          <Badge variant="secondary" className={`text-xs ${APPROVAL_STATUS_COLOR[l.certificateStatus as keyof typeof APPROVAL_STATUS_COLOR] ?? APPROVAL_STATUS_COLOR.PENDING}`}>
+                          <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
                             {getApprovalStatusLabel(l.certificateStatus)}
                           </Badge>
                           <Badge
@@ -164,7 +164,7 @@ export function ReviewManagementSection() {
                       </TableCell>
                       {/* 수료증 상태 */}
                       <TableCell className="hidden sm:table-cell">
-                        <Badge variant="secondary" className={`text-xs ${APPROVAL_STATUS_COLOR[l.certificateStatus as keyof typeof APPROVAL_STATUS_COLOR] ?? APPROVAL_STATUS_COLOR.PENDING}`}>
+                        <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
                           {getApprovalStatusLabel(l.certificateStatus)}
                         </Badge>
                       </TableCell>
@@ -323,7 +323,7 @@ export function ReviewManagementSection() {
                   <span className="text-sm text-gray-600">수료증 상태:</span>
                   <Badge
                     variant="secondary"
-                    className={`text-xs ${APPROVAL_STATUS_COLOR[selectedCertificate.certificateStatus as keyof typeof APPROVAL_STATUS_COLOR] ?? APPROVAL_STATUS_COLOR.PENDING}`}
+                    className={`text-xs ${getApprovalStatusColor(selectedCertificate.certificateStatus)}`}
                   >
                     {getApprovalStatusLabel(selectedCertificate.certificateStatus)}
                   </Badge>
