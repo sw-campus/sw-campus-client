@@ -16,7 +16,11 @@ export function OrganizationDetailPageClient({ organizationId }: OrganizationDet
   const { data: organization, isLoading: isOrgLoading } = useOrganizationDetailQuery(organizationId)
 
   // 기관별 강의 목록 조회
-  const { data: courses = [], isLoading: isCoursesLoading } = useOrganizationLecturesQuery(organizationId)
+  const {
+    data: courses = [],
+    isLoading: isCoursesLoading,
+    isError: isCoursesError,
+  } = useOrganizationLecturesQuery(organizationId)
 
   const isLoading = isOrgLoading || isCoursesLoading
 
@@ -38,5 +42,5 @@ export function OrganizationDetailPageClient({ organizationId }: OrganizationDet
     )
   }
 
-  return <OrganizationDetail organization={organization} lectures={courses} />
+  return <OrganizationDetail organization={organization} lectures={courses} isCoursesError={isCoursesError} />
 }
