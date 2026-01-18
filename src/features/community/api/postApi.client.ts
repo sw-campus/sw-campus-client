@@ -5,31 +5,16 @@ import {
   ApiPostDetailResponse,
   ApiPostResponse,
   CreatePostRequest,
+  PagedPosts,
   Post,
   PostDetail,
   PostSearchParams,
   UpdatePostRequest,
+  mapApiPostToPost,
 } from './postApi.types'
 
 // Mapper functions
-function mapApiPostToPost(apiPost: ApiPostResponse): Post {
-  return {
-    id: apiPost.id,
-    title: apiPost.title,
-    authorId: apiPost.authorId,
-    authorNickname: apiPost.authorNickname,
-    categoryId: apiPost.categoryId,
-    categoryName: apiPost.categoryName,
-    tags: apiPost.tags,
-    viewCount: apiPost.viewCount,
-    likeCount: apiPost.likeCount,
-    commentCount: apiPost.commentCount,
-    createdAt: new Date(apiPost.createdAt),
-    hasImage: apiPost.hasImage,
-    thumbnailUrl: apiPost.thumbnailUrl,
-    pinned: apiPost.pinned,
-  }
-}
+
 
 function mapApiPostDetailToPostDetail(apiPost: ApiPostDetailResponse): PostDetail {
   return {
@@ -56,15 +41,7 @@ function mapApiPostDetailToPostDetail(apiPost: ApiPostDetailResponse): PostDetai
 }
 
 // API response type
-export interface PagedPosts {
-  posts: Post[]
-  page: {
-    size: number
-    number: number
-    totalElements: number
-    totalPages: number
-  }
-}
+
 
 /**
  * 게시글 목록 조회 API

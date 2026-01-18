@@ -2,8 +2,8 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { getPosts, PagedPosts } from '../api/postApi.client'
-import type { PostSearchParams } from '../api/postApi.types'
+import { getPosts } from '../api/postApi.client'
+import type { PagedPosts, PostSearchParams } from '../api/postApi.types'
 
 export const postKeys = {
   all: ['posts'] as const,

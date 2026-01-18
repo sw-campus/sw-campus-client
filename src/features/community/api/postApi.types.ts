@@ -60,6 +60,36 @@ export interface ApiPageResponse<T> {
   empty: boolean
 }
 
+export interface PagedPosts {
+  posts: Post[]
+  page: {
+    size: number
+    number: number
+    totalElements: number
+    totalPages: number
+  }
+}
+
+// Mapper functions
+export function mapApiPostToPost(apiPost: ApiPostResponse): Post {
+  return {
+    id: apiPost.id,
+    title: apiPost.title,
+    authorId: apiPost.authorId,
+    authorNickname: apiPost.authorNickname,
+    categoryId: apiPost.categoryId,
+    categoryName: apiPost.categoryName,
+    tags: apiPost.tags,
+    viewCount: apiPost.viewCount,
+    likeCount: apiPost.likeCount,
+    commentCount: apiPost.commentCount,
+    createdAt: new Date(apiPost.createdAt),
+    hasImage: apiPost.hasImage,
+    thumbnailUrl: apiPost.thumbnailUrl,
+    pinned: apiPost.pinned,
+  }
+}
+
 // Frontend types
 export interface Post {
   id: number

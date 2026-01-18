@@ -7,6 +7,17 @@ import { FiArrowLeft, FiEdit2, FiTrash2, FiHeart, FiBookmark, FiEye, FiMessageCi
 import DOMPurify from 'dompurify'
 
 import { Button } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { useDeletePost } from '@/features/community/hooks/useDeletePost'
 import { usePostDetail } from '@/features/community/hooks/usePostDetail'
 import { CommentSection } from '@/features/community/components/CommentSection'
@@ -28,6 +39,7 @@ export default function PostDetailPage() {
   const { mutate: toggleBookmark, isPending: isBookmarking } = useToggleBookmark(postId)
   const { mutate: togglePin, isPending: isPinning } = useTogglePin(postId)
   const [isCopied, setIsCopied] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const imagesNotInBody = useMemo(() => {
     if (!post) return []
@@ -46,21 +58,24 @@ export default function PostDetailPage() {
   }, [post])
 
   const handleDelete = () => {
-    if (!confirm('정말 삭제하시겠습니까?')) return
-
     deletePost(postId, {
       onSuccess: () => {
+        setIsDeleteDialogOpen(false)
         router.push('/community')
       },
     })
+  }
+
+  const showCopySuccess = () => {
+    setIsCopied(true)
+    setTimeout(() => setIsCopied(false), 2000)
   }
 
   const handleShare = async () => {
     const url = window.location.href
     try {
       await navigator.clipboard.writeText(url)
-      setIsCopied(true)
-      setTimeout(() => setIsCopied(false), 2000)
+      showCopySuccess()
     } catch {
       // 클립보드 API 미지원 시 fallback
       const textArea = document.createElement('textarea')
@@ -69,8 +84,7 @@ export default function PostDetailPage() {
       textArea.select()
       document.execCommand('copy')
       document.body.removeChild(textArea)
-      setIsCopied(true)
-      setTimeout(() => setIsCopied(false), 2000)
+      showCopySuccess()
     }
   }
 
@@ -235,7 +249,7 @@ export default function PostDetailPage() {
                 disabled={isLiking}
               >
                 <FiHeart className={post.isLiked ? 'fill-red-500 text-red-500' : ''} />
-                <span>{post.isLiked ? '좋아요' : '좋아요'}</span>
+                <span>좋아요</span>
                 {post.likeCount > 0 && <span>{post.likeCount}</span>}
               </Button>
               <Button
@@ -273,16 +287,37 @@ export default function PostDetailPage() {
                       수정
                     </Button>
                   </Link>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-10 gap-1 text-red-500 active:scale-95 hover:bg-red-50 sm:h-9"
-                    onClick={handleDelete}
-                    disabled={isDeleting}
-                  >
-                    <FiTrash2 />
-                    삭제
-                  </Button>
+                  <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-10 gap-1 text-red-500 active:scale-95 hover:bg-red-50 sm:h-9"
+                        disabled={isDeleting}
+                      >
+                        <FiTrash2 />
+                        삭제
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>게시글 삭제</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          정말 이 게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>취소</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDelete}
+                          className="bg-red-500 hover:bg-red-600"
+                          disabled={isDeleting}
+                        >
+                          {isDeleting ? '삭제 중...' : '삭제'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               )}
             </div>

@@ -4,7 +4,8 @@ import { ApiUserProfileResponse, UserProfile } from './userProfileApi.types'
 import {
   ApiPageResponse,
   ApiPostResponse,
-  Post,
+  PagedPosts,
+  mapApiPostToPost,
 } from './postApi.types'
 
 // Mapper function
@@ -17,34 +18,7 @@ function mapApiUserProfileToUserProfile(apiProfile: ApiUserProfileResponse): Use
   }
 }
 
-function mapApiPostToPost(apiPost: ApiPostResponse): Post {
-  return {
-    id: apiPost.id,
-    title: apiPost.title,
-    authorId: apiPost.authorId,
-    authorNickname: apiPost.authorNickname,
-    categoryId: apiPost.categoryId,
-    categoryName: apiPost.categoryName,
-    tags: apiPost.tags,
-    viewCount: apiPost.viewCount,
-    likeCount: apiPost.likeCount,
-    commentCount: apiPost.commentCount,
-    createdAt: new Date(apiPost.createdAt),
-    hasImage: apiPost.hasImage,
-    thumbnailUrl: apiPost.thumbnailUrl,
-    pinned: apiPost.pinned,
-  }
-}
 
-export interface PagedPosts {
-  posts: Post[]
-  page: {
-    size: number
-    number: number
-    totalElements: number
-    totalPages: number
-  }
-}
 
 /**
  * 유저 프로필 조회 API

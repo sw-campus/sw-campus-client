@@ -2,7 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query'
 
-import { getUserProfile, getUserPosts, PagedPosts } from '../api/userProfileApi.client'
+import { PagedPosts } from '../api/postApi.types'
+import { getUserProfile, getUserPosts } from '../api/userProfileApi.client'
 import { UserProfile } from '../api/userProfileApi.types'
 
 export const userProfileKeys = {
