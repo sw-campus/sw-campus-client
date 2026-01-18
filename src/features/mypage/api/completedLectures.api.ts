@@ -1,7 +1,8 @@
+import { APPROVAL_STATUS, type ApprovalStatus } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 
-export type CertificateStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
-export type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+export type CertificateStatus = ApprovalStatus
+export type ReviewStatus = ApprovalStatus
 
 export type CompletedLecture = {
   certificateId: number
@@ -35,12 +36,12 @@ export async function getReviewStatus(lectureId: number): Promise<ReviewStatus> 
   try {
     const { data } = await api.get<ReviewResponse>(`/mypage/completed-lectures/${lectureId}/review`)
     const statusStr = String(data?.approvalStatus ?? '').toUpperCase()
-    if (statusStr === 'APPROVED') return 'APPROVED'
-    if (statusStr === 'REJECTED') return 'REJECTED'
-    return 'PENDING'
+    if (statusStr === APPROVAL_STATUS.APPROVED) return APPROVAL_STATUS.APPROVED
+    if (statusStr === APPROVAL_STATUS.REJECTED) return APPROVAL_STATUS.REJECTED
+    return APPROVAL_STATUS.PENDING
   } catch (error) {
     console.error(`리뷰 상태 조회 실패 (lectureId: ${lectureId}):`, error)
-    return 'PENDING'
+    return APPROVAL_STATUS.PENDING
   }
 }
 

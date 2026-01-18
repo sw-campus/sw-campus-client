@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
+  REVIEW_AUTH_STATUS,
   REVIEW_AUTH_STATUS_COLOR,
   REVIEW_AUTH_STATUS_LABEL,
   type ReviewAuthStatus,
@@ -31,7 +32,7 @@ function StatusBadge({ status }: { status: ReviewAuthStatus }) {
 export function ReviewTable({ reviews, isLoading, currentPage, pageSize, onViewDetail }: ReviewTableProps) {
   // 수료증이 승인된 리뷰이거나, 이미 승인/반려 처리가 완료된 리뷰만 표시
   const visibleReviews = reviews.filter(
-    review => review.reviewApprovalStatus !== 'PENDING' || review.certificateApprovalStatus === 'APPROVED',
+    review => review.reviewApprovalStatus !== REVIEW_AUTH_STATUS.PENDING || review.certificateApprovalStatus === REVIEW_AUTH_STATUS.APPROVED,
   )
 
   const getRowNumber = (index: number) => currentPage * pageSize + index + 1

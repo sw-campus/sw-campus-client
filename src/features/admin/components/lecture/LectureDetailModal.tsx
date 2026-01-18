@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 import { useLectureDetailQuery } from '../../hooks/useLectures'
 import {
   CURRICULUM_LEVEL_LABEL,
+  LECTURE_AUTH_STATUS,
   LECTURE_AUTH_STATUS_COLOR,
   LECTURE_AUTH_STATUS_LABEL,
   type LectureAuthStatus,
@@ -209,7 +210,7 @@ export function LectureDetailModal({
               수정
             </Button>
           )}
-          {lecture.lectureAuthStatus === 'PENDING' && (
+          {lecture.lectureAuthStatus === LECTURE_AUTH_STATUS.PENDING && (
             <>
               <Button
                 onClick={handleApprove}

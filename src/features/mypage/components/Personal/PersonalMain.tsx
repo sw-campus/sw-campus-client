@@ -11,6 +11,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  APPROVAL_STATUS,
+  APPROVAL_STATUS_COLOR,
+  getApprovalStatusLabel,
+  canEditByStatus,
+  type ApprovalStatus,
+} from '@/features/admin/types/approval.type'
 import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
 import { updateCertificateImage } from '@/features/certificate/api/certificate.api'
 import { api } from '@/lib/axios'
@@ -55,7 +62,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     canWriteReview: boolean
     reviewId?: number
     certificateImageUrl?: string
-    certificateStatus?: 'PENDING' | 'APPROVED' | 'REJECTED'
+    certificateStatus?: ApprovalStatus
   }
 
   const [lectures, setLectures] = useState<CompletedLecture[] | null>(null)
@@ -164,7 +171,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     const parseApproved = (data: unknown): boolean => {
       const approvalStatus = (data as { approvalStatus?: unknown })?.approvalStatus
       if (typeof approvalStatus === 'string') {
-        return approvalStatus.toUpperCase() === 'APPROVED'
+        return approvalStatus.toUpperCase() === APPROVAL_STATUS.APPROVED
       }
 
       const status =
@@ -175,7 +182,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
       const isApprovedBool =
         (data as { isApproved?: unknown })?.isApproved === true || (data as { approved?: unknown })?.approved === true
 
-      return isApprovedBool || statusStr.toUpperCase() === 'APPROVED'
+      return isApprovedBool || statusStr.toUpperCase() === APPROVAL_STATUS.APPROVED
     }
 
     const hydrateApproved = async () => {
@@ -229,32 +236,17 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     }
   }
 
-  const getCertStatusLabel = (status?: string) => {
-    switch (status) {
-      case 'APPROVED':
-        return '승인됨'
-      case 'REJECTED':
-        return '반려됨'
-      case 'PENDING':
-      default:
-        return '대기중'
-    }
-  }
-
+  // MyPage에서 사용하는 배지 스타일 (outline 스타일)
   const getCertStatusColor = (status?: string) => {
     switch (status) {
-      case 'APPROVED':
+      case APPROVAL_STATUS.APPROVED:
         return 'bg-green-50 text-green-700 border-green-200'
-      case 'REJECTED':
+      case APPROVAL_STATUS.REJECTED:
         return 'bg-red-50 text-red-700 border-red-200'
-      case 'PENDING':
+      case APPROVAL_STATUS.PENDING:
       default:
         return 'bg-yellow-50 text-yellow-700 border-yellow-200'
     }
-  }
-
-  const canEditCertificate = (status?: string) => {
-    return status !== 'APPROVED'
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -512,7 +504,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                         <div className="mt-1 flex items-center justify-between sm:hidden">
                           <div className="flex items-center gap-2">
                             <Badge className={`rounded-full border ${getCertStatusColor(l.certificateStatus)}`} variant="outline">
-                              {getCertStatusLabel(l.certificateStatus)}
+                              {getApprovalStatusLabel(l.certificateStatus)}
                             </Badge>
                             {l.canWriteReview ? (
                               <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
@@ -530,7 +522,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
-                              aria-label={canEditCertificate(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
+                              aria-label={canEditByStatus(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
                               onClick={() => {
                                 setSelectedCertificate(l)
                                 setCertImageError(null)
@@ -576,7 +568,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                       {/* 수료증 상태 */}
                       <TableCell className="hidden sm:table-cell">
                         <Badge className={`rounded-full border ${getCertStatusColor(l.certificateStatus)}`} variant="outline">
-                          {getCertStatusLabel(l.certificateStatus)}
+                          {getApprovalStatusLabel(l.certificateStatus)}
                         </Badge>
                       </TableCell>
                       {/* 후기 상태 */}
@@ -611,7 +603,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              {canEditCertificate(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
+                              {canEditByStatus(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
                             </TooltipContent>
                           </Tooltip>
                           {/* 후기 버튼 */}
@@ -728,7 +720,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-foreground text-2xl font-bold">
-              {selectedCertificate && canEditCertificate(selectedCertificate.certificateStatus)
+              {selectedCertificate && canEditByStatus(selectedCertificate.certificateStatus)
                 ? '수료증 확인/수정'
                 : '수료증 확인'}
             </DialogTitle>
@@ -742,7 +734,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-sm text-gray-600">수료증 상태:</span>
                   <Badge className={`rounded-full border ${getCertStatusColor(selectedCertificate.certificateStatus)}`} variant="outline">
-                    {getCertStatusLabel(selectedCertificate.certificateStatus)}
+                    {getApprovalStatusLabel(selectedCertificate.certificateStatus)}
                   </Badge>
                 </div>
               </div>
@@ -763,14 +755,14 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
               )}
 
               {/* 수정 불가 안내 (APPROVED) */}
-              {!canEditCertificate(selectedCertificate.certificateStatus) && (
+              {!canEditByStatus(selectedCertificate.certificateStatus) && (
                 <p className="text-sm text-gray-500">
                   승인된 수료증은 수정할 수 없습니다.
                 </p>
               )}
 
               {/* 이미지 수정 폼 (PENDING/REJECTED만) */}
-              {canEditCertificate(selectedCertificate.certificateStatus) && (
+              {canEditByStatus(selectedCertificate.certificateStatus) && (
                 <div className="space-y-3">
                   <p className="text-sm font-medium text-gray-700">새 이미지 업로드</p>
                   <div className="flex items-center gap-3">

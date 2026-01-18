@@ -1,3 +1,5 @@
+import type { ApprovalStatus } from '@/features/admin/types/approval.type'
+
 // -----------------------------
 // mock data types
 // -----------------------------
@@ -46,7 +48,7 @@ export type EquipmentType = 'NONE' | 'PC' | 'LAPTOP' | 'PERSONAL' | (string & {}
 
 export type LectureStatus = 'RECRUITING' | 'FINISHED' | (string & {})
 
-export type LectureAuthStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | (string & {})
+export type LectureAuthStatus = ApprovalStatus | (string & {})
 
 export interface LectureDto {
   lectureId: number

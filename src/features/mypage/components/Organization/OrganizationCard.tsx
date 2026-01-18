@@ -6,6 +6,7 @@ import { LuBuilding, LuKey, LuPencil } from 'react-icons/lu'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { APPROVAL_STATUS, type ApprovalStatus } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 import { cn } from '@/lib/utils'
 
@@ -19,7 +20,7 @@ type MyOrganizationResponse = {
   representativeName: string
   phone: string
   location: string
-  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
+  approvalStatus: ApprovalStatus | string
   certificateKey: string
   govAuth: string
   homepage: string
@@ -64,11 +65,11 @@ export function OrganizationCard({ onEditClick }: OrganizationCardProps) {
   const getStatusLabel = (status: string) => {
     const s = status.toUpperCase()
     switch (s) {
-      case 'APPROVED':
+      case APPROVAL_STATUS.APPROVED:
         return '승인됨'
-      case 'PENDING':
-        return '승인 대기'
-      case 'REJECTED':
+      case APPROVAL_STATUS.PENDING:
+        return '대기중'
+      case APPROVAL_STATUS.REJECTED:
         return '반려됨'
       default:
         return status
@@ -78,11 +79,11 @@ export function OrganizationCard({ onEditClick }: OrganizationCardProps) {
   const getStatusColor = (status: string) => {
     const s = status.toUpperCase()
     switch (s) {
-      case 'APPROVED':
+      case APPROVAL_STATUS.APPROVED:
         return 'text-green-600 bg-green-50 border-green-200'
-      case 'PENDING':
+      case APPROVAL_STATUS.PENDING:
         return 'text-amber-600 bg-amber-50 border-amber-200'
-      case 'REJECTED':
+      case APPROVAL_STATUS.REJECTED:
         return 'text-red-600 bg-red-50 border-red-200'
       default:
         return 'text-gray-600 bg-gray-50 border-gray-200'

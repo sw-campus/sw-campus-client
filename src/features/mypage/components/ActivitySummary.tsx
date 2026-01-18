@@ -6,6 +6,7 @@ import { LuAward, LuBadgeCheck, LuClipboardCheck, LuPencil } from 'react-icons/l
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { APPROVAL_STATUS } from '@/features/admin/types/approval.type'
 import {
   useCompletedLecturesQuery,
   useReviewStatusesQuery,
@@ -32,7 +33,7 @@ export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
     if (!reviewStatuses) return 0
     let count = 0
     reviewStatuses.forEach(status => {
-      if (status === 'APPROVED') count++
+      if (status === APPROVAL_STATUS.APPROVED) count++
     })
     return count
   }, [reviewStatuses])

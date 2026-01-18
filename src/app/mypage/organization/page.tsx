@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import { APPROVAL_STATUS, type ApprovalStatus } from '@/features/admin/types/approval.type'
 import OrganizationAside from '@/features/mypage/components/Organization/OrganizationAside'
 import OrganizationMain from '@/features/mypage/components/Organization/OrganizationMain'
 import { api } from '@/lib/axios'
 import { useAuthStore } from '@/store/authStore'
 
 type MyOrganizationResponse = {
-  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
+  approvalStatus: ApprovalStatus | string
 }
 
 export default function MyPage() {
@@ -27,7 +28,7 @@ export default function MyPage() {
         .get<MyOrganizationResponse>('/mypage/organization')
         .then(res => {
           const status = res.data.approvalStatus?.toUpperCase()
-          setIsApproved(status === 'APPROVED')
+          setIsApproved(status === APPROVAL_STATUS.APPROVED)
         })
         .catch(() => {
           setIsApproved(false)
