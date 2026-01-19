@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 
 import { FiChevronRight, FiChevronDown } from 'react-icons/fi'
 
@@ -21,6 +21,8 @@ interface CategorySidebarProps {
  * - 모바일: 가로 스크롤 탭
  */
 export function CategorySidebar({ categories, selectedCategoryId, onSelect }: CategorySidebarProps) {
+  const [expandedIds, setExpandedIds] = useState<number[]>([])
+
   // 선택된 카테고리의 모든 조상 ID 찾기 (트리 펼침용)
   const findAncestorIds = (categoryId: number | null, list: BoardCategory[]): number[] => {
     if (categoryId === null) return []
@@ -37,38 +39,58 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
     return []
   }
 
-  const ancestorIds = findAncestorIds(selectedCategoryId, categories)
+  // 선택된 카테고리가 변경되면 조상들을 자동으로 펼침
+  useEffect(() => {
+    if (selectedCategoryId !== null) {
+      const ancestors = findAncestorIds(selectedCategoryId, categories)
+      setExpandedIds(prev => {
+        const newIds = new Set([...prev, ...ancestors])
+        return Array.from(newIds)
+      })
+    }
+  }, [selectedCategoryId, categories])
+
+  const toggleExpand = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setExpandedIds(prev => (prev.includes(id) ? prev.filter(expandedId => expandedId !== id) : [...prev, id]))
+  }
 
   // 재귀적 카테고리 아이템 렌더링 (데스크탑)
   const renderCategoryItem = (category: BoardCategory, depth: number = 0) => {
     const isSelected = selectedCategoryId === category.id
-    const isExpanded = ancestorIds.includes(category.id) || isSelected
+    const isExpanded = expandedIds.includes(category.id)
     const hasChildren = category.children && category.children.length > 0
 
     return (
       <div key={category.id}>
-        <button
-          type="button"
-          onClick={() => onSelect(category.id)}
+        <div
           className={cn(
-            'flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-sm transition-colors',
+            'group flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-sm transition-colors',
             isSelected
               ? 'bg-orange-50 font-medium text-orange-600'
               : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
             depth > 0 && 'ml-3 border-l border-gray-100 pl-3',
           )}
+          onClick={() => onSelect(category.id)}
         >
-          <span className="flex items-center gap-2">
+          <span className="flex flex-1 items-center gap-2">
             {depth === 0 && <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />}
             {category.name}
           </span>
-          {hasChildren &&
-            (isExpanded ? (
-              <FiChevronDown className="h-3.5 w-3.5 opacity-50" />
-            ) : (
-              <FiChevronRight className="h-3.5 w-3.5 opacity-50" />
-            ))}
-        </button>
+          {hasChildren && (
+            <button
+              type="button"
+              onClick={e => toggleExpand(category.id, e)}
+              className="rounded p-1 transition-colors hover:bg-black/5"
+            >
+              {isExpanded ? (
+                <FiChevronDown className="h-3.5 w-3.5 opacity-50" />
+              ) : (
+                <FiChevronRight className="h-3.5 w-3.5 opacity-50" />
+              )}
+            </button>
+          )}
+        </div>
 
         {/* 자식 카테고리 재귀 렌더링 */}
         {hasChildren && isExpanded && (

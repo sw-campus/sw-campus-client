@@ -1,12 +1,24 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+
+import DOMPurify from 'dompurify'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { FiArrowLeft, FiEdit2, FiTrash2, FiHeart, FiBookmark, FiEye, FiMessageCircle, FiShare2, FiUser, FiCheck, FiMapPin } from 'react-icons/fi'
-import DOMPurify from 'dompurify'
+import {
+  FiArrowLeft,
+  FiEdit2,
+  FiTrash2,
+  FiHeart,
+  FiBookmark,
+  FiEye,
+  FiMessageCircle,
+  FiShare2,
+  FiUser,
+  FiCheck,
+  FiMapPin,
+} from 'react-icons/fi'
 
-import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,14 +30,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { useDeletePost } from '@/features/community/hooks/useDeletePost'
-import { usePostDetail } from '@/features/community/hooks/usePostDetail'
+import { Button } from '@/components/ui/button'
+import { ClickableTag } from '@/features/community/components/ClickableTag'
 import { CommentSection } from '@/features/community/components/CommentSection'
 import { PostNavigation } from '@/features/community/components/PostNavigation'
+import { useDeletePost } from '@/features/community/hooks/useDeletePost'
+import { usePostDetail } from '@/features/community/hooks/usePostDetail'
 import { useToggleLike, useToggleBookmark, useTogglePin } from '@/features/community/hooks/usePostInteractions'
-import { useAuthStore } from '@/store/authStore'
 import { formatRelativeTime } from '@/lib/formatRelativeTime'
-import { ClickableTag } from '@/features/community/components/ClickableTag'
+import { useAuthStore } from '@/store/authStore'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -90,7 +103,7 @@ export default function PostDetailPage() {
 
   if (isLoading) {
     return (
-      <main className="custom-container mx-auto max-w-6xl">
+      <main className="custom-container mx-auto w-full max-w-7xl md:!px-10">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-32 rounded bg-gray-200" />
           <div className="h-12 w-full rounded bg-gray-200" />
@@ -103,7 +116,7 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <main className="custom-container mx-auto max-w-6xl">
+      <main className="custom-container mx-auto w-full max-w-7xl md:!px-10">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">게시글을 찾을 수 없습니다</p>
           <Link href="/community" className="mt-4 inline-block text-orange-500 hover:underline">
@@ -125,9 +138,12 @@ export default function PostDetailPage() {
   const relativeTime = formatRelativeTime(post.createdAt)
 
   return (
-    <main className="custom-container mx-auto max-w-6xl">
+    <main className="custom-container mx-auto w-full max-w-7xl md:!px-10">
       {/* 뒤로가기 */}
-      <Link href="/community" className="mb-6 inline-flex items-center gap-2 text-gray-600 transition-colors hover:text-gray-900">
+      <Link
+        href="/community"
+        className="mb-6 inline-flex items-center gap-2 text-gray-600 transition-colors hover:text-gray-900"
+      >
         <FiArrowLeft />
         목록으로
       </Link>
@@ -240,7 +256,7 @@ export default function PostDetailPage() {
         {/* 액션 버튼 */}
         {isLoggedIn && (
           <div className="mt-6 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:pt-6">
-          <div className="flex gap-2">
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -270,7 +286,7 @@ export default function PostDetailPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className={`h-10 gap-1 sm:h-9 ${post.pinned ? 'bg-orange-50 text-orange-600 border-orange-200' : 'text-gray-500 hover:text-orange-600'}`}
+                  className={`h-10 gap-1 sm:h-9 ${post.pinned ? 'border-orange-200 bg-orange-50 text-orange-600' : 'text-gray-500 hover:text-orange-600'}`}
                   onClick={() => togglePin()}
                   disabled={isPinning}
                 >
@@ -292,7 +308,7 @@ export default function PostDetailPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-10 gap-1 text-red-500 active:scale-95 hover:bg-red-50 sm:h-9"
+                        className="h-10 gap-1 text-red-500 hover:bg-red-50 active:scale-95 sm:h-9"
                         disabled={isDeleting}
                       >
                         <FiTrash2 />

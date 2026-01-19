@@ -88,7 +88,7 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       </div>
 
       {/* 질문 1: 배운 기술 */}
-      <div>
+      <div id="diary-field-learnedSkills">
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">{DIARY_QUESTIONS.learnedSkills.label} *</label>
           <CharCount current={getTextLength(formData.learnedSkills)} min={DIARY_MIN_LENGTH} />
@@ -104,7 +104,7 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       </div>
 
       {/* 질문 2: 문제 해결 */}
-      <div>
+      <div id="diary-field-problemSolving">
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">
             {DIARY_QUESTIONS.problemSolving.label}{' '}
@@ -123,7 +123,7 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       </div>
 
       {/* 질문 3: 수업 리뷰 */}
-      <div>
+      <div id="diary-field-classReview">
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">{DIARY_QUESTIONS.classReview.label} *</label>
           <CharCount current={getTextLength(formData.classReview)} min={DIARY_MIN_LENGTH} />
@@ -139,7 +139,7 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       </div>
 
       {/* 질문 4: 다음 주 계획 */}
-      <div>
+      <div id="diary-field-nextWeekPlan">
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">{DIARY_QUESTIONS.nextWeekPlan.label} *</label>
           <CharCount current={getTextLength(formData.nextWeekPlan)} min={DIARY_MIN_LENGTH} />

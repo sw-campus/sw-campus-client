@@ -56,7 +56,7 @@ export function SearchBar({ value, onChange, placeholder = '검색어를 입력�
         onChange={e => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none"
+        className="w-full rounded-full border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-all hover:border-orange-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none"
       />
       {inputValue && (
         <button

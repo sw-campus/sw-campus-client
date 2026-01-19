@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { TiptapEditor } from '@/components/ui/editor/TiptapEditor'
+import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import type { BoardCategory } from '../api/boardCategoryApi.types'
@@ -125,7 +125,7 @@ export function PostForm({
         setDiaryWeek(parsedTitle.week)
         setDiarySummary(parsedTitle.summary)
       }
-      
+
       // 본문 파싱
       const parsedBody = parseDiaryBody(initialData.body)
       if (parsedBody) {
@@ -156,15 +156,24 @@ export function PostForm({
     if (isBootcampDiaryCategory) {
       if (!selectedLecture) {
         setLectureError('부트캠프 성장일기 작성 시 수강 강의를 선택해주세요.')
+        document.getElementById('lecture-selector')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
         return
       }
       if (diarySummary.trim().length < 5) {
         setDiarySummaryError('한 줄 소감을 5자 이상 입력해주세요.')
+        document.getElementById('diary-summary-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
         return
       }
       const templateErrors = validateDiaryForm(diaryForm)
       if (Object.keys(templateErrors).length > 0) {
         setDiaryErrors(templateErrors)
+        // 첫 번째 에러 필드로 스크롤
+        const firstErrorKey = Object.keys(templateErrors)[0]
+        if (firstErrorKey) {
+          document
+            .getElementById(`diary-field-${firstErrorKey}`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
         return
       }
     }
@@ -266,10 +275,7 @@ export function PostForm({
 
       selects.push(
         <div key={i} className="min-w-[150px] flex-1">
-          <Select
-            value={selectedId ? String(selectedId) : ''}
-            onValueChange={(value) => handleCategoryChange(i, value)}
-          >
+          <Select value={selectedId ? String(selectedId) : ''} onValueChange={value => handleCategoryChange(i, value)}>
             <SelectTrigger className="w-full border-gray-300 bg-white hover:border-orange-300 focus:border-orange-500 focus:ring-orange-200">
               <SelectValue placeholder={i === 0 ? '대분류 선택' : i === 1 ? '중분류 선택' : '소분류 선택'} />
             </SelectTrigger>
@@ -411,10 +417,10 @@ export function PostForm({
 
         {/* 제출 버튼 */}
         <div className="flex justify-end gap-3">
-          <Button 
-            type="submit" 
-            disabled={isSubmitting} 
-            className="h-12 w-full bg-orange-500 text-base active:scale-[0.98] hover:bg-orange-600 sm:h-10 sm:w-auto sm:px-8 sm:text-sm"
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="h-12 w-full bg-orange-500 text-base hover:bg-orange-600 active:scale-[0.98] sm:h-10 sm:w-auto sm:px-8 sm:text-sm"
           >
             {isSubmitting ? '처리 중...' : submitLabel}
           </Button>

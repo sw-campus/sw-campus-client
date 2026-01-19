@@ -45,6 +45,7 @@ export function PostListRow({ post }: PostListRowProps) {
                 src={post.thumbnailUrl}
                 alt={post.title}
                 fill
+                sizes="(max-width: 640px) 64px, 96px"
                 className="object-cover transition-transform duration-300 group-hover:scale-110"
               />
             </div>

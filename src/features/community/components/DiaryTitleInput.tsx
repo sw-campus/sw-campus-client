@@ -34,7 +34,7 @@ export function DiaryTitleInput({
       <div className="space-y-3">
         {/* 월/주차 선택 */}
         <div className="flex flex-wrap items-center gap-2">
-          <Select value={String(month)} onValueChange={(value) => onMonthChange(Number(value))}>
+          <Select value={String(month)} onValueChange={value => onMonthChange(Number(value))}>
             <SelectTrigger className="w-24 border-gray-300 bg-white hover:border-orange-300 focus:border-orange-500 focus:ring-orange-200">
               <SelectValue />
             </SelectTrigger>
@@ -46,7 +46,7 @@ export function DiaryTitleInput({
               ))}
             </SelectContent>
           </Select>
-          <Select value={String(week)} onValueChange={(value) => onWeekChange(Number(value))}>
+          <Select value={String(week)} onValueChange={value => onWeekChange(Number(value))}>
             <SelectTrigger className="w-24 border-gray-300 bg-white hover:border-orange-300 focus:border-orange-500 focus:ring-orange-200">
               <SelectValue />
             </SelectTrigger>
@@ -63,13 +63,12 @@ export function DiaryTitleInput({
 
         {/* 한 줄 소감 */}
         <Input
+          id="diary-summary-input"
           type="text"
           value={summary}
           onChange={e => onSummaryChange(e.target.value)}
           placeholder="한 줄 소감을 입력하세요 (예: JWT 인증 구현 완료!)"
-          className={`border-gray-300 focus:border-orange-500 focus:ring-orange-200 ${
-            error ? 'border-red-500' : ''
-          }`}
+          className={`border-gray-300 focus:border-orange-500 focus:ring-orange-200 ${error ? 'border-red-500' : ''}`}
           maxLength={50}
         />
         {error && <p className="text-sm text-red-500">{error}</p>}

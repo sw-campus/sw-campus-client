@@ -8,13 +8,10 @@ import type { Post } from '../api/postApi.types'
 import { PostCard } from './PostCard'
 import { PostListRow } from './PostListRow'
 
-type ViewType = 'list' | 'card'
-
-const VIEW_STORAGE_KEY = 'community-post-view-type'
-
 interface PostListProps {
   posts: Post[]
   isLoading?: boolean
+  viewType: 'list' | 'card'
 }
 
 /**
@@ -22,25 +19,7 @@ interface PostListProps {
  * - 카드형/줄형 보기 전환 지원
  * - 기본값: 줄형 (list)
  */
-export function PostList({ posts, isLoading = false }: PostListProps) {
-  const [viewType, setViewType] = useState<ViewType>('list')
-  const [isHydrated, setIsHydrated] = useState(false)
-
-  // localStorage에서 저장된 보기 타입 불러오기
-  useEffect(() => {
-    const saved = localStorage.getItem(VIEW_STORAGE_KEY) as ViewType | null
-    if (saved === 'card' || saved === 'list') {
-      setViewType(saved)
-    }
-    setIsHydrated(true)
-  }, [])
-
-  // 보기 타입 변경 시 localStorage에 저장
-  const handleViewChange = (type: ViewType) => {
-    setViewType(type)
-    localStorage.setItem(VIEW_STORAGE_KEY, type)
-  }
-
+export function PostList({ posts, isLoading = false, viewType }: PostListProps) {
   // 로딩 스켈레톤
   if (isLoading) {
     return (
@@ -97,32 +76,6 @@ export function PostList({ posts, isLoading = false }: PostListProps) {
 
   return (
     <div className="w-full">
-      {/* 보기 전환 버튼 */}
-      {isHydrated && (
-        <div className="mb-4 flex justify-end">
-          <div className="inline-flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
-            <button
-              onClick={() => handleViewChange('list')}
-              className={`flex items-center justify-center rounded-md p-2 transition-colors ${
-                viewType === 'list' ? 'bg-orange-500 text-white' : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              title="줄형 보기"
-            >
-              <FiList className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => handleViewChange('card')}
-              className={`flex items-center justify-center rounded-md p-2 transition-colors ${
-                viewType === 'card' ? 'bg-orange-500 text-white' : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              title="카드형 보기"
-            >
-              <FiGrid className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* 게시글 목록 */}
       {viewType === 'card' ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -141,9 +94,7 @@ export function PostList({ posts, isLoading = false }: PostListProps) {
               {pinnedPosts.map(post => (
                 <PostListRow key={post.id} post={post} />
               ))}
-              {regularPosts.length > 0 && (
-                <div className="my-4 border-t border-dashed border-gray-200" />
-              )}
+              {regularPosts.length > 0 && <div className="my-4 border-t border-dashed border-gray-200" />}
             </>
           )}
           {/* 일반 게시글 */}

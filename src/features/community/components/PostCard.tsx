@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { FiEye, FiHeart, FiMessageCircle, FiImage, FiMapPin } from 'react-icons/fi'
 
 import type { Post } from '../api/postApi.types'
@@ -16,18 +17,17 @@ interface PostCardProps {
  * - 썸네일, 제목, 본문 미리보기, 작성자 정보
  */
 export function PostCard({ post }: PostCardProps) {
+  const router = useRouter()
   const formattedDate = new Intl.DateTimeFormat('ko-KR', {
     month: 'short',
     day: 'numeric',
   }).format(post.createdAt)
 
   return (
-    <Link
-      href={`/community/${post.id}`}
-      className={`group flex w-full flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg ${
-        post.pinned 
-          ? 'border-orange-200 ring-1 ring-orange-100' 
-          : 'border-gray-100'
+    <div
+      onClick={() => router.push(`/community/${post.id}`)}
+      className={`group flex w-full cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg ${
+        post.pinned ? 'border-orange-200 ring-1 ring-orange-100' : 'border-gray-100'
       }`}
     >
       {/* 썸네일 */}
@@ -37,18 +37,21 @@ export function PostCard({ post }: PostCardProps) {
             src={post.thumbnailUrl}
             alt={post.title}
             fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className={`flex h-full w-full items-center justify-center ${
-            post.pinned 
-              ? 'bg-gradient-to-br from-orange-100 to-orange-200' 
-              : 'bg-gradient-to-br from-orange-50 to-orange-100'
-          }`}>
+          <div
+            className={`flex h-full w-full items-center justify-center ${
+              post.pinned
+                ? 'bg-gradient-to-br from-orange-100 to-orange-200'
+                : 'bg-gradient-to-br from-orange-50 to-orange-100'
+            }`}
+          >
             <FiImage className={`h-12 w-12 ${post.pinned ? 'text-orange-400' : 'text-orange-200'}`} />
           </div>
         )}
-        
+
         {/* 배지 영역 */}
         <div className="absolute top-3 left-3 flex gap-2">
           {post.pinned && (
@@ -67,7 +70,9 @@ export function PostCard({ post }: PostCardProps) {
       <div className="flex flex-1 flex-col p-4">
         {/* 제목 */}
         <h3 className="mb-2 line-clamp-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-orange-600">
-          {post.title}
+          <Link href={`/community/${post.id}`} onClick={e => e.stopPropagation()}>
+            {post.title}
+          </Link>
         </h3>
 
         {/* 부트캠프 성장일기: 강의명, 훈련기관명 태그 */}
@@ -84,7 +89,7 @@ export function PostCard({ post }: PostCardProps) {
           <div className="flex items-center gap-2">
             <Link
               href={`/community/user/${post.authorId}`}
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
               className="font-medium text-gray-700 transition-colors hover:text-orange-600 hover:underline"
             >
               {post.authorNickname}
@@ -105,6 +110,6 @@ export function PostCard({ post }: PostCardProps) {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }

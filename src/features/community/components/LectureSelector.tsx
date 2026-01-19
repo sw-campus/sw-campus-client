@@ -17,7 +17,7 @@ interface LectureSelectorProps {
  */
 export function LectureSelector({ selectedLecture, onOpenModal, onRemove, error }: LectureSelectorProps) {
   return (
-    <div>
+    <div id="lecture-selector">
       <label className="mb-2 block text-sm font-medium text-gray-700">
         수강 강의 * <span className="text-xs font-normal text-gray-500">(부트캠프 성장일기 전용)</span>
       </label>
