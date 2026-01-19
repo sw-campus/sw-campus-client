@@ -3,7 +3,6 @@
 import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -49,8 +48,6 @@ export default function CartCompareSection() {
     right,
     leftDetail,
     rightDetail,
-    leftOrgName,
-    rightOrgName,
     leftDetailResolved,
     rightDetailResolved,
     canUseItem,
@@ -65,7 +62,6 @@ export default function CartCompareSection() {
     isLoading: isAiLoading,
     analyze: runAiAnalyze,
     clearResult: handleClearAi,
-    hasCachedResult,
   } = useAiCompare({
     leftId,
     rightId,
@@ -161,7 +157,6 @@ export default function CartCompareSection() {
               <LectureSummaryCard
                 side="left"
                 title={left?.title ?? ''}
-                orgName={leftOrgName}
                 thumbnailUrl={leftDetail?.thumbnailUrl}
                 lectureId={leftId}
                 onClear={handleClearLeft}
@@ -193,7 +188,6 @@ export default function CartCompareSection() {
               <LectureSummaryCard
                 side="right"
                 title={right?.title ?? ''}
-                orgName={rightOrgName}
                 thumbnailUrl={rightDetail?.thumbnailUrl}
                 lectureId={rightId}
                 onClear={handleClearRight}

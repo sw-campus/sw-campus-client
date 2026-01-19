@@ -1,4 +1,5 @@
 import {
+  APPROVAL_STATUS,
   APPROVAL_STATUS_COLOR,
   APPROVAL_STATUS_FILTER_LABEL,
   APPROVAL_STATUS_LABEL,
@@ -13,7 +14,7 @@ import {
 export type { ApprovalStatus, ApprovalStatusFilter, MutationOptions, PageInfo, PageResponse }
 
 // 공통 상수 재export (기존 이름 유지)
-export { APPROVAL_STATUS_LABEL, APPROVAL_STATUS_FILTER_LABEL, APPROVAL_STATUS_COLOR }
+export { APPROVAL_STATUS, APPROVAL_STATUS_LABEL, APPROVAL_STATUS_FILTER_LABEL, APPROVAL_STATUS_COLOR }
 
 /**
  * Organization 요약 정보 (목록용)

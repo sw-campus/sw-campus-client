@@ -21,7 +21,7 @@ interface ApprovalFilterProps {
    */
   searchPlaceholder?: string
   /**
-   * 필터 옵션 목록 (기본값: 전체/승인대기/승인완료/반려)
+   * 필터 옵션 목록 (기본값: 전체/대기중/승인됨/반려됨)
    */
   filterOptions?: FilterOption<ApprovalStatusFilter>[]
   /**

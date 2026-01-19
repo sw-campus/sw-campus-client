@@ -118,13 +118,13 @@ export function ApprovalPage<TItem>({
       bgColor: APPROVAL_STAT_COLORS.total,
     },
     {
-      title: '승인 대기',
+      title: '대기중',
       value: pendingData?.page?.totalElements ?? pendingData?.content?.length ?? 0,
       icon: LuClock,
       bgColor: APPROVAL_STAT_COLORS.pending,
     },
     {
-      title: '승인 완료',
+      title: '승인됨',
       value: approvedData?.page?.totalElements ?? approvedData?.content?.length ?? 0,
       icon: LuCheck,
       bgColor: APPROVAL_STAT_COLORS.approved,

@@ -11,7 +11,6 @@ import {
   formatPcType,
   formatRecruitType,
   formatText,
-  parseMoneyLike,
 } from '@/features/cart/utils/cartCompareFormatters'
 import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
 import { cn } from '@/lib/utils'

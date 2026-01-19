@@ -15,8 +15,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ApprovalFilter } from '@/features/admin/components/common/ApprovalFilter'
 import { ApprovalPagination } from '@/features/admin/components/common/ApprovalPagination'
 import { APPROVAL_STAT_COLORS, ColorfulStatCard } from '@/features/admin/components/common/ColorfulStatCard'
-import { APPROVAL_STATUS_COLOR, APPROVAL_STATUS_LABEL } from '@/features/admin/types/approval.type'
-import type { ApprovalStatus, ApprovalStatusFilter } from '@/features/admin/types/approval.type'
+import {
+  APPROVAL_STATUS,
+  APPROVAL_STATUS_COLOR,
+  APPROVAL_STATUS_LABEL,
+  type ApprovalStatus,
+  type ApprovalStatusFilter,
+} from '@/features/admin/types/approval.type'
 import LectureEditModal from '@/features/mypage/components/Organization/LectureEditModal'
 import { OrganizationCard } from '@/features/mypage/components/Organization/OrganizationCard'
 import ReviewListModal from '@/features/mypage/components/Organization/ReviewListModal'
@@ -36,7 +41,7 @@ type Lecture = {
   lectureId: number
   lectureName: string
   lectureImageUrl?: string
-  lectureAuthStatus: 'PENDING' | 'APPROVED' | 'REJECTED'
+  lectureAuthStatus: ApprovalStatus
   status: string
   createdAt: string
   updatedAt: string
@@ -98,14 +103,14 @@ export default function OrganizationMain({ activeTab, openInfoModal, onOpenProdu
 
   // 통계 계산
   const totalCount = lectures.length
-  const approvedCount = lectures.filter(l => l.lectureAuthStatus === 'APPROVED').length
-  const pendingCount = lectures.filter(l => l.lectureAuthStatus === 'PENDING').length
-  const rejectedCount = lectures.filter(l => l.lectureAuthStatus === 'REJECTED').length
+  const approvedCount = lectures.filter(l => l.lectureAuthStatus === APPROVAL_STATUS.APPROVED).length
+  const pendingCount = lectures.filter(l => l.lectureAuthStatus === APPROVAL_STATUS.PENDING).length
+  const rejectedCount = lectures.filter(l => l.lectureAuthStatus === APPROVAL_STATUS.REJECTED).length
 
   const stats = [
     { title: '전체', value: totalCount, icon: LuList, bgColor: APPROVAL_STAT_COLORS.total },
-    { title: '승인 대기', value: pendingCount, icon: LuClock, bgColor: APPROVAL_STAT_COLORS.pending },
-    { title: '승인 완료', value: approvedCount, icon: LuCheck, bgColor: APPROVAL_STAT_COLORS.approved },
+    { title: '대기중', value: pendingCount, icon: LuClock, bgColor: APPROVAL_STAT_COLORS.pending },
+    { title: '승인됨', value: approvedCount, icon: LuCheck, bgColor: APPROVAL_STAT_COLORS.approved },
     { title: '반려', value: rejectedCount, icon: LuX, bgColor: APPROVAL_STAT_COLORS.rejected },
   ]
 
@@ -123,7 +128,7 @@ export default function OrganizationMain({ activeTab, openInfoModal, onOpenProdu
     const lecture = lectures.find(l => l.lectureId === lectureId)
     if (!lecture) return
 
-    if (lecture.lectureAuthStatus === 'PENDING' || lecture.lectureAuthStatus === 'REJECTED') {
+    if (lecture.lectureAuthStatus === APPROVAL_STATUS.PENDING || lecture.lectureAuthStatus === APPROVAL_STATUS.REJECTED) {
       toast.info('승인된 강의만 상세 페이지를 확인할 수 있습니다.')
       return
     }
@@ -247,7 +252,7 @@ export default function OrganizationMain({ activeTab, openInfoModal, onOpenProdu
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
-                              disabled={lecture.lectureAuthStatus !== 'APPROVED'}
+                              disabled={lecture.lectureAuthStatus !== APPROVAL_STATUS.APPROVED}
                               onClick={() => {
                                 setReviewLectureId(lecture.lectureId)
                                 setReviewLectureName(lecture.lectureName)
@@ -258,7 +263,7 @@ export default function OrganizationMain({ activeTab, openInfoModal, onOpenProdu
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {lecture.lectureAuthStatus === 'APPROVED' ? '리뷰 관리' : '승인 후 리뷰 관리 가능'}
+                            {lecture.lectureAuthStatus === APPROVAL_STATUS.APPROVED ? '리뷰 관리' : '승인 후 리뷰 관리 가능'}
                           </TooltipContent>
                         </Tooltip>
 

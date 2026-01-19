@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, FileText, Target } from 'lucide-react'
@@ -19,6 +19,14 @@ import { SurveyResultsStep } from './SurveyResultsStep'
 
 export type SurveyStep = 'basic' | 'aptitude' | 'results'
 
+/** 설문 상태에 따른 기본 스텝 계산 */
+function getDefaultStep(hasBasicSurvey: boolean, hasAptitudeTest: boolean): SurveyStep {
+  if (hasAptitudeTest || hasBasicSurvey) {
+    return 'results'
+  }
+  return 'basic'
+}
+
 interface SurveyContainerProps {
   embedded?: boolean
   onComplete?: () => void
@@ -26,24 +34,23 @@ interface SurveyContainerProps {
 
 export function SurveyContainer({ embedded = false, onComplete }: SurveyContainerProps) {
   const { data: survey, isLoading, refetch } = useSurveyQuery()
-  const [currentStep, setCurrentStep] = useState<SurveyStep>('basic')
   const [showContinueModal, setShowContinueModal] = useState(false)
   const [aptitudeProgress, setAptitudeProgress] = useState(0)
+  // 사용자가 직접 선택한 스텝 (null이면 서버 상태 기반으로 계산)
+  const [userSelectedStep, setUserSelectedStep] = useState<SurveyStep | null>(null)
 
-  // 설문 상태에 따라 초기 스텝 결정 (primitive 값으로 의존성 분리하여 무한 루프 방지)
+  // 설문 상태에 따라 스텝 결정
   const hasBasicSurvey = survey?.status?.hasBasicSurvey ?? false
   const hasAptitudeTest = survey?.status?.hasAptitudeTest ?? false
 
-  useEffect(() => {
-    if (hasAptitudeTest) {
-      setCurrentStep('results')
-    } else if (hasBasicSurvey) {
-      // 기초 설문만 완료된 경우 results 화면에서 성향 테스트 유도
-      setCurrentStep('results')
-    } else {
-      setCurrentStep('basic')
-    }
-  }, [hasBasicSurvey, hasAptitudeTest])
+  // 서버 상태 기반 기본 스텝
+  const serverDefaultStep = useMemo(
+    () => getDefaultStep(hasBasicSurvey, hasAptitudeTest),
+    [hasBasicSurvey, hasAptitudeTest]
+  )
+
+  // 현재 스텝: 사용자 선택 > 서버 기본값
+  const currentStep = userSelectedStep ?? serverDefaultStep
 
   // 전체 진행률 계산 (실제 완료 여부 기준, 동적 계산)
   const calculateOverallProgress = useCallback(() => {
@@ -71,12 +78,12 @@ export function SurveyContainer({ embedded = false, onComplete }: SurveyContaine
 
   const handleContinueToAptitude = useCallback(() => {
     setShowContinueModal(false)
-    setCurrentStep('aptitude')
+    setUserSelectedStep('aptitude')
   }, [])
 
   const handleSkipToResults = useCallback(() => {
     setShowContinueModal(false)
-    setCurrentStep('results')
+    setUserSelectedStep('results')
   }, [])
 
   const handleAptitudeProgressChange = useCallback((answered: number) => {
@@ -87,7 +94,7 @@ export function SurveyContainer({ embedded = false, onComplete }: SurveyContaine
     // 임시 저장 데이터 삭제
     localStorage.removeItem(APTITUDE_TEST_STORAGE_KEY)
     refetch()
-    setCurrentStep('results')
+    setUserSelectedStep('results')
     // 결과 화면을 보여주기 위해 onComplete는 호출하지 않음
   }, [refetch])
 
@@ -96,11 +103,11 @@ export function SurveyContainer({ embedded = false, onComplete }: SurveyContaine
   }, [onComplete])
 
   const handleRetakeAptitude = useCallback(() => {
-    setCurrentStep('aptitude')
+    setUserSelectedStep('aptitude')
   }, [])
 
   const handleEditBasic = useCallback(() => {
-    setCurrentStep('basic')
+    setUserSelectedStep('basic')
   }, [])
 
   // 스텝 인디케이터
@@ -161,7 +168,7 @@ export function SurveyContainer({ embedded = false, onComplete }: SurveyContaine
 
             const handleStepClick = () => {
               if (isClickable && !isActive) {
-                setCurrentStep(step.id as SurveyStep)
+                setUserSelectedStep(step.id as SurveyStep)
               }
             }
 

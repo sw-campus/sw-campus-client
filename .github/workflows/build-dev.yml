@@ -47,8 +47,8 @@ jobs:
           # NEXT_PUBLIC_ variables only for build
           # develop 환경: VM IP + 서버 포트로 직접 연결
           docker build \
-            --build-arg NEXT_PUBLIC_API_URL="https://sw-campus-dev.tail0ffc99.ts.net/api" \
-            --build-arg NEXT_PUBLIC_BASE_URL="https://sw-campus-dev.tail0ffc99.ts.net" \
+            --build-arg NEXT_PUBLIC_API_URL=${{ secrets.DEV_NEXT_PUBLIC_API_URL }} \
+            --build-arg NEXT_PUBLIC_BASE_URL=${{ secrets.DEV_NEXT_PUBLIC_BASE_URL }} \
             --build-arg NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID }} \
             --build-arg NEXT_PUBLIC_S3_HOSTNAME=${{ secrets.NEXT_PUBLIC_S3_HOSTNAME }} \
             --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }} \
@@ -93,7 +93,7 @@ jobs:
         if: steps.cpr.outputs.pull-request-number
         run: |
           cd manifest
-          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} --squash --delete-branch
+          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} --merge --delete-branch
         env:
           GH_TOKEN: ${{ secrets.MANIFEST_REPO_TOKEN }}
 

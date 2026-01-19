@@ -1,92 +1,36 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 
 import { LuAward, LuBadgeCheck, LuClipboardCheck, LuPencil } from 'react-icons/lu'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { api } from '@/lib/axios'
+import { APPROVAL_STATUS } from '@/features/admin/types/approval.type'
+import { useCompletedLecturesQuery } from '@/features/mypage/hooks/useCompletedLecturesQuery'
 
 import { useSurveyStatusQuery } from '../hooks/useSurvey'
-
-type CompletedLecture = {
-  certificateId: number
-  lectureId: number
-  lectureName: string
-  canWriteReview: boolean
-  reviewId?: number
-}
-
-type ReviewResponse = {
-  approvalStatus?: string
-}
 
 type ActivitySummaryProps = {
   onEditSurvey?: () => void
 }
 
 export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
-  const [lectureStats, setLectureStats] = useState({
-    completedLectures: 0,
-    approvedReviews: 0,
-  })
-  const [lectureLoading, setLectureLoading] = useState(true)
+  // React Query hooks - 캐싱으로 중복 호출 방지
+  const { data: lectures, isLoading: lecturesLoading } = useCompletedLecturesQuery()
 
   // 설문 상태는 React Query로 관리 (모달에서 변경 시 자동 반영)
   const { data: surveyStatus, isLoading: surveyLoading } = useSurveyStatusQuery()
   const hasBasicSurvey = surveyStatus?.hasBasicSurvey ?? false
   const hasAptitudeTest = surveyStatus?.hasAptitudeTest ?? false
 
-  const loading = lectureLoading || surveyLoading
+  // 승인된 후기 수 계산 (응답의 reviewStatus 직접 사용)
+  const approvedReviews = useMemo(() => {
+    if (!lectures) return 0
+    return lectures.filter(l => l.reviewStatus === APPROVAL_STATUS.APPROVED).length
+  }, [lectures])
 
-  useEffect(() => {
-    let mounted = true
-
-    const loadLectureStats = async () => {
-      try {
-        setLectureLoading(true)
-
-        // 수료 강의 목록
-        const lecturesRes = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
-        const lectures = Array.isArray(lecturesRes.data) ? lecturesRes.data : []
-        const completedCount = lectures.length
-
-        // 승인된 후기 수 계산
-        let approvedCount = 0
-        const reviewLectures = lectures.filter(l => !l.canWriteReview)
-        if (reviewLectures.length > 0) {
-          const results = await Promise.all(
-            reviewLectures.map(async l => {
-              try {
-                const { data } = await api.get<ReviewResponse>(`/mypage/completed-lectures/${l.lectureId}/review`)
-                return String(data?.approvalStatus ?? '').toUpperCase() === 'APPROVED'
-              } catch {
-                return false
-              }
-            }),
-          )
-          approvedCount = results.filter(Boolean).length
-        }
-
-        if (mounted) {
-          setLectureStats({
-            completedLectures: completedCount,
-            approvedReviews: approvedCount,
-          })
-        }
-      } catch {
-        // ignore
-      } finally {
-        if (mounted) setLectureLoading(false)
-      }
-    }
-
-    loadLectureStats()
-    return () => {
-      mounted = false
-    }
-  }, [])
+  const loading = lecturesLoading || surveyLoading
 
   return (
     <Card className="bg-card">
@@ -105,7 +49,7 @@ export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
               <div className="text-muted-foreground">
                 <LuAward className="h-5 w-5" />
               </div>
-              <span className="text-foreground text-xl font-bold">{lectureStats.completedLectures}개</span>
+              <span className="text-foreground text-xl font-bold">{lectures?.length ?? 0}개</span>
               <span className="text-muted-foreground text-xs">수료 강의</span>
             </div>
 
@@ -114,7 +58,7 @@ export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
               <div className="text-muted-foreground">
                 <LuBadgeCheck className="h-5 w-5" />
               </div>
-              <span className="text-foreground text-xl font-bold">{lectureStats.approvedReviews}개</span>
+              <span className="text-foreground text-xl font-bold">{approvedReviews}개</span>
               <span className="text-muted-foreground text-xs">승인된 후기</span>
             </div>
 

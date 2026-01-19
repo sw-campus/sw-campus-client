@@ -17,7 +17,6 @@ type Props = {
 export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
   const {
     control,
-    setValue,
     formState: { errors },
   } = useFormContext<LectureFormValues>()
 

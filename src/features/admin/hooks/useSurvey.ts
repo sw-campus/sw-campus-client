@@ -298,7 +298,7 @@ export function useReorderOptionMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ setId, questionId, optionId, newOrder }: { setId: number; questionId: number; optionId: number; newOrder: number }) =>
+    mutationFn: ({ questionId, optionId, newOrder }: { setId: number; questionId: number; optionId: number; newOrder: number }) =>
       reorderOption(questionId, optionId, newOrder),
     onSuccess: (_data, { setId }) => {
       queryClient.invalidateQueries({

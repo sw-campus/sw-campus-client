@@ -44,9 +44,9 @@ export function LectureApprovalPage() {
 
   const stats = [
     { title: '전체', value: statsData?.total ?? 0, icon: LuList, bgColor: APPROVAL_STAT_COLORS.total },
-    { title: '승인 대기', value: statsData?.pending ?? 0, icon: LuClock, bgColor: APPROVAL_STAT_COLORS.pending },
-    { title: '승인 완료', value: statsData?.approved ?? 0, icon: LuCheck, bgColor: APPROVAL_STAT_COLORS.approved },
-    { title: '반려', value: statsData?.rejected ?? 0, icon: LuX, bgColor: APPROVAL_STAT_COLORS.rejected },
+    { title: '대기중', value: statsData?.pending ?? 0, icon: LuClock, bgColor: APPROVAL_STAT_COLORS.pending },
+    { title: '승인됨', value: statsData?.approved ?? 0, icon: LuCheck, bgColor: APPROVAL_STAT_COLORS.approved },
+    { title: '반려됨', value: statsData?.rejected ?? 0, icon: LuX, bgColor: APPROVAL_STAT_COLORS.rejected },
   ]
 
   const handleViewDetail = (item: LectureSummary) => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Controller, useFormContext } from 'react-hook-form'
@@ -17,21 +17,17 @@ type OrganizationSearchInputProps = {
 }
 
 export function OrganizationSearchInput({ initialOrgName = '' }: OrganizationSearchInputProps) {
-  const { control, setValue, watch } = useFormContext()
+  const { control, setValue } = useFormContext()
   const [open, setOpen] = useState(false)
   const [keyword, setKeyword] = useState('')
-  const [selectedOrgName, setSelectedOrgName] = useState(initialOrgName)
+  // 사용자가 직접 선택한 기관명만 저장 (null이면 initialOrgName 사용)
+  const [userSelectedOrgName, setUserSelectedOrgName] = useState<string | null>(null)
 
   // Use public API hook which returns OrganizationSummary[] directly
   const { data: orgData, isLoading } = useOrganizationsQuery(keyword)
-  const orgId = watch('orgId')
 
-  // initialOrgName이 변경되면 selectedOrgName 업데이트
-  useEffect(() => {
-    if (initialOrgName) {
-      setSelectedOrgName(initialOrgName)
-    }
-  }, [initialOrgName])
+  // 표시할 기관명: 사용자 선택 > 초기값
+  const displayOrgName = userSelectedOrgName ?? initialOrgName
 
   return (
     <Field>
@@ -50,7 +46,7 @@ export function OrganizationSearchInput({ initialOrgName = '' }: OrganizationSea
                     aria-expanded={open}
                     className={cn('w-full justify-between', !field.value && 'text-muted-foreground')}
                   >
-                    {selectedOrgName || initialOrgName || (field.value ? '기관이 선택됨' : '기관을 검색해 주세요')}
+                    {displayOrgName || (field.value ? '기관이 선택됨' : '기관을 검색해 주세요')}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -84,7 +80,7 @@ export function OrganizationSearchInput({ initialOrgName = '' }: OrganizationSea
                           )}
                           onClick={() => {
                             setValue('orgId', org.id)
-                            setSelectedOrgName(org.name)
+                            setUserSelectedOrgName(org.name)
                             setOpen(false)
                           }}
                         >

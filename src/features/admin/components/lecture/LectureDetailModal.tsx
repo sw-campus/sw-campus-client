@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- 동적 외부 URL (강사 이미지) 사용 */
 'use client'
 
 import { Badge } from '@/components/ui/badge'
@@ -16,6 +17,7 @@ import { cn } from '@/lib/utils'
 import { useLectureDetailQuery } from '../../hooks/useLectures'
 import {
   CURRICULUM_LEVEL_LABEL,
+  LECTURE_AUTH_STATUS,
   LECTURE_AUTH_STATUS_COLOR,
   LECTURE_AUTH_STATUS_LABEL,
   type LectureAuthStatus,
@@ -209,7 +211,7 @@ export function LectureDetailModal({
               수정
             </Button>
           )}
-          {lecture.lectureAuthStatus === 'PENDING' && (
+          {lecture.lectureAuthStatus === LECTURE_AUTH_STATUS.PENDING && (
             <>
               <Button
                 onClick={handleApprove}

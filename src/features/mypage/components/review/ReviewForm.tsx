@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
+import { APPROVAL_STATUS } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 
 type ReviewFormProps = {
@@ -117,7 +118,7 @@ export function ReviewForm({
           if (!mounted) return
           setResolvedReviewId(res.data?.reviewId ?? null)
           setComment(res.data?.comment ?? '')
-          setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === 'APPROVED')
+          setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === APPROVAL_STATUS.APPROVED)
 
           const details = Array.isArray(res.data?.detailScores) ? res.data.detailScores : []
           setDetailScores(
@@ -135,7 +136,7 @@ export function ReviewForm({
           if (!mounted) return
           setResolvedReviewId(res.data?.reviewId ?? reviewId)
           setComment(res.data?.comment ?? '')
-          setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === 'APPROVED')
+          setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === APPROVAL_STATUS.APPROVED)
 
           const details = Array.isArray(res.data?.detailScores) ? res.data.detailScores : []
           setDetailScores(

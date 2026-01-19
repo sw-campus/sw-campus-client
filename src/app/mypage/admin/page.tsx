@@ -1,10 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { FiEdit3 } from 'react-icons/fi'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ProfileCard } from '@/features/mypage/components/ProfileCard'
 
 export default function AdminMyPage() {

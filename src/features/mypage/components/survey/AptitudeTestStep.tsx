@@ -11,12 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 
 import { SURVEY_MESSAGES } from '../../constants/surveyMessages'
-import {
-  ALL_APTITUDE_QUESTIONS as FALLBACK_QUESTIONS,
-  PART1_QUESTIONS as FALLBACK_PART1,
-  PART2_QUESTIONS as FALLBACK_PART2,
-  PART3_QUESTIONS as FALLBACK_PART3,
-} from '../../constants/surveyQuestions'
+import { ALL_APTITUDE_QUESTIONS as FALLBACK_QUESTIONS } from '../../constants/surveyQuestions'
 import { usePublishedQuestionSetQuery, useSubmitAptitudeTestMutation } from '../../hooks/useSurvey'
 import type { AptitudeQuestion, JobTypeCode, SubmitAptitudeTestRequest } from '../../types/survey.type'
 import { APTITUDE_TEST_STORAGE_KEY, mapQuestionSetToAptitudeQuestions } from '../../types/survey.type'
@@ -116,12 +111,13 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
     if (savedVersion !== questionSet.version) {
       const resetAnswers = { ...DEFAULT_DRAFT, questionSetVersion: questionSet.version }
       setAnswers(resetAnswers)
-      saveToLocalStorage(resetAnswers)
       setCurrentIndex(0)
+      saveToLocalStorage(resetAnswers)
       toast.info('문항이 변경되어 처음부터 다시 시작합니다.')
     }
 
     versionCheckedRef.current = true
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- answers는 의도적으로 제외 (무한 루프 방지)
   }, [questionSet, answers.questionSetVersion, saveToLocalStorage])
 
   // 진행률을 상위 컴포넌트에 전달

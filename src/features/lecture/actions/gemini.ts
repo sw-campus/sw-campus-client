@@ -367,7 +367,7 @@ export async function compareCoursesWithAI(
         ...parsed,
         recommendationLevel: userSurvey.recommendationLevel,
       }
-    } catch (parseError) {
+    } catch {
       console.error('JSON Parse Error. Raw Text:', text)
       throw new Error('AI 응답을 분석할 수 없습니다.')
     }

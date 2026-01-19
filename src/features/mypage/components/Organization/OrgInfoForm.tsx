@@ -12,6 +12,7 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import { ImageUploadInput } from '@/components/ui/image-upload-input'
+import { APPROVAL_STATUS, type ApprovalStatus } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 
 type MyOrganizationResponse = {
@@ -21,7 +22,7 @@ type MyOrganizationResponse = {
   representativeName: string
   phone: string
   location: string
-  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
+  approvalStatus: ApprovalStatus | string
   certificateKey: string
   govAuth: string
   facilityImageUrl: string
@@ -59,7 +60,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
   const [isPending, setIsPending] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [organizationId, setOrganizationId] = useState<number | null>(null)
   const [approvalStatus, setApprovalStatus] = useState<string>('')
 
   const methods = useForm<OrgInfoFormValues>({
@@ -104,7 +104,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
         const data = res.data
 
-        setOrganizationId(data.organizationId ?? null)
         setApprovalStatus(data.approvalStatus ?? '')
 
         methods.reset({
@@ -165,10 +164,10 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
   }
 
   const getApprovalStatusUI = (status: string) => {
-    const s = (status || '').toLowerCase()
-    if (s === 'approved') return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
-    if (s === 'rejected') return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
-    return { label: '승인 대기', dot: 'bg-amber-500', text: 'text-amber-700' }
+    const s = (status || '').toUpperCase()
+    if (s === APPROVAL_STATUS.APPROVED) return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
+    if (s === APPROVAL_STATUS.REJECTED) return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
+    return { label: '대기중', dot: 'bg-amber-500', text: 'text-amber-700' }
   }
 
   const formContent = (

@@ -92,7 +92,8 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
           hasGovCard: !!data.hasGovCard,
           affordableAmount: data.affordableAmount ?? 0,
         })
-      } catch (e: any) {
+      } catch {
+        // API 오류 시 기본값 사용
       } finally {
         if (mounted) setIsLoading(false)
       }
