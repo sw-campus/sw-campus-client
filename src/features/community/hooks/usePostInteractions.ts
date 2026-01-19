@@ -27,23 +27,33 @@ export function useToggleLike(postId: number) {
           ...previousPost,
           isLiked: !previousPost.isLiked,
           likeCount: previousPost.isLiked
-            ? previousPost.likeCount - 1
+            ? Math.max(0, previousPost.likeCount - 1)
             : previousPost.likeCount + 1,
         })
       }
 
       return { previousPost }
     },
+    onSuccess: (data) => {
+      // 서버 응답을 기반으로 캐시 확정 (서버가 진실의 원천)
+      const currentPost = queryClient.getQueryData<PostDetail>(queryKey)
+      if (currentPost && currentPost.isLiked !== data.liked) {
+        queryClient.setQueryData<PostDetail>(queryKey, {
+          ...currentPost,
+          isLiked: data.liked,
+          likeCount: data.liked
+            ? currentPost.likeCount + 1
+            : Math.max(0, currentPost.likeCount - 1),
+        })
+      }
+      // 목록 캐시 갱신
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() })
+    },
     onError: (_err, _variables, context) => {
       // 에러 시 롤백
       if (context?.previousPost) {
         queryClient.setQueryData(queryKey, context.previousPost)
       }
-    },
-    onSettled: () => {
-      // 성공/실패 후 캐시 갱신 (상세 + 목록)
-      queryClient.invalidateQueries({ queryKey })
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() })
     },
   })
 }
@@ -74,16 +84,21 @@ export function useToggleBookmark(postId: number) {
 
       return { previousPost }
     },
+    onSuccess: (data) => {
+      // 서버 응답을 기반으로 캐시 확정 (서버가 진실의 원천)
+      const currentPost = queryClient.getQueryData<PostDetail>(queryKey)
+      if (currentPost && currentPost.isBookmarked !== data.bookmarked) {
+        queryClient.setQueryData<PostDetail>(queryKey, {
+          ...currentPost,
+          isBookmarked: data.bookmarked,
+        })
+      }
+    },
     onError: (_err, _variables, context) => {
       // 에러 시 롤백
       if (context?.previousPost) {
         queryClient.setQueryData(queryKey, context.previousPost)
       }
-    },
-    onSettled: () => {
-      // 성공/실패 후 캐시 갱신 (상세 + 목록)
-      queryClient.invalidateQueries({ queryKey })
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() })
     },
   })
 }

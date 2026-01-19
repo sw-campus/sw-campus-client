@@ -3,7 +3,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FiEye, FiHeart, FiMessageCircle, FiImage, FiMapPin } from 'react-icons/fi'
+import { FiHeart, FiMessageCircle, FiImage, FiMapPin } from 'react-icons/fi'
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 
 import type { Post } from '../api/postApi.types'
 import { ClickableTag } from './ClickableTag'
@@ -13,8 +16,10 @@ interface PostCardProps {
 }
 
 /**
- * 게시글 카드 컴포넌트 (Velog 스타일)
- * - 썸네일, 제목, 본문 미리보기, 작성자 정보
+ * 게시글 카드 컴포넌트 (모던 글래스모피즘 스타일)
+ * - 모바일에서 컴팩트한 크기
+ * - 부드러운 그라데이션 배경
+ * - 섬세한 호버 애니메이션
  */
 export function PostCard({ post }: PostCardProps) {
   const router = useRouter()
@@ -26,87 +31,101 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <div
       onClick={() => router.push(`/community/${post.id}`)}
-      className={`group flex w-full cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg ${
-        post.pinned ? 'border-orange-200 ring-1 ring-orange-100' : 'border-gray-100'
-      }`}
+      className="group cursor-pointer active:scale-[0.98] sm:active:scale-100"
     >
-      {/* 썸네일 */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-100">
-        {post.thumbnailUrl ? (
-          <Image
-            src={post.thumbnailUrl}
-            alt={post.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div
-            className={`flex h-full w-full items-center justify-center ${
-              post.pinned
-                ? 'bg-gradient-to-br from-orange-100 to-orange-200'
-                : 'bg-gradient-to-br from-orange-50 to-orange-100'
-            }`}
-          >
-            <FiImage className={`h-12 w-12 ${post.pinned ? 'text-orange-400' : 'text-orange-200'}`} />
-          </div>
-        )}
+      <div className="relative h-full overflow-hidden rounded-xl border border-gray-200/60 bg-white shadow-sm transition-all duration-300 ease-out hover:border-gray-300/80 hover:shadow-xl hover:shadow-gray-200/50 sm:rounded-2xl">
+        {/* 호버 시 나타나는 그라데이션 오버레이 */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-orange-500/[0.02] to-amber-500/[0.02] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-        {/* 배지 영역 */}
-        <div className="absolute top-3 left-3 flex gap-2">
-          {post.pinned && (
-            <span className="flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-bold text-orange-600 shadow-sm backdrop-blur-sm">
-              <FiMapPin className="h-3 w-3 fill-orange-600" />
-              공지
-            </span>
-          )}
-          <span className="rounded-full bg-orange-500 px-2.5 py-1 text-xs font-medium text-white shadow-sm">
-            {post.categoryName}
-          </span>
-        </div>
-      </div>
-
-      {/* 컨텐츠 */}
-      <div className="flex flex-1 flex-col p-4">
-        {/* 제목 */}
-        <h3 className="mb-2 line-clamp-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-orange-600">
-          <Link href={`/community/${post.id}`} onClick={e => e.stopPropagation()}>
-            {post.title}
-          </Link>
-        </h3>
-
-        {/* 부트캠프 성장일기: 강의명, 훈련기관명 태그 */}
-        {post.categoryName === '부트캠프 성장일기' && post.tags.length > 0 && (
-          <div className="mb-2 flex flex-wrap gap-1.5">
-            {post.tags.slice(0, 2).map(tag => (
-              <ClickableTag key={tag} tag={tag} maxLength={10} />
-            ))}
-          </div>
-        )}
-
-        {/* 작성자 & 통계 */}
-        <div className="mt-auto flex items-center justify-between pt-3 text-sm text-gray-500">
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/community/user/${post.authorId}`}
-              onClick={e => e.stopPropagation()}
-              className="font-medium text-gray-700 transition-colors hover:text-orange-600 hover:underline"
+        {/* 썸네일 영역 - 모바일에서 더 작은 비율 */}
+        <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9]">
+          {post.thumbnailUrl ? (
+            <>
+              <Image
+                src={post.thumbnailUrl}
+                alt={post.title}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+              />
+              {/* 이미지 위 그라데이션 오버레이 */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            </>
+          ) : (
+            <div
+              className={`flex h-full w-full items-center justify-center transition-colors duration-300 ${
+                post.pinned
+                  ? 'bg-gradient-to-br from-orange-100 via-amber-50 to-orange-100'
+                  : 'bg-gradient-to-br from-gray-50 via-gray-100/50 to-gray-50'
+              }`}
             >
-              {post.authorNickname}
-            </Link>
-            <span className="text-gray-300">·</span>
-            <span>{formattedDate}</span>
-          </div>
+              <div className="rounded-xl bg-white/60 p-3 backdrop-blur-sm sm:rounded-2xl sm:p-4">
+                <FiImage className={`h-6 w-6 sm:h-8 sm:w-8 ${post.pinned ? 'text-orange-300' : 'text-gray-300'}`} />
+              </div>
+            </div>
+          )}
 
-          <div className="flex items-center gap-3 text-xs">
-            <span className="flex items-center gap-1">
-              <FiHeart className="h-3.5 w-3.5" />
-              {post.likeCount}
+          {/* 배지 영역 */}
+          <div className="absolute top-2 left-2 flex flex-wrap gap-1.5 sm:top-3 sm:left-3 sm:gap-2">
+            {post.pinned && (
+              <span className="inline-flex items-center gap-0.5 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold text-orange-600 shadow-sm backdrop-blur-md sm:gap-1 sm:px-2.5 sm:py-1 sm:text-xs">
+                <FiMapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                공지
+              </span>
+            )}
+            <span className="rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2 py-0.5 text-[10px] font-medium text-white shadow-sm sm:px-2.5 sm:py-1 sm:text-xs">
+              {post.categoryName}
             </span>
-            <span className="flex items-center gap-1">
-              <FiMessageCircle className="h-3.5 w-3.5" />
-              {post.commentCount}
-            </span>
+          </div>
+        </div>
+
+        {/* 컨텐츠 영역 - 모바일에서 더 작은 패딩 */}
+        <div className="relative flex flex-col p-3 sm:p-4">
+          <h3 className="line-clamp-2 min-h-[2.5rem] text-[13px] leading-snug font-semibold text-gray-900 transition-colors duration-200 group-hover:text-orange-600 sm:min-h-[3rem] sm:text-[15px] sm:leading-relaxed">
+            {post.title}
+          </h3>
+
+          {/* 태그 영역 - 모바일에서 숨김 */}
+          {post.categoryName === '부트캠프 성장일기' && post.tags.length > 0 ? (
+            <div className="mt-2 hidden h-5 flex-wrap gap-1.5 overflow-hidden sm:mt-3 sm:flex sm:h-6">
+              {post.tags.slice(0, 2).map(tag => (
+                <ClickableTag key={tag} tag={tag} maxLength={10} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-2 hidden h-5 sm:mt-3 sm:block sm:h-6" />
+          )}
+
+          {/* 구분선 */}
+          <div className="my-2.5 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent sm:my-3" />
+
+          {/* 푸터 영역 */}
+          <div className="flex items-center justify-between text-[11px] sm:text-[13px]">
+            <div className="flex items-center gap-1.5 sm:gap-2.5">
+              <Avatar className="h-5 w-5 ring-1 ring-white sm:h-7 sm:w-7 sm:ring-2">
+                <AvatarFallback className="bg-gradient-to-br from-orange-100 to-amber-100 text-[8px] font-medium text-orange-700 sm:text-[10px]">
+                  {post.authorNickname?.slice(0, 2) ?? '익명'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex items-center gap-1 sm:gap-1.5">
+                <span className="max-w-[60px] truncate font-medium text-gray-800 sm:max-w-[80px]">
+                  {post.authorNickname ?? '익명'}
+                </span>
+                <span className="text-gray-300">·</span>
+                <span className="text-gray-500">{formattedDate}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-gray-500 sm:gap-3">
+              <span className="flex items-center gap-0.5 transition-colors group-hover:text-rose-500 sm:gap-1">
+                <FiHeart className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <span className="tabular-nums">{post.likeCount}</span>
+              </span>
+              <span className="flex items-center gap-0.5 transition-colors group-hover:text-blue-500 sm:gap-1">
+                <FiMessageCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <span className="tabular-nums">{post.commentCount}</span>
+              </span>
+            </div>
           </div>
         </div>
       </div>

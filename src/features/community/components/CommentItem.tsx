@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { FiCornerDownRight, FiEdit2, FiHeart, FiMessageCircle, FiTrash2, FiUser } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
@@ -9,7 +11,7 @@ import { formatRelativeTime } from '@/lib/formatRelativeTime'
 import { useAuthStore } from '@/store/authStore'
 
 import type { Comment } from '../api/commentApi.types'
-import { useDeleteComment, useUpdateComment } from '../hooks/useComments'
+import { useDeleteComment, useUpdateComment, useToggleCommentLike } from '../hooks/useComments'
 
 interface CommentItemProps {
   comment: Comment
@@ -18,15 +20,17 @@ interface CommentItemProps {
   depth?: number
 }
 
-const MAX_DEPTH = 2 // 대댓글은 2단계까지만
+const MAX_DEPTH = 3 // 권장: 3단계 (모바일 가독성 고려)
 
 export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItemProps) {
+  const router = useRouter()
   const { isLoggedIn, userType } = useAuthStore()
   const [isEditing, setIsEditing] = useState(false)
   const [editBody, setEditBody] = useState(comment.body)
-  
+
   const { mutate: updateComment, isPending: isUpdating } = useUpdateComment(postId)
   const { mutate: deleteComment, isPending: isDeleting } = useDeleteComment(postId)
+  const { mutate: toggleLike, isPending: isLiking } = useToggleCommentLike(postId)
 
   const handleUpdate = () => {
     if (!editBody.trim()) return
@@ -34,7 +38,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
       { commentId: comment.id, request: { body: editBody.trim() } },
       {
         onSuccess: () => setIsEditing(false),
-      }
+      },
     )
   }
 
@@ -43,50 +47,91 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
     deleteComment(comment.id)
   }
 
+  const handleLike = () => {
+    if (!isLoggedIn) {
+      if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
+        router.push('/login')
+      }
+      return
+    }
+    toggleLike(comment.id)
+  }
+
   const relativeTime = formatRelativeTime(comment.createdAt)
 
-  return (
-    <div className={`${depth > 0 ? 'ml-4 border-l-2 border-gray-100 pl-3 sm:ml-8 sm:pl-4' : ''}`}>
-      <div className="group rounded-lg bg-gray-50/50 p-3 transition-colors hover:bg-gray-50 sm:p-4">
-        {/* 작성자 정보 */}
-        <div className="mb-2 flex items-center justify-between">
+  // 삭제된 댓글 표시
+  if (comment.isDeleted) {
+    return (
+      <div className={`${depth > 0 ? 'ml-4 border-l-2 border-gray-100 pl-4 sm:ml-6 sm:pl-5' : ''}`}>
+        <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 p-4">
           <div className="flex items-center gap-2">
-            {depth > 0 && <FiCornerDownRight className="h-4 w-4 text-gray-400" />}
+            {depth > 0 && <FiCornerDownRight className="h-4 w-4 text-gray-300" />}
+            <p className="text-sm text-gray-400 italic">삭제된 댓글입니다.</p>
+          </div>
+        </div>
+
+        {/* 대댓글은 여전히 표시 */}
+        {comment.replies.length > 0 && (
+          <div className="mt-3 space-y-3">
+            {comment.replies.map(reply => (
+              <CommentItem key={reply.id} comment={reply} postId={postId} onReply={onReply} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className={`${depth > 0 ? 'ml-4 border-l-2 border-orange-100 pl-4 sm:ml-6 sm:pl-5' : ''}`}>
+      <div className="group rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all duration-200 hover:border-gray-300/80 hover:shadow-md sm:p-5">
+        {/* 작성자 정보 */}
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            {depth > 0 && <FiCornerDownRight className="h-4 w-4 text-orange-400" />}
             <Link
               href={`/community/user/${comment.authorId}`}
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-orange-200 transition-transform hover:scale-110"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-amber-100 ring-2 ring-white transition-transform hover:scale-110"
             >
               <FiUser className="h-3.5 w-3.5 text-orange-600" />
             </Link>
-            <Link
-              href={`/community/user/${comment.authorId}`}
-              className="font-medium text-gray-800 transition-colors hover:text-orange-600 hover:underline"
-            >
-              {comment.authorNickname}
-            </Link>
-            <span className="text-xs text-gray-400">·</span>
-            <span className="text-xs text-gray-400" title={comment.createdAt.toLocaleString('ko-KR')}>
-              {relativeTime}
-            </span>
-            {comment.createdAt.getTime() !== comment.updatedAt.getTime() && (
-              <span className="text-xs text-gray-400">(수정됨)</span>
-            )}
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/community/user/${comment.authorId}`}
+                className="font-semibold text-gray-800 transition-colors hover:text-orange-600"
+              >
+                {comment.authorNickname}
+              </Link>
+              <span className="h-1 w-1 rounded-full bg-gray-300" />
+              <span className="text-xs text-gray-400" title={comment.createdAt.toLocaleString('ko-KR')}>
+                {relativeTime}
+              </span>
+              {comment.createdAt.getTime() !== comment.updatedAt.getTime() && (
+                <span className="rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-400">수정됨</span>
+              )}
+            </div>
           </div>
 
           {/* 좋아요 */}
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <FiHeart className={`h-4 w-4 sm:h-3.5 sm:w-3.5 ${comment.isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+          <button
+            onClick={handleLike}
+            disabled={isLiking}
+            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs transition-all hover:bg-rose-50 active:scale-95 ${
+              comment.isLiked ? 'bg-rose-50 font-semibold text-rose-500' : 'text-gray-500 hover:text-rose-500'
+            }`}
+          >
+            <FiHeart className={`h-3.5 w-3.5 ${comment.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
             {comment.likeCount > 0 && <span>{comment.likeCount}</span>}
-          </div>
+          </button>
         </div>
 
         {/* 본문 */}
         {isEditing ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <textarea
               value={editBody}
-              onChange={(e) => setEditBody(e.target.value)}
-              className="w-full resize-none rounded-lg border border-gray-200 p-3 text-sm focus:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-100"
+              onChange={e => setEditBody(e.target.value)}
+              className="w-full resize-none rounded-xl border border-gray-200 p-3 text-sm transition-all focus:border-orange-300 focus:ring-2 focus:ring-orange-100 focus:outline-none"
               rows={3}
             />
             <div className="flex justify-end gap-2">
@@ -97,6 +142,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
                   setIsEditing(false)
                   setEditBody(comment.body)
                 }}
+                className="rounded-lg"
               >
                 취소
               </Button>
@@ -104,34 +150,30 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
                 size="sm"
                 onClick={handleUpdate}
                 disabled={isUpdating || !editBody.trim()}
-                className="bg-orange-500 hover:bg-orange-600"
+                className="rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 shadow-sm"
               >
-                수정
+                {isUpdating ? '수정 중...' : '수정'}
               </Button>
             </div>
           </div>
         ) : (
-          <p className="whitespace-pre-wrap text-sm text-gray-700">{comment.body}</p>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-700">{comment.body}</p>
         )}
 
         {/* 이미지 */}
         {comment.imageUrl && !isEditing && (
-          <img
-            src={comment.imageUrl}
-            alt="댓글 이미지"
-            className="mt-3 max-h-48 rounded-lg object-cover"
-          />
+          <img src={comment.imageUrl} alt="댓글 이미지" className="mt-4 max-h-48 rounded-xl object-cover" />
         )}
 
-        {/* 액션 버튼 - 모바일에서 항상 표시 */}
+        {/* 액션 버튼 */}
         {isLoggedIn && !isEditing && (
-          <div className="mt-2 flex items-center gap-3 text-sm opacity-100 transition-opacity sm:mt-3 sm:gap-2 sm:text-xs sm:opacity-0 sm:group-hover:opacity-100">
+          <div className="mt-4 flex items-center gap-1 border-t border-gray-100 pt-3 text-[13px] opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
             {depth < MAX_DEPTH && onReply && (
               <button
                 onClick={() => onReply(comment.id)}
-                className="flex items-center gap-1.5 rounded-md px-2 py-1 text-gray-500 transition-colors active:bg-gray-100 sm:gap-1 sm:px-0 sm:py-0 sm:hover:text-orange-600"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-gray-500 transition-all hover:bg-orange-50 hover:text-orange-600 active:scale-95"
               >
-                <FiMessageCircle className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+                <FiMessageCircle className="h-3.5 w-3.5" />
                 답글
               </button>
             )}
@@ -139,17 +181,17 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
               <>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-1.5 rounded-md px-2 py-1 text-gray-500 transition-colors active:bg-gray-100 sm:gap-1 sm:px-0 sm:py-0 sm:hover:text-orange-600"
+                  className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-700 active:scale-95"
                 >
-                  <FiEdit2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+                  <FiEdit2 className="h-3.5 w-3.5" />
                   수정
                 </button>
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="flex items-center gap-1.5 rounded-md px-2 py-1 text-gray-500 transition-colors active:bg-gray-100 sm:gap-1 sm:px-0 sm:py-0 sm:hover:text-red-600"
+                  className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-gray-500 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-95"
                 >
-                  <FiTrash2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+                  <FiTrash2 className="h-3.5 w-3.5" />
                   삭제
                 </button>
               </>
@@ -160,15 +202,9 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
 
       {/* 대댓글 */}
       {comment.replies.length > 0 && (
-        <div className="mt-2 space-y-2">
-          {comment.replies.map((reply) => (
-            <CommentItem
-              key={reply.id}
-              comment={reply}
-              postId={postId}
-              onReply={onReply}
-              depth={depth + 1}
-            />
+        <div className="mt-3 space-y-3">
+          {comment.replies.map(reply => (
+            <CommentItem key={reply.id} comment={reply} postId={postId} onReply={onReply} depth={depth + 1} />
           ))}
         </div>
       )}

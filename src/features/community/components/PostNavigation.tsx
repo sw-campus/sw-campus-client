@@ -19,9 +19,9 @@ export function PostNavigation({ postId }: PostNavigationProps) {
 
   if (isLoading) {
     return (
-      <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
-        <div className="h-14 w-40 animate-pulse rounded-lg bg-gray-100" />
-        <div className="h-14 w-40 animate-pulse rounded-lg bg-gray-100" />
+      <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+        <div className="h-16 flex-1 rounded-2xl bg-gray-100" />
+        <div className="h-16 flex-1 rounded-2xl bg-gray-100" />
       </div>
     )
   }
@@ -31,17 +31,19 @@ export function PostNavigation({ postId }: PostNavigationProps) {
   }
 
   return (
-    <nav className="mt-6 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:mt-8 sm:flex-row sm:items-stretch sm:justify-between sm:gap-4 sm:pt-6">
+    <nav className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-4">
       {/* 이전 게시글 */}
       {data.previous ? (
         <Link
           href={`/community/${data.previous.id}`}
-          className="group flex flex-1 items-center gap-3 rounded-lg border border-gray-100 bg-white p-4 transition-all active:scale-[0.99] hover:border-orange-200 hover:bg-orange-50/30"
+          className="group flex flex-1 items-center gap-3 rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all active:scale-[0.98] hover:border-orange-200 hover:shadow-md sm:active:scale-100"
         >
-          <FiChevronLeft className="h-5 w-5 shrink-0 text-gray-400 transition-transform group-hover:-translate-x-1 group-hover:text-orange-500" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 transition-colors group-hover:bg-orange-100">
+            <FiChevronLeft className="h-5 w-5 text-gray-400 transition-all group-hover:-translate-x-0.5 group-hover:text-orange-500" />
+          </div>
           <div className="min-w-0 text-left">
-            <span className="text-xs text-gray-400">이전 글</span>
-            <p className="truncate text-sm font-medium text-gray-700 group-hover:text-orange-600">
+            <span className="text-xs font-medium text-gray-400">이전 글</span>
+            <p className="truncate text-sm font-semibold text-gray-700 transition-colors group-hover:text-orange-600">
               {data.previous.title}
             </p>
           </div>
@@ -54,15 +56,17 @@ export function PostNavigation({ postId }: PostNavigationProps) {
       {data.next ? (
         <Link
           href={`/community/${data.next.id}`}
-          className="group flex flex-1 items-center justify-end gap-3 rounded-lg border border-gray-100 bg-white p-4 transition-all active:scale-[0.99] hover:border-orange-200 hover:bg-orange-50/30"
+          className="group flex flex-1 items-center justify-end gap-3 rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all active:scale-[0.98] hover:border-orange-200 hover:shadow-md sm:active:scale-100"
         >
           <div className="min-w-0 text-right">
-            <span className="text-xs text-gray-400">다음 글</span>
-            <p className="truncate text-sm font-medium text-gray-700 group-hover:text-orange-600">
+            <span className="text-xs font-medium text-gray-400">다음 글</span>
+            <p className="truncate text-sm font-semibold text-gray-700 transition-colors group-hover:text-orange-600">
               {data.next.title}
             </p>
           </div>
-          <FiChevronRight className="h-5 w-5 shrink-0 text-gray-400 transition-transform group-hover:translate-x-1 group-hover:text-orange-500" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 transition-colors group-hover:bg-orange-100">
+            <FiChevronRight className="h-5 w-5 text-gray-400 transition-all group-hover:translate-x-0.5 group-hover:text-orange-500" />
+          </div>
         </Link>
       ) : (
         <div className="hidden flex-1 sm:block" />

@@ -42,3 +42,13 @@ export async function updateComment(commentId: number, request: UpdateCommentReq
 export async function deleteComment(commentId: number): Promise<void> {
   await api.delete(`/comments/${commentId}`)
 }
+
+/**
+ * 댓글 좋아요 토글 API
+ * POST /api/v1/comments/:commentId/like
+ * @returns liked - true: 좋아요 추가됨, false: 좋아요 취소됨
+ */
+export async function toggleCommentLike(commentId: number): Promise<{ liked: boolean }> {
+  const { data } = await api.post<{ liked: boolean }>(`/comments/${commentId}/like`)
+  return data
+}

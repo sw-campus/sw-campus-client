@@ -13,6 +13,7 @@ export interface Comment {
   updatedAt: Date
   isAuthor: boolean
   isLiked: boolean
+  isDeleted: boolean
   replies: Comment[]
 }
 
@@ -27,8 +28,9 @@ export interface ApiCommentResponse {
   likeCount: number
   createdAt: string
   updatedAt: string
-  isAuthor: boolean
-  isLiked: boolean
+  author: boolean
+  liked: boolean
+  deleted: boolean
   replies: ApiCommentResponse[]
 }
 
@@ -57,8 +59,9 @@ export function mapApiComment(api: ApiCommentResponse): Comment {
     likeCount: api.likeCount,
     createdAt: new Date(api.createdAt),
     updatedAt: new Date(api.updatedAt),
-    isAuthor: api.isAuthor,
-    isLiked: api.isLiked,
+    isAuthor: api.author,
+    isLiked: api.liked,
+    isDeleted: api.deleted,
     replies: api.replies.map(mapApiComment),
   }
 }

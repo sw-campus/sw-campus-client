@@ -9,7 +9,7 @@ interface ClickableTagProps {
   maxLength?: number
   /** 추가 CSS 클래스 */
   className?: string
-  /** 버튼 스타일 (기본: 링크 스타일) */
+  /** 버튼 스타일 (기본: chip 스타일) */
   variant?: 'link' | 'chip'
 }
 
@@ -17,16 +17,16 @@ interface ClickableTagProps {
  * 클릭 가능한 태그 컴포넌트
  * 클릭 시 해당 태그로 필터링된 게시글 목록으로 이동
  */
-export function ClickableTag({ 
-  tag, 
+export function ClickableTag({
+  tag,
   maxLength = 20,
   className = '',
-  variant = 'link'
+  variant = 'chip'
 }: ClickableTagProps) {
   const router = useRouter()
-  
-  const displayText = maxLength && tag.length > maxLength 
-    ? tag.slice(0, maxLength) + '...' 
+
+  const displayText = maxLength && tag.length > maxLength
+    ? tag.slice(0, maxLength) + '...'
     : tag
 
   const handleClick = (e: MouseEvent) => {
@@ -36,16 +36,17 @@ export function ClickableTag({
   }
 
   const baseStyles = variant === 'chip'
-    ? 'cursor-pointer rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-600 transition-colors hover:bg-orange-100 hover:text-orange-600'
-    : 'cursor-pointer text-xs text-gray-500 transition-colors hover:text-orange-600'
+    ? 'inline-flex cursor-pointer items-center gap-1 rounded-full bg-gradient-to-r from-gray-50 to-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200/60 transition-all duration-200 hover:from-orange-50 hover:to-amber-50 hover:text-orange-600 hover:ring-orange-200/60 hover:shadow-sm active:scale-95'
+    : 'cursor-pointer text-xs font-medium text-gray-500 transition-all duration-200 hover:text-orange-600'
 
   return (
     <span
       onClick={handleClick}
       className={`${baseStyles} ${className}`}
+      title={tag}
     >
-      #{displayText}
+      <span className={variant === 'chip' ? 'text-gray-400 transition-colors group-hover:text-orange-400' : ''}>#</span>
+      {displayText}
     </span>
   )
 }
-
