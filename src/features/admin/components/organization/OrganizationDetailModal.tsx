@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils'
 
 import { useOrganizationDetailQuery } from '../../hooks/useOrganizations'
 import {
+  APPROVAL_STATUS,
   APPROVAL_STATUS_COLOR,
   APPROVAL_STATUS_LABEL,
   type ApprovalStatus,
@@ -120,7 +121,7 @@ export function OrganizationDetailModal({
         )}
 
         <DialogFooter>
-          {organization.approvalStatus === 'PENDING' && (
+          {organization.approvalStatus === APPROVAL_STATUS.PENDING && (
             <>
               <Button
                 onClick={handleApprove}

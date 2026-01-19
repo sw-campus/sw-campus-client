@@ -7,7 +7,7 @@ import { LuSearch } from 'react-icons/lu'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
-import { APPROVAL_STATUS_FILTER_LABEL, type ApprovalStatusFilter } from '../../types/organization.type'
+import { APPROVAL_STATUS, APPROVAL_STATUS_FILTER_LABEL, type ApprovalStatusFilter } from '../../types/organization.type'
 
 interface OrganizationFilterProps {
   currentStatus: ApprovalStatusFilter
@@ -18,9 +18,9 @@ interface OrganizationFilterProps {
 
 const filterOptions: { label: string; value: ApprovalStatusFilter }[] = [
   { label: APPROVAL_STATUS_FILTER_LABEL.ALL, value: 'ALL' },
-  { label: APPROVAL_STATUS_FILTER_LABEL.PENDING, value: 'PENDING' },
-  { label: APPROVAL_STATUS_FILTER_LABEL.APPROVED, value: 'APPROVED' },
-  { label: APPROVAL_STATUS_FILTER_LABEL.REJECTED, value: 'REJECTED' },
+  { label: APPROVAL_STATUS_FILTER_LABEL.PENDING, value: APPROVAL_STATUS.PENDING },
+  { label: APPROVAL_STATUS_FILTER_LABEL.APPROVED, value: APPROVAL_STATUS.APPROVED },
+  { label: APPROVAL_STATUS_FILTER_LABEL.REJECTED, value: APPROVAL_STATUS.REJECTED },
 ]
 
 export function OrganizationFilter({

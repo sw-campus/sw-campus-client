@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { FieldPath, FormProvider, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -49,16 +49,24 @@ export function AdminLectureRegisterModal({ isOpen, onClose }: AdminLectureRegis
     formState: { isSubmitting },
     trigger,
     reset,
-    watch,
+    control,
   } = methods
-  const categoryId = watch('categoryId')
+  const categoryId = useWatch({ control, name: 'categoryId' })
 
-  useEffect(() => {
-    if (isOpen) {
-      reset(lectureCreateFormDefaultValues)
-      setCurrentStep(0)
-    }
-  }, [isOpen, reset])
+  // 모달 닫을 때 상태 초기화
+  const handleClose = useCallback(() => {
+    reset(lectureCreateFormDefaultValues)
+    setCurrentStep(0)
+    onClose()
+  }, [reset, onClose])
+
+  // Dialog의 onOpenChange 핸들러
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) handleClose()
+    },
+    [handleClose]
+  )
 
   // 단계 이동 시 스크롤 최상단으로 이동
   useEffect(() => {
@@ -71,9 +79,8 @@ export function AdminLectureRegisterModal({ isOpen, onClose }: AdminLectureRegis
     }
     // 기존 스텝 인덱스는 1부터 시작하므로 -1 해줌
     const originalStepIndex = currentStep - 1
-    const fields = stepFields[originalStepIndex as keyof typeof stepFields]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const isValid = await trigger(fields as any)
+    const fields = stepFields[originalStepIndex as keyof typeof stepFields] as FieldPath<LectureFormValues>[]
+    const isValid = await trigger(fields)
     return isValid
   }
 
@@ -145,7 +152,7 @@ export function AdminLectureRegisterModal({ isOpen, onClose }: AdminLectureRegis
       teacherImageFiles: teacherImageFiles.length > 0 ? (teacherImageFiles as File[]) : undefined,
     })
     toast.success('강의가 성공적으로 등록되었습니다.')
-    onClose()
+    handleClose()
   }
 
   const isLastStep = currentStep === TOTAL_STEPS - 1
@@ -161,7 +168,7 @@ export function AdminLectureRegisterModal({ isOpen, onClose }: AdminLectureRegis
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent id="admin-lecture-create-scroll-area" className="max-h-[90vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>강의 등록 (관리자)</DialogTitle>
@@ -208,7 +215,7 @@ export function AdminLectureRegisterModal({ isOpen, onClose }: AdminLectureRegis
                   </span>
 
                   <div className="flex gap-2">
-                    <Button type="button" variant="outline" onClick={onClose}>
+                    <Button type="button" variant="outline" onClick={handleClose}>
                       취소
                     </Button>
                     {isLastStep ? (

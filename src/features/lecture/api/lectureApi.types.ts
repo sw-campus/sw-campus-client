@@ -1,3 +1,49 @@
+/** API 응답: 모집 절차 단계 */
+interface ApiStep {
+  stepOrder: number
+  stepType: string
+}
+
+/** API 응답: 추가 혜택 */
+interface ApiAdd {
+  addName: string
+}
+
+/** API 응답: 지원 자격 */
+interface ApiQual {
+  type: string
+  text: string
+}
+
+/** API 응답: 커리큘럼 (중첩 구조 호환) */
+interface ApiCurriculum {
+  level: string
+  curriculumName?: string
+  curriculum?: {
+    curriculumName: string
+  }
+}
+
+/** API 응답: 강사 정보 (다양한 구조 호환) */
+interface ApiTeacher {
+  teacherName?: string
+  name?: string
+  teacherDescription?: string
+  teacherDesc?: string
+  desc?: string
+  teacherImageUrl?: string
+  imageUrl?: string
+  teacher?: {
+    teacherName?: string
+    name?: string
+    teacherDescription?: string
+    teacherDesc?: string
+    desc?: string
+    teacherImageUrl?: string
+    imageUrl?: string
+  }
+}
+
 // 백엔드 API 응답 타입 (서버에서 내려주는 강의 상세 데이터 구조)
 export interface ApiLectureDetail {
   lectureId: number
@@ -36,12 +82,12 @@ export interface ApiLectureDetail {
   deadline: string
   totalDays: number
   totalTimes: number
-  steps: any[]
-  adds: any[]
-  quals: any[]
-  teachers: any[]
+  steps: ApiStep[]
+  adds: ApiAdd[]
+  quals: ApiQual[]
+  teachers: (string | ApiTeacher)[]
   categoryName: string
-  curriculums: any[]
+  curriculums: ApiCurriculum[]
   orgLogoUrl: string
   orgFacilityImageUrls: string[]
   averageScore: number

@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { LuImage, LuPencil, LuStar, LuUpload } from 'react-icons/lu'
 import { toast } from 'sonner'
 
@@ -11,31 +12,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  APPROVAL_STATUS,
+  getApprovalStatusLabel,
+  getApprovalStatusColor,
+  canEditByStatus,
+} from '@/features/admin/types/approval.type'
+import type { CompletedLecture } from '@/features/mypage/api/completedLectures.api'
 import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
-import { api } from '@/lib/axios'
-
-type CertificateStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
-
-type CompletedLecture = {
-  certificateId: number
-  lectureId: number
-  lectureName: string
-  lectureImageUrl?: string
-  organizationName: string
-  certifiedAt: string
-  canWriteReview: boolean
-  reviewId?: number
-  certificateImageUrl?: string
-  certificateStatus?: CertificateStatus
-}
-
-type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+import { completedLecturesQueryKey, useCompletedLecturesQuery } from '@/features/mypage/hooks/useCompletedLecturesQuery'
 
 export function ReviewManagementSection() {
-  // Reviews state
-  const [lectures, setLectures] = useState<CompletedLecture[] | null>(null)
-  const [lecturesLoading, setLecturesLoading] = useState(true)
-  const [reviewStatuses, setReviewStatuses] = useState<Map<number, ReviewStatus>>(new Map())
+  const queryClient = useQueryClient()
+
+  // React Query hooks - 캐싱으로 중복 호출 방지
+  // reviewStatus가 응답에 포함되어 별도 API 호출 불필요
+  const { data: lectures, isLoading } = useCompletedLecturesQuery()
 
   // Edit review modal
   const [editOpen, setEditOpen] = useState(false)
@@ -57,132 +49,18 @@ export function ReviewManagementSection() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fullImageUrl, setFullImageUrl] = useState<string | null>(null)
 
-  // Load lectures on mount
-  useEffect(() => {
-    let cancelled = false
-
-    const fetchLectures = async () => {
-      try {
-        setLecturesLoading(true)
-        const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
-        if (!cancelled) setLectures(Array.isArray(data) ? data : [])
-      } catch {
-        if (!cancelled) toast.error('강의 목록을 불러오지 못했습니다.')
-      } finally {
-        if (!cancelled) setLecturesLoading(false)
-      }
-    }
-
-    fetchLectures()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  // Hydrate review statuses
-  useEffect(() => {
-    if (!lectures || lectures.length === 0) return
-
-    let cancelled = false
-
-    const hydrateStatuses = async () => {
-      const targetLectures = lectures.filter(l => !l.canWriteReview)
-      if (targetLectures.length === 0) return
-
-      try {
-        const results = await Promise.all(
-          targetLectures.map(async l => {
-            try {
-              const { data } = await api.get<{ approvalStatus?: string }>(
-                `/mypage/completed-lectures/${l.lectureId}/review`,
-              )
-              const statusStr = String(data?.approvalStatus ?? '').toUpperCase()
-              let status: ReviewStatus = 'PENDING'
-              if (statusStr === 'APPROVED') status = 'APPROVED'
-              else if (statusStr === 'REJECTED') status = 'REJECTED'
-              return { lectureId: l.lectureId, status }
-            } catch {
-              return { lectureId: l.lectureId, status: 'PENDING' as ReviewStatus }
-            }
-          }),
-        )
-
-        if (cancelled) return
-        setReviewStatuses(prev => {
-          const next = new Map(prev)
-          for (const r of results) {
-            next.set(r.lectureId, r.status)
-          }
-          return next
-        })
-      } catch {
-        // ignore
-      }
-    }
-
-    hydrateStatuses()
-    return () => {
-      cancelled = true
-    }
-  }, [lectures])
-
-  const formatDate = (iso?: string) => {
-    if (!iso) return ''
-    try {
-      return new Date(iso).toLocaleDateString()
-    } catch {
-      return iso
-    }
+  const getStatusLabel = (lecture: CompletedLecture): string => {
+    if (lecture.canWriteReview) return '작성 가능'
+    return getApprovalStatusLabel(lecture.reviewStatus)
   }
 
-  const getStatusLabel = (lectureId: number, canWriteReview: boolean): string => {
-    if (canWriteReview) return '작성 가능'
-    const status = reviewStatuses.get(lectureId)
-    if (status === 'APPROVED') return '승인됨'
-    if (status === 'REJECTED') return '반려됨'
-    return '대기중'
+  const getStatusBadgeClass = (lecture: CompletedLecture): string => {
+    if (lecture.canWriteReview) return 'bg-gray-400 text-white'
+    return getApprovalStatusColor(lecture.reviewStatus)
   }
 
-  const getStatusBadgeClass = (lectureId: number, canWriteReview: boolean): string => {
-    if (canWriteReview) return 'bg-gray-400 text-white'
-    const status = reviewStatuses.get(lectureId)
-    if (status === 'APPROVED') return 'bg-emerald-500 text-white'
-    if (status === 'REJECTED') return 'bg-rose-500 text-white'
-    return 'bg-amber-500 text-white' // PENDING
-  }
-
-  const isReadOnly = (lectureId: number): boolean => {
-    const status = reviewStatuses.get(lectureId)
-    return status === 'APPROVED' || status === 'REJECTED'
-  }
-
-  // Certificate status helpers
-  const getCertStatusLabel = (status?: CertificateStatus) => {
-    switch (status) {
-      case 'APPROVED':
-        return '승인됨'
-      case 'REJECTED':
-        return '반려됨'
-      case 'PENDING':
-      default:
-        return '대기중'
-    }
-  }
-
-  const getCertStatusBadgeClass = (status?: CertificateStatus) => {
-    switch (status) {
-      case 'APPROVED':
-        return 'bg-emerald-500 text-white'
-      case 'REJECTED':
-        return 'bg-rose-500 text-white'
-      case 'PENDING':
-      default:
-        return 'bg-amber-500 text-white'
-    }
-  }
-
-  const canEditCertificate = (status?: CertificateStatus) => {
-    return status !== 'APPROVED'
+  const isReadOnly = (lecture: CompletedLecture): boolean => {
+    return lecture.reviewStatus === APPROVAL_STATUS.APPROVED || lecture.reviewStatus === APPROVAL_STATUS.REJECTED
   }
 
   const handleFileSelect = (file: File) => {
@@ -212,8 +90,8 @@ export function ReviewManagementSection() {
       const { updateCertificateImage } = await import('@/features/certificate/api/certificate.api')
       await updateCertificateImage(selectedCertificate.certificateId, selectedFile)
 
-      // 목록 갱신
-      await refreshLectures()
+      // 캐시 무효화로 목록 갱신
+      await queryClient.invalidateQueries({ queryKey: completedLecturesQueryKey })
       setCertImageOpen(false)
       setSelectedCertificate(null)
       handleCancelFileSelect()
@@ -226,13 +104,7 @@ export function ReviewManagementSection() {
   }
 
   const refreshLectures = async () => {
-    try {
-      setLecturesLoading(true)
-      const { data } = await api.get<CompletedLecture[]>('/mypage/completed-lectures')
-      setLectures(Array.isArray(data) ? data : [])
-    } finally {
-      setLecturesLoading(false)
-    }
+    await queryClient.invalidateQueries({ queryKey: completedLecturesQueryKey })
   }
 
   return (
@@ -241,7 +113,7 @@ export function ReviewManagementSection() {
         <CardTitle className="text-foreground text-lg">내 후기 관리</CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
-        {lecturesLoading ? (
+        {isLoading ? (
           <div className="flex h-32 items-center justify-center">
             <span className="text-muted-foreground text-sm">불러오는 중...</span>
           </div>
@@ -270,30 +142,30 @@ export function ReviewManagementSection() {
                         {l.lectureName}
                         {/* Mobile info */}
                         <div className="mt-1 flex items-center gap-2 sm:hidden">
-                          <Badge variant="secondary" className={`text-xs ${getCertStatusBadgeClass(l.certificateStatus)}`}>
-                            {getCertStatusLabel(l.certificateStatus)}
+                          <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
+                            {getApprovalStatusLabel(l.certificateStatus)}
                           </Badge>
                           <Badge
                             variant="secondary"
-                            className={`text-xs ${getStatusBadgeClass(l.lectureId, l.canWriteReview)}`}
+                            className={`text-xs ${getStatusBadgeClass(l)}`}
                           >
-                            {getStatusLabel(l.lectureId, l.canWriteReview)}
+                            {getStatusLabel(l)}
                           </Badge>
                         </div>
                       </TableCell>
                       {/* 수료증 상태 */}
                       <TableCell className="hidden sm:table-cell">
-                        <Badge variant="secondary" className={`text-xs ${getCertStatusBadgeClass(l.certificateStatus)}`}>
-                          {getCertStatusLabel(l.certificateStatus)}
+                        <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
+                          {getApprovalStatusLabel(l.certificateStatus)}
                         </Badge>
                       </TableCell>
                       {/* 후기 상태 */}
                       <TableCell className="hidden sm:table-cell">
                         <Badge
                           variant="secondary"
-                          className={`text-xs ${getStatusBadgeClass(l.lectureId, l.canWriteReview)}`}
+                          className={`text-xs ${getStatusBadgeClass(l)}`}
                         >
-                          {getStatusLabel(l.lectureId, l.canWriteReview)}
+                          {getStatusLabel(l)}
                         </Badge>
                       </TableCell>
                       {/* 관리 버튼: 수료증 + 후기 */}
@@ -316,7 +188,7 @@ export function ReviewManagementSection() {
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              {canEditCertificate(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
+                              {canEditByStatus(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
                             </TooltipContent>
                           </Tooltip>
                           {/* 후기 버튼 */}
@@ -348,14 +220,14 @@ export function ReviewManagementSection() {
                                   onClick={() => {
                                     setSelectedReviewId(l.reviewId ?? null)
                                     setSelectedLectureId(l.lectureId)
-                                    setSelectedReviewReadOnly(isReadOnly(l.lectureId))
+                                    setSelectedReviewReadOnly(isReadOnly(l))
                                     setEditOpen(true)
                                   }}
                                 >
                                   <LuPencil className="h-4 w-4" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>{isReadOnly(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}</TooltipContent>
+                              <TooltipContent>{isReadOnly(l) ? '리뷰 조회' : '리뷰 수정'}</TooltipContent>
                             </Tooltip>
                           )}
                         </div>
@@ -427,7 +299,7 @@ export function ReviewManagementSection() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-foreground text-xl font-bold">
-              {selectedCertificate && canEditCertificate(selectedCertificate.certificateStatus)
+              {selectedCertificate && canEditByStatus(selectedCertificate.certificateStatus)
                 ? '수료증 확인/수정'
                 : '수료증 확인'}
             </DialogTitle>
@@ -442,9 +314,9 @@ export function ReviewManagementSection() {
                   <span className="text-sm text-gray-600">수료증 상태:</span>
                   <Badge
                     variant="secondary"
-                    className={`text-xs ${getCertStatusBadgeClass(selectedCertificate.certificateStatus)}`}
+                    className={`text-xs ${getApprovalStatusColor(selectedCertificate.certificateStatus)}`}
                   >
-                    {getCertStatusLabel(selectedCertificate.certificateStatus)}
+                    {getApprovalStatusLabel(selectedCertificate.certificateStatus)}
                   </Badge>
                 </div>
               </div>
@@ -493,12 +365,12 @@ export function ReviewManagementSection() {
               </div>
 
               {/* 수정 불가 안내 (APPROVED) */}
-              {!canEditCertificate(selectedCertificate.certificateStatus) && (
+              {!canEditByStatus(selectedCertificate.certificateStatus) && (
                 <p className="text-sm text-gray-500">승인된 수료증은 수정할 수 없습니다.</p>
               )}
 
               {/* 이미지 수정 폼 (PENDING/REJECTED만) */}
-              {canEditCertificate(selectedCertificate.certificateStatus) && (
+              {canEditByStatus(selectedCertificate.certificateStatus) && (
                 <div className="space-y-3">
                   {/* 파일 선택 버튼 (파일 미선택 시) */}
                   {!previewUrl && (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -13,31 +13,23 @@ interface AdminGuardProps {
 export function AdminGuard({ children }: AdminGuardProps) {
   const router = useRouter()
   const { isLoggedIn, userType, hasHydrated } = useAuthStore()
-  const [isChecking, setIsChecking] = useState(true)
 
+  // 권한 상태를 계산으로 도출
+  const isAuthorized = hasHydrated && isLoggedIn && userType === 'ADMIN'
+  const shouldRedirectToLogin = hasHydrated && !isLoggedIn
+  const shouldRedirectToHome = hasHydrated && isLoggedIn && userType !== 'ADMIN'
+
+  // 리다이렉트 처리
   useEffect(() => {
-    // 하이드레이션이 완료될 때까지 대기
-    if (!hasHydrated) {
-      return
-    }
-
-    // 로그인 상태 확인
-    if (!isLoggedIn) {
+    if (shouldRedirectToLogin) {
       router.replace('/login')
-      return
-    }
-
-    // 관리자 권한 확인
-    if (userType !== 'ADMIN') {
+    } else if (shouldRedirectToHome) {
       router.replace('/')
-      return
     }
+  }, [shouldRedirectToLogin, shouldRedirectToHome, router])
 
-    setIsChecking(false)
-  }, [isLoggedIn, userType, router, hasHydrated])
-
-  // 권한 확인 중에는 로딩 표시
-  if (isChecking) {
+  // 권한 확인 중이거나 리다이렉트 대기 중에는 로딩 표시
+  if (!isAuthorized) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-3">

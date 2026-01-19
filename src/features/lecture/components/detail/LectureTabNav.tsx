@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 
 import { createPortal } from 'react-dom'
 
+import { useIsMounted } from '@/hooks/useIsMounted'
 import { cn } from '@/lib/utils'
 
 /**
@@ -35,7 +36,7 @@ export default function LectureTabNav() {
   // ========================================
   const [activeTab, setActiveTab] = useState('overview')
   const [isFixed, setIsFixed] = useState(false)
-  const [mounted, setMounted] = useState(false) // 클라이언트 사이드 마운트 여부 (Portal용)
+  const isMounted = useIsMounted()
   const [tabPosition, setTabPosition] = useState({ left: 0, width: 0 })
   const placeholderRef = useRef<HTMLDivElement>(null)
 
@@ -60,13 +61,6 @@ export default function LectureTabNav() {
       setActiveTab(id)
     }
   }
-
-  // ========================================
-  // 클라이언트 사이드 마운트 감지
-  // ========================================
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   // ========================================
   // 스크롤 및 리사이즈 이벤트 처리
@@ -181,7 +175,7 @@ export default function LectureTabNav() {
         - 부모 요소의 overflow, transform 등에 영향받지 않음
         - z-[var(--z-fixed)]: globals.css에 정의된 고정 요소용 z-index 토큰 사용
       */}
-      {mounted &&
+      {isMounted &&
         isFixed &&
         createPortal(
           <div

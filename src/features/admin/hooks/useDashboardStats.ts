@@ -52,7 +52,7 @@ export function useDashboardStats() {
     reviews: reviewStatsQuery.data?.total ?? 0,
   }
 
-  // 승인 대기 건수
+  // 대기중 건수
   const pendingCounts: PendingCounts = {
     organizations: organizationStatsQuery.data?.pending ?? 0,
     lectures: lectureStatsQuery.data?.pending ?? 0,

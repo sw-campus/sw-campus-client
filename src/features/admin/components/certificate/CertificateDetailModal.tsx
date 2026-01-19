@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { useCertificateDetailQuery } from '@/features/admin/hooks/useReviews'
 import {
+  REVIEW_AUTH_STATUS,
   REVIEW_AUTH_STATUS_COLOR,
   REVIEW_AUTH_STATUS_LABEL,
   type MutationOptions,
@@ -121,7 +122,7 @@ export function CertificateDetailModal({
         )}
 
         <DialogFooter>
-          {(detail?.approvalStatus ?? review.certificateApprovalStatus) === 'PENDING' && (
+          {(detail?.approvalStatus ?? review.certificateApprovalStatus) === REVIEW_AUTH_STATUS.PENDING && (
             <>
               <Button
                 onClick={handleApprove}

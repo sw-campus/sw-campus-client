@@ -11,13 +11,13 @@ import { useDesktopNavigationStore } from '@/store/navigation.store'
 
 export default function HeaderSection() {
   const pathname = usePathname()
-  if (pathname === '/login' || pathname.startsWith('/signup')) return null
-
   const [open, setOpen] = useState(false)
 
   const { data: categoryTree } = useCategoryTree()
   const setActiveMenu = useDesktopNavigationStore(state => state.setActiveMenu)
   const hideDesktopNav = useDesktopNavigationStore(state => state.hideDesktopNav)
+
+  if (pathname === '/login' || pathname.startsWith('/signup')) return null
 
   const handleCategoryEnter = (categoryId: number) => {
     setActiveMenu(categoryId)

@@ -18,6 +18,44 @@ interface ClickRankingSectionProps {
   period?: Period
 }
 
+function RankBadge({ rank }: { rank: number }) {
+  return (
+    <span
+      className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold ${
+        rank === 1
+          ? 'bg-yellow-100 text-yellow-700'
+          : rank === 2
+            ? 'bg-gray-200 text-gray-600'
+            : rank === 3
+              ? 'bg-orange-100 text-orange-600'
+              : 'bg-gray-50 text-gray-500'
+      }`}
+    >
+      {rank}
+    </span>
+  )
+}
+
+function SkeletonRows() {
+  return (
+    <>
+      {[1, 2, 3].map(i => (
+        <TableRow key={i}>
+          <TableCell>
+            <div className="h-4 w-6 animate-pulse rounded bg-gray-200" />
+          </TableCell>
+          <TableCell>
+            <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
+          </TableCell>
+          <TableCell>
+            <div className="h-4 w-12 animate-pulse rounded bg-gray-200" />
+          </TableCell>
+        </TableRow>
+      ))}
+    </>
+  )
+}
+
 export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
   const [modalOpen, setModalOpen] = useState<ModalType>(null)
 
@@ -58,40 +96,6 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
 
   const periodLabel = getPeriodLabel(period)
 
-  const RankBadge = ({ rank }: { rank: number }) => (
-    <span
-      className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold ${
-        rank === 1
-          ? 'bg-yellow-100 text-yellow-700'
-          : rank === 2
-            ? 'bg-gray-200 text-gray-600'
-            : rank === 3
-              ? 'bg-orange-100 text-orange-600'
-              : 'bg-gray-50 text-gray-500'
-      }`}
-    >
-      {rank}
-    </span>
-  )
-
-  const SkeletonRows = () => (
-    <>
-      {[1, 2, 3].map(i => (
-        <TableRow key={i}>
-          <TableCell>
-            <div className="h-4 w-6 animate-pulse rounded bg-gray-200" />
-          </TableCell>
-          <TableCell>
-            <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
-          </TableCell>
-          <TableCell>
-            <div className="h-4 w-12 animate-pulse rounded bg-gray-200" />
-          </TableCell>
-        </TableRow>
-      ))}
-    </>
-  )
-
   return (
     <>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -124,7 +128,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                   </TableRow>
                 ) : (
                   banners.map((banner, idx) => (
-                    <TableRow key={banner.bannerId}>
+                    <TableRow key={`${banner.bannerId}-${idx}`}>
                       <TableCell className="font-medium">
                         <RankBadge rank={idx + 1} />
                       </TableCell>
@@ -185,7 +189,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                   </TableRow>
                 ) : (
                   lectures.map((lecture, idx) => (
-                    <TableRow key={lecture.lectureId}>
+                    <TableRow key={`${lecture.lectureId}-${idx}`}>
                       <TableCell className="font-medium">
                         <RankBadge rank={idx + 1} />
                       </TableCell>
@@ -250,7 +254,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                 </TableRow>
               ) : (
                 allBanners.map((banner, idx) => (
-                  <TableRow key={banner.bannerId}>
+                  <TableRow key={`${banner.bannerId}-${idx}`}>
                     <TableCell>
                       <RankBadge rank={idx + 1} />
                     </TableCell>
@@ -302,7 +306,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                 </TableRow>
               ) : (
                 allLectures.map((lecture, idx) => (
-                  <TableRow key={lecture.lectureId}>
+                  <TableRow key={`${lecture.lectureId}-${idx}`}>
                     <TableCell>
                       <RankBadge rank={idx + 1} />
                     </TableCell>

@@ -6,13 +6,11 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { createPortal } from 'react-dom'
 import { FiArrowUp } from 'react-icons/fi'
 
-export function ScrollToTopButton() {
-  const [mounted, setMounted] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
+import { useIsMounted } from '@/hooks/useIsMounted'
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+export function ScrollToTopButton() {
+  const isMounted = useIsMounted()
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,7 +26,7 @@ export function ScrollToTopButton() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  if (!mounted) return null
+  if (!isMounted) return null
 
   return createPortal(
     <div className="pointer-events-none fixed inset-x-0 bottom-24 z-50 mx-auto w-full max-w-7xl px-4 md:bottom-10">

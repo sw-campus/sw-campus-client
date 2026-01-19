@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- 파일 업로드 미리보기에 blob URL 사용 */
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
