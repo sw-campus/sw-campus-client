@@ -8,13 +8,13 @@ import { FiEdit3, FiFilter, FiX, FiTag } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { POST_SORT_OPTIONS, DEFAULT_POST_SORT } from '@/features/community/api/postApi.types'
 import { CategorySidebar } from '@/features/community/components/CategorySidebar'
 import { LectureSearchModal, type SelectedLecture } from '@/features/community/components/LectureSearchModal'
 import { PostList } from '@/features/community/components/PostList'
 import { SearchBar } from '@/features/community/components/SearchBar'
 import { useBoardCategories } from '@/features/community/hooks/useBoardCategories'
 import { usePosts } from '@/features/community/hooks/usePosts'
-import { POST_SORT_OPTIONS, DEFAULT_POST_SORT } from '@/features/community/api/postApi.types'
 import { useAuthStore } from '@/store/authStore'
 
 export default function CommunityPage() {
@@ -35,7 +35,7 @@ export default function CommunityPage() {
   const { data: categories = [] } = useBoardCategories()
   const { data, isLoading } = usePosts({
     categoryId: selectedCategoryId ?? undefined,
-    keyword: selectedLecture ? selectedLecture.name : (keywordParam || undefined),
+    keyword: selectedLecture ? selectedLecture.name : keywordParam || undefined,
     tags: selectedTags,
     page,
     size: 12,
@@ -112,7 +112,7 @@ export default function CommunityPage() {
   const totalPages = pageInfo?.totalPages ?? 1
 
   return (
-    <div className="custom-container mx-auto max-w-7xl">
+    <div className="custom-container !lg:px-0 mx-auto max-w-screen-2xl">
       {/* 헤더 */}
       <div className="mb-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -126,7 +126,13 @@ export default function CommunityPage() {
               <SearchBar value={keywordParam} onChange={handleSearch} placeholder="검색..." />
             </div>
             {/* 정렬 */}
-            <Select value={sort} onValueChange={(value) => { setSort(value); setPage(0) }}>
+            <Select
+              value={sort}
+              onValueChange={value => {
+                setSort(value)
+                setPage(0)
+              }}
+            >
               <SelectTrigger className="w-20 shrink-0 border-gray-300 bg-white text-xs sm:w-32 sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
@@ -292,10 +298,7 @@ export default function CommunityPage() {
               {/* Go to page - 데스크탑에서만 */}
               <div className="hidden items-center gap-2 sm:flex">
                 <span className="text-sm text-gray-500">Go to page:</span>
-                <Select
-                  value={String(page + 1)}
-                  onValueChange={value => setPage(Number(value) - 1)}
-                >
+                <Select value={String(page + 1)} onValueChange={value => setPage(Number(value) - 1)}>
                   <SelectTrigger className="h-8 w-16">
                     <SelectValue />
                   </SelectTrigger>
@@ -317,7 +320,7 @@ export default function CommunityPage() {
       {isLoggedIn && (
         <Link
           href="/community/write"
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg transition-all hover:bg-orange-600 active:scale-95 sm:hidden"
+          className="fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg transition-all hover:bg-orange-600 active:scale-95 sm:hidden"
           aria-label="글쓰기"
         >
           <FiEdit3 className="h-6 w-6" />
