@@ -1,5 +1,6 @@
 'use client'
 
+import type { Editor } from '@tiptap/core'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
@@ -79,7 +80,7 @@ export function TiptapEditor({
         ),
       },
     },
-    onUpdate: ({ editor }: { editor: any }) => {
+    onUpdate: ({ editor }: { editor: Editor }) => {
       onChange(editor.getHTML())
     },
     immediatelyRender: false,

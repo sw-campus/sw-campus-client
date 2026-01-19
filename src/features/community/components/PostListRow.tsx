@@ -8,6 +8,7 @@ import { FiEye, FiHeart, FiMessageCircle, FiImage, FiTrendingUp, FiMapPin } from
 import { formatRelativeTime } from '@/lib/formatRelativeTime'
 
 import type { Post } from '../api/postApi.types'
+import { BOOTCAMP_DIARY_CATEGORY_NAME } from '../constants'
 import { ClickableTag } from './ClickableTag'
 
 interface PostListRowProps {
@@ -49,7 +50,8 @@ export function PostListRow({ post }: PostListRowProps) {
                 src={post.thumbnailUrl}
                 alt={post.title}
                 fill
-                sizes="(max-width: 639px) 64px, 128px"
+                sizes="(max-width: 639px) 128px, 256px"
+                quality={90}
                 className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               />
             </div>
@@ -95,7 +97,7 @@ export function PostListRow({ post }: PostListRowProps) {
             </h3>
 
             {/* 부트캠프 성장일기 태그 */}
-            {post.categoryName === '부트캠프 성장일기' && post.tags.length > 0 && (
+            {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.length > 0 && (
               <div className="flex gap-2">
                 {post.tags.slice(0, 2).map(tag => (
                   <ClickableTag key={tag} tag={tag} maxLength={10} />

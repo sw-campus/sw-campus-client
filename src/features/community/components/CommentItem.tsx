@@ -6,6 +6,17 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FiCornerDownRight, FiEdit2, FiHeart, FiMessageCircle, FiTrash2, FiUser } from 'react-icons/fi'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { formatRelativeTime } from '@/lib/formatRelativeTime'
 import { useAuthStore } from '@/store/authStore'
@@ -27,6 +38,8 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
   const { isLoggedIn, userType } = useAuthStore()
   const [isEditing, setIsEditing] = useState(false)
   const [editBody, setEditBody] = useState(comment.body)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
 
   const { mutate: updateComment, isPending: isUpdating } = useUpdateComment(postId)
   const { mutate: deleteComment, isPending: isDeleting } = useDeleteComment(postId)
@@ -43,18 +56,22 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
   }
 
   const handleDelete = () => {
-    if (!confirm('정말 삭제하시겠습니까?')) return
-    deleteComment(comment.id)
+    deleteComment(comment.id, {
+      onSuccess: () => setIsDeleteDialogOpen(false),
+    })
   }
 
   const handleLike = () => {
     if (!isLoggedIn) {
-      if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
-        router.push('/login')
-      }
+      setIsLoginDialogOpen(true)
       return
     }
     toggleLike(comment.id)
+  }
+
+  const handleLoginRedirect = () => {
+    setIsLoginDialogOpen(false)
+    router.push('/login')
   }
 
   const relativeTime = formatRelativeTime(comment.createdAt)
@@ -186,14 +203,35 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
                   <FiEdit2 className="h-3.5 w-3.5" />
                   수정
                 </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-gray-500 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-95"
-                >
-                  <FiTrash2 className="h-3.5 w-3.5" />
-                  삭제
-                </button>
+                <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      disabled={isDeleting}
+                      className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-gray-500 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-95"
+                    >
+                      <FiTrash2 className="h-3.5 w-3.5" />
+                      삭제
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="mx-4 max-w-sm rounded-2xl sm:mx-auto">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>댓글 삭제</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        정말 이 댓글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="gap-2 sm:gap-0">
+                      <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDelete}
+                        className="rounded-xl bg-rose-500 hover:bg-rose-600"
+                        disabled={isDeleting}
+                      >
+                        {isDeleting ? '삭제 중...' : '삭제'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </>
             )}
           </div>
@@ -208,6 +246,24 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
           ))}
         </div>
       )}
+
+      {/* 로그인 필요 다이얼로그 */}
+      <AlertDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
+        <AlertDialogContent className="mx-4 max-w-sm rounded-2xl sm:mx-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>로그인 필요</AlertDialogTitle>
+            <AlertDialogDescription>
+              좋아요를 누르려면 로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:gap-0">
+            <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLoginRedirect} className="rounded-xl">
+              로그인하기
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

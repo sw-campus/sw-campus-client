@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 
 import type { Post } from '../api/postApi.types'
+import { BOOTCAMP_DIARY_CATEGORY_NAME } from '../constants'
 import { ClickableTag } from './ClickableTag'
 
 interface PostCardProps {
@@ -45,7 +46,8 @@ export function PostCard({ post }: PostCardProps) {
                 src={post.thumbnailUrl}
                 alt={post.title}
                 fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+                quality={90}
                 className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
               />
               {/* 이미지 위 그라데이션 오버레이 */}
@@ -86,7 +88,7 @@ export function PostCard({ post }: PostCardProps) {
           </h3>
 
           {/* 태그 영역 - 모바일에서 숨김 */}
-          {post.categoryName === '부트캠프 성장일기' && post.tags.length > 0 ? (
+          {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.length > 0 ? (
             <div className="mt-2 hidden h-5 flex-wrap gap-1.5 overflow-hidden sm:mt-3 sm:flex sm:h-6">
               {post.tags.slice(0, 2).map(tag => (
                 <ClickableTag key={tag} tag={tag} maxLength={10} />

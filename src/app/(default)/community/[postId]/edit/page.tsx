@@ -17,8 +17,9 @@ export default function EditPostPage() {
   const postId = Number(params.postId)
 
   const { isLoggedIn, hasHydrated, userType } = useAuthStore()
-  const { data: categories = [] } = useBoardCategories()
-  const { data: post, isLoading, error } = usePostDetail(postId)
+  const { data: categories = [], isLoading: isCategoriesLoading } = useBoardCategories()
+  const { data: post, isLoading: isPostLoading, error } = usePostDetail(postId)
+  const isLoading = isCategoriesLoading || isPostLoading
   const { mutate: updatePost, isPending } = useUpdatePost()
 
   // 로그인 체크
@@ -133,7 +134,14 @@ export default function EditPostPage() {
             submitLabel="수정하기"
           />
         ) : (
-          <div className="py-8 text-center text-gray-500">카테고리를 불러오는 중...</div>
+          <div className="animate-pulse space-y-4">
+            <div className="h-10 w-40 rounded bg-gray-200" />
+            <div className="h-10 w-full rounded bg-gray-200" />
+            <div className="h-64 w-full rounded bg-gray-200" />
+            <div className="flex justify-end">
+              <div className="h-10 w-24 rounded bg-gray-200" />
+            </div>
+          </div>
         )}
       </div>
     </main>

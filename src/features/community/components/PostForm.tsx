@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import type { BoardCategory } from '../api/boardCategoryApi.types'
 import type { CreatePostRequest, PostDetail } from '../api/postApi.types'
+import { BOOTCAMP_DIARY_CATEGORY_NAME } from '../constants'
 import {
   DiaryTemplateForm,
   validateDiaryForm,
@@ -24,9 +25,6 @@ import {
 import { DiaryTitleInput, buildDiaryTitle } from './DiaryTitleInput'
 import { LectureSearchModal, type SelectedLecture } from './LectureSearchModal'
 import { LectureSelector } from './LectureSelector'
-
-// 부트캠프 성장일기 카테고리 이름
-const BOOTCAMP_DIARY_CATEGORY_NAME = '부트캠프 성장일기'
 
 interface PostFormData {
   title: string

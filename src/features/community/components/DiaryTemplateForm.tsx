@@ -190,27 +190,21 @@ export function validateDiaryForm(formData: DiaryFormData): Partial<Record<keyof
 
 /**
  * 질문 섹션 HTML 생성
- */
-/**
- * 질문 섹션 HTML 생성
  * WARNING: 이 함수의 출력 구조를 변경하면 parseDiaryBody 함수의 정규식도 함께 수정해야 합니다.
  * data-diary-section 속성은 파싱에 사용되는 핵심 식별자입니다.
+ *
+ * 시맨틱 HTML 구조를 사용하여 prose 클래스에서 자동으로 스타일링됩니다.
  */
 function buildSection(number: number, label: string, content: string, sublabel?: string): string {
-  const sublabelHtml = sublabel
-    ? ` <span style="font-size: 0.75rem; color: #6b7280; font-weight: normal;">${sublabel}</span>`
-    : ''
+  const sublabelHtml = sublabel ? ` <small>${sublabel}</small>` : ''
 
   return `
-<div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #f97316;">
-  <h3 style="font-size: 1rem; font-weight: 600; color: #c2410c; margin: 0 0 12px 0; display: flex; align-items: baseline; gap: 8px;">
-    <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #f97316; color: white; border-radius: 50%; font-size: 0.875rem; flex-shrink: 0;">${number}</span>
-    <span>${label.replace(/^\d+\.\s*/, '')}${sublabelHtml}</span>
-  </h3>
-  <div data-diary-section="${number}" style="color: #374151; line-height: 1.75; padding-left: 32px;">
+<section class="diary-section">
+  <h3>${label}${sublabelHtml}</h3>
+  <div data-diary-section="${number}">
     ${content}
   </div>
-</div>`
+</section>`
 }
 
 /**
@@ -218,7 +212,7 @@ function buildSection(number: number, label: string, content: string, sublabel?:
  */
 export function buildDiaryBody(formData: DiaryFormData): string {
   return `
-<div style="display: flex; flex-direction: column; gap: 8px;">
+<div class="diary-template">
   ${buildSection(1, DIARY_QUESTIONS.learnedSkills.label, formData.learnedSkills)}
   ${buildSection(2, DIARY_QUESTIONS.problemSolving.label, formData.problemSolving, DIARY_QUESTIONS.problemSolving.sublabel)}
   ${buildSection(3, DIARY_QUESTIONS.classReview.label, formData.classReview)}
@@ -236,7 +230,8 @@ export function parseDiaryBody(html: string): DiaryFormData | null {
   try {
     // 각 섹션의 내용을 추출하는 패턴
     // data-diary-section 속성을 사용하여 더 안정적으로 파싱합니다.
-    const sectionPattern = /<div[^>]*data-diary-section="[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/g
+    // 새로운 시맨틱 구조: <section> 내부의 <div data-diary-section="N">...</div>
+    const sectionPattern = /<div[^>]*data-diary-section="[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/section>/g
     const matches = [...html.matchAll(sectionPattern)]
 
     if (matches.length !== 4) {

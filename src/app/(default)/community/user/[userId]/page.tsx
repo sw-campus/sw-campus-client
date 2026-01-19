@@ -21,6 +21,7 @@ export default function UserProfilePage() {
 
   const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(userId)
   const { data: postsData, isLoading: postsLoading } = useUserPosts(userId, { page, size: 10, sort })
+  const isLoading = profileLoading || postsLoading
 
   // ViewType 로컬 스토리지 연동
   useEffect(() => {
@@ -68,7 +69,7 @@ export default function UserProfilePage() {
 
         {/* 프로필 정보 */}
         <div className="relative px-5 pb-5 sm:px-6 sm:pb-6">
-          {profileLoading ? (
+          {isLoading ? (
             <div className="space-y-4 pt-10">
               <div className="absolute -top-8 left-5 h-16 w-16 rounded-2xl bg-gray-200 ring-4 ring-white sm:-top-10 sm:left-6 sm:h-20 sm:w-20" />
               <div className="h-7 w-40 rounded-lg bg-gray-200" />
@@ -152,7 +153,7 @@ export default function UserProfilePage() {
           </div>
         </div>
 
-        <PostList posts={postsData?.posts ?? []} isLoading={postsLoading} viewType={viewType} />
+        <PostList posts={postsData?.posts ?? []} isLoading={isLoading} viewType={viewType} />
 
         {/* 페이지네이션 */}
         {totalPages > 1 && (
@@ -219,7 +220,7 @@ export default function UserProfilePage() {
         )}
 
         {/* 게시글 없음 */}
-        {!postsLoading && postsData?.posts.length === 0 && (
+        {!isLoading && postsData?.posts.length === 0 && (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-16">
             <div className="mb-4 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 p-4">
               <FiUser className="h-8 w-8 text-gray-300" />

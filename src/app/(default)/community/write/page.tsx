@@ -13,7 +13,7 @@ import { useAuthStore } from '@/store/authStore'
 export default function WritePostPage() {
   const router = useRouter()
   const { isLoggedIn, hasHydrated } = useAuthStore()
-  const { data: categories = [] } = useBoardCategories()
+  const { data: categories = [], isLoading: isCategoriesLoading } = useBoardCategories()
   const { mutate: createPost, isPending } = useCreatePost()
 
   // 로그인 체크
@@ -63,10 +63,17 @@ export default function WritePostPage() {
       <div className="custom-card">
         <h1 className="mb-6 text-2xl font-bold text-gray-900">게시글 작성</h1>
 
-        {categories.length > 0 ? (
-          <PostForm categories={categories} onSubmit={handleSubmit} isSubmitting={isPending} submitLabel="작성하기" />
+        {isCategoriesLoading ? (
+          <div className="animate-pulse space-y-4">
+            <div className="h-10 w-40 rounded bg-gray-200" />
+            <div className="h-10 w-full rounded bg-gray-200" />
+            <div className="h-64 w-full rounded bg-gray-200" />
+            <div className="flex justify-end">
+              <div className="h-10 w-24 rounded bg-gray-200" />
+            </div>
+          </div>
         ) : (
-          <div className="py-8 text-center text-gray-500">카테고리를 불러오는 중...</div>
+          <PostForm categories={categories} onSubmit={handleSubmit} isSubmitting={isPending} submitLabel="작성하기" />
         )}
       </div>
     </main>

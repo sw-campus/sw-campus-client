@@ -33,8 +33,8 @@ export default function CommunityPage() {
   const [selectedLecture, setSelectedLecture] = useState<SelectedLecture | null>(null)
 
   const { isLoggedIn } = useAuthStore()
-  const { data: categories = [] } = useBoardCategories()
-  const { data, isLoading } = usePosts({
+  const { data: categories = [], isLoading: isCategoriesLoading } = useBoardCategories()
+  const { data, isLoading: isPostsLoading } = usePosts({
     categoryId: selectedCategoryId ?? undefined,
     keyword: selectedLecture ? selectedLecture.name : keywordParam || undefined,
     tags: selectedTags,
@@ -42,6 +42,7 @@ export default function CommunityPage() {
     size: 12,
     sort,
   })
+  const isLoading = isCategoriesLoading || isPostsLoading
 
   // 강의 선택 핸들러
   const handleLectureSelect = (lecture: SelectedLecture) => {

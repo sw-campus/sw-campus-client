@@ -13,14 +13,15 @@ import { useDesktopNavigationStore } from '@/store/navigation.store'
 
 export default function HeaderSection() {
   const pathname = usePathname()
-  if (pathname === '/login' || pathname.startsWith('/signup')) return null
-
   const [open, setOpen] = useState(false)
 
   const { data: categoryTree } = useCategoryTree()
   const { data: boardCategories } = useBoardCategories()
   const setActiveMenu = useDesktopNavigationStore(state => state.setActiveMenu)
   const hideDesktopNav = useDesktopNavigationStore(state => state.hideDesktopNav)
+
+  // 로그인/회원가입 페이지에서는 헤더 숨김
+  if (pathname === '/login' || pathname.startsWith('/signup')) return null
 
   // 게시판 카테고리를 네비게이션 아이템으로 변환하는 재귀 함수
   const mapBoardToNav = (category: BoardCategory): NavCategoryItem => ({

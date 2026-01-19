@@ -1,12 +1,26 @@
 'use client'
 
+import { useState } from 'react'
+
 import { toast } from 'sonner'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 
 import { useCreateTestDataMutation, useDeleteTestDataMutation, useTestDataSummaryQuery } from '../../hooks/useTestData'
 
 export function TestDataPage() {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const { data: summary, isLoading } = useTestDataSummaryQuery()
   const createMutation = useCreateTestDataMutation()
   const deleteMutation = useDeleteTestDataMutation()
@@ -20,13 +34,9 @@ export function TestDataPage() {
   }
 
   const handleDelete = () => {
-    if (!summary?.exists) {
-      toast.error('삭제할 테스트 데이터가 없습니다.')
-      return
-    }
-    if (confirm('테스트 데이터를 삭제하시겠습니까?')) {
-      deleteMutation.mutate()
-    }
+    deleteMutation.mutate(undefined, {
+      onSuccess: () => setIsDeleteDialogOpen(false),
+    })
   }
 
   const isProcessing = createMutation.isPending || deleteMutation.isPending
@@ -107,14 +117,27 @@ export function TestDataPage() {
             {createMutation.isPending ? '생성 중...' : '테스트 데이터 생성'}
           </Button>
 
-          <Button
-            onClick={handleDelete}
-            disabled={isProcessing || !summary?.exists}
-            variant="destructive"
-            className="min-w-[140px]"
-          >
-            {deleteMutation.isPending ? '삭제 중...' : '테스트 데이터 삭제'}
-          </Button>
+          <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <AlertDialogTrigger asChild>
+              <Button disabled={isProcessing || !summary?.exists} variant="destructive" className="min-w-[140px]">
+                {deleteMutation.isPending ? '삭제 중...' : '테스트 데이터 삭제'}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>테스트 데이터 삭제</AlertDialogTitle>
+                <AlertDialogDescription>
+                  테스트 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>취소</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete} disabled={deleteMutation.isPending}>
+                  {deleteMutation.isPending ? '삭제 중...' : '삭제'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         <p className="text-muted-foreground mt-4 text-sm">
