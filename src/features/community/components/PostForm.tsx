@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 
 import { useForm, Controller } from 'react-hook-form'
+import { FiFolder, FiType, FiFileText, FiTag } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { TiptapEditor } from '@/components/ui/editor/TiptapEditor'
+import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import type { BoardCategory } from '../api/boardCategoryApi.types'
@@ -16,6 +17,8 @@ import {
   validateDiaryForm,
   buildDiaryBody,
   initialDiaryFormData,
+  parseDiaryBody,
+  parseDiaryTitle,
   type DiaryFormData,
 } from './DiaryTemplateForm'
 import { DiaryTitleInput, buildDiaryTitle } from './DiaryTitleInput'
@@ -73,6 +76,7 @@ export function PostForm({
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm<PostFormData>({
     defaultValues: {
       title: initialData?.title || '',
@@ -81,6 +85,18 @@ export function PostForm({
       tags: initialData?.tags?.join(', ') || '',
     },
   })
+
+  // initialData가 비동기로 로드된 후 폼 값 업데이트
+  useEffect(() => {
+    if (initialData) {
+      reset({
+        title: initialData.title || '',
+        body: initialData.body || '',
+        boardCategoryId: initialData.categoryId || categories[0]?.id || 0,
+        tags: initialData.tags?.join(', ') || '',
+      })
+    }
+  }, [initialData, categories, reset])
 
   const watchedCategoryId = watch('boardCategoryId')
 
@@ -97,7 +113,27 @@ export function PostForm({
   }
 
   const bootcampDiaryCategoryId = findBootcampDiaryCategoryId(categories)
+  // 수정/작성 모드 모두에서 부트캠프 성장일기 템플릿 사용
   const isBootcampDiaryCategory = bootcampDiaryCategoryId !== null && watchedCategoryId === bootcampDiaryCategoryId
+
+  // 수정 모드에서 부트캠프 성장일기 기존 데이터 파싱
+  useEffect(() => {
+    if (initialData && isBootcampDiaryCategory) {
+      // 제목 파싱
+      const parsedTitle = parseDiaryTitle(initialData.title)
+      if (parsedTitle) {
+        setDiaryMonth(parsedTitle.month)
+        setDiaryWeek(parsedTitle.week)
+        setDiarySummary(parsedTitle.summary)
+      }
+
+      // 본문 파싱
+      const parsedBody = parseDiaryBody(initialData.body)
+      if (parsedBody) {
+        setDiaryForm(parsedBody)
+      }
+    }
+  }, [initialData, isBootcampDiaryCategory])
 
   // 카테고리 변경 시 상태 초기화
   useEffect(() => {
@@ -121,15 +157,24 @@ export function PostForm({
     if (isBootcampDiaryCategory) {
       if (!selectedLecture) {
         setLectureError('부트캠프 성장일기 작성 시 수강 강의를 선택해주세요.')
+        document.getElementById('lecture-selector')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
         return
       }
       if (diarySummary.trim().length < 5) {
         setDiarySummaryError('한 줄 소감을 5자 이상 입력해주세요.')
+        document.getElementById('diary-summary-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
         return
       }
       const templateErrors = validateDiaryForm(diaryForm)
       if (Object.keys(templateErrors).length > 0) {
         setDiaryErrors(templateErrors)
+        // 첫 번째 에러 필드로 스크롤
+        const firstErrorKey = Object.keys(templateErrors)[0]
+        if (firstErrorKey) {
+          document
+            .getElementById(`diary-field-${firstErrorKey}`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
         return
       }
     }
@@ -231,11 +276,8 @@ export function PostForm({
 
       selects.push(
         <div key={i} className="min-w-[150px] flex-1">
-          <Select
-            value={selectedId ? String(selectedId) : ''}
-            onValueChange={(value) => handleCategoryChange(i, value)}
-          >
-            <SelectTrigger className="w-full border-gray-300 bg-white hover:border-orange-300 focus:border-orange-500 focus:ring-orange-200">
+          <Select value={selectedId ? String(selectedId) : ''} onValueChange={value => handleCategoryChange(i, value)}>
+            <SelectTrigger className="bg-background w-full">
               <SelectValue placeholder={i === 0 ? '대분류 선택' : i === 1 ? '중분류 선택' : '소분류 선택'} />
             </SelectTrigger>
             <SelectContent>
@@ -260,11 +302,16 @@ export function PostForm({
 
   return (
     <>
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5 sm:space-y-6">
         {/* 카테고리 선택 */}
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">카테고리 *</label>
-          <div className="flex flex-wrap gap-2">{renderCategorySelects()}</div>
+        <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+          <label className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-800">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-orange-100 to-amber-100">
+              <FiFolder className="h-3.5 w-3.5 text-orange-600" />
+            </div>
+            카테고리 선택 <span className="text-orange-500">*</span>
+          </label>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">{renderCategorySelects()}</div>
           <input
             type="hidden"
             {...register('boardCategoryId', {
@@ -272,7 +319,9 @@ export function PostForm({
               validate: value => value > 0 || '카테고리를 선택해주세요',
             })}
           />
-          {errors.boardCategoryId && <p className="mt-1 text-sm text-red-500">{errors.boardCategoryId.message}</p>}
+          {errors.boardCategoryId && (
+            <p className="mt-2 text-sm font-medium text-red-500">{errors.boardCategoryId.message}</p>
+          )}
         </div>
 
         {/* 부트캠프 성장일기 - 강의 선택 */}
@@ -300,9 +349,12 @@ export function PostForm({
             error={diarySummaryError}
           />
         ) : (
-          <div>
-            <label htmlFor="title" className="mb-2 block text-sm font-medium text-gray-700">
-              제목 *
+          <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+            <label htmlFor="title" className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-800">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100">
+                <FiType className="h-3.5 w-3.5 text-blue-600" />
+              </div>
+              제목 <span className="text-orange-500">*</span>
             </label>
             <Input
               id="title"
@@ -312,9 +364,9 @@ export function PostForm({
                 maxLength: { value: 100, message: '제목은 100자 이내로 입력해주세요' },
               })}
               placeholder="제목을 입력해주세요"
-              className="border-gray-300 focus:border-orange-500 focus:ring-orange-200"
+              className="h-11 rounded-xl border-gray-200 bg-gray-50/50 transition-all focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100"
             />
-            {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>}
+            {errors.title && <p className="mt-2 text-sm font-medium text-red-500">{errors.title.message}</p>}
           </div>
         )}
 
@@ -322,9 +374,12 @@ export function PostForm({
         {isBootcampDiaryCategory ? (
           <DiaryTemplateForm formData={diaryForm} errors={diaryErrors} onChange={handleDiaryChange} />
         ) : (
-          <div>
-            <label htmlFor="body" className="mb-2 block text-sm font-medium text-gray-700">
-              내용 *
+          <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+            <label htmlFor="body" className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-800">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-100">
+                <FiFileText className="h-3.5 w-3.5 text-green-600" />
+              </div>
+              내용 <span className="text-orange-500">*</span>
             </label>
             <Controller
               name="body"
@@ -339,20 +394,26 @@ export function PostForm({
                   onChange={field.onChange}
                   placeholder="내용을 자유롭게 작성해주세요..."
                   minHeight="400px"
-                  className={errors.body ? 'border-red-500 ring-1 ring-red-500' : ''}
+                  className={errors.body ? 'rounded-xl border-red-500 ring-1 ring-red-500' : 'rounded-xl'}
                 />
               )}
             />
-            {errors.body && <p className="mt-1 text-sm text-red-500">{errors.body.message}</p>}
+            {errors.body && <p className="mt-2 text-sm font-medium text-red-500">{errors.body.message}</p>}
           </div>
         )}
 
         {/* 태그 */}
-        <div>
-          <label htmlFor="tags" className="mb-2 block text-sm font-medium text-gray-700">
-            태그 (쉼표로 구분)
+        <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+          <label htmlFor="tags" className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-800">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-purple-100 to-violet-100">
+              <FiTag className="h-3.5 w-3.5 text-purple-600" />
+            </div>
+            <span>태그</span>
+            <span className="text-xs font-normal text-gray-500">(쉼표로 구분)</span>
             {selectedLecture && (
-              <span className="ml-2 text-xs font-normal text-green-600">+ 강의명, 훈련기관 자동 추가</span>
+              <span className="ml-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                + 강의 정보 자동 추가
+              </span>
             )}
           </label>
           <Input
@@ -360,14 +421,16 @@ export function PostForm({
             type="text"
             {...register('tags')}
             placeholder="React, TypeScript, Next.js"
-            className="border-gray-300 focus:border-orange-500 focus:ring-orange-200"
+            className="h-11 rounded-xl border-gray-200 bg-gray-50/50 transition-all focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100"
           />
           {selectedLecture && (
-            <div className="mt-2 flex flex-wrap gap-2">
-              <span className="rounded-full bg-orange-100 px-3 py-1 text-sm text-orange-700">
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 px-3 py-1 text-sm font-medium text-orange-700 ring-1 ring-orange-200/50">
+                <FiTag className="h-3 w-3" />
                 {selectedLecture.name}
               </span>
-              <span className="rounded-full bg-orange-100 px-3 py-1 text-sm text-orange-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 px-3 py-1 text-sm font-medium text-orange-700 ring-1 ring-orange-200/50">
+                <FiTag className="h-3 w-3" />
                 {selectedLecture.orgName}
               </span>
             </div>
@@ -375,8 +438,12 @@ export function PostForm({
         </div>
 
         {/* 제출 버튼 */}
-        <div className="flex justify-end gap-3">
-          <Button type="submit" disabled={isSubmitting} className="bg-orange-500 px-8 hover:bg-orange-600">
+        <div className="flex justify-end pt-2">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="h-12 w-full rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-base font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-300/50 active:scale-[0.98] disabled:opacity-60 sm:h-11 sm:w-auto sm:px-10 sm:text-sm"
+          >
             {isSubmitting ? '처리 중...' : submitLabel}
           </Button>
         </div>

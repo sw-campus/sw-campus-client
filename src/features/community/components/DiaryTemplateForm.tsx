@@ -59,7 +59,10 @@ interface DiaryTemplateFormProps {
 export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateFormProps) {
   // HTML에서 텍스트만 추출하여 글자 수 계산
   const getTextLength = (html: string): number => {
-    const text = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+    const text = html
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .trim()
     return text.length
   }
 
@@ -78,20 +81,21 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
         <div className="text-sm text-blue-800">
           <p className="font-medium">부트캠프 성장일기 작성 가이드</p>
           <p className="mt-1 text-blue-600">
-            아래 4가지 질문에 각각 {DIARY_MIN_LENGTH}자 이상 작성해주세요. 이미지를 삽입하려면 에디터 툴바의 이미지 버튼을 사용하세요!
+            아래 4가지 질문에 각각 {DIARY_MIN_LENGTH}자 이상 작성해주세요. 이미지를 삽입하려면 에디터 툴바의 이미지
+            버튼을 사용하세요!
           </p>
         </div>
       </div>
 
       {/* 질문 1: 배운 기술 */}
-      <div>
+      <div id="diary-field-learnedSkills">
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">{DIARY_QUESTIONS.learnedSkills.label} *</label>
           <CharCount current={getTextLength(formData.learnedSkills)} min={DIARY_MIN_LENGTH} />
         </div>
         <TiptapEditor
           content={formData.learnedSkills}
-          onChange={(content) => onChange('learnedSkills', content)}
+          onChange={content => onChange('learnedSkills', content)}
           placeholder={DIARY_QUESTIONS.learnedSkills.placeholder}
           minHeight="120px"
           className={errors.learnedSkills ? 'ring-2 ring-red-500' : ''}
@@ -100,17 +104,17 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       </div>
 
       {/* 질문 2: 문제 해결 */}
-      <div>
+      <div id="diary-field-problemSolving">
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">
-            {DIARY_QUESTIONS.problemSolving.label} *
-            <span className="ml-1 text-xs font-normal text-gray-500">{DIARY_QUESTIONS.problemSolving.sublabel}</span>
+            {DIARY_QUESTIONS.problemSolving.label}{' '}
+            <span className="text-xs font-normal text-gray-500">{DIARY_QUESTIONS.problemSolving.sublabel}</span> *
           </label>
           <CharCount current={getTextLength(formData.problemSolving)} min={DIARY_MIN_LENGTH} />
         </div>
         <TiptapEditor
           content={formData.problemSolving}
-          onChange={(content) => onChange('problemSolving', content)}
+          onChange={content => onChange('problemSolving', content)}
           placeholder={DIARY_QUESTIONS.problemSolving.placeholder}
           minHeight="150px"
           className={errors.problemSolving ? 'ring-2 ring-red-500' : ''}
@@ -119,14 +123,14 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       </div>
 
       {/* 질문 3: 수업 리뷰 */}
-      <div>
+      <div id="diary-field-classReview">
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">{DIARY_QUESTIONS.classReview.label} *</label>
           <CharCount current={getTextLength(formData.classReview)} min={DIARY_MIN_LENGTH} />
         </div>
         <TiptapEditor
           content={formData.classReview}
-          onChange={(content) => onChange('classReview', content)}
+          onChange={content => onChange('classReview', content)}
           placeholder={DIARY_QUESTIONS.classReview.placeholder}
           minHeight="120px"
           className={errors.classReview ? 'ring-2 ring-red-500' : ''}
@@ -135,14 +139,14 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
       </div>
 
       {/* 질문 4: 다음 주 계획 */}
-      <div>
+      <div id="diary-field-nextWeekPlan">
         <div className="mb-2 flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">{DIARY_QUESTIONS.nextWeekPlan.label} *</label>
           <CharCount current={getTextLength(formData.nextWeekPlan)} min={DIARY_MIN_LENGTH} />
         </div>
         <TiptapEditor
           content={formData.nextWeekPlan}
-          onChange={(content) => onChange('nextWeekPlan', content)}
+          onChange={content => onChange('nextWeekPlan', content)}
           placeholder={DIARY_QUESTIONS.nextWeekPlan.placeholder}
           minHeight="120px"
           className={errors.nextWeekPlan ? 'ring-2 ring-red-500' : ''}
@@ -161,7 +165,10 @@ export function validateDiaryForm(formData: DiaryFormData): Partial<Record<keyof
 
   // HTML에서 텍스트만 추출하여 글자 수 계산
   const getTextLength = (html: string): number => {
-    const text = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+    const text = html
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .trim()
     return text.length
   }
 
@@ -184,19 +191,23 @@ export function validateDiaryForm(formData: DiaryFormData): Partial<Record<keyof
 /**
  * 질문 섹션 HTML 생성
  */
+/**
+ * 질문 섹션 HTML 생성
+ * WARNING: 이 함수의 출력 구조를 변경하면 parseDiaryBody 함수의 정규식도 함께 수정해야 합니다.
+ * data-diary-section 속성은 파싱에 사용되는 핵심 식별자입니다.
+ */
 function buildSection(number: number, label: string, content: string, sublabel?: string): string {
   const sublabelHtml = sublabel
-    ? `<span style="font-size: 0.75rem; color: #6b7280; font-weight: normal;">${sublabel}</span>`
+    ? ` <span style="font-size: 0.75rem; color: #6b7280; font-weight: normal;">${sublabel}</span>`
     : ''
 
   return `
 <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #f97316;">
   <h3 style="font-size: 1rem; font-weight: 600; color: #c2410c; margin: 0 0 12px 0; display: flex; align-items: baseline; gap: 8px;">
     <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #f97316; color: white; border-radius: 50%; font-size: 0.875rem; flex-shrink: 0;">${number}</span>
-    <span>${label.replace(/^\d+\.\s*/, '')}</span>
-    ${sublabelHtml}
+    <span>${label.replace(/^\d+\.\s*/, '')}${sublabelHtml}</span>
   </h3>
-  <div style="color: #374151; line-height: 1.75; padding-left: 32px;">
+  <div data-diary-section="${number}" style="color: #374151; line-height: 1.75; padding-left: 32px;">
     ${content}
   </div>
 </div>`
@@ -214,4 +225,54 @@ export function buildDiaryBody(formData: DiaryFormData): string {
   ${buildSection(4, DIARY_QUESTIONS.nextWeekPlan.label, formData.nextWeekPlan)}
 </div>
 `.trim()
+}
+
+/**
+ * 기존 HTML 본문을 파싱하여 DiaryFormData로 변환
+ * 수정 모드에서 기존 데이터를 템플릿 폼에 채울 때 사용
+ * WARNING: 이 함수는 buildSection 함수가 생성하는 HTML 구조(data-diary-section)에 강하게 의존합니다.
+ */
+export function parseDiaryBody(html: string): DiaryFormData | null {
+  try {
+    // 각 섹션의 내용을 추출하는 패턴
+    // data-diary-section 속성을 사용하여 더 안정적으로 파싱합니다.
+    const sectionPattern = /<div[^>]*data-diary-section="[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/g
+    const matches = [...html.matchAll(sectionPattern)]
+
+    if (matches.length !== 4) {
+      return null // 4개의 섹션이 아니면 파싱 실패
+    }
+
+    return {
+      learnedSkills: matches[0][1].trim(),
+      problemSolving: matches[1][1].trim(),
+      classReview: matches[2][1].trim(),
+      nextWeekPlan: matches[3][1].trim(),
+    }
+  } catch {
+    return null
+  }
+}
+
+/**
+ * 기존 제목을 파싱하여 월, 주차, 한줄소감으로 분리
+ * 제목 형식: "X월 Y주차 성장일기 - 한줄소감"
+ */
+export function parseDiaryTitle(title: string): { month: number; week: number; summary: string } | null {
+  try {
+    const pattern = /(\d+)월\s*(\d+)주차\s*성장일기\s*-\s*(.+)/
+    const match = title.match(pattern)
+
+    if (!match) {
+      return null
+    }
+
+    return {
+      month: parseInt(match[1], 10),
+      week: parseInt(match[2], 10),
+      summary: match[3].trim(),
+    }
+  } catch {
+    return null
+  }
 }

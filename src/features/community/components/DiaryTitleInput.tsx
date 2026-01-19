@@ -29,13 +29,13 @@ export function DiaryTitleInput({
   return (
     <div>
       <label className="mb-2 block text-sm font-medium text-gray-700">
-        제목 * <span className="text-xs font-normal text-gray-500">(자동 생성됨)</span>
+        제목 * <span className="text-muted-foreground text-xs font-normal">(자동 생성됨)</span>
       </label>
-      <div className="space-y-3">
+      <div className="space-y-4">
         {/* 월/주차 선택 */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Select value={String(month)} onValueChange={(value) => onMonthChange(Number(value))}>
-            <SelectTrigger className="w-24 border-gray-300 bg-white hover:border-orange-300 focus:border-orange-500 focus:ring-orange-200">
+        <div className="flex flex-wrap items-center gap-3">
+          <Select value={String(month)} onValueChange={value => onMonthChange(Number(value))}>
+            <SelectTrigger className="bg-background w-24">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -46,8 +46,8 @@ export function DiaryTitleInput({
               ))}
             </SelectContent>
           </Select>
-          <Select value={String(week)} onValueChange={(value) => onWeekChange(Number(value))}>
-            <SelectTrigger className="w-24 border-gray-300 bg-white hover:border-orange-300 focus:border-orange-500 focus:ring-orange-200">
+          <Select value={String(week)} onValueChange={value => onWeekChange(Number(value))}>
+            <SelectTrigger className="bg-background w-24">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -58,26 +58,27 @@ export function DiaryTitleInput({
               ))}
             </SelectContent>
           </Select>
-          <span className="text-gray-500">성장일기 -</span>
+          <span className="text-muted-foreground font-medium">성장일기 -</span>
         </div>
 
         {/* 한 줄 소감 */}
-        <Input
-          type="text"
-          value={summary}
-          onChange={e => onSummaryChange(e.target.value)}
-          placeholder="한 줄 소감을 입력하세요 (예: JWT 인증 구현 완료!)"
-          className={`border-gray-300 focus:border-orange-500 focus:ring-orange-200 ${
-            error ? 'border-red-500' : ''
-          }`}
-          maxLength={50}
-        />
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        <div className="relative">
+          <Input
+            id="diary-summary-input"
+            type="text"
+            value={summary}
+            onChange={e => onSummaryChange(e.target.value)}
+            placeholder="한 줄 소감을 입력하세요 (예: JWT 인증 구현 완료!)"
+            className={error ? 'border-destructive focus-visible:ring-destructive' : ''}
+            maxLength={50}
+          />
+          {error && <p className="text-destructive mt-1.5 text-sm font-medium">{error}</p>}
+        </div>
 
         {/* 미리보기 */}
-        <div className="rounded-lg bg-gray-50 px-4 py-2.5 text-sm text-gray-600">
-          <span className="font-medium">제목 미리보기: </span>
-          <span className="text-gray-900">
+        <div className="bg-muted/50 rounded-lg border px-4 py-3 text-sm">
+          <span className="text-muted-foreground mr-2 font-medium">제목 미리보기:</span>
+          <span className="text-foreground font-bold">
             {month}월 {week}주차 성장일기 - {summary || '(한 줄 소감)'}
           </span>
         </div>

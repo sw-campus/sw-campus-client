@@ -16,6 +16,7 @@ export interface ApiPostResponse {
   createdAt: string
   hasImage: boolean
   thumbnailUrl: string | null
+  pinned: boolean
 }
 
 export interface ApiPostDetailResponse {
@@ -37,6 +38,7 @@ export interface ApiPostDetailResponse {
   bookmarked: boolean
   liked: boolean
   isAuthor: boolean
+  pinned: boolean
 }
 
 export interface ApiPageResponse<T> {
@@ -58,6 +60,36 @@ export interface ApiPageResponse<T> {
   empty: boolean
 }
 
+export interface PagedPosts {
+  posts: Post[]
+  page: {
+    size: number
+    number: number
+    totalElements: number
+    totalPages: number
+  }
+}
+
+// Mapper functions
+export function mapApiPostToPost(apiPost: ApiPostResponse): Post {
+  return {
+    id: apiPost.id,
+    title: apiPost.title,
+    authorId: apiPost.authorId,
+    authorNickname: apiPost.authorNickname,
+    categoryId: apiPost.categoryId,
+    categoryName: apiPost.categoryName,
+    tags: apiPost.tags,
+    viewCount: apiPost.viewCount,
+    likeCount: apiPost.likeCount,
+    commentCount: apiPost.commentCount,
+    createdAt: new Date(apiPost.createdAt),
+    hasImage: apiPost.hasImage,
+    thumbnailUrl: apiPost.thumbnailUrl,
+    pinned: apiPost.pinned,
+  }
+}
+
 // Frontend types
 export interface Post {
   id: number
@@ -73,6 +105,7 @@ export interface Post {
   createdAt: Date
   hasImage: boolean
   thumbnailUrl: string | null
+  pinned: boolean
 }
 
 export interface PostDetail {
@@ -94,6 +127,7 @@ export interface PostDetail {
   isBookmarked: boolean
   isLiked: boolean
   isAuthor: boolean
+  pinned: boolean
 }
 
 // Request types
@@ -131,3 +165,15 @@ export const POST_SORT_OPTIONS = [
 ] as const
 
 export const DEFAULT_POST_SORT = 'created_at,desc'
+
+// 이전/다음 게시글
+export interface AdjacentPostItem {
+  id: number
+  title: string
+  categoryName: string
+}
+
+export interface AdjacentPosts {
+  previous: AdjacentPostItem | null
+  next: AdjacentPostItem | null
+}

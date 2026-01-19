@@ -1,8 +1,8 @@
 'use client'
 
-import { Fragment } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 
-import { FiChevronRight, FiChevronDown } from 'react-icons/fi'
+import { FiChevronRight, FiChevronDown, FiFolder, FiFolderPlus } from 'react-icons/fi'
 
 import { cn } from '@/lib/utils'
 
@@ -17,10 +17,12 @@ interface CategorySidebarProps {
 /**
  * 카테고리 사이드바 네비게이션 컴포넌트
  * - 재귀적 트리 구조 지원 (무한 깊이)
- * - 데스크탑: 사이드바 트리
- * - 모바일: 가로 스크롤 탭
+ * - 모던한 글래스모피즘 디자인
+ * - 부드러운 애니메이션
  */
 export function CategorySidebar({ categories, selectedCategoryId, onSelect }: CategorySidebarProps) {
+  const [expandedIds, setExpandedIds] = useState<number[]>([])
+
   // 선택된 카테고리의 모든 조상 ID 찾기 (트리 펼침용)
   const findAncestorIds = (categoryId: number | null, list: BoardCategory[]): number[] => {
     if (categoryId === null) return []
@@ -37,42 +39,76 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
     return []
   }
 
-  const ancestorIds = findAncestorIds(selectedCategoryId, categories)
+  // 선택된 카테고리가 변경되면 조상들을 자동으로 펼침
+  useEffect(() => {
+    if (selectedCategoryId !== null) {
+      const ancestors = findAncestorIds(selectedCategoryId, categories)
+      setExpandedIds(prev => {
+        const newIds = new Set([...prev, ...ancestors])
+        return Array.from(newIds)
+      })
+    }
+  }, [selectedCategoryId, categories])
+
+  const toggleExpand = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setExpandedIds(prev => (prev.includes(id) ? prev.filter(expandedId => expandedId !== id) : [...prev, id]))
+  }
 
   // 재귀적 카테고리 아이템 렌더링 (데스크탑)
   const renderCategoryItem = (category: BoardCategory, depth: number = 0) => {
     const isSelected = selectedCategoryId === category.id
-    const isExpanded = ancestorIds.includes(category.id) || isSelected
+    const isExpanded = expandedIds.includes(category.id)
     const hasChildren = category.children && category.children.length > 0
 
     return (
       <div key={category.id}>
-        <button
-          type="button"
-          onClick={() => onSelect(category.id)}
+        <div
           className={cn(
-            'flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-sm transition-colors',
+            'group relative flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-all duration-200',
             isSelected
-              ? 'bg-orange-50 font-medium text-orange-600'
-              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-            depth > 0 && 'ml-3 border-l border-gray-100 pl-3',
+              ? 'bg-gradient-to-r from-orange-500 to-amber-500 font-medium text-white shadow-md shadow-orange-200/50'
+              : 'text-gray-600 hover:bg-gray-50/80 hover:text-gray-900',
+            depth > 0 && 'ml-3 border-l-2 border-gray-100 pl-3',
           )}
+          onClick={() => onSelect(category.id)}
         >
-          <span className="flex items-center gap-2">
-            {depth === 0 && <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />}
-            {category.name}
+          <span className="flex flex-1 items-center gap-2.5">
+            {depth === 0 && (
+              <span className={cn(
+                'flex h-6 w-6 items-center justify-center rounded-lg transition-colors',
+                isSelected ? 'bg-white/20' : 'bg-gray-100'
+              )}>
+                {hasChildren ? (
+                  <FiFolderPlus className={cn('h-3.5 w-3.5', isSelected ? 'text-white' : 'text-gray-500')} />
+                ) : (
+                  <FiFolder className={cn('h-3.5 w-3.5', isSelected ? 'text-white' : 'text-gray-500')} />
+                )}
+              </span>
+            )}
+            <span className="truncate">{category.name}</span>
           </span>
-          {hasChildren &&
-            (isExpanded ? (
-              <FiChevronDown className="h-3.5 w-3.5 opacity-50" />
-            ) : (
-              <FiChevronRight className="h-3.5 w-3.5 opacity-50" />
-            ))}
-        </button>
+          {hasChildren && (
+            <button
+              type="button"
+              onClick={e => toggleExpand(category.id, e)}
+              className={cn(
+                'rounded-md p-1 transition-all hover:scale-110',
+                isSelected ? 'hover:bg-white/20' : 'hover:bg-gray-100'
+              )}
+            >
+              {isExpanded ? (
+                <FiChevronDown className={cn('h-4 w-4', isSelected ? 'text-white' : 'text-gray-400')} />
+              ) : (
+                <FiChevronRight className={cn('h-4 w-4', isSelected ? 'text-white' : 'text-gray-400')} />
+              )}
+            </button>
+          )}
+        </div>
 
         {/* 자식 카테고리 재귀 렌더링 */}
         {hasChildren && isExpanded && (
-          <div className="mt-0.5 space-y-0.5">
+          <div className="mt-1 space-y-1">
             {category.children.map(child => renderCategoryItem(child, depth + 1))}
           </div>
         )}
@@ -109,11 +145,12 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
     const current = findCategoryAndParent(selectedCategoryId, categories)
 
     // 선택된 카테고리가 자식이 있으면 -> 그 자식들을 보여줌 (드릴다운)
+    // "← 부모" 버튼은 실제 부모로 이동해야 함
     if (current?.target.children && current.target.children.length > 0) {
       return {
-        parent: current.target,
+        parent: current.parent, // 실제 부모로 설정 (null이면 최상위로 돌아감)
         siblings: current.target.children,
-        showParentAsTab: true, // "전체" 탭 역할
+        currentCategory: current.target, // 현재 선택된 카테고리 정보 유지
       }
     }
 
@@ -131,27 +168,34 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
     <>
       {/* 모바일: 드릴다운 방식 탭 */}
       <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 lg:hidden">
-        <div className="flex gap-2 pb-2">
-          {/* 상위로 가기 버튼 (부모가 있을 때만) */}
-          {mobileTabs.parent && (
+        <div className="flex gap-2 pb-3">
+          {/* 상위로 가기 버튼 */}
+          {/* currentCategory가 있으면 (자식 카테고리를 보여주는 상태) 해당 카테고리명으로 표시 */}
+          {mobileTabs.currentCategory ? (
             <button
               type="button"
               onClick={() => onSelect(mobileTabs.parent?.id ?? null)}
-              className="shrink-0 rounded-full border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-500 shadow-sm"
+              className="shrink-0 rounded-full border border-gray-200/80 bg-white px-4 py-2 text-sm font-medium text-gray-500 shadow-sm transition-all active:scale-95"
+            >
+              ← {mobileTabs.currentCategory.name}
+            </button>
+          ) : mobileTabs.parent ? (
+            <button
+              type="button"
+              onClick={() => onSelect(mobileTabs.parent?.id ?? null)}
+              className="shrink-0 rounded-full border border-gray-200/80 bg-white px-4 py-2 text-sm font-medium text-gray-500 shadow-sm transition-all active:scale-95"
             >
               ← {mobileTabs.parent.name}
             </button>
-          )}
-
-          {/* 현재 레벨의 "전체" (부모 카테고리 자체 선택) */}
-          {!mobileTabs.parent && (
+          ) : (
+            /* 최상위 레벨의 "전체" */
             <button
               type="button"
               onClick={() => onSelect(null)}
               className={cn(
-                'shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all',
+                'shrink-0 rounded-full px-5 py-2 text-sm font-semibold transition-all active:scale-95',
                 selectedCategoryId === null
-                  ? 'bg-orange-500 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/50'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
               )}
             >
@@ -166,9 +210,9 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
               type="button"
               onClick={() => onSelect(cat.id)}
               className={cn(
-                'shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-all',
+                'shrink-0 rounded-full px-5 py-2 text-sm font-semibold whitespace-nowrap transition-all active:scale-95',
                 selectedCategoryId === cat.id
-                  ? 'bg-orange-500 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/50'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
               )}
             >
@@ -180,24 +224,37 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
 
       {/* 데스크탑: 사이드바 트리 */}
       <aside className="hidden w-64 shrink-0 lg:block">
-        <nav className="sticky top-24 space-y-1 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
-          <h3 className="mb-3 px-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">카테고리</h3>
+        <nav className="sticky top-24 space-y-1 rounded-2xl border border-gray-200/60 bg-white/80 p-4 shadow-sm backdrop-blur-xl">
+          <h3 className="mb-4 flex items-center gap-2 px-2 text-xs font-bold tracking-wider text-gray-400 uppercase">
+            <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+            카테고리
+          </h3>
 
           {/* 전체 게시글 */}
           <button
             type="button"
             onClick={() => onSelect(null)}
             className={cn(
-              'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-              selectedCategoryId === null ? 'bg-orange-50 text-orange-600' : 'text-gray-700 hover:bg-gray-50',
+              'flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+              selectedCategoryId === null
+                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/50'
+                : 'text-gray-700 hover:bg-gray-50',
             )}
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />
+            <span className={cn(
+              'flex h-6 w-6 items-center justify-center rounded-lg',
+              selectedCategoryId === null ? 'bg-white/20' : 'bg-gray-100'
+            )}>
+              <FiFolder className={cn('h-3.5 w-3.5', selectedCategoryId === null ? 'text-white' : 'text-gray-500')} />
+            </span>
             전체 게시글
           </button>
 
+          {/* 구분선 */}
+          <div className="my-3 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+
           {/* 재귀 트리 */}
-          <div className="mt-2 space-y-1">{categories.map(category => renderCategoryItem(category))}</div>
+          <div className="space-y-1">{categories.map(category => renderCategoryItem(category))}</div>
         </nav>
       </aside>
     </>
