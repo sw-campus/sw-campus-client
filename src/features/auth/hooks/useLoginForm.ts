@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { login as loginApi } from '@/features/auth/authApi'
@@ -12,6 +12,7 @@ import { useAuthStore } from '@/store/authStore'
 
 export function useLoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { login: setLogin, setUserType: setAuthUserType, setNickname } = useAuthStore()
 
   const [email, setEmail] = useState('')
@@ -50,8 +51,12 @@ export function useLoginForm() {
         // ignore nickname fetch errors
       }
 
-      // 관리자인 경우 /admin 페이지로, 그 외에는 홈으로 리다이렉트
-      if (userType === 'ADMIN') {
+      // returnUrl이 있으면 해당 페이지로, 없으면 관리자는 /admin, 그 외에는 홈으로 리다이렉트
+      const returnUrl = searchParams.get('returnUrl')
+      if (returnUrl && returnUrl.startsWith('/')) {
+        // 상대 경로만 허용 (Open Redirect 방지)
+        router.push(returnUrl)
+      } else if (userType === 'ADMIN') {
         router.push('/admin')
       } else {
         router.push('/')

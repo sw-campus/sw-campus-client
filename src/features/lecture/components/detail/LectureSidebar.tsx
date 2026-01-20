@@ -46,8 +46,8 @@ export default function LectureSidebar({ lecture }: Props) {
   return (
     <>
       {/* 모바일: 하단 고정 바 */}
-      <div className="fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white/95 p-3 backdrop-blur-xl lg:hidden">
-        <div className="mx-auto flex max-w-md items-center gap-2">
+      <div className="fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur-xl sm:px-6 lg:hidden">
+        <div className="mx-auto flex max-w-lg items-center gap-3">
           <Button
             size="lg"
             className="h-12 flex-1 rounded-xl bg-orange-400 text-base font-bold text-white shadow-lg shadow-orange-200 hover:bg-orange-500 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none"
