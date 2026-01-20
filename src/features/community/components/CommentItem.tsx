@@ -211,6 +211,8 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
 
         {/* 이미지 */}
         {comment.imageUrl && !isEditing && (
+          // 사용자 업로드 이미지로 외부 URL이므로 img 태그 사용
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={comment.imageUrl} alt="댓글 이미지" className="mt-4 max-h-48 rounded-xl object-cover" />
         )}
 

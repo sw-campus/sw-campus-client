@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/authStore'
 
 import { getComments, createComment, updateComment, deleteComment, toggleCommentLike } from '../api/commentApi.client'
-import type { CreateCommentRequest, UpdateCommentRequest } from '../api/commentApi.types'
+import type { Comment, CreateCommentRequest, UpdateCommentRequest } from '../api/commentApi.types'
 
 // Query Keys
 export const commentKeys = {
@@ -102,10 +102,10 @@ export function useToggleCommentLike(postId: number) {
       const previousComments = queryClient.getQueryData(queryKey)
 
       // 3. 낙관적 업데이트 적용
-      queryClient.setQueryData(queryKey, (old: any[]) => {
+      queryClient.setQueryData(queryKey, (old: Comment[] | undefined) => {
         if (!old) return []
 
-        const updateLike = (comments: any[]): any[] => {
+        const updateLike = (comments: Comment[]): Comment[] => {
           return comments.map(comment => {
             if (comment.id === commentId) {
               const isLiked = !comment.isLiked
@@ -132,10 +132,10 @@ export function useToggleCommentLike(postId: number) {
     },
     onSuccess: (data) => {
       // 서버 응답을 기반으로 캐시 업데이트 (서버가 진실의 원천)
-      queryClient.setQueryData(queryKey, (old: any[]) => {
+      queryClient.setQueryData(queryKey, (old: Comment[] | undefined) => {
         if (!old) return []
 
-        const updateLike = (comments: any[]): any[] => {
+        const updateLike = (comments: Comment[]): Comment[] => {
           return comments.map(comment => {
             if (comment.id === data.commentId) {
               // 서버 응답의 liked 값으로 확정

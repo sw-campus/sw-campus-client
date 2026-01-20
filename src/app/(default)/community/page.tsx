@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -32,7 +32,7 @@ export default function CommunityPage() {
   const [selectedLecture, setSelectedLecture] = useState<SelectedLecture | null>(null)
 
   const { isLoggedIn } = useAuthStore()
-  const { data: categories = [], isLoading: isCategoriesLoading } = useBoardCategories()
+  const { data: _categories = [], isLoading: isCategoriesLoading } = useBoardCategories()
   const { data, isLoading: isPostsLoading } = usePosts({
     categoryId: selectedCategoryId ?? undefined,
     keyword: selectedLecture ? selectedLecture.name : keywordParam || undefined,
@@ -69,7 +69,7 @@ export default function CommunityPage() {
     setPage(0)
   }
 
-  const handleCategorySelect = (categoryId: number | null) => {
+  const _handleCategorySelect = (categoryId: number | null) => {
     setPage(0) // 카테고리 변경 시 첫 페이지로
 
     const params = new URLSearchParams()
@@ -97,15 +97,12 @@ export default function CommunityPage() {
     router.push(queryString ? `/community?${queryString}` : '/community')
   }
 
-  // ViewType 상태 관리 (로컬 스토리지 연동)
-  const [viewType, setViewType] = useState<'list' | 'card'>('list')
-
-  useEffect(() => {
+  // ViewType 상태 관리 (로컬 스토리지 연동) - lazy initialization으로 초기값 설정
+  const [viewType, setViewType] = useState<'list' | 'card'>(() => {
+    if (typeof window === 'undefined') return 'list'
     const saved = localStorage.getItem('community-post-view-type') as 'list' | 'card' | null
-    if (saved === 'card' || saved === 'list') {
-      setViewType(saved)
-    }
-  }, [])
+    return saved === 'card' || saved === 'list' ? saved : 'list'
+  })
 
   const handleViewChange = (type: 'list' | 'card') => {
     setViewType(type)

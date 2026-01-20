@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import Link from 'next/link'
 import { useParams, notFound } from 'next/navigation'
@@ -17,19 +17,16 @@ export default function UserProfilePage() {
 
   const [page, setPage] = useState(0)
   const [sort] = useState(DEFAULT_POST_SORT)
-  const [viewType, setViewType] = useState<'list' | 'card'>('list')
+  // ViewType 상태 관리 (로컬 스토리지 연동) - lazy initialization으로 초기값 설정
+  const [viewType, setViewType] = useState<'list' | 'card'>(() => {
+    if (typeof window === 'undefined') return 'list'
+    const saved = localStorage.getItem('community-post-view-type') as 'list' | 'card' | null
+    return saved === 'card' || saved === 'list' ? saved : 'list'
+  })
 
   const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(userId)
   const { data: postsData, isLoading: postsLoading } = useUserPosts(userId, { page, size: 10, sort })
   const isLoading = profileLoading || postsLoading
-
-  // ViewType 로컬 스토리지 연동
-  useEffect(() => {
-    const saved = localStorage.getItem('community-post-view-type') as 'list' | 'card' | null
-    if (saved === 'card' || saved === 'list') {
-      setViewType(saved)
-    }
-  }, [])
 
   const handleViewChange = (type: 'list' | 'card') => {
     setViewType(type)

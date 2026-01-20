@@ -240,19 +240,20 @@ export function PostForm({
   // 카테고리 선택 로직
   const [selectedPath, setSelectedPath] = useState<number[]>([])
 
-  const findPath = (cats: BoardCategory[], targetId: number): number[] | null => {
-    for (const cat of cats) {
-      if (cat.id === targetId) return [cat.id]
-      if (cat.children.length > 0) {
-        const path = findPath(cat.children, targetId)
-        if (path) return [cat.id, ...path]
-      }
-    }
-    return null
-  }
-
   useEffect(() => {
     if (categories.length > 0 && initialData?.categoryId) {
+      // findPath를 useEffect 내부로 이동하여 exhaustive-deps 경고 해결
+      const findPath = (cats: BoardCategory[], targetId: number): number[] | null => {
+        for (const cat of cats) {
+          if (cat.id === targetId) return [cat.id]
+          if (cat.children.length > 0) {
+            const path = findPath(cat.children, targetId)
+            if (path) return [cat.id, ...path]
+          }
+        }
+        return null
+      }
+
       const path = findPath(categories, initialData.categoryId)
       if (path) {
         setSelectedPath(path)

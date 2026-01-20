@@ -21,28 +21,51 @@ interface CategorySidebarProps {
  * - 부드러운 애니메이션
  */
 export function CategorySidebar({ categories, selectedCategoryId, onSelect }: CategorySidebarProps) {
-  const [expandedIds, setExpandedIds] = useState<number[]>([])
+  // 선택된 카테고리의 조상들을 펼쳐서 보여주기 위해 초기값을 계산
+  const [expandedIds, setExpandedIds] = useState<number[]>(() => {
+    if (selectedCategoryId === null) return []
 
-  // 선택된 카테고리의 모든 조상 ID 찾기 (트리 펼침용)
-  const findAncestorIds = (categoryId: number | null, list: BoardCategory[]): number[] => {
-    if (categoryId === null) return []
+    // 선택된 카테고리의 모든 조상 ID 찾기 (트리 펼침용)
+    const findAncestorIds = (categoryId: number | null, list: BoardCategory[]): number[] => {
+      if (categoryId === null) return []
 
-    for (const category of list) {
-      if (category.id === categoryId) return [category.id]
-      if (category.children && category.children.length > 0) {
-        const path = findAncestorIds(categoryId, category.children)
-        if (path.length > 0) {
-          return [category.id, ...path]
+      for (const category of list) {
+        if (category.id === categoryId) return [category.id]
+        if (category.children && category.children.length > 0) {
+          const path = findAncestorIds(categoryId, category.children)
+          if (path.length > 0) {
+            return [category.id, ...path]
+          }
         }
       }
+      return []
     }
-    return []
-  }
+
+    return findAncestorIds(selectedCategoryId, categories)
+  })
 
   // 선택된 카테고리가 변경되면 조상들을 자동으로 펼침
   useEffect(() => {
     if (selectedCategoryId !== null) {
+      // 선택된 카테고리의 모든 조상 ID 찾기
+      const findAncestorIds = (categoryId: number | null, list: BoardCategory[]): number[] => {
+        if (categoryId === null) return []
+
+        for (const category of list) {
+          if (category.id === categoryId) return [category.id]
+          if (category.children && category.children.length > 0) {
+            const path = findAncestorIds(categoryId, category.children)
+            if (path.length > 0) {
+              return [category.id, ...path]
+            }
+          }
+        }
+        return []
+      }
+
       const ancestors = findAncestorIds(selectedCategoryId, categories)
+      // 선택된 카테고리의 조상 노드들을 펼침 상태에 추가 (의도적인 props→state 동기화)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpandedIds(prev => {
         const newIds = new Set([...prev, ...ancestors])
         return Array.from(newIds)

@@ -286,6 +286,8 @@ export default function PostDetailPage() {
               {imagesNotInBody.length > 0 && (
                 <div className="mt-6 flex flex-wrap gap-3">
                   {imagesNotInBody.map((url, index) => (
+                    // 사용자 업로드 이미지로 외부 URL이므로 img 태그 사용
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       key={index}
                       src={url}
