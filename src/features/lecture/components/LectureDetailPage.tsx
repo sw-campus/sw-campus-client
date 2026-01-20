@@ -148,7 +148,7 @@ export default function LectureDetailPage({ lectureId }: Props) {
 
                   {/* 커리큘럼 */}
                   <div id="curriculum" className="scroll-mt-28">
-                    <LectureCurriculum curriculum={lecture.curriculum} />
+                    <LectureCurriculum curriculum={lecture.curriculum} specialCurriculums={lecture.specialCurriculums} />
                   </div>
 
                   <Separator />

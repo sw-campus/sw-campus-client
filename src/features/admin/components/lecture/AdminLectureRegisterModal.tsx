@@ -21,7 +21,7 @@ import { stepFields } from '@/features/lecture/validation/lectureFormStepSchemas
 
 import { OrganizationSearchInput } from './OrganizationSearchInput'
 
-const ADMIN_LECTURE_FORM_STEPS = [{ title: '기관 선택', description: '강의를 등록할 기관 선택' }, ...LECTURE_FORM_STEPS]
+const ADMIN_LECTURE_FORM_STEPS = [{ title: '기관', description: '기관 선택' }, ...LECTURE_FORM_STEPS]
 
 const TOTAL_STEPS = ADMIN_LECTURE_FORM_STEPS.length
 
@@ -74,6 +74,10 @@ export function AdminLectureRegisterModal({ isOpen, onClose }: AdminLectureRegis
   }, [currentStep])
 
   const validateCurrentStep = async () => {
+    // useFieldArray 상태 동기화를 위해 마이크로태스크 큐 대기
+    // React의 렌더링 사이클이 완료된 후 trigger 실행
+    await new Promise(resolve => setTimeout(resolve, 0))
+
     if (currentStep === 0) {
       return await trigger('orgId')
     }

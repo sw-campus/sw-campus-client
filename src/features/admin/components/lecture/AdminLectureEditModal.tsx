@@ -25,7 +25,7 @@ import { useAdminUpdateLectureMutation } from '../../hooks/useLectures'
 import { OrganizationSearchInput } from './OrganizationSearchInput'
 
 // 관리자용 스텝: 기관 선택 + 기존 스텝
-const ADMIN_LECTURE_EDIT_STEPS = [{ title: '기관 선택', description: '강의 기관 변경' }, ...LECTURE_FORM_STEPS]
+const ADMIN_LECTURE_EDIT_STEPS = [{ title: '기관', description: '기관 변경' }, ...LECTURE_FORM_STEPS]
 
 const TOTAL_STEPS = ADMIN_LECTURE_EDIT_STEPS.length
 
@@ -78,7 +78,7 @@ export function AdminLectureEditModal({ open, onOpenChange, lectureId, onSuccess
         }
       } catch (error) {
         console.error('Failed to fetch lecture:', error)
-        toast.error('강의 정보를 불러오는데 실패했습니다.')
+        // 에러 toast는 axios 인터셉터에서 처리됨
       } finally {
         setIsLoading(false)
       }
@@ -102,6 +102,10 @@ export function AdminLectureEditModal({ open, onOpenChange, lectureId, onSuccess
   }, [currentStep])
 
   const validateCurrentStep = async () => {
+    // useFieldArray 상태 동기화를 위해 마이크로태스크 큐 대기
+    // React의 렌더링 사이클이 완료된 후 trigger 실행
+    await new Promise(resolve => setTimeout(resolve, 0))
+
     if (currentStep === 0) {
       return await trigger('orgId')
     }

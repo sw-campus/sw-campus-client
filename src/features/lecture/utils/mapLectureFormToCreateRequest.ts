@@ -66,5 +66,15 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
       : undefined,
     adds: values.adds?.length ? values.adds : undefined,
     curriculums,
+    // 빈 항목 필터링 후 순서 재계산 (1,3,5에만 입력 → 1,2,3으로 저장)
+    specialCurriculums: (() => {
+      const filtered = values.specialCurriculums
+        ?.filter(sc => sc.title?.trim())
+        .map((sc, idx) => ({
+          title: sc.title.trim(),
+          sortOrder: idx + 1,
+        }))
+      return filtered?.length ? filtered : undefined
+    })(),
   }
 }

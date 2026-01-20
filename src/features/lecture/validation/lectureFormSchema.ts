@@ -98,6 +98,21 @@ export const lectureFormSchema = z
         }),
       )
       .optional(),
+
+    // 특화 커리큘럼 (최대 5개) - 추가 시 제목은 필수
+    specialCurriculums: z
+      .array(
+        z.object({
+          title: z
+            .string()
+            .min(1, '제목은 필수입니다.')
+            .max(20, '제목은 20자 이내로 입력해 주세요.')
+            .refine(val => val.trim().length > 0, '제목은 공백만 입력할 수 없습니다.'),
+          sortOrder: z.number().int().positive('정렬 순서는 1 이상이어야 합니다.'),
+        }),
+      )
+      .max(5, '특화 커리큘럼은 최대 5개까지 등록할 수 있습니다.')
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.startAtDate && data.endAtDate && data.startAtDate > data.endAtDate) {

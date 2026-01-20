@@ -27,6 +27,7 @@ function sectionRow(label: string, rowKey: string) {
   )
 }
 
+
 function curriculumLevel(detail: LectureDetail | null | undefined, name: string) {
   const found = detail?.curriculum?.find(c => c?.name === name)
   if (!found) return '-'
@@ -63,6 +64,27 @@ function renderCurriculumLevel(level: string) {
   )
 }
 
+// 특화 커리큘럼을 sortOrder로 정렬해서 반환
+function getSortedSpecialCurriculums(detail: LectureDetail | null | undefined) {
+  const items = detail?.specialCurriculums ?? []
+  return [...items].sort((a, b) => a.sortOrder - b.sortOrder)
+}
+
+// 특화 커리큘럼 전체 목록 렌더링 (하나의 셀에 모두 표시)
+function renderSpecialCurriculumList(items: { title: string }[]) {
+  if (items.length === 0) return '-'
+
+  return (
+    <div className="space-y-1 text-center">
+      {items.map((item, idx) => (
+        <span key={idx} className="block text-xs text-foreground md:text-base">
+          {item.title}
+        </span>
+      ))}
+    </div>
+  )
+}
+
 export function CompareTable({
   leftTitle,
   rightTitle,
@@ -80,6 +102,8 @@ export function CompareTable({
 }) {
   const curriculumNames = getCurriculumNames(leftDetail, rightDetail)
   const stepTypes = getStepTypes(leftDetail, rightDetail)
+  const leftSpecialCurriculums = getSortedSpecialCurriculums(leftDetail)
+  const rightSpecialCurriculums = getSortedSpecialCurriculums(rightDetail)
   const isLeftSelected = Boolean(leftDetail)
   const isRightSelected = Boolean(rightDetail)
 
@@ -216,7 +240,7 @@ export function CompareTable({
             )
           })()}
 
-          {sectionRow('커리큘럼', 'curriculum-title')}
+          {sectionRow('메인 커리큘럼', 'curriculum-title')}
           {curriculumNames.length === 0
             ? dataRow({
                 rowKey: 'curriculum-empty',
@@ -240,7 +264,19 @@ export function CompareTable({
                   isRightSelected,
                 }),
               )}
-          {/* 커리큘럼 AI 코멘트 */}
+          {/* 특화 커리큘럼 */}
+          {sectionRow('특화 커리큘럼', 'special-curriculum-title')}
+          {dataRow({
+            rowKey: 'special-curriculum-content',
+            label: '내용',
+            leftValue: valueOrUnselected(leftDetail, renderSpecialCurriculumList(leftSpecialCurriculums)),
+            rightValue: valueOrUnselected(rightDetail, renderSpecialCurriculumList(rightSpecialCurriculums)),
+            labelColClassName,
+            valueAlign: 'center',
+            isLeftSelected,
+            isRightSelected,
+          })}
+          {/* 커리큘럼 AI 코멘트 (메인 + 특화 통합) */}
           {(() => {
             const aiComment = getAiComment('curriculum')
             if (!aiComment) return null

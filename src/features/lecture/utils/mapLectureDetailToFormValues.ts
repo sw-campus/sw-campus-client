@@ -85,6 +85,13 @@ export const mapLectureDetailToFormValues = (
       level: (curr.level as 'NONE' | 'BASIC' | 'ADVANCED') ?? 'NONE',
     })) ?? []
 
+  // 특화 커리큘럼 매핑 (nullable 처리)
+  const specialCurriculums =
+    detail.specialCurriculums?.map(sc => ({
+      title: sc.title ?? '',
+      sortOrder: sc.sortOrder ?? 1,
+    })) ?? []
+
   // 카테고리 ID (백엔드에서 직접 받은 ID 사용)
   // 만약 백엔드에서 null을 준다면 기존 로직(이름 기반 찾기)으로 fallback하거나 null 처리
   // 여기서는 백엔드가 categoryId를 준다고 가정하고 우선 사용
@@ -141,5 +148,6 @@ export const mapLectureDetailToFormValues = (
     adds: adds.length > 0 ? adds : undefined,
     categoryId,
     curriculums: curriculums.length > 0 ? curriculums : undefined,
+    specialCurriculums: specialCurriculums.length > 0 ? specialCurriculums : undefined,
   }
 }
