@@ -35,7 +35,7 @@ type MySurveyResponse = {
 
 // PersonalForm과 동일 톤의 입력 스타일
 const INPUT_CLASS =
-  'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
+  'h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none'
 
 export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
@@ -109,7 +109,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
       router.back()
     } catch (error) {
       console.error('설문조사 저장 중 오류가 발생했습니다:', error)
-      toast.error('설문조사 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      // API 에러 toast는 axios 인터셉터에서 처리
     } finally {
       setIsPending(false)
     }
@@ -121,7 +121,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
         <FieldSet>
           <FieldGroup className="grid grid-cols-1 gap-6">
             <div>
-              <label htmlFor="major" className="mb-1 block text-sm font-medium text-gray-800">
+              <label htmlFor="major" className="mb-1 block text-sm font-medium text-foreground">
                 전공<span className="text-red-500">*</span>
               </label>
               <input id="major" type="text" {...register('major')} className={INPUT_CLASS} />
@@ -129,7 +129,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
             </div>
 
             <div>
-              <label htmlFor="affordableAmount" className="mb-1 block text-sm font-medium text-gray-800">
+              <label htmlFor="affordableAmount" className="mb-1 block text-sm font-medium text-foreground">
                 가능 금액(원)<span className="text-red-500">*</span>
               </label>
               <input
@@ -149,9 +149,9 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
                 id="bootcampCompleted"
                 type="checkbox"
                 {...register('bootcampCompleted')}
-                className="h-4 w-4 rounded border-gray-300"
+                className="h-4 w-4 rounded border-border"
               />
-              <label htmlFor="bootcampCompleted" className="text-sm font-medium text-gray-800">
+              <label htmlFor="bootcampCompleted" className="text-sm font-medium text-foreground">
                 부트캠프 수료
               </label>
             </div>
@@ -161,9 +161,9 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
                 id="hasGovCard"
                 type="checkbox"
                 {...register('hasGovCard')}
-                className="h-4 w-4 rounded border-gray-300"
+                className="h-4 w-4 rounded border-border"
               />
-              <label htmlFor="hasGovCard" className="text-sm font-medium text-gray-800">
+              <label htmlFor="hasGovCard" className="text-sm font-medium text-foreground">
                 국민내일배움카드 보유
               </label>
             </div>
@@ -173,7 +173,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
             <Button
               type="submit"
               disabled={!isValid || isPending || upsertSurvey.isPending || isLoading}
-              className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+              className="h-11 w-full"
             >
               {isLoading ? '불러오는 중...' : isPending || upsertSurvey.isPending ? '저장 중...' : '저장'}
             </Button>
@@ -193,13 +193,13 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
 
   return (
     <div className="mx-auto w-full">
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-gray-200 px-8 py-6">
-          <h2 className="text-xl font-semibold text-gray-900">설문조사</h2>
+      <div className="rounded-2xl border border-border bg-card shadow-sm">
+        <div className="flex items-center justify-between border-b border-border px-8 py-6">
+          <h2 className="text-xl font-semibold text-foreground">설문조사</h2>
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
             aria-label="닫기"
           >
             <FiX className="h-5 w-5" aria-hidden />

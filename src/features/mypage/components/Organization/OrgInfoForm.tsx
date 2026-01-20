@@ -53,10 +53,10 @@ const orgInfoSchema = z.object({
 
 type OrgInfoFormValues = z.infer<typeof orgInfoSchema>
 const INPUT_CLASS =
-  'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
+  'h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none'
 
 const TEXTAREA_CLASS =
-  'w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
+  'w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none'
 
 export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
@@ -127,7 +127,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
           location: '',
         })
       } catch {
-        toast.error('기관 정보 조회에 실패했습니다.')
+        // API 에러 toast는 axios 인터셉터에서 처리
       } finally {
         if (mounted) setIsLoading(false)
       }
@@ -183,8 +183,8 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
           <FieldGroup className="grid grid-cols-1 gap-6">
             {/* 수정 불가: 승인 상태 */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-800">승인 상태</label>
-              <div className={`${INPUT_CLASS} flex items-center bg-gray-50`}>
+              <label className="mb-1 block text-sm font-medium text-foreground">승인 상태</label>
+              <div className={`${INPUT_CLASS} flex items-center bg-muted`}>
                 {(() => {
                   const ui = getApprovalStatusUI(approvalStatus)
                   return (
@@ -198,7 +198,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
             </div>
 
             <div>
-              <label htmlFor="organizationName" className="mb-1 block text-sm font-medium text-gray-800">
+              <label htmlFor="organizationName" className="mb-1 block text-sm font-medium text-foreground">
                 기관명
               </label>
               <input
@@ -215,7 +215,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
             <div>
               <div className="mb-1 flex items-center justify-between">
-                <label htmlFor="description" className="text-sm font-medium text-gray-800">
+                <label htmlFor="description" className="text-sm font-medium text-foreground">
                   기관 소개
                 </label>
                 <CharacterCounter current={description.length} max={MAX_DESCRIPTION_LENGTH} />
@@ -231,7 +231,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
             </div>
 
             <div>
-              <label htmlFor="homepage" className="mb-1 block text-sm font-medium text-gray-800">
+              <label htmlFor="homepage" className="mb-1 block text-sm font-medium text-foreground">
                 홈페이지
               </label>
               <input
@@ -245,11 +245,11 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
             {/* 첨부/링크 */}
             <div className="pt-2">
-              <p className="mb-3 text-sm font-semibold text-gray-900">첨부/링크</p>
+              <p className="mb-3 text-sm font-semibold text-foreground">첨부/링크</p>
 
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-800">로고</label>
+                  <label className="mb-1 block text-sm font-medium text-foreground">로고</label>
                   <Controller
                     control={methods.control}
                     name="logoUrl"
@@ -260,7 +260,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-800">재직증명서</label>
+                  <label className="mb-1 block text-sm font-medium text-foreground">재직증명서</label>
                   <Controller
                     control={methods.control}
                     name="certificateKey"
@@ -280,7 +280,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                           onFileChange={setCertificateFile}
                         />
                         {field.value && !certificateFile && (
-                          <p className="text-xs text-gray-500">새 파일을 업로드하면 기존 파일이 대체됩니다.</p>
+                          <p className="text-xs text-muted-foreground">새 파일을 업로드하면 기존 파일이 대체됩니다.</p>
                         )}
                       </div>
                     )}
@@ -288,7 +288,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                 </div>
 
                 <div>
-                  <label htmlFor="govAuth" className="mb-1 block text-sm font-medium text-gray-800">
+                  <label htmlFor="govAuth" className="mb-1 block text-sm font-medium text-foreground">
                     정부 인증
                   </label>
                   <input
@@ -307,7 +307,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-800">업체시설1</label>
+                  <label className="mb-1 block text-sm font-medium text-foreground">업체시설1</label>
                   <Controller
                     control={methods.control}
                     name="facilityImageUrl"
@@ -318,7 +318,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-800">업체시설2</label>
+                  <label className="mb-1 block text-sm font-medium text-foreground">업체시설2</label>
                   <Controller
                     control={methods.control}
                     name="facilityImageUrl2"
@@ -329,7 +329,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-800">업체시설3</label>
+                  <label className="mb-1 block text-sm font-medium text-foreground">업체시설3</label>
                   <Controller
                     control={methods.control}
                     name="facilityImageUrl3"
@@ -339,7 +339,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-800">업체시설4</label>
+                  <label className="mb-1 block text-sm font-medium text-foreground">업체시설4</label>
                   <Controller
                     control={methods.control}
                     name="facilityImageUrl4"
@@ -356,7 +356,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
             <Button
               type="submit"
               disabled={!isValid || isPending || isLoading}
-              className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+              className="h-11 w-full"
             >
               {isLoading ? '불러오는 중...' : isPending ? '저장 중...' : '저장'}
             </Button>
@@ -376,14 +376,14 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
   return (
     <div className="mx-auto w-full">
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-gray-200 px-8 py-6">
-          <h2 className="text-xl font-semibold text-gray-900">기관 정보 수정</h2>
+      <div className="rounded-2xl border border-border bg-card shadow-sm">
+        <div className="flex items-center justify-between border-b border-border px-8 py-6">
+          <h2 className="text-xl font-semibold text-foreground">기관 정보 수정</h2>
 
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
             aria-label="닫기"
           >
             <FiX className="h-5 w-5" aria-hidden />
