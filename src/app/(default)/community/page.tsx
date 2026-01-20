@@ -2,9 +2,9 @@
 
 import { Suspense, useState } from 'react'
 
-import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { FiEdit3, FiFilter, FiX, FiTag, FiList, FiGrid, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -32,13 +32,29 @@ function CommunityContent() {
   const [selectedLecture, setSelectedLecture] = useState<SelectedLecture | null>(null)
 
   const { isLoggedIn } = useAuthStore()
+
+  // 글쓰기 버튼 클릭 핸들러
+  const handleWriteClick = () => {
+    if (!isLoggedIn) {
+      toast.error('로그인이 필요합니다', {
+        description: '글을 작성하려면 먼저 로그인해주세요.',
+        action: {
+          label: '로그인',
+          onClick: () => router.push('/login?returnUrl=/community/write'),
+        },
+      })
+      return
+    }
+    router.push('/community/write')
+  }
+
   const { data: _categories = [], isLoading: isCategoriesLoading } = useBoardCategories()
   const { data, isLoading: isPostsLoading } = usePosts({
     categoryId: selectedCategoryId ?? undefined,
     keyword: selectedLecture ? selectedLecture.name : keywordParam || undefined,
     tags: selectedTags,
     page,
-    size: 12,
+    size: 10,
     sort,
   })
   const isLoading = isCategoriesLoading || isPostsLoading
@@ -125,16 +141,15 @@ function CommunityContent() {
           </div>
 
           {/* 데스크탑 글쓰기 버튼 */}
-          {isLoggedIn && (
-            <div className="hidden sm:block">
-              <Link href="/community/write">
-                <Button className="h-10 gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 text-sm font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-300/50">
-                  <FiEdit3 className="h-4 w-4" />
-                  글쓰기
-                </Button>
-              </Link>
-            </div>
-          )}
+          <div className="hidden sm:block">
+            <Button
+              onClick={handleWriteClick}
+              className="h-10 gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 text-sm font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-300/50"
+            >
+              <FiEdit3 className="h-4 w-4" />
+              글쓰기
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -336,15 +351,13 @@ function CommunityContent() {
       </div>
 
       {/* 모바일 플로팅 글쓰기 버튼 */}
-      {isLoggedIn && (
-        <Link
-          href="/community/write"
-          className="fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-300/50 transition-all active:scale-90 sm:hidden"
-          aria-label="글쓰기"
-        >
-          <FiEdit3 className="h-6 w-6" />
-        </Link>
-      )}
+      <button
+        onClick={handleWriteClick}
+        className="fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-300/50 transition-all active:scale-90 sm:hidden"
+        aria-label="글쓰기"
+      >
+        <FiEdit3 className="h-6 w-6" />
+      </button>
 
       {/* 강의 검색 모달 */}
       <LectureSearchModal

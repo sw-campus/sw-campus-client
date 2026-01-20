@@ -1,10 +1,14 @@
 'use client'
 
+import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
+
+import { OAUTH_RETURN_URL_KEY } from '@/features/auth/constants'
 
 export type Provider = 'google' | 'github' | 'kakao'
 
 export function useOAuthUrls() {
+  const searchParams = useSearchParams()
   // OAuth (Google / GitHub / Kakao)
   const oauthRedirectUri = (() => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? (typeof window !== 'undefined' ? window.location.origin : '')
@@ -100,6 +104,18 @@ export function useOAuthUrls() {
     if (!target) {
       toast.error('OAuth 환경변수(NEXT_PUBLIC_*_CLIENT_ID)가 설정되지 않았어요.')
       return
+    }
+
+    // returnUrl을 sessionStorage에 저장 (OAuth 콜백에서 사용)
+    try {
+      const returnUrl = searchParams.get('returnUrl')
+      if (returnUrl && returnUrl.startsWith('/')) {
+        sessionStorage.setItem(OAUTH_RETURN_URL_KEY, returnUrl)
+      } else {
+        sessionStorage.removeItem(OAUTH_RETURN_URL_KEY)
+      }
+    } catch {
+      // ignore storage errors
     }
 
     window.location.href = target

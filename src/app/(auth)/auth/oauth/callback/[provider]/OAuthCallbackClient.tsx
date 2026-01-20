@@ -6,6 +6,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { oauthLogin } from '@/features/auth/authApi'
+import { OAUTH_RETURN_URL_KEY } from '@/features/auth/constants'
 import { getProfile } from '@/features/mypage/api/survey.api'
 import { parseUserType, parseUserName, parseNickname, type LoginResponse } from '@/lib/parseLoginResponse'
 import { useAuthStore } from '@/store/authStore'
@@ -73,8 +74,20 @@ export default function OAuthCallbackClient() {
         }
 
         toast.success('로그인되었습니다.')
-        // 관리자인 경우 /admin 페이지로, 그 외에는 홈으로 리다이렉트
-        if (userType === 'ADMIN') {
+
+        // returnUrl 확인 (sessionStorage에서)
+        let returnUrl: string | null = null
+        try {
+          returnUrl = sessionStorage.getItem(OAUTH_RETURN_URL_KEY)
+          sessionStorage.removeItem(OAUTH_RETURN_URL_KEY)
+        } catch {
+          // ignore storage errors
+        }
+
+        // 리다이렉트: returnUrl > 관리자면 /admin > 홈
+        if (returnUrl && returnUrl.startsWith('/')) {
+          router.replace(returnUrl)
+        } else if (userType === 'ADMIN') {
           router.replace('/admin')
         } else {
           router.replace('/')
