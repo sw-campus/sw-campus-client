@@ -3,9 +3,9 @@
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
-export type Provider = 'google' | 'github' | 'kakao'
+import { OAUTH_RETURN_URL_KEY } from '@/features/auth/constants'
 
-const OAUTH_RETURN_URL_KEY = 'oauth_return_url'
+export type Provider = 'google' | 'github' | 'kakao'
 
 export function useOAuthUrls() {
   const searchParams = useSearchParams()

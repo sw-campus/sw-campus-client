@@ -2,7 +2,6 @@
 
 import { Suspense, useState } from 'react'
 
-import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { FiEdit3, FiFilter, FiX, FiTag, FiList, FiGrid, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { toast } from 'sonner'

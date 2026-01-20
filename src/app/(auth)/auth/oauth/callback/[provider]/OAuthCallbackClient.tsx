@@ -6,11 +6,10 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { oauthLogin } from '@/features/auth/authApi'
+import { OAUTH_RETURN_URL_KEY } from '@/features/auth/constants'
 import { getProfile } from '@/features/mypage/api/survey.api'
 import { parseUserType, parseUserName, parseNickname, type LoginResponse } from '@/lib/parseLoginResponse'
 import { useAuthStore } from '@/store/authStore'
-
-const OAUTH_RETURN_URL_KEY = 'oauth_return_url'
 
 export default function OAuthCallbackClient() {
   const router = useRouter()
