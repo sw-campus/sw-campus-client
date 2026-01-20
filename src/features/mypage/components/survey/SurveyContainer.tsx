@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, FileText, Target } from 'lucide-react'
@@ -30,9 +30,10 @@ function getDefaultStep(hasBasicSurvey: boolean, hasAptitudeTest: boolean): Surv
 interface SurveyContainerProps {
   embedded?: boolean
   onComplete?: () => void
+  onStepChange?: (step: SurveyStep) => void
 }
 
-export function SurveyContainer({ embedded = false, onComplete }: SurveyContainerProps) {
+export function SurveyContainer({ embedded = false, onComplete, onStepChange }: SurveyContainerProps) {
   const { data: survey, isLoading, refetch } = useSurveyQuery()
   const [showContinueModal, setShowContinueModal] = useState(false)
   const [aptitudeProgress, setAptitudeProgress] = useState(0)
@@ -51,6 +52,11 @@ export function SurveyContainer({ embedded = false, onComplete }: SurveyContaine
 
   // 현재 스텝: 사용자 선택 > 서버 기본값
   const currentStep = userSelectedStep ?? serverDefaultStep
+
+  // 스텝 변경 시 부모에게 알림
+  useEffect(() => {
+    onStepChange?.(currentStep)
+  }, [currentStep, onStepChange])
 
   // 전체 진행률 계산 (실제 완료 여부 기준, 동적 계산)
   const calculateOverallProgress = useCallback(() => {
@@ -257,6 +263,7 @@ export function SurveyContainer({ embedded = false, onComplete }: SurveyContaine
                 survey={survey}
                 onEditBasic={handleEditBasic}
                 onRetakeAptitude={handleRetakeAptitude}
+                onClose={onComplete}
               />
             </motion.div>
           )}

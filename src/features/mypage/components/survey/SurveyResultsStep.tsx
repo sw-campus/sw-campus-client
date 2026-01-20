@@ -27,6 +27,7 @@ interface SurveyResultsStepProps {
   survey: SurveyResponse | null | undefined
   onEditBasic: () => void
   onRetakeAptitude: () => void
+  onClose?: () => void
 }
 
 const RECOMMENDED_JOB_ICONS: Record<RecommendedJob, LucideIcon> = {
@@ -45,6 +46,7 @@ export function SurveyResultsStep({
   survey,
   onEditBasic,
   onRetakeAptitude,
+  onClose,
 }: SurveyResultsStepProps) {
   const [showRetakeConfirm, setShowRetakeConfirm] = useState(false)
   const basicSurvey = survey?.basicSurvey
@@ -94,6 +96,20 @@ export function SurveyResultsStep({
         <p className="mt-1 text-sm text-gray-500">
           AI 추천에 활용되는 당신의 프로필입니다
         </p>
+        {/* 설문조사 완료 상태 표시 */}
+        <div className="mt-3">
+          {status?.hasAptitudeTest ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+              <span className="h-2 w-2 rounded-full bg-green-500" />
+              설문조사가 완료되었습니다
+            </span>
+          ) : status?.hasBasicSurvey ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-700">
+              <span className="h-2 w-2 rounded-full bg-amber-500" />
+              기초 설문 완료 (성향 테스트 미완료)
+            </span>
+          ) : null}
+        </div>
       </div>
 
       {/* 추천 직무 카드 (성향 테스트 완료 시) */}
@@ -233,22 +249,30 @@ export function SurveyResultsStep({
         </div>
       )}
 
-      {/* 성향 테스트 다시하기 (완료 시) */}
-      {status?.hasAptitudeTest && (
-        <div className="text-center">
-          <Button
-            variant="outline"
-            onClick={handleRetakeClick}
-            className="gap-2 text-gray-600"
-          >
-            <RefreshCw className="h-4 w-4" />
-            성향 테스트 다시하기
+      {/* 버튼 영역 */}
+      <div className="flex flex-col items-center gap-3">
+        {onClose && (
+          <Button onClick={onClose} className="w-full max-w-xs">
+            확인
           </Button>
-          <p className="mt-2 text-xs text-gray-400">
-            다시 테스트하면 기존 결과가 덮어씌워집니다
-          </p>
-        </div>
-      )}
+        )}
+
+        {status?.hasAptitudeTest && (
+          <div className="text-center">
+            <Button
+              variant="outline"
+              onClick={handleRetakeClick}
+              className="w-full max-w-xs gap-2 text-gray-600"
+            >
+              <RefreshCw className="h-4 w-4" />
+              성향 테스트 다시하기
+            </Button>
+            <p className="mt-2 text-xs text-gray-400">
+              다시 테스트하면 기존 결과가 덮어씌워집니다
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* 성향 테스트 재응시 확인 모달 */}
       <Dialog open={showRetakeConfirm} onOpenChange={setShowRetakeConfirm}>
