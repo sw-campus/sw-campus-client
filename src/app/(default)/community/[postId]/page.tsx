@@ -16,6 +16,7 @@ import {
   FiShare2,
   FiCheck,
   FiMapPin,
+  FiUser,
 } from 'react-icons/fi'
 
 import {
@@ -29,7 +30,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ClickableTag } from '@/features/community/components/ClickableTag'
 import { CommentSection } from '@/features/community/components/CommentSection'
 import { PostNavigation } from '@/features/community/components/PostNavigation'
@@ -102,10 +102,10 @@ export default function PostDetailPage() {
 
   if (isLoading) {
     return (
-      <main className="custom-container mx-auto w-full max-w-7xl">
-        <div className="mx-auto space-y-4 lg:max-w-3xl">
-          <div className="h-8 w-24 rounded-lg bg-gray-100" />
-          <div className="rounded-2xl border border-gray-200/60 bg-white p-5 sm:p-8">
+      <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 sm:px-6 sm:py-8 md:px-8">
+        <div className="mx-auto w-full space-y-4 lg:max-w-3xl">
+          <div className="ml-4 h-8 w-24 rounded-lg bg-gray-100 sm:ml-0" />
+          <div className="border-y border-gray-200/60 bg-white p-4 sm:rounded-2xl sm:border sm:p-8">
             <div className="space-y-4">
               <div className="flex gap-2">
                 <div className="h-6 w-16 rounded-full bg-gray-100" />
@@ -134,8 +134,8 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <main className="custom-container mx-auto w-full max-w-7xl">
-        <div className="mx-auto flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-20 lg:max-w-3xl">
+      <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 sm:px-6 sm:py-8 md:px-8">
+        <div className="mx-auto flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-20 lg:max-w-3xl">
           <p className="text-lg font-medium text-gray-500">게시글을 찾을 수 없습니다</p>
           <Link
             href="/community"
@@ -160,8 +160,8 @@ export default function PostDetailPage() {
   const relativeTime = formatRelativeTime(post.createdAt)
 
   return (
-    <main className="custom-container mx-auto w-full max-w-7xl !px-0 sm:!px-6 md:!px-8">
-      <div className="mx-auto lg:max-w-3xl">
+    <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 sm:px-6 sm:py-8 md:px-8">
+      <div className="mx-auto w-full lg:max-w-3xl">
       {/* 뒤로가기 */}
       <Link
         href="/community"
@@ -230,13 +230,11 @@ export default function PostDetailPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             {/* 작성자 */}
             <div className="flex items-center gap-3">
-              <Link href={`/community/user/${post.authorId}`}>
-                <Avatar className="h-11 w-11 ring-2 ring-white transition-transform hover:scale-105 sm:h-10 sm:w-10">
-                  <AvatarImage />
-                  <AvatarFallback className="bg-gradient-to-br from-orange-100 to-amber-100 text-sm font-semibold text-orange-700">
-                    {post.authorNickname?.slice(0, 2) ?? '익명'}
-                  </AvatarFallback>
-                </Avatar>
+              <Link
+                href={`/community/user/${post.authorId}`}
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-amber-100 ring-2 ring-white transition-transform hover:scale-105 sm:h-10 sm:w-10"
+              >
+                <FiUser className="h-5 w-5 text-orange-600 sm:h-4 sm:w-4" />
               </Link>
               <div className="flex flex-col">
                 <Link
@@ -276,22 +274,40 @@ export default function PostDetailPage() {
 
         {/* 본문 */}
         <div className="px-4 sm:px-8">
-          <div
-            className="prose prose-gray max-w-none prose-img:rounded-xl"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.body) }}
-          />
+          {isLoggedIn ? (
+            <>
+              <div
+                className="prose prose-gray max-w-none prose-img:rounded-xl"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.body) }}
+              />
 
-          {/* 이미지 - 본문에 포함되지 않은 이미지만 표시 */}
-          {imagesNotInBody.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-3">
-              {imagesNotInBody.map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`첨부 이미지 ${index + 1}`}
-                  className="max-h-80 rounded-xl object-contain"
-                />
-              ))}
+              {/* 이미지 - 본문에 포함되지 않은 이미지만 표시 */}
+              {imagesNotInBody.length > 0 && (
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {imagesNotInBody.map((url, index) => (
+                    <img
+                      key={index}
+                      src={url}
+                      alt={`첨부 이미지 ${index + 1}`}
+                      className="max-h-80 rounded-xl object-contain"
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-16">
+              <div className="mb-4 rounded-full bg-orange-100 p-4">
+                <FiEye className="h-8 w-8 text-orange-500" />
+              </div>
+              <p className="mb-2 text-lg font-semibold text-gray-700">로그인이 필요합니다</p>
+              <p className="mb-6 text-sm text-gray-500">게시글 내용을 확인하려면 로그인해 주세요.</p>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-600 active:scale-95"
+              >
+                로그인하기
+              </Link>
             </div>
           )}
         </div>
@@ -389,10 +405,12 @@ export default function PostDetailPage() {
           </div>
         )}
 
-        {/* 댓글 섹션 */}
-        <div className="px-4 pb-4 sm:px-8 sm:pb-8">
-          <CommentSection postId={postId} />
-        </div>
+        {/* 댓글 섹션 - 로그인한 사용자만 */}
+        {isLoggedIn && (
+          <div className="px-4 pb-4 sm:px-8 sm:pb-8">
+            <CommentSection postId={postId} />
+          </div>
+        )}
       </article>
 
       {/* 이전/다음 게시글 네비게이션 */}
