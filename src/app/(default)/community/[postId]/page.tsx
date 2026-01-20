@@ -14,7 +14,6 @@ import {
   FiEye,
   FiMessageCircle,
   FiShare2,
-  FiUser,
   FiCheck,
   FiMapPin,
 } from 'react-icons/fi'
@@ -31,8 +30,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { ClickableTag } from '@/features/community/components/ClickableTag'
 import { CommentSection } from '@/features/community/components/CommentSection'
 import { PostNavigation } from '@/features/community/components/PostNavigation'
@@ -105,8 +102,8 @@ export default function PostDetailPage() {
 
   if (isLoading) {
     return (
-      <main className="custom-container mx-auto w-full max-w-3xl">
-        <div className="space-y-4">
+      <main className="custom-container mx-auto w-full max-w-7xl">
+        <div className="mx-auto space-y-4 lg:max-w-3xl">
           <div className="h-8 w-24 rounded-lg bg-gray-100" />
           <div className="rounded-2xl border border-gray-200/60 bg-white p-5 sm:p-8">
             <div className="space-y-4">
@@ -137,8 +134,8 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <main className="custom-container mx-auto w-full max-w-3xl">
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-20">
+      <main className="custom-container mx-auto w-full max-w-7xl">
+        <div className="mx-auto flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-20 lg:max-w-3xl">
           <p className="text-lg font-medium text-gray-500">게시글을 찾을 수 없습니다</p>
           <Link
             href="/community"
@@ -163,20 +160,21 @@ export default function PostDetailPage() {
   const relativeTime = formatRelativeTime(post.createdAt)
 
   return (
-    <main className="custom-container mx-auto w-full max-w-3xl">
+    <main className="custom-container mx-auto w-full max-w-7xl !px-0 sm:!px-6 md:!px-8">
+      <div className="mx-auto lg:max-w-3xl">
       {/* 뒤로가기 */}
       <Link
         href="/community"
-        className="mb-4 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900 active:scale-95 sm:mb-6"
+        className="mb-4 ml-4 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900 active:scale-95 sm:mb-6 sm:ml-0"
       >
         <FiArrowLeft className="h-4 w-4" />
         <span>목록</span>
       </Link>
 
       {/* 게시글 카드 */}
-      <article className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-sm sm:rounded-3xl">
+      <article className="overflow-hidden border-y border-gray-200/60 bg-white shadow-sm sm:rounded-3xl sm:border">
         {/* 헤더 */}
-        <header className="p-5 pb-0 sm:p-8 sm:pb-0">
+        <header className="p-4 pb-0 sm:p-8 sm:pb-0">
           {/* 배지 영역 */}
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -274,10 +272,10 @@ export default function PostDetailPage() {
         </header>
 
         {/* 구분선 */}
-        <div className="mx-5 my-5 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent sm:mx-8 sm:my-6" />
+        <div className="mx-4 my-4 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent sm:mx-8 sm:my-6" />
 
         {/* 본문 */}
-        <div className="px-5 sm:px-8">
+        <div className="px-4 sm:px-8">
           <div
             className="prose prose-gray max-w-none prose-img:rounded-xl"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.body) }}
@@ -392,14 +390,15 @@ export default function PostDetailPage() {
         )}
 
         {/* 댓글 섹션 */}
-        <div className="px-5 pb-5 sm:px-8 sm:pb-8">
+        <div className="px-4 pb-4 sm:px-8 sm:pb-8">
           <CommentSection postId={postId} />
         </div>
       </article>
 
       {/* 이전/다음 게시글 네비게이션 */}
-      <div className="mt-6">
+      <div className="mt-6 px-4 sm:px-0">
         <PostNavigation postId={postId} />
+      </div>
       </div>
     </main>
   )

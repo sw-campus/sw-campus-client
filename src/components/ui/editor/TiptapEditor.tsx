@@ -7,7 +7,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import Underline from '@tiptap/extension-underline'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import {
   Bold,
   Italic,
@@ -45,7 +45,7 @@ export function TiptapEditor({
   minHeight = '300px',
 }: TiptapEditorProps) {
   const imageInputRef = useRef<HTMLInputElement>(null)
-  const { uploadImage, isUploading, progress } = useImageUpload()
+  const { uploadImage, isUploading } = useImageUpload()
   const editor = useEditor({
     extensions: [
       StarterKit,

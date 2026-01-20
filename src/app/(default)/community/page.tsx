@@ -170,13 +170,13 @@ export default function CommunityPage() {
               variant="outline"
               size="sm"
               onClick={() => setIsLectureModalOpen(true)}
-              className={`h-9 shrink-0 gap-1.5 rounded-xl border px-3 text-[13px] font-medium transition-all active:scale-95 ${
+              className={`h-10 shrink-0 gap-1.5 rounded-xl border px-3 text-sm font-medium transition-all active:scale-95 sm:h-9 sm:text-[13px] ${
                 selectedLecture
                   ? 'border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700'
                   : 'border-gray-200 text-gray-600 hover:border-gray-300'
               }`}
             >
-              <FiFilter className="h-3.5 w-3.5" />
+              <FiFilter className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
               <span>강의 필터</span>
               {selectedLecture && (
                 <span className="flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">
@@ -193,7 +193,7 @@ export default function CommunityPage() {
                 setPage(0)
               }}
             >
-              <SelectTrigger className="h-9 w-[100px] shrink-0 rounded-xl border-gray-200 bg-white text-[13px]">
+              <SelectTrigger className="h-10 w-[110px] shrink-0 rounded-xl border-gray-200 bg-white text-sm sm:h-9 sm:w-[100px] sm:text-[13px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -212,7 +212,7 @@ export default function CommunityPage() {
             <div className="flex shrink-0 items-center gap-0.5 rounded-xl border border-gray-200 bg-gray-50 p-0.5">
               <button
                 onClick={() => handleViewChange('list')}
-                className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all active:scale-90 ${
+                className={`flex h-9 w-9 items-center justify-center rounded-lg transition-all active:scale-90 sm:h-8 sm:w-8 ${
                   viewType === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'
                 }`}
                 aria-label="리스트형 보기"
@@ -221,7 +221,7 @@ export default function CommunityPage() {
               </button>
               <button
                 onClick={() => handleViewChange('card')}
-                className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all active:scale-90 ${
+                className={`flex h-9 w-9 items-center justify-center rounded-lg transition-all active:scale-90 sm:h-8 sm:w-8 ${
                   viewType === 'card' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'
                 }`}
                 aria-label="카드형 보기"

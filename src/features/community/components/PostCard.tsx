@@ -1,12 +1,10 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FiHeart, FiMessageCircle, FiImage, FiMapPin } from 'react-icons/fi'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 import type { Post } from '../api/postApi.types'
 import { BOOTCAMP_DIARY_CATEGORY_NAME } from '../constants'

@@ -6,7 +6,6 @@ import {
   ApiPostResponse,
   CreatePostRequest,
   PagedPosts,
-  Post,
   PostDetail,
   PostSearchParams,
   UpdatePostRequest,

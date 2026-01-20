@@ -71,18 +71,18 @@ export function PostListRow({ post }: PostListRowProps) {
           {/* 상단: 배지 + 제목 */}
           <div className="space-y-2">
             {/* 배지 영역 */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               {post.pinned && (
-                <span className="inline-flex items-center gap-1 rounded-md bg-orange-100 px-2 py-0.5 text-[11px] font-bold text-orange-600">
+                <span className="inline-flex items-center gap-1 rounded-md bg-orange-100 px-2 py-0.5 text-xs font-bold text-orange-600">
                   <FiMapPin className="h-3 w-3" />
                   공지
                 </span>
               )}
-              <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
+              <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
                 {post.categoryName}
               </span>
               {isPopular && (
-                <span className="inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-rose-50 to-pink-50 px-2 py-0.5 text-[11px] font-semibold text-rose-600">
+                <span className="inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-rose-50 to-pink-50 px-2 py-0.5 text-xs font-semibold text-rose-600">
                   <FiTrendingUp className="h-3 w-3" />
                   인기
                 </span>
@@ -107,8 +107,8 @@ export function PostListRow({ post }: PostListRowProps) {
           </div>
 
           {/* 하단: 메타 정보 */}
-          <div className="mt-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[13px]">
+          <div className="mt-2 flex flex-col gap-2 sm:mt-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-1.5 text-sm sm:gap-2">
               <Link
                 href={`/community/user/${post.authorId}`}
                 onClick={e => e.stopPropagation()}
@@ -123,17 +123,17 @@ export function PostListRow({ post }: PostListRowProps) {
             </div>
 
             {/* 통계 */}
-            <div className="flex items-center gap-4 text-[12px] text-gray-500">
+            <div className="flex items-center gap-3 text-xs text-gray-500 sm:gap-4 sm:text-sm">
               <span className="flex items-center gap-1">
-                <FiEye className="h-3.5 w-3.5" />
+                <FiEye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="tabular-nums">{post.viewCount}</span>
               </span>
               <span className={`flex items-center gap-1 transition-colors ${isPopular ? 'text-rose-500' : ''}`}>
-                <FiHeart className={`h-3.5 w-3.5 ${isPopular ? 'fill-rose-500' : ''}`} />
+                <FiHeart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isPopular ? 'fill-rose-500' : ''}`} />
                 <span className="tabular-nums">{post.likeCount}</span>
               </span>
               <span className="flex items-center gap-1">
-                <FiMessageCircle className="h-3.5 w-3.5" />
+                <FiMessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="tabular-nums">{post.commentCount}</span>
               </span>
             </div>

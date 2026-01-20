@@ -124,16 +124,16 @@ export function CommentSection({ postId }: CommentSectionProps) {
               value={body}
               onChange={(e) => setBody(e.target.value)}
               placeholder={replyTo ? '답글을 입력하세요...' : '댓글을 입력하세요...'}
-              className="min-h-[100px] w-full resize-none border-0 bg-transparent p-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0"
+              className="min-h-[80px] w-full resize-none border-0 bg-transparent p-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 sm:min-h-[100px]"
               rows={3}
             />
             <div className="flex items-center justify-end border-t border-gray-100 bg-gray-50/50 px-3 py-2">
               <Button
                 type="submit"
                 disabled={isCreating || !body.trim()}
-                className="h-9 gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-4 font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-200/50 active:scale-95 disabled:opacity-50"
+                className="h-10 gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-4 font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-200/50 active:scale-95 disabled:opacity-50 sm:h-9"
               >
-                <FiSend className="h-3.5 w-3.5" />
+                <FiSend className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                 {isCreating ? '등록 중...' : '등록'}
               </Button>
             </div>

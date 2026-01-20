@@ -69,18 +69,18 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
         </div>
 
         {/* 별점 */}
-        <div className="mb-3 flex items-center gap-1.5">
+        <div className="mb-3 flex items-center gap-2 sm:gap-1.5">
           <span className={normalizedScore > 0 ? 'text-amber-500' : 'text-muted-foreground'}>★</span>
-          <span className="text-base font-semibold tabular-nums">{normalizedScore.toFixed(1)}</span>
-          <span className="text-muted-foreground text-sm tabular-nums">({normalizedReviewCount})</span>
+          <span className="text-sm font-semibold tabular-nums sm:text-base">{normalizedScore.toFixed(1)}</span>
+          <span className="text-muted-foreground text-xs tabular-nums sm:text-sm">({normalizedReviewCount})</span>
         </div>
 
-        <p className="text-muted-foreground mb-5 text-xs">
+        <p className="text-muted-foreground mb-5 text-sm sm:text-xs">
           {periodStart} ~ {periodEnd}
         </p>
 
         {/* 태그 */}
-        <div className="mb-6 flex h-5 flex-nowrap items-center gap-1.5 overflow-hidden whitespace-nowrap">
+        <div className="mb-6 flex h-6 flex-nowrap items-center gap-1.5 overflow-hidden whitespace-nowrap sm:h-5">
           {tags.slice(1).map(tag => (
             <span
               key={tag.id}

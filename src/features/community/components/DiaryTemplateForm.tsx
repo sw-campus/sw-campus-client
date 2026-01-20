@@ -52,27 +52,29 @@ interface DiaryTemplateFormProps {
   onChange: (field: keyof DiaryFormData, value: string) => void
 }
 
+// HTML에서 텍스트만 추출하여 글자 수 계산
+function getTextLength(html: string): number {
+  const text = html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
+  return text.length
+}
+
+// 글자 수 표시 컴포넌트
+function CharCount({ current, min }: { current: number; min: number }) {
+  return (
+    <span className={`text-xs ${current >= min ? 'text-green-600' : 'text-gray-400'}`}>
+      {current}/{min}자
+    </span>
+  )
+}
+
 /**
  * 부트캠프 성장일기 템플릿 폼 컴포넌트
  * 4가지 필수 질문에 대한 입력 폼을 제공합니다.
  */
 export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateFormProps) {
-  // HTML에서 텍스트만 추출하여 글자 수 계산
-  const getTextLength = (html: string): number => {
-    const text = html
-      .replace(/<[^>]*>/g, '')
-      .replace(/&nbsp;/g, ' ')
-      .trim()
-    return text.length
-  }
-
-  // 글자 수 표시 컴포넌트
-  const CharCount = ({ current, min }: { current: number; min: number }) => (
-    <span className={`text-xs ${current >= min ? 'text-green-600' : 'text-gray-400'}`}>
-      {current}/{min}자
-    </span>
-  )
-
   return (
     <div className="space-y-6">
       {/* 가이드 안내 */}
@@ -162,15 +164,6 @@ export function DiaryTemplateForm({ formData, errors, onChange }: DiaryTemplateF
  */
 export function validateDiaryForm(formData: DiaryFormData): Partial<Record<keyof DiaryFormData, string>> {
   const errors: Partial<Record<keyof DiaryFormData, string>> = {}
-
-  // HTML에서 텍스트만 추출하여 글자 수 계산
-  const getTextLength = (html: string): number => {
-    const text = html
-      .replace(/<[^>]*>/g, '')
-      .replace(/&nbsp;/g, ' ')
-      .trim()
-    return text.length
-  }
 
   if (getTextLength(formData.learnedSkills) < DIARY_MIN_LENGTH) {
     errors.learnedSkills = `${DIARY_MIN_LENGTH}자 이상 입력해주세요.`

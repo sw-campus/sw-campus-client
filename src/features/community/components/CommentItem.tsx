@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FiCornerDownRight, FiEdit2, FiHeart, FiMessageCircle, FiTrash2, FiUser } from 'react-icons/fi'
+import { FiCornerDownRight, FiEdit2, FiHeart, FiMessageCircle, FiMoreVertical, FiTrash2, FiUser } from 'react-icons/fi'
 
 import {
   AlertDialog,
@@ -15,9 +15,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { formatRelativeTime } from '@/lib/formatRelativeTime'
 import { useAuthStore } from '@/store/authStore'
 
@@ -79,7 +84,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
   // 삭제된 댓글 표시
   if (comment.isDeleted) {
     return (
-      <div className={`${depth > 0 ? 'ml-4 border-l-2 border-gray-100 pl-4 sm:ml-6 sm:pl-5' : ''}`}>
+      <div className={`${depth > 0 ? 'ml-2 border-l-2 border-gray-100 pl-2 sm:ml-6 sm:pl-5' : ''}`}>
         <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 p-4">
           <div className="flex items-center gap-2">
             {depth > 0 && <FiCornerDownRight className="h-4 w-4 text-gray-300" />}
@@ -100,7 +105,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
   }
 
   return (
-    <div className={`${depth > 0 ? 'ml-4 border-l-2 border-orange-100 pl-4 sm:ml-6 sm:pl-5' : ''}`}>
+    <div className={`${depth > 0 ? 'ml-2 border-l-2 border-orange-100 pl-2 sm:ml-6 sm:pl-5' : ''}`}>
       <div className="group rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all duration-200 hover:border-gray-300/80 hover:shadow-md sm:p-5">
         {/* 작성자 정보 */}
         <div className="mb-3 flex items-center justify-between">
@@ -129,17 +134,43 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
             </div>
           </div>
 
-          {/* 좋아요 */}
-          <button
-            onClick={handleLike}
-            disabled={isLiking}
-            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs transition-all hover:bg-rose-50 active:scale-95 ${
-              comment.isLiked ? 'bg-rose-50 font-semibold text-rose-500' : 'text-gray-500 hover:text-rose-500'
-            }`}
-          >
-            <FiHeart className={`h-3.5 w-3.5 ${comment.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
-            {comment.likeCount > 0 && <span>{comment.likeCount}</span>}
-          </button>
+          <div className="flex items-center gap-1">
+            {/* 좋아요 */}
+            <button
+              onClick={handleLike}
+              disabled={isLiking}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-sm transition-all hover:bg-rose-50 active:scale-95 sm:px-2.5 sm:py-1 sm:text-xs ${
+                comment.isLiked ? 'bg-rose-50 font-semibold text-rose-500' : 'text-gray-500 hover:text-rose-500'
+              }`}
+            >
+              <FiHeart className={`h-4 w-4 sm:h-3.5 sm:w-3.5 ${comment.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
+              {comment.likeCount > 0 && <span>{comment.likeCount}</span>}
+            </button>
+
+            {/* 더보기 메뉴 (작성자/관리자만) */}
+            {isLoggedIn && (comment.isAuthor || userType === 'ADMIN') && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                    <FiMoreVertical className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[120px]">
+                  <DropdownMenuItem onClick={() => setIsEditing(true)} className="gap-2">
+                    <FiEdit2 className="h-4 w-4" />
+                    수정
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                    className="gap-2 text-rose-600 focus:text-rose-600"
+                  >
+                    <FiTrash2 className="h-4 w-4" />
+                    삭제
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
 
         {/* 본문 */}
@@ -182,60 +213,40 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
           <img src={comment.imageUrl} alt="댓글 이미지" className="mt-4 max-h-48 rounded-xl object-cover" />
         )}
 
-        {/* 액션 버튼 */}
-        {isLoggedIn && !isEditing && (
-          <div className="mt-4 flex items-center gap-1 border-t border-gray-100 pt-3 text-[13px] opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
-            {depth < MAX_DEPTH && onReply && (
-              <button
-                onClick={() => onReply(comment.id)}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-gray-500 transition-all hover:bg-orange-50 hover:text-orange-600 active:scale-95"
-              >
-                <FiMessageCircle className="h-3.5 w-3.5" />
-                답글
-              </button>
-            )}
-            {(comment.isAuthor || userType === 'ADMIN') && (
-              <>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-700 active:scale-95"
-                >
-                  <FiEdit2 className="h-3.5 w-3.5" />
-                  수정
-                </button>
-                <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                  <AlertDialogTrigger asChild>
-                    <button
-                      disabled={isDeleting}
-                      className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-gray-500 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-95"
-                    >
-                      <FiTrash2 className="h-3.5 w-3.5" />
-                      삭제
-                    </button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="mx-4 max-w-sm rounded-2xl sm:mx-auto">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>댓글 삭제</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        정말 이 댓글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="gap-2 sm:gap-0">
-                      <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={handleDelete}
-                        className="rounded-xl bg-rose-500 hover:bg-rose-600"
-                        disabled={isDeleting}
-                      >
-                        {isDeleting ? '삭제 중...' : '삭제'}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </>
-            )}
+        {/* 답글 버튼 */}
+        {isLoggedIn && !isEditing && depth < MAX_DEPTH && onReply && (
+          <div className="mt-3 border-t border-gray-100 pt-2 sm:mt-4 sm:pt-3">
+            <button
+              onClick={() => onReply(comment.id)}
+              className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-gray-400 transition-all hover:bg-orange-50 hover:text-orange-600 active:scale-95 sm:gap-1.5 sm:rounded-lg sm:px-3 sm:text-[13px]"
+            >
+              <FiMessageCircle className="h-3.5 w-3.5" />
+              답글
+            </button>
           </div>
         )}
+
+        {/* 삭제 확인 다이얼로그 */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent className="mx-4 max-w-sm rounded-2xl sm:mx-auto">
+            <AlertDialogHeader>
+              <AlertDialogTitle>댓글 삭제</AlertDialogTitle>
+              <AlertDialogDescription>
+                정말 이 댓글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="gap-2 sm:gap-0">
+              <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                className="rounded-xl bg-rose-500 hover:bg-rose-600"
+                disabled={isDeleting}
+              >
+                {isDeleting ? '삭제 중...' : '삭제'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       {/* 대댓글 */}
