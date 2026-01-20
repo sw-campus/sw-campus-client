@@ -4,8 +4,8 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from '@/components/ui/Dialog'
 import { AiFinalRecommendation } from '@/features/cart/components/AiFinalRecommendation'
 import { AiFloatingButton } from '@/features/cart/components/AiFloatingButton'
 import { CartItemSidebar } from '@/features/cart/components/compare-table/CartItemSidebar'

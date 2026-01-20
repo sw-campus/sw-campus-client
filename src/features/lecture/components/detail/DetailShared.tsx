@@ -2,7 +2,7 @@ import { type ReactNode } from 'react'
 
 import { Star } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/Badge'
 
 /**
  * ISO 날짜 문자열을 YYYY.MM.DD 형식으로 변환합니다.

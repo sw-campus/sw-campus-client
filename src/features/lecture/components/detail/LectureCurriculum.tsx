@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/Badge'
 import { type LectureDetail } from '@/features/lecture/api/lectureApi'
 
 import { Section } from './DetailShared'

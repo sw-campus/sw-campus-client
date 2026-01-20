@@ -10,8 +10,8 @@ import { toast } from 'sonner'
 
 import { useAuthStore } from '@/store/authStore'
 
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 
 import { checkReviewEligibility, createReview, getLectureReviews } from '../../api/reviewApi.client'
 import { CATEGORY_LABELS, type Review, type ReviewCategory } from '../../api/reviewApi.types'

@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 
 import { Star } from 'lucide-react'
 
-import { Card } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Card } from '@/components/ui/Card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
 import { getLectureReviews } from '@/features/lecture/api/reviewApi.client'
 import { CATEGORY_LABELS, type Review } from '@/features/lecture/api/reviewApi.types'
 import { formatDate, StarRating } from '@/features/lecture/components/detail/DetailShared'

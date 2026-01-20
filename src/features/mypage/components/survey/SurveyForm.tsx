@@ -10,8 +10,8 @@ import { FiX } from 'react-icons/fi'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { Button } from '@/components/ui/button'
-import { FieldGroup, FieldSet } from '@/components/ui/field'
+import { Button } from '@/components/ui/Button'
+import { FieldGroup, FieldSet } from '@/components/ui/Field'
 import { api } from '@/lib/axios'
 
 const surveySchema = z.object({

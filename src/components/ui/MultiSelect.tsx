@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { ChevronsUpDown } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Separator } from '@/components/ui/separator'
+import { Button } from '@/components/ui/Button'
+import { Checkbox } from '@/components/ui/Checkbox'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
+import { Separator } from '@/components/ui/Separator'
 import { cn } from '@/lib/utils'
 
 export interface Option {

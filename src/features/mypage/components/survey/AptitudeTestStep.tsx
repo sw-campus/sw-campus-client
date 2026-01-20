@@ -7,8 +7,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Brain, ChevronLeft, Lightbulb, Loader2, Target } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
+import { Button } from '@/components/ui/Button'
+import { Progress } from '@/components/ui/Progress'
 
 import { SURVEY_MESSAGES } from '../../constants/surveyMessages'
 import { ALL_APTITUDE_QUESTIONS as FALLBACK_QUESTIONS } from '../../constants/surveyQuestions'

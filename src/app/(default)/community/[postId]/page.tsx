@@ -29,7 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
+} from '@/components/ui/AlertDialog'
 import { ClickableTag } from '@/features/community/components/ClickableTag'
 import { CommentSection } from '@/features/community/components/CommentSection'
 import { PostNavigation } from '@/features/community/components/PostNavigation'

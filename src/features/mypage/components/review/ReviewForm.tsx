@@ -8,8 +8,8 @@ import { Star } from 'lucide-react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { Button } from '@/components/ui/button'
-import { CharacterCounter } from '@/components/ui/character-counter'
+import { Button } from '@/components/ui/Button'
+import { CharacterCounter } from '@/components/ui/CharacterCounter'
 import { APPROVAL_STATUS } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 

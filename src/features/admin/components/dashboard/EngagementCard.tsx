@@ -2,7 +2,7 @@
 
 import { LuClock, LuEye, LuMousePointer2 } from 'react-icons/lu'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 import { Period } from './shared/PeriodToggle'
 

@@ -4,8 +4,8 @@ import { useState } from 'react'
 
 import { LuSearch } from 'react-icons/lu'
 
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/Input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import { cn } from '@/lib/utils'
 
 import type { BannerPeriodStatus, BannerTypeFilter } from '../../types/banner.type'

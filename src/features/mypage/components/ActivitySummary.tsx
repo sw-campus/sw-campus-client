@@ -4,8 +4,8 @@ import { useMemo } from 'react'
 
 import { LuAward, LuBadgeCheck, LuClipboardCheck, LuPencil } from 'react-icons/lu'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { APPROVAL_STATUS } from '@/features/admin/types/approval.type'
 import { useCompletedLecturesQuery } from '@/features/mypage/hooks/useCompletedLecturesQuery'
 

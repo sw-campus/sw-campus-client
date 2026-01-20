@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FiX } from 'react-icons/fi'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 
 type Side = 'left' | 'right'

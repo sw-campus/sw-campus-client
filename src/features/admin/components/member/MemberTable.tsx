@@ -2,8 +2,8 @@
 
 import { LuBuilding, LuShield, LuUser } from 'react-icons/lu'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import { cn } from '@/lib/utils'
 
 import type { MemberRole, MemberSummary } from '../../types/member.type'

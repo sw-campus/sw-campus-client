@@ -5,9 +5,9 @@ import { useState } from 'react'
 import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import { FiChevronDown, FiChevronUp, FiTrash2 } from 'react-icons/fi'
 
-import { Button } from '@/components/ui/button'
-import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Button } from '@/components/ui/Button'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/Field'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 type Props = {

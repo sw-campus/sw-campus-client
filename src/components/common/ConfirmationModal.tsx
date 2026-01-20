@@ -9,7 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from '@/components/ui/AlertDialog'
 import { cn } from '@/lib/utils'
 
 export interface ConfirmationModalProps {

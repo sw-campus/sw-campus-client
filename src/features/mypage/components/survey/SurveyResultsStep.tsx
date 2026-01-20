@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { Code2, Database, Layers, Palette, Pencil, RefreshCw, Sparkles, type LucideIcon } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from '@/components/ui/Dialog'
 
 import { usePublishedQuestionSetQuery } from '../../hooks/useSurvey'
 import type { RecommendedJob, SurveyResponse } from '../../types/survey.type'

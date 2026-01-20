@@ -5,7 +5,7 @@ import { useRef } from 'react'
 import { Loader2, UploadCloud } from 'lucide-react'
 import Image from 'next/image'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { useImageUpload } from '@/features/storage/hooks/useImageUpload'
 import { StorageCategory } from '@/features/storage/types/storage.type'
 

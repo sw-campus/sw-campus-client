@@ -2,7 +2,7 @@
 
 import type { IconType } from 'react-icons'
 
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
 
 export interface ColorfulStatCardProps {

@@ -4,8 +4,8 @@ import { useState } from 'react'
 
 import { isAxiosError } from 'axios'
 
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
 import { api } from '@/lib/axios'
 
 type PasswordVerifyModalProps = {

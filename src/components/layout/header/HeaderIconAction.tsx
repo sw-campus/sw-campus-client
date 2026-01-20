@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import Link from 'next/link'
 
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip'
 
 type Props =
   | {

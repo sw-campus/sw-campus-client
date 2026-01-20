@@ -2,14 +2,14 @@
 
 import { CheckCircle2, Clock, Sparkles, Target } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from '@/components/ui/Dialog'
 
 interface AptitudeContinueModalProps {
   open: boolean

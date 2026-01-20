@@ -4,9 +4,9 @@ import { Suspense, useState, useEffect } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import { useCategoryTree } from '@/features/category'
 import type { CategoryTreeNode } from '@/features/category/types/category.type'
 import { LectureList } from '@/features/lecture/components/LectureList'

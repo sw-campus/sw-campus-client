@@ -4,10 +4,10 @@ import * as React from 'react'
 
 import { ChevronDownIcon } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { Label } from '@/components/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Button } from '@/components/ui/Button'
+import { Calendar } from '@/components/ui/Calendar'
+import { Label } from '@/components/ui/Label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 
 export function DatePicker({
   label,

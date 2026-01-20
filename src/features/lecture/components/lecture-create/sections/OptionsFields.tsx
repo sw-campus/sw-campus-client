@@ -2,13 +2,13 @@
 
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { CharacterCounter } from '@/components/ui/character-counter'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
+import { CharacterCounter } from '@/components/ui/CharacterCounter'
+import { Checkbox } from '@/components/ui/Checkbox'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/Field'
+import { Input } from '@/components/ui/Input'
+import { Label } from '@/components/ui/Label'
+import { Switch } from '@/components/ui/Switch'
+import { Textarea } from '@/components/ui/Textarea'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 const MAX_GOAL_LENGTH = 500

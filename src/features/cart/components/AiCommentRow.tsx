@@ -1,6 +1,6 @@
 'use client'
 
-import { TableCell, TableRow } from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/Table'
 import { cn } from '@/lib/utils'
 
 interface AiCommentRowProps {

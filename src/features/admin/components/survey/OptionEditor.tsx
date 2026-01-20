@@ -7,11 +7,11 @@ import { LuGripVertical, LuPlus, LuTrash2 } from 'react-icons/lu'
 
 import { cn } from '@/lib/utils'
 
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Button } from '@/components/ui/Button'
+import { Checkbox } from '@/components/ui/Checkbox'
+import { Input } from '@/components/ui/Input'
+import { Label } from '@/components/ui/Label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 
 import { useAddOptionMutation, useDeleteOptionMutation, useReorderOptionMutation, useUpdateOptionMutation } from '../../hooks/useSurvey'
 import type { AdminOption, JobTypeCode, QuestionPart } from '../../types/survey.type'

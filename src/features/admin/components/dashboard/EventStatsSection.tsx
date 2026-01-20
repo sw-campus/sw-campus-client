@@ -1,7 +1,7 @@
 import { LuActivity, LuExternalLink, LuMousePointerClick, LuShare2 } from 'react-icons/lu'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 import { useEventStatsQuery } from '../../hooks/useAnalytics'
 import { type Period } from './shared/PeriodToggle'

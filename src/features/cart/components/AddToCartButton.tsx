@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { useAddToCart } from '@/features/cart/hooks/useAddToCart'
 import type { AddToCartItem } from '@/features/cart/types/cart.type'
 

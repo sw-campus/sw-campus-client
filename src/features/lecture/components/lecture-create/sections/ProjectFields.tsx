@@ -2,9 +2,9 @@
 
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/Field'
+import { Input } from '@/components/ui/Input'
+import { Switch } from '@/components/ui/Switch'
 import { toDigitsOnly } from '@/features/lecture/utils/inputFormat'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 

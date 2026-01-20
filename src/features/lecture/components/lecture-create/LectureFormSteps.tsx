@@ -2,7 +2,7 @@
 
 import type { RefObject } from 'react'
 
-import type { FormStep } from '@/components/ui/form-stepper'
+import type { FormStep } from '@/components/ui/FormStepper'
 import type { CategoryTreeNode } from '@/features/category/types/category.type'
 import {
   LectureCreateAddsFields,

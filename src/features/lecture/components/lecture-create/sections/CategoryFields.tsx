@@ -4,8 +4,8 @@ import { useState } from 'react'
 
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/Field'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import { useCategoryTree } from '@/features/category'
 import type { CategoryTreeNode } from '@/features/category/types/category.type'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'

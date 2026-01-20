@@ -3,7 +3,7 @@
 import { Star } from 'lucide-react'
 
 import Modal from '@/components/ui/Modal'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 
 import { CATEGORY_LABELS, type ReviewCategory } from '../../api/reviewApi.types'
 

@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { LuBuilding, LuList, LuSearch, LuShield, LuUser } from 'react-icons/lu'
 
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/ui/Input'
 import { cn } from '@/lib/utils'
 
 import type { MemberRoleFilter } from '../../types/member.type'

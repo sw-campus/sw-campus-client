@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 
 import { LuBuilding, LuPencil } from 'react-icons/lu'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { APPROVAL_STATUS, type ApprovalStatus } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 import { cn } from '@/lib/utils'

@@ -4,9 +4,9 @@ import type { RefObject } from 'react'
 
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
 
-import { Button } from '@/components/ui/button'
-import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/Button'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/Field'
+import { Input } from '@/components/ui/Input'
 import { toDigitsOnly } from '@/features/lecture/utils/inputFormat'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 

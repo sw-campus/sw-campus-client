@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { LuBadgeCheck, LuExternalLink } from 'react-icons/lu'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from '@/components/ui/Dialog'
 import { useAuthStore } from '@/store/authStore'
 
 type WithdrawCompleteModalProps = {

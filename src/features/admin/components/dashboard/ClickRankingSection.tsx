@@ -4,10 +4,10 @@ import { useState } from 'react'
 
 import { LuChevronRight, LuImage, LuTrendingUp } from 'react-icons/lu'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 
 import { useTopBannersQuery, useTopLecturesQuery } from '../../hooks/useAnalytics'
 import { type Period } from './shared/PeriodToggle'

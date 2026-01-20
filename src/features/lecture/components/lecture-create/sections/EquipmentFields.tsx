@@ -2,10 +2,10 @@
 
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/Field'
+import { Label } from '@/components/ui/Label'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
+import { Textarea } from '@/components/ui/Textarea'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 type Props = {

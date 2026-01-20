@@ -2,7 +2,7 @@
 
 import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 import { AnalyticsReport } from '../../api/analyticsApi'
 import { Period } from './shared/PeriodToggle'

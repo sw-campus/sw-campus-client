@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
 import { type LectureDetail } from '@/features/lecture/api/lectureApi'
 import { processApplicationSteps } from '@/features/lecture/utils/processApplicationSteps'
 import { type OrganizationDetail } from '@/features/organization/types/organization.type'

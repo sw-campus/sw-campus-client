@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { LuSearch } from 'react-icons/lu'
 
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/ui/Input'
 import { cn } from '@/lib/utils'
 
 import { LECTURE_AUTH_STATUS, LECTURE_AUTH_STATUS_FILTER_LABEL, type LectureAuthStatusFilter } from '../../types/lecture.type'

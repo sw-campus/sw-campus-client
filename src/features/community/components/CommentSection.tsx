@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import { FiMessageCircle, FiSend, FiX } from 'react-icons/fi'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { useAuthStore } from '@/store/authStore'
 
 import { useComments, useCreateComment } from '../hooks/useComments'

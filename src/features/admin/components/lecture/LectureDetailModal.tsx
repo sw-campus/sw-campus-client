@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element -- 동적 외부 URL (강사 이미지) 사용 */
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from '@/components/ui/Dialog'
 import { formatDate, formatTimeRange } from '@/lib/date'
 import { cn } from '@/lib/utils'
 

@@ -5,10 +5,10 @@ import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { FiFolder, FiType, FiFileText, FiTag } from 'react-icons/fi'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { TiptapEditor } from '@/components/ui/editor/TiptapEditor'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/Input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 
 import type { BoardCategory } from '../api/boardCategoryApi.types'
 import type { CreatePostRequest, PostDetail } from '../api/postApi.types'

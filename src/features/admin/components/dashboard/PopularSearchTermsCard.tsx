@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { LuSearch, LuTrendingUp } from 'react-icons/lu'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 import { usePopularSearchTermsQuery } from '../../hooks/useAnalytics'
 import { type Period } from './shared/PeriodToggle'

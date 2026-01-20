@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 
 import { FiSearch, FiX, FiMapPin, FiCalendar } from 'react-icons/fi'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
 import { getLectureSearch } from '@/features/lecture/api/lecture.api'
 import type { LectureResponseDto } from '@/features/lecture/types/lecture-response.type'
 

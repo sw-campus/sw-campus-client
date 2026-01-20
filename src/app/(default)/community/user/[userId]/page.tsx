@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useParams, notFound } from 'next/navigation'
 import { FiArrowLeft, FiCalendar, FiFileText, FiUser, FiChevronLeft, FiChevronRight, FiList, FiGrid } from 'react-icons/fi'
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/Avatar'
 import { PostList } from '@/features/community/components/PostList'
 import { useUserProfile, useUserPosts } from '@/features/community/hooks/useUserProfile'
 import { DEFAULT_POST_SORT } from '@/features/community/api/postApi.types'

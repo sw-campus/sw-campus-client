@@ -2,8 +2,8 @@
 
 import { useRef, useState, useEffect } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import { Badge } from '@/components/ui/Badge'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/Table'
 import { AiCommentRow } from '@/features/cart/components/AiCommentRow'
 import {
   COMPARE_SECTIONS,

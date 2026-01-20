@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
 import { SurveyContainer, type SurveyStep } from '@/features/mypage/components/survey/SurveyContainer'
 
 const STEP_TITLES: Record<SurveyStep, string> = {

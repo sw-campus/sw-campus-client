@@ -3,9 +3,9 @@
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form'
 import { FiChevronDown, FiChevronUp, FiTrash2 } from 'react-icons/fi'
 
-import { Button } from '@/components/ui/button'
-import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/Button'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/Field'
+import { Input } from '@/components/ui/Input'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 export function LectureCreateAddsFields() {

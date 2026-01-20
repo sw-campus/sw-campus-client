@@ -3,10 +3,10 @@
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form'
 import { FiChevronDown, FiChevronUp, FiPlus, FiTrash2 } from 'react-icons/fi'
 
-import { Button } from '@/components/ui/button'
-import { CharacterCounter } from '@/components/ui/character-counter'
-import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/Button'
+import { CharacterCounter } from '@/components/ui/CharacterCounter'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/Field'
+import { Input } from '@/components/ui/Input'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 const TITLE_MAX_LENGTH = 20

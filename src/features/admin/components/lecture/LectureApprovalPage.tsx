@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { LuCheck, LuClock, LuList, LuX } from 'react-icons/lu'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 
 import { useLecturesQuery, useLectureStatsQuery } from '../../hooks/useLectures'
 import { useApproveLectureMutation, useRejectLectureMutation } from '../../hooks/useLectures'

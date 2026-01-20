@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 
 import { LuKey, LuPencil, LuUser, LuUserX } from 'react-icons/lu'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { api } from '@/lib/axios'
 
 import { WithdrawResponse } from '../api/member.api'

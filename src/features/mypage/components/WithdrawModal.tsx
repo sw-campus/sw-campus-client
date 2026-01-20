@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { LuTriangleAlert, LuLoader } from 'react-icons/lu'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import {
   Dialog,
   DialogContent,
@@ -12,9 +12,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from '@/components/ui/Dialog'
+import { Input } from '@/components/ui/Input'
+import { Label } from '@/components/ui/Label'
 
 import { withdrawMember, WithdrawResponse } from '../api/member.api'
 

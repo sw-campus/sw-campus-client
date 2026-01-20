@@ -2,9 +2,9 @@
 
 import { toast } from 'sonner'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
+import { Separator } from '@/components/ui/Separator'
 import { AddToCartButton } from '@/features/cart'
 import { type LectureDetail } from '@/features/lecture/api/lectureApi'
 import { processApplicationSteps } from '@/features/lecture/utils/processApplicationSteps'

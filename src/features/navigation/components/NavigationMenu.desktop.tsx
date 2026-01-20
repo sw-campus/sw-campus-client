@@ -9,7 +9,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu'
+} from '@/components/ui/NavigationMenu'
 
 import type { DesktopNavCategory } from '../types/navigation-menu.types'
 

@@ -1,7 +1,7 @@
 import { MemberStatusData } from '..'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 
 const mockData: MemberStatusData[] = [
   { status: '전체회원', count: 2500, color: 'bg-foreground' },

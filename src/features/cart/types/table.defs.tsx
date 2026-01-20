@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { TableCell, TableRow } from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/Table'
 import {
   formatBoolean,
   formatCourseTime,

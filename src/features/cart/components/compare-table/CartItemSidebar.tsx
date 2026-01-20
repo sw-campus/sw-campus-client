@@ -7,7 +7,7 @@ import Image from 'next/image'
 import { FiChevronDown } from 'react-icons/fi'
 import { PiRobotDuotone } from 'react-icons/pi'
 
-import { Card } from '@/components/ui/card'
+import { Card } from '@/components/ui/Card'
 import type { CartItem } from '@/features/cart/types/cart.type'
 import { setDragLectureId } from '@/features/cart/utils/cartCompareDnd'
 import { cn } from '@/lib/utils'

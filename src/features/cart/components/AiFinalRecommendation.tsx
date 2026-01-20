@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { FiAward, FiArrowRight } from 'react-icons/fi'
 
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/Card'
 import type { FinalRecommendation, RecommendationLevel } from '@/features/lecture/actions/gemini'
 
 interface AiFinalRecommendationProps {
