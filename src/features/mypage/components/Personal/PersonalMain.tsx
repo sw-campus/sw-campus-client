@@ -11,6 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  APPROVAL_STATUS,
+  getApprovalStatusLabel,
+  canEditByStatus,
+  type ApprovalStatus,
+} from '@/features/admin/types/approval.type'
 import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
 import { updateCertificateImage } from '@/features/certificate/api/certificate.api'
 import { api } from '@/lib/axios'
@@ -55,7 +61,8 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     canWriteReview: boolean
     reviewId?: number
     certificateImageUrl?: string
-    certificateStatus?: 'PENDING' | 'APPROVED' | 'REJECTED'
+    certificateStatus?: ApprovalStatus
+    reviewStatus?: ApprovalStatus
   }
 
   const [lectures, setLectures] = useState<CompletedLecture[] | null>(null)
@@ -67,9 +74,6 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
   const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null)
   const [selectedLectureId, setSelectedLectureId] = useState<number | null>(null)
   const [selectedReviewReadOnly, setSelectedReviewReadOnly] = useState(false)
-
-  // lectureId별 승인(버튼 라벨 전환용)
-  const [approvedLectureIds, setApprovedLectureIds] = useState<Set<number>>(new Set())
 
   // 강의 목록 새로고침 함수 (중복 로직 추출)
   const refetchLectures = async () => {
@@ -155,71 +159,12 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     }
   }, [activeSection])
 
-  useEffect(() => {
-    if (activeSection !== 'reviews') return
-    if (!lectures || lectures.length === 0) return
+  // 리뷰 승인 여부 확인 헬퍼 함수
+  const isReviewApproved = (lecture: CompletedLecture): boolean => {
+    return lecture.reviewStatus === APPROVAL_STATUS.APPROVED
+  }
 
-    let cancelled = false
-
-    const parseApproved = (data: unknown): boolean => {
-      const approvalStatus = (data as { approvalStatus?: unknown })?.approvalStatus
-      if (typeof approvalStatus === 'string') {
-        return approvalStatus.toUpperCase() === 'APPROVED'
-      }
-
-      const status =
-        (data as { status?: unknown; reviewStatus?: unknown })?.status ??
-        (data as { reviewStatus?: unknown })?.reviewStatus
-      const statusStr = typeof status === 'string' ? status : ''
-
-      const isApprovedBool =
-        (data as { isApproved?: unknown })?.isApproved === true || (data as { approved?: unknown })?.approved === true
-
-      return isApprovedBool || statusStr.toUpperCase() === 'APPROVED'
-    }
-
-    const hydrateApproved = async () => {
-      const targetLectures = lectures.filter(l => !l.canWriteReview)
-      if (targetLectures.length === 0) return
-
-      try {
-        const results = await Promise.all(
-          targetLectures.map(async l => {
-            try {
-              const { data } = await api.get<unknown>(`/mypage/completed-lectures/${l.lectureId}/review`)
-              const rid = (data as { reviewId?: unknown })?.reviewId
-              return {
-                lectureId: l.lectureId,
-                reviewId: typeof rid === 'number' ? rid : Number(rid),
-                approved: parseApproved(data),
-              }
-            } catch {
-              return { lectureId: l.lectureId, reviewId: NaN, approved: false }
-            }
-          }),
-        )
-
-        if (cancelled) return
-        setApprovedLectureIds(prev => {
-          const next = new Set(prev)
-          for (const r of results) {
-            if (r.approved) next.add(r.lectureId)
-            else next.delete(r.lectureId)
-          }
-          return next
-        })
-      } catch {
-        // ignore
-      }
-    }
-
-    hydrateApproved()
-    return () => {
-      cancelled = true
-    }
-  }, [activeSection, lectures])
-
-  const formatDate = (iso?: string) => {
+  const _formatDate = (iso?: string) => {
     if (!iso) return ''
     try {
       const d = new Date(iso)
@@ -229,32 +174,17 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
     }
   }
 
-  const getCertStatusLabel = (status?: string) => {
-    switch (status) {
-      case 'APPROVED':
-        return '승인됨'
-      case 'REJECTED':
-        return '반려됨'
-      case 'PENDING':
-      default:
-        return '대기중'
-    }
-  }
-
+  // MyPage에서 사용하는 배지 스타일 (outline 스타일)
   const getCertStatusColor = (status?: string) => {
     switch (status) {
-      case 'APPROVED':
+      case APPROVAL_STATUS.APPROVED:
         return 'bg-green-50 text-green-700 border-green-200'
-      case 'REJECTED':
+      case APPROVAL_STATUS.REJECTED:
         return 'bg-red-50 text-red-700 border-red-200'
-      case 'PENDING':
+      case APPROVAL_STATUS.PENDING:
       default:
         return 'bg-yellow-50 text-yellow-700 border-yellow-200'
     }
-  }
-
-  const canEditCertificate = (status?: string) => {
-    return status !== 'APPROVED'
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -512,7 +442,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                         <div className="mt-1 flex items-center justify-between sm:hidden">
                           <div className="flex items-center gap-2">
                             <Badge className={`rounded-full border ${getCertStatusColor(l.certificateStatus)}`} variant="outline">
-                              {getCertStatusLabel(l.certificateStatus)}
+                              {getApprovalStatusLabel(l.certificateStatus)}
                             </Badge>
                             {l.canWriteReview ? (
                               <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
@@ -520,7 +450,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                               </Badge>
                             ) : (
                               <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                                {approvedLectureIds.has(l.lectureId) ? '후기 승인' : '후기 완료'}
+                                {isReviewApproved(l) ? '후기 승인' : '후기 완료'}
                               </Badge>
                             )}
                           </div>
@@ -530,7 +460,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
-                              aria-label={canEditCertificate(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
+                              aria-label={canEditByStatus(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
                               onClick={() => {
                                 setSelectedCertificate(l)
                                 setCertImageError(null)
@@ -559,11 +489,11 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8"
-                                aria-label={approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
+                                aria-label={isReviewApproved(l) ? '리뷰 조회' : '리뷰 수정'}
                                 onClick={() => {
                                   setSelectedReviewId(l.reviewId ?? null)
                                   setSelectedLectureId(l.lectureId)
-                                  setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
+                                  setSelectedReviewReadOnly(Boolean(isReviewApproved(l)))
                                   setEditOpen(true)
                                 }}
                               >
@@ -576,7 +506,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                       {/* 수료증 상태 */}
                       <TableCell className="hidden sm:table-cell">
                         <Badge className={`rounded-full border ${getCertStatusColor(l.certificateStatus)}`} variant="outline">
-                          {getCertStatusLabel(l.certificateStatus)}
+                          {getApprovalStatusLabel(l.certificateStatus)}
                         </Badge>
                       </TableCell>
                       {/* 후기 상태 */}
@@ -587,7 +517,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                           </Badge>
                         ) : (
                           <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
-                            {approvedLectureIds.has(l.lectureId) ? '승인됨' : '작성완료'}
+                            {isReviewApproved(l) ? '승인됨' : '작성완료'}
                           </Badge>
                         )}
                       </TableCell>
@@ -611,7 +541,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              {canEditCertificate(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
+                              {canEditByStatus(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
                             </TooltipContent>
                           </Tooltip>
                           {/* 후기 버튼 */}
@@ -643,7 +573,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                                   onClick={() => {
                                     setSelectedReviewId(l.reviewId ?? null)
                                     setSelectedLectureId(l.lectureId)
-                                    setSelectedReviewReadOnly(Boolean(approvedLectureIds.has(l.lectureId)))
+                                    setSelectedReviewReadOnly(Boolean(isReviewApproved(l)))
                                     setEditOpen(true)
                                   }}
                                 >
@@ -651,7 +581,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                {approvedLectureIds.has(l.lectureId) ? '리뷰 조회' : '리뷰 수정'}
+                                {isReviewApproved(l) ? '리뷰 조회' : '리뷰 수정'}
                               </TooltipContent>
                             </Tooltip>
                           )}
@@ -728,7 +658,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-foreground text-2xl font-bold">
-              {selectedCertificate && canEditCertificate(selectedCertificate.certificateStatus)
+              {selectedCertificate && canEditByStatus(selectedCertificate.certificateStatus)
                 ? '수료증 확인/수정'
                 : '수료증 확인'}
             </DialogTitle>
@@ -742,7 +672,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-sm text-gray-600">수료증 상태:</span>
                   <Badge className={`rounded-full border ${getCertStatusColor(selectedCertificate.certificateStatus)}`} variant="outline">
-                    {getCertStatusLabel(selectedCertificate.certificateStatus)}
+                    {getApprovalStatusLabel(selectedCertificate.certificateStatus)}
                   </Badge>
                 </div>
               </div>
@@ -763,14 +693,14 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
               )}
 
               {/* 수정 불가 안내 (APPROVED) */}
-              {!canEditCertificate(selectedCertificate.certificateStatus) && (
+              {!canEditByStatus(selectedCertificate.certificateStatus) && (
                 <p className="text-sm text-gray-500">
                   승인된 수료증은 수정할 수 없습니다.
                 </p>
               )}
 
               {/* 이미지 수정 폼 (PENDING/REJECTED만) */}
-              {canEditCertificate(selectedCertificate.certificateStatus) && (
+              {canEditByStatus(selectedCertificate.certificateStatus) && (
                 <div className="space-y-3">
                   <p className="text-sm font-medium text-gray-700">새 이미지 업로드</p>
                   <div className="flex items-center gap-3">

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { FiAward, FiArrowRight } from 'react-icons/fi'
 
 import { Card, CardContent } from '@/components/ui/card'
-import type { FinalRecommendation } from '@/features/lecture/actions/gemini'
+import type { FinalRecommendation, RecommendationLevel } from '@/features/lecture/actions/gemini'
 
 interface AiFinalRecommendationProps {
   recommendation: FinalRecommendation
@@ -12,6 +12,7 @@ interface AiFinalRecommendationProps {
   rightTitle: string
   leftId: string | null
   rightId: string | null
+  recommendationLevel: RecommendationLevel
 }
 
 export function AiFinalRecommendation({
@@ -20,10 +21,12 @@ export function AiFinalRecommendation({
   rightTitle,
   leftId,
   rightId,
+  recommendationLevel,
 }: AiFinalRecommendationProps) {
   const isLeftRecommended = recommendation.recommended === 'left'
   const recommendedTitle = isLeftRecommended ? leftTitle : rightTitle
   const recommendedId = isLeftRecommended ? leftId : rightId
+  const isPrecise = recommendationLevel === 'precise'
 
   return (
     <Card className="overflow-hidden border-0 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 shadow-xl">
@@ -41,6 +44,13 @@ export function AiFinalRecommendation({
             <div className="flex items-center gap-2">
               <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold tracking-wide uppercase">
                 AI 추천
+              </span>
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  isPrecise ? 'bg-purple-200 text-purple-800' : 'bg-amber-200 text-amber-800'
+                }`}
+              >
+                {isPrecise ? '정밀 추천' : '기본 추천'}
               </span>
             </div>
             <h3 className="text-lg font-bold md:text-xl">{recommendation.summary}</h3>

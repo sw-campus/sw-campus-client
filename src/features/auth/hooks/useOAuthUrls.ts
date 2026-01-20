@@ -18,10 +18,24 @@ export function useOAuthUrls() {
   const createOAuthState = (provider: Provider) => {
     if (typeof window === 'undefined') return null
     const key = `oauth_state_${provider}`
-    const state =
-      typeof crypto !== 'undefined' && 'randomUUID' in crypto
-        ? crypto.randomUUID().replace(/-/g, '')
-        : Math.random().toString(36).slice(2)
+
+    // 🔒 보안: 암호학적으로 안전한 난수 생성
+    let state: string
+    const cryptoObj = globalThis.crypto
+    if (cryptoObj?.randomUUID) {
+      // 최신 브라우저: crypto.randomUUID() 사용
+      state = cryptoObj.randomUUID().replace(/-/g, '')
+    } else if (cryptoObj?.getRandomValues) {
+      // 구형 브라우저 fallback: crypto.getRandomValues() 사용
+      const array = new Uint8Array(16)
+      cryptoObj.getRandomValues(array)
+      state = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
+    } else {
+      // 극히 드문 환경: 경고 로그 후 state 없이 진행 (OAuth는 가능)
+      console.warn('crypto API not available for secure state generation')
+      return null
+    }
+
     try {
       sessionStorage.setItem(key, state)
     } catch {

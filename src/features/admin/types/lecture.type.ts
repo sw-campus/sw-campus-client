@@ -1,4 +1,5 @@
 import {
+  APPROVAL_STATUS,
   APPROVAL_STATUS_COLOR,
   APPROVAL_STATUS_FILTER_LABEL,
   APPROVAL_STATUS_LABEL,
@@ -19,6 +20,11 @@ export type LectureAuthStatusFilter = ApprovalStatusFilter
 
 // MutationOptions 타입 re-export
 export type { MutationOptions }
+
+/**
+ * 승인 상태 상수 (공통 상수 재사용)
+ */
+export const LECTURE_AUTH_STATUS = APPROVAL_STATUS
 
 /**
  * 승인 상태 한국어 라벨 (공통 상수 재사용)

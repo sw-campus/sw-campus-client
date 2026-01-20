@@ -22,31 +22,31 @@ export function AdminDashboard() {
   const { stats, pendingCounts, memberDistribution, isLoading } = useDashboardStats()
   const { data: analyticsReport, isLoading: isAnalyticsLoading } = useAnalyticsReportQuery(period)
 
-  // 동적 stats 데이터 (서브텍스트로 승인 대기 건수 표시)
+  // 동적 stats 데이터 (서브텍스트로 대기중 건수 표시)
   const statCards = [
     {
       title: '회원관리',
       value: stats.members,
       icon: LuUsers,
-      subtext: pendingCounts.organizations > 0 ? `기관 승인 대기: ${pendingCounts.organizations}` : undefined,
+      subtext: pendingCounts.organizations > 0 ? `기관 대기중: ${pendingCounts.organizations}` : undefined,
     },
     {
       title: '강의관리',
       value: stats.lectures,
       icon: LuBookOpen,
-      subtext: pendingCounts.lectures > 0 ? `승인 대기: ${pendingCounts.lectures}` : undefined,
+      subtext: pendingCounts.lectures > 0 ? `대기중: ${pendingCounts.lectures}` : undefined,
     },
     {
       title: '수료증관리',
       value: stats.certificates,
       icon: LuAward,
-      subtext: pendingCounts.certificates > 0 ? `승인 대기: ${pendingCounts.certificates}` : undefined,
+      subtext: pendingCounts.certificates > 0 ? `대기중: ${pendingCounts.certificates}` : undefined,
     },
     {
       title: '리뷰관리',
       value: stats.reviews,
       icon: LuStar,
-      subtext: pendingCounts.reviews > 0 ? `승인 대기: ${pendingCounts.reviews}` : undefined,
+      subtext: pendingCounts.reviews > 0 ? `대기중: ${pendingCounts.reviews}` : undefined,
     },
   ]
 

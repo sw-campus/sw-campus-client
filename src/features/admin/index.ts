@@ -27,12 +27,20 @@ export { BannerCreateModal, BannerManagementPage, BannerTable } from './componen
 // Review Components
 export { ReviewApprovalPage, ReviewDetailModal, ReviewTable } from './components/review'
 
-// TestData Components
-export { TestDataPage } from './components/testdata/TestDataPage'
-
 // Member Components
 export { MemberPage } from './components/member/MemberPage'
 export { MemberTable } from './components/member/MemberTable'
+
+// Survey Components
+export {
+  SurveyManagementPage,
+  QuestionSetTable,
+  QuestionSetFilter,
+  QuestionSetCreateModal,
+  QuestionSetDetailModal,
+  QuestionEditor,
+  OptionEditor,
+} from './components/survey'
 
 // Hooks
 export {
@@ -67,6 +75,22 @@ export {
 } from './hooks/useBanners'
 
 export { useMembersQuery, useMemberStatsQuery } from './hooks/useMembers'
+
+export {
+  useQuestionSetsQuery,
+  useQuestionSetDetailQuery,
+  useCreateQuestionSetMutation,
+  useUpdateQuestionSetMutation,
+  useDeleteQuestionSetMutation,
+  usePublishQuestionSetMutation,
+  useCloneQuestionSetMutation,
+  useAddQuestionMutation,
+  useUpdateQuestionMutation,
+  useDeleteQuestionMutation,
+  useAddOptionMutation,
+  useUpdateOptionMutation,
+  useDeleteOptionMutation,
+} from './hooks/useSurvey'
 
 export { useDashboardStats } from './hooks/useDashboardStats'
 export type { DashboardStats, MemberDistribution, PendingCounts } from './hooks/useDashboardStats'
@@ -126,3 +150,31 @@ export {
 } from './types/review.type'
 
 export type { MemberSummary } from './types/member.type'
+
+export type {
+  QuestionSetType,
+  QuestionSetStatus,
+  QuestionSetStatusFilter,
+  QuestionType,
+  QuestionPart,
+  JobTypeCode,
+  AdminQuestionSet,
+  AdminQuestionSetDetail,
+  AdminQuestion,
+  AdminOption,
+  CreateQuestionSetRequest,
+  UpdateQuestionSetRequest,
+  CreateQuestionRequest,
+  UpdateQuestionRequest,
+  CreateOptionRequest,
+  UpdateOptionRequest,
+} from './types/survey.type'
+
+export {
+  QUESTION_SET_TYPE_LABEL,
+  QUESTION_SET_STATUS_LABEL,
+  QUESTION_SET_STATUS_COLOR,
+  QUESTION_TYPE_LABEL,
+  QUESTION_PART_LABEL,
+  JOB_TYPE_LABEL,
+} from './types/survey.type'
