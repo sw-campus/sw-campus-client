@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 import { FiArrowLeft } from 'react-icons/fi'
 
 import type { CreatePostRequest } from '@/features/community/api/postApi.types'
@@ -14,6 +14,7 @@ import { useAuthStore } from '@/store/authStore'
 export default function EditPostPage() {
   const params = useParams()
   const router = useRouter()
+  const pathname = usePathname()
   const postId = Number(params.postId)
 
   const { isLoggedIn, hasHydrated, userType } = useAuthStore()
@@ -41,7 +42,7 @@ export default function EditPostPage() {
       <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">로그인이 필요합니다</p>
-          <Link href="/login" className="mt-4 inline-block text-orange-500 hover:underline">
+          <Link href={`/login?returnUrl=${encodeURIComponent(pathname)}`} className="mt-4 inline-block text-orange-500 hover:underline">
             로그인하기
           </Link>
         </div>

@@ -20,9 +20,10 @@ import {
   initialDiaryFormData,
   parseDiaryBody,
   parseDiaryTitle,
+  parseWeekTag,
   type DiaryFormData,
 } from './DiaryTemplateForm'
-import { DiaryTitleInput, buildDiaryTitle } from './DiaryTitleInput'
+import { DiaryTitleInput, buildDiaryTitle, buildWeekTag } from './DiaryTitleInput'
 import { LectureSearchModal, type SelectedLecture } from './LectureSearchModal'
 import { LectureSelector } from './LectureSelector'
 
@@ -117,12 +118,20 @@ export function PostForm({
   // 수정 모드에서 부트캠프 성장일기 기존 데이터 파싱
   useEffect(() => {
     if (initialData && isBootcampDiaryCategory) {
-      // 제목 파싱
+      // 제목 파싱 (기존 형식: "X월 Y주차 성장일기 - 한줄소감")
       const parsedTitle = parseDiaryTitle(initialData.title)
       if (parsedTitle) {
         setDiaryMonth(parsedTitle.month)
         setDiaryWeek(parsedTitle.week)
         setDiarySummary(parsedTitle.summary)
+      } else {
+        // 새 형식: 제목이 한줄소감만, 주차 정보는 태그에서 파싱
+        const weekInfo = parseWeekTag(initialData.tags || [])
+        if (weekInfo) {
+          setDiaryMonth(weekInfo.month)
+          setDiaryWeek(weekInfo.week)
+        }
+        setDiarySummary(initialData.title)
       }
 
       // 본문 파싱
@@ -191,6 +200,12 @@ export function PostForm({
     if (selectedLecture) {
       const lectureTags = [selectedLecture.name, selectedLecture.orgName].filter(Boolean)
       tags = [...lectureTags, ...tags.filter(tag => !lectureTags.includes(tag))]
+    }
+
+    // 부트캠프 성장일기: 주차 정보를 태그 맨 앞에 추가
+    if (isBootcampDiaryCategory) {
+      const weekTag = buildWeekTag(diaryMonth, diaryWeek)
+      tags = [weekTag, ...tags.filter(tag => tag !== weekTag)]
     }
 
     // 제목/본문 생성
@@ -440,7 +455,7 @@ export function PostForm({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="h-12 w-full rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-base font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-300/50 active:scale-[0.98] disabled:opacity-60 sm:h-11 sm:w-auto sm:px-10 sm:text-sm"
+            className="h-12 w-full rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-base font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-300/50 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-none disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none sm:h-11 sm:w-auto sm:px-10 sm:text-sm"
           >
             {isSubmitting ? '처리 중...' : submitLabel}
           </Button>
@@ -454,6 +469,11 @@ export function PostForm({
         onSelect={lecture => {
           setSelectedLecture(lecture)
           setLectureError(null)
+          // 강의 선택 후 제목 입력 부분으로 스크롤
+          setTimeout(() => {
+            document.getElementById('diary-summary-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            document.getElementById('diary-summary-input')?.focus()
+          }, 100)
         }}
       />
     </>

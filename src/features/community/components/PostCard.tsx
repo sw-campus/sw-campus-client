@@ -2,9 +2,9 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { FiHeart, FiMessageCircle, FiImage, FiMapPin } from 'react-icons/fi'
+import { FiHeart, FiMessageCircle, FiMapPin, FiFileText } from 'react-icons/fi'
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { formatRelativeTime } from '@/lib/formatRelativeTime'
 
 import type { Post } from '../api/postApi.types'
 import { BOOTCAMP_DIARY_CATEGORY_NAME } from '../constants'
@@ -22,10 +22,7 @@ interface PostCardProps {
  */
 export function PostCard({ post }: PostCardProps) {
   const router = useRouter()
-  const formattedDate = new Intl.DateTimeFormat('ko-KR', {
-    month: 'short',
-    day: 'numeric',
-  }).format(post.createdAt)
+  const relativeTime = formatRelativeTime(post.createdAt)
 
   return (
     <div
@@ -36,7 +33,7 @@ export function PostCard({ post }: PostCardProps) {
         {/* 호버 시 나타나는 그라데이션 오버레이 */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-orange-500/[0.02] to-amber-500/[0.02] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-        {/* 썸네일 영역 - 모바일에서 더 작은 비율 */}
+        {/* 썸네일 영역 */}
         <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9]">
           {post.thumbnailUrl ? (
             <>
@@ -52,20 +49,15 @@ export function PostCard({ post }: PostCardProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </>
           ) : (
-            <div
-              className={`flex h-full w-full items-center justify-center transition-colors duration-300 ${
-                post.pinned
-                  ? 'bg-gradient-to-br from-orange-100 via-amber-50 to-orange-100'
-                  : 'bg-gradient-to-br from-gray-50 via-gray-100/50 to-gray-50'
-              }`}
-            >
-              <div className="rounded-xl bg-white/60 p-3 backdrop-blur-sm sm:rounded-2xl sm:p-4">
-                <FiImage className={`h-6 w-6 sm:h-8 sm:w-8 ${post.pinned ? 'text-orange-300' : 'text-gray-300'}`} />
+            /* 기본 이미지 - 그라데이션 배경 */
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100">
+              <div className="rounded-2xl bg-white/60 p-4 shadow-sm backdrop-blur-sm">
+                <FiFileText className="h-8 w-8 text-orange-300 sm:h-10 sm:w-10" />
               </div>
             </div>
           )}
 
-          {/* 배지 영역 */}
+          {/* 배지 영역 - 썸네일 위 */}
           <div className="absolute top-2 left-2 flex flex-wrap gap-1.5 sm:top-3 sm:left-3 sm:gap-2">
             {post.pinned && (
               <span className="inline-flex items-center gap-0.5 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold text-orange-600 shadow-sm backdrop-blur-md sm:gap-1 sm:px-2.5 sm:py-1 sm:text-xs">
@@ -76,6 +68,12 @@ export function PostCard({ post }: PostCardProps) {
             <span className="rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2 py-0.5 text-[10px] font-medium text-white shadow-sm sm:px-2.5 sm:py-1 sm:text-xs">
               {post.categoryName}
             </span>
+            {/* 부트캠프 수강일기 주차 정보 */}
+            {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.length > 0 && post.tags[0].match(/^\d+월 \d+주차$/) && (
+              <span className="rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-medium text-gray-700 shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-xs">
+                {post.tags[0]}
+              </span>
+            )}
           </div>
         </div>
 
@@ -85,15 +83,18 @@ export function PostCard({ post }: PostCardProps) {
             {post.title}
           </h3>
 
-          {/* 태그 영역 - 모바일에서 숨김 */}
-          {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.length > 0 ? (
-            <div className="mt-2 hidden h-5 flex-wrap gap-1.5 overflow-hidden sm:mt-3 sm:flex sm:h-6">
-              {post.tags.slice(0, 2).map(tag => (
-                <ClickableTag key={tag} tag={tag} maxLength={10} />
-              ))}
+          {/* 태그 영역 (주차 정보 태그는 카테고리 옆에 표시하므로 제외) */}
+          {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.filter(tag => !tag.match(/^\d+월 \d+주차$/)).length > 0 ? (
+            <div className="mt-2 flex h-5 gap-1.5 overflow-hidden sm:mt-3 sm:h-6">
+              {post.tags
+                .filter(tag => !tag.match(/^\d+월 \d+주차$/))
+                .slice(0, 2)
+                .map(tag => (
+                  <ClickableTag key={tag} tag={tag} maxLength={8} />
+                ))}
             </div>
           ) : (
-            <div className="mt-2 hidden h-5 sm:mt-3 sm:block sm:h-6" />
+            <div className="mt-2 h-5 sm:mt-3 sm:h-6" />
           )}
 
           {/* 구분선 */}
@@ -101,19 +102,14 @@ export function PostCard({ post }: PostCardProps) {
 
           {/* 푸터 영역 */}
           <div className="flex items-center justify-between text-[11px] sm:text-[13px]">
-            <div className="flex items-center gap-1.5 sm:gap-2.5">
-              <Avatar className="h-5 w-5 ring-1 ring-white sm:h-7 sm:w-7 sm:ring-2">
-                <AvatarFallback className="bg-gradient-to-br from-orange-100 to-amber-100 text-[8px] font-medium text-orange-700 sm:text-[10px]">
-                  {post.authorNickname?.slice(0, 2) ?? '익명'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex items-center gap-1 sm:gap-1.5">
-                <span className="max-w-[60px] truncate font-medium text-gray-800 sm:max-w-[80px]">
-                  {post.authorNickname ?? '익명'}
-                </span>
-                <span className="text-gray-300">·</span>
-                <span className="text-gray-500">{formattedDate}</span>
-              </div>
+            <div className="flex items-center gap-1 sm:gap-1.5">
+              <span className="max-w-[70px] truncate font-medium text-gray-700 sm:max-w-[100px]">
+                {post.authorNickname ?? '익명'}
+              </span>
+              <span className="h-1 w-1 rounded-full bg-gray-300" />
+              <span className="text-gray-500" title={post.createdAt.toLocaleString('ko-KR')}>
+                {relativeTime}
+              </span>
             </div>
 
             <div className="flex items-center gap-2 text-gray-500 sm:gap-3">

@@ -137,9 +137,8 @@ export default function Header({
               <Link
                 key={uniqueKey}
                 href={href}
-                onMouseEnter={() => onCategoryEnter(category.categoryId)}
-                onFocus={() => onCategoryEnter(category.categoryId)}
-                onClick={() => onCategoryEnter(category.categoryId)}
+                onMouseEnter={onOtherNavEnter}
+                onFocus={onOtherNavEnter}
               >
                 {category.categoryName}
               </Link>

@@ -72,14 +72,24 @@ export function DiaryTitleInput({
             className={error ? 'border-destructive focus-visible:ring-destructive' : ''}
             maxLength={50}
           />
-          {error && <p className="text-destructive mt-1.5 text-sm font-medium">{error}</p>}
+          <div className="mt-1.5 flex items-center justify-between">
+            {error ? (
+              <p className="text-destructive text-sm font-medium">{error}</p>
+            ) : (
+              <p className="text-muted-foreground text-xs">5자 이상 입력해주세요</p>
+            )}
+            <span className={`text-xs font-medium ${summary.length >= 5 ? 'text-green-600' : 'text-red-500'}`}>
+              {summary.length}/50
+            </span>
+          </div>
         </div>
 
         {/* 미리보기 */}
         <div className="bg-muted/50 rounded-lg border px-4 py-3 text-sm">
           <span className="text-muted-foreground mr-2 font-medium">제목 미리보기:</span>
-          <span className="text-foreground font-bold">
-            {month}월 {week}주차 성장일기 - {summary || '(한 줄 소감)'}
+          <span className="text-foreground font-bold">{summary || '(한 줄 소감)'}</span>
+          <span className="text-muted-foreground ml-3 text-xs">
+            ({month}월 {week}주차 정보는 게시글 목록에 표시됩니다)
           </span>
         </div>
       </div>
@@ -89,7 +99,15 @@ export function DiaryTitleInput({
 
 /**
  * 제목 문자열 생성 헬퍼
+ * 한 줄 소감만 제목으로 사용 (주차 정보는 태그로 저장)
  */
-export function buildDiaryTitle(month: number, week: number, summary: string): string {
-  return `${month}월 ${week}주차 성장일기 - ${summary.trim()}`
+export function buildDiaryTitle(_month: number, _week: number, summary: string): string {
+  return summary.trim()
+}
+
+/**
+ * 주차 정보 태그 생성 헬퍼
+ */
+export function buildWeekTag(month: number, week: number): string {
+  return `${month}월 ${week}주차`
 }

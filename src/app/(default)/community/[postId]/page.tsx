@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 
 import DOMPurify from 'dompurify'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 import {
   FiArrowLeft,
   FiEdit2,
@@ -42,6 +42,7 @@ import { useAuthStore } from '@/store/authStore'
 export default function PostDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const pathname = usePathname()
   const postId = Number(params.postId)
 
   const { isLoggedIn, userType } = useAuthStore()
@@ -303,7 +304,7 @@ export default function PostDetailPage() {
               <p className="mb-2 text-lg font-semibold text-gray-700">로그인이 필요합니다</p>
               <p className="mb-6 text-sm text-gray-500">게시글 내용을 확인하려면 로그인해 주세요.</p>
               <Link
-                href="/login"
+                href={`/login?returnUrl=${encodeURIComponent(pathname)}`}
                 className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-600 active:scale-95"
               >
                 로그인하기

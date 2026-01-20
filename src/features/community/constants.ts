@@ -6,7 +6,7 @@
  */
 
 /**
- * 부트캠프 성장일기 카테고리 이름
+ * 부트캠프 수강일기 카테고리 이름
  * 이 카테고리는 특수한 템플릿 폼과 강의 선택 기능을 사용합니다.
  */
-export const BOOTCAMP_DIARY_CATEGORY_NAME = '부트캠프 성장일기'
+export const BOOTCAMP_DIARY_CATEGORY_NAME = '부트캠프 수강일기'

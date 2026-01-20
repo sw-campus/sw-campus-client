@@ -64,7 +64,7 @@ function getTextLength(html: string): number {
 // 글자 수 표시 컴포넌트
 function CharCount({ current, min }: { current: number; min: number }) {
   return (
-    <span className={`text-xs ${current >= min ? 'text-green-600' : 'text-gray-400'}`}>
+    <span className={`text-xs font-medium ${current >= min ? 'text-green-600' : 'text-red-500'}`}>
       {current}/{min}자
     </span>
   )
@@ -244,10 +244,12 @@ export function parseDiaryBody(html: string): DiaryFormData | null {
 
 /**
  * 기존 제목을 파싱하여 월, 주차, 한줄소감으로 분리
- * 제목 형식: "X월 Y주차 성장일기 - 한줄소감"
+ * 기존 형식: "X월 Y주차 성장일기 - 한줄소감"
+ * 새 형식: "한줄소감" (주차 정보는 태그에서 가져옴)
  */
 export function parseDiaryTitle(title: string): { month: number; week: number; summary: string } | null {
   try {
+    // 기존 형식 파싱 시도
     const pattern = /(\d+)월\s*(\d+)주차\s*성장일기\s*-\s*(.+)/
     const match = title.match(pattern)
 
@@ -259,6 +261,27 @@ export function parseDiaryTitle(title: string): { month: number; week: number; s
       month: parseInt(match[1], 10),
       week: parseInt(match[2], 10),
       summary: match[3].trim(),
+    }
+  } catch {
+    return null
+  }
+}
+
+/**
+ * 태그에서 주차 정보를 파싱
+ * 태그 형식: "X월 Y주차"
+ */
+export function parseWeekTag(tags: string[]): { month: number; week: number } | null {
+  try {
+    const weekTag = tags.find(tag => /^\d+월 \d+주차$/.test(tag))
+    if (!weekTag) return null
+
+    const match = weekTag.match(/(\d+)월 (\d+)주차/)
+    if (!match) return null
+
+    return {
+      month: parseInt(match[1], 10),
+      week: parseInt(match[2], 10),
     }
   } catch {
     return null

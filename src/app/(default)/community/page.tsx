@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { POST_SORT_OPTIONS, DEFAULT_POST_SORT } from '@/features/community/api/postApi.types'
-import { CategorySidebar } from '@/features/community/components/CategorySidebar'
 import { LectureSearchModal, type SelectedLecture } from '@/features/community/components/LectureSearchModal'
 import { PostList } from '@/features/community/components/PostList'
 import { SearchBar } from '@/features/community/components/SearchBar'
@@ -113,18 +112,6 @@ export default function CommunityPage() {
     localStorage.setItem('community-post-view-type', type)
   }
 
-  // 선택된 카테고리 이름 찾기 - useMemo 사용
-  const selectedCategoryName = useMemo(() => {
-    if (selectedCategoryId === null) return '전체 게시글'
-    for (const parent of categories) {
-      if (parent.id === selectedCategoryId) return parent.name
-      for (const child of parent.children) {
-        if (child.id === selectedCategoryId) return child.name
-      }
-    }
-    return '전체 게시글'
-  }, [categories, selectedCategoryId])
-
   const pageInfo = data?.page
   const totalPages = pageInfo?.totalPages ?? 1
 
@@ -134,9 +121,9 @@ export default function CommunityPage() {
       <div className="mb-5 sm:mb-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">커뮤니티</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">부트캠프 수강일기</h1>
             <p className="mt-1 text-sm text-gray-500 sm:mt-2 sm:text-base">
-              SW 캠퍼스에서 자유롭게 소통하세요
+              매주 배운 내용과 성장 과정을 기록하고 공유하세요
             </p>
           </div>
 
@@ -269,20 +256,13 @@ export default function CommunityPage() {
       )}
 
       {/* 메인 컨텐츠 영역 */}
-      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
-        {/* 사이드바 */}
-        <CategorySidebar
-          categories={categories}
-          selectedCategoryId={selectedCategoryId}
-          onSelect={handleCategorySelect}
-        />
-
+      <div className="flex flex-col gap-6">
         {/* 게시글 목록 */}
         <main className="min-w-0 flex-1">
           {/* 목록 헤더 */}
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 sm:text-lg">
-              {selectedCategoryName}
+              전체 글
               <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-gray-100 px-2 text-xs font-semibold text-gray-600">
                 {data?.page?.totalElements ?? 0}
               </span>

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { FiCornerDownRight, FiEdit2, FiHeart, FiMessageCircle, FiMoreVertical, FiTrash2, FiUser } from 'react-icons/fi'
 
 import {
@@ -40,6 +40,7 @@ const MAX_DEPTH = 3 // 권장: 3단계 (모바일 가독성 고려)
 
 export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItemProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const { isLoggedIn, userType } = useAuthStore()
   const [isEditing, setIsEditing] = useState(false)
   const [editBody, setEditBody] = useState(comment.body)
@@ -76,7 +77,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
 
   const handleLoginRedirect = () => {
     setIsLoginDialogOpen(false)
-    router.push('/login')
+    router.push(`/login?returnUrl=${encodeURIComponent(pathname)}`)
   }
 
   const relativeTime = formatRelativeTime(comment.createdAt)
