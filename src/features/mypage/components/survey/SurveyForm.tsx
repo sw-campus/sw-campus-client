@@ -11,21 +11,12 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { CharacterCounter } from '@/components/ui/character-counter'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import { api } from '@/lib/axios'
-
-const MAX_WANTED_JOBS_LENGTH = 200
-const MAX_LICENSES_LENGTH = 200
 
 const surveySchema = z.object({
   major: z.string().min(1, '전공을 입력해주세요.'),
   bootcampCompleted: z.boolean(),
-  wantedJobs: z
-    .string()
-    .min(1, '희망 직무를 입력해주세요.')
-    .max(MAX_WANTED_JOBS_LENGTH, `희망 직무는 ${MAX_WANTED_JOBS_LENGTH}자 이내로 입력해주세요.`),
-  licenses: z.string().max(MAX_LICENSES_LENGTH, `자격증은 ${MAX_LICENSES_LENGTH}자 이내로 입력해주세요.`).optional(),
   hasGovCard: z.boolean(),
   affordableAmount: z.number().min(0, '가능 금액은 0 이상 숫자여야 합니다.'),
 })
@@ -36,8 +27,6 @@ type MySurveyResponse = {
   memberId: number
   major: string
   bootcampCompleted: boolean
-  wantedJobs: string
-  licenses: string
   hasGovCard: boolean
   affordableAmount: number
   createdAt: string
@@ -47,9 +36,6 @@ type MySurveyResponse = {
 // PersonalForm과 동일 톤의 입력 스타일
 const INPUT_CLASS =
   'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
-
-const TEXTAREA_CLASS =
-  'w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
 
 export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
@@ -62,8 +48,6 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
     defaultValues: {
       major: '',
       bootcampCompleted: false,
-      wantedJobs: '',
-      licenses: '',
       hasGovCard: false,
       affordableAmount: 0,
     },
@@ -79,11 +63,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
     handleSubmit,
     formState: { isValid, errors },
     register,
-    watch,
   } = methods
-
-  const wantedJobs = watch('wantedJobs') ?? ''
-  const licenses = watch('licenses') ?? ''
 
   useEffect(() => {
     let mounted = true
@@ -98,8 +78,6 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
         methods.reset({
           major: data.major ?? '',
           bootcampCompleted: !!data.bootcampCompleted,
-          wantedJobs: data.wantedJobs ?? '',
-          licenses: data.licenses ?? '',
           hasGovCard: !!data.hasGovCard,
           affordableAmount: data.affordableAmount ?? 0,
         })
@@ -164,40 +142,6 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
               {errors.affordableAmount && (
                 <p className="mt-1 text-xs text-red-600">{errors.affordableAmount.message as string}</p>
               )}
-            </div>
-
-            <div>
-              <div className="mb-1 flex items-center justify-between">
-                <label htmlFor="wantedJobs" className="text-sm font-medium text-gray-800">
-                  희망 직무<span className="text-red-500">*</span>
-                </label>
-                <CharacterCounter current={wantedJobs.length} max={MAX_WANTED_JOBS_LENGTH} />
-              </div>
-              <textarea
-                id="wantedJobs"
-                rows={3}
-                maxLength={MAX_WANTED_JOBS_LENGTH}
-                {...register('wantedJobs')}
-                className={TEXTAREA_CLASS}
-              />
-              {errors.wantedJobs && <p className="mt-1 text-xs text-red-600">{errors.wantedJobs.message}</p>}
-            </div>
-
-            <div>
-              <div className="mb-1 flex items-center justify-between">
-                <label htmlFor="licenses" className="text-sm font-medium text-gray-800">
-                  자격증 (선택)
-                </label>
-                <CharacterCounter current={licenses.length} max={MAX_LICENSES_LENGTH} />
-              </div>
-              <textarea
-                id="licenses"
-                rows={3}
-                maxLength={MAX_LICENSES_LENGTH}
-                {...register('licenses')}
-                className={TEXTAREA_CLASS}
-              />
-              {errors.licenses && <p className="mt-1 text-xs text-red-600">{errors.licenses.message}</p>}
             </div>
 
             <div className="flex items-center gap-3">
