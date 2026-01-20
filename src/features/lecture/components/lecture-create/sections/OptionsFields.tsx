@@ -2,6 +2,7 @@
 
 import { Controller, useFormContext } from 'react-hook-form'
 
+import { CharacterCounter } from '@/components/ui/character-counter'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -9,6 +10,8 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
+
+const MAX_GOAL_LENGTH = 500
 
 export function LectureCreateOptionsFields() {
   const {
@@ -84,11 +87,17 @@ export function LectureCreateOptionsFields() {
             control={control}
             name="goal"
             render={({ field }) => (
-              <Textarea
-                placeholder="1. ...&#10;2. ...&#10;형식으로 강의 목표를 작성해 주세요."
-                {...field}
-                value={field.value ?? ''}
-              />
+              <div className="space-y-1">
+                <Textarea
+                  placeholder="1. ...&#10;2. ...&#10;형식으로 강의 목표를 작성해 주세요."
+                  maxLength={MAX_GOAL_LENGTH}
+                  {...field}
+                  value={field.value ?? ''}
+                />
+                <div className="flex justify-end">
+                  <CharacterCounter current={field.value?.length ?? 0} max={MAX_GOAL_LENGTH} />
+                </div>
+              </div>
             )}
           />
         </FieldContent>

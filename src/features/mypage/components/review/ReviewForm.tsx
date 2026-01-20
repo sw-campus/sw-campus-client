@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
+import { CharacterCounter } from '@/components/ui/character-counter'
 import { APPROVAL_STATUS } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 
@@ -257,17 +258,7 @@ export function ReviewForm({
             disabled={effectiveReadOnly || loading || saveMutation.isPending}
           />
           <div className="mt-1 flex justify-end">
-            <span
-              className={`text-xs ${
-                comment.length > MAX_COMMENT_LENGTH
-                  ? 'font-semibold text-red-500'
-                  : comment.length > MAX_COMMENT_LENGTH * 0.8
-                    ? 'text-amber-500'
-                    : 'text-gray-400'
-              }`}
-            >
-              {comment.length} / {MAX_COMMENT_LENGTH}자{comment.length > MAX_COMMENT_LENGTH && ' (초과)'}
-            </span>
+            <CharacterCounter current={comment.length} max={MAX_COMMENT_LENGTH} warningThreshold={MAX_COMMENT_LENGTH * 0.8} />
           </div>
         </div>
       </div>
@@ -320,24 +311,15 @@ export function ReviewForm({
                   placeholder="세부 의견을 입력하세요 (10자 이상)"
                   disabled={effectiveReadOnly || loading || saveMutation.isPending}
                 />
-                <div className="mt-1 flex justify-end">
-                  <span
-                    className={`text-xs ${
-                      (d.comment?.length ?? 0) > MAX_COMMENT_LENGTH
-                        ? 'font-semibold text-red-500'
-                        : (d.comment?.length ?? 0) > 0 && (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH
-                          ? 'text-red-500'
-                          : (d.comment?.length ?? 0) > MAX_COMMENT_LENGTH * 0.8
-                            ? 'text-amber-500'
-                            : 'text-gray-400'
-                    }`}
-                  >
-                    {d.comment?.length ?? 0} / {MAX_COMMENT_LENGTH}자
-                    {(d.comment?.length ?? 0) > MAX_COMMENT_LENGTH && ' (초과)'}
-                    {(d.comment?.length ?? 0) > 0 &&
-                      (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH &&
-                      ` (최소 ${MIN_DETAIL_COMMENT_LENGTH}자)`}
-                  </span>
+                <div className="mt-1 flex items-center justify-end gap-2">
+                  {(d.comment?.length ?? 0) > 0 && (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH && (
+                    <span className="text-xs text-destructive">최소 {MIN_DETAIL_COMMENT_LENGTH}자</span>
+                  )}
+                  <CharacterCounter
+                    current={d.comment?.length ?? 0}
+                    max={MAX_COMMENT_LENGTH}
+                    warningThreshold={MAX_COMMENT_LENGTH * 0.8}
+                  />
                 </div>
               </div>
             </div>

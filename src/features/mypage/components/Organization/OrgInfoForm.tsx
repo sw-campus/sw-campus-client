@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
+import { CharacterCounter } from '@/components/ui/character-counter'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import { ImageUploadInput } from '@/components/ui/image-upload-input'
 import { APPROVAL_STATUS, type ApprovalStatus } from '@/features/admin/types/approval.type'
@@ -33,10 +34,12 @@ type MyOrganizationResponse = {
   homepage: string
 }
 
+const MAX_DESCRIPTION_LENGTH = 500
+
 const orgInfoSchema = z.object({
   organizationName: z.string().min(1, '기관명을 입력해주세요.'),
   representativeName: z.string().min(1, '대표자명을 입력해주세요.'),
-  description: z.string().optional(),
+  description: z.string().max(MAX_DESCRIPTION_LENGTH, `기관 소개는 ${MAX_DESCRIPTION_LENGTH}자 이내로 입력해주세요.`).optional(),
   homepage: z.string().optional(),
   logoUrl: z.string().optional(),
   certificateKey: z.string().optional(),
@@ -85,7 +88,10 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     handleSubmit,
     formState: { isValid, errors },
     register,
+    watch,
   } = methods
+
+  const description = watch('description') ?? ''
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [certificateFile, setCertificateFile] = useState<File | null>(null)
   const [facilityFile1, setFacilityFile1] = useState<File | null>(null)
@@ -208,12 +214,16 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
             </div>
 
             <div>
-              <label htmlFor="description" className="mb-1 block text-sm font-medium text-gray-800">
-                기관 소개
-              </label>
+              <div className="mb-1 flex items-center justify-between">
+                <label htmlFor="description" className="text-sm font-medium text-gray-800">
+                  기관 소개
+                </label>
+                <CharacterCounter current={description.length} max={MAX_DESCRIPTION_LENGTH} />
+              </div>
               <textarea
                 id="description"
                 rows={4}
+                maxLength={MAX_DESCRIPTION_LENGTH}
                 placeholder="기관 소개를 입력해주세요."
                 {...register('description')}
                 className={TEXTAREA_CLASS}
