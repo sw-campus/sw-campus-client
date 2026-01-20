@@ -94,6 +94,20 @@ export function SurveyResultsStep({
         <p className="mt-1 text-sm text-gray-500">
           AI 추천에 활용되는 당신의 프로필입니다
         </p>
+        {/* 설문조사 완료 상태 표시 */}
+        <div className="mt-3">
+          {status?.hasAptitudeTest ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+              <span className="h-2 w-2 rounded-full bg-green-500" />
+              설문조사가 완료되었습니다
+            </span>
+          ) : status?.hasBasicSurvey ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-700">
+              <span className="h-2 w-2 rounded-full bg-amber-500" />
+              기초 설문 완료 (성향 테스트 미완료)
+            </span>
+          ) : null}
+        </div>
       </div>
 
       {/* 추천 직무 카드 (성향 테스트 완료 시) */}
