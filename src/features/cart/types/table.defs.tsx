@@ -25,7 +25,7 @@ export type RowDef = {
 }
 
 export function valueOrUnselected(detail: Detail, value: ReactNode) {
-  return detail ? value : '미선택'
+  return detail ? value : '-'
 }
 
 export function dividerCell() {

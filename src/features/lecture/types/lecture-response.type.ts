@@ -32,6 +32,12 @@ export interface LectureCurriculumResponseDto {
   level: string | null
 }
 
+export interface LectureSpecialCurriculumResponseDto {
+  specialCurriculumId: number
+  title: string
+  sortOrder: number
+}
+
 export interface LectureResponseDto {
   lectureId: number
   categoryId: number | null
@@ -87,6 +93,7 @@ export interface LectureResponseDto {
   quals: LectureQualResponseDto[]
   teachers: LectureTeacherResponseDto[]
   curriculums: LectureCurriculumResponseDto[]
+  specialCurriculums: LectureSpecialCurriculumResponseDto[] | null
   categoryName: string | null
   averageScore: number | null
   reviewCount: number | null

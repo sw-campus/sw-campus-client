@@ -65,7 +65,7 @@ export default function LectureEditModal({ open, onOpenChange, lectureId, onSucc
         reset(formValues)
       } catch (error) {
         console.error('Failed to fetch lecture:', error)
-        toast.error('강의 정보를 불러오는데 실패했습니다.')
+        // 에러 toast는 axios 인터셉터에서 처리됨
       } finally {
         setIsLoading(false)
       }
@@ -88,6 +88,9 @@ export default function LectureEditModal({ open, onOpenChange, lectureId, onSucc
   }, [currentStep])
 
   const validateCurrentStep = async () => {
+    // useFieldArray 상태 동기화를 위해 마이크로태스크 큐 대기
+    // React의 렌더링 사이클이 완료된 후 trigger 실행
+    await new Promise(resolve => setTimeout(resolve, 0))
     const fields = stepFields[currentStep as keyof typeof stepFields]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const isValid = await trigger(fields as any)

@@ -90,6 +90,13 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
           .filter(t => Boolean(t.name))
       : [],
     quals: api.quals ? api.quals.map(q => ({ type: q.type, text: q.text })) : [],
+    specialCurriculums: api.specialCurriculums
+      ? api.specialCurriculums.map(sc => ({
+          specialCurriculumId: sc.specialCurriculumId,
+          title: sc.title,
+          sortOrder: sc.sortOrder,
+        }))
+      : [],
   }
 }
 

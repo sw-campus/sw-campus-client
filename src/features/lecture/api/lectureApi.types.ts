@@ -24,6 +24,13 @@ interface ApiCurriculum {
   }
 }
 
+/** API 응답: 특화 커리큘럼 */
+interface ApiSpecialCurriculum {
+  specialCurriculumId: number
+  title: string
+  sortOrder: number
+}
+
 /** API 응답: 강사 정보 (다양한 구조 호환) */
 interface ApiTeacher {
   teacherName?: string
@@ -88,6 +95,7 @@ export interface ApiLectureDetail {
   teachers: (string | ApiTeacher)[]
   categoryName: string
   curriculums: ApiCurriculum[]
+  specialCurriculums: ApiSpecialCurriculum[] | null
   orgLogoUrl: string
   orgFacilityImageUrls: string[]
   averageScore: number
@@ -158,4 +166,9 @@ export type LectureDetail = {
     type: string
     text: string
   }[]
+  specialCurriculums: {
+    specialCurriculumId: number
+    title: string
+    sortOrder: number
+  }[] | null
 }

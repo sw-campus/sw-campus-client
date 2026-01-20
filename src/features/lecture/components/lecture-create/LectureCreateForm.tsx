@@ -44,6 +44,9 @@ export function LectureCreateForm() {
   const [isStepMoving, setIsStepMoving] = useState(false)
 
   const validateCurrentStep = async () => {
+    // useFieldArray 상태 동기화를 위해 마이크로태스크 큐 대기
+    // React의 렌더링 사이클이 완료된 후 trigger 실행
+    await new Promise(resolve => setTimeout(resolve, 0))
     const fields = stepFields[currentStep as keyof typeof stepFields]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const isValid = await trigger(fields as any)

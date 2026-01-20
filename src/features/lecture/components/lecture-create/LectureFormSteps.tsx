@@ -17,15 +17,17 @@ import {
   LectureCreateQualificationFields,
   LectureCreateRecruitProcedureFields,
   LectureCreateScheduleFields,
+  LectureCreateSpecialCurriculumFields,
   LectureCreateTeachersFields,
 } from '@/features/lecture/components/lecture-create'
 
 export const LECTURE_FORM_STEPS: FormStep[] = [
-  { title: '기본 정보', description: '강의명, 카테고리, 커리큘럼' },
-  { title: '일정 및 장소', description: '운영 방식, 장소, 요일/시간' },
-  { title: '모집 및 비용', description: '선발 절차, 지원 자격, 비용' },
-  { title: '옵션 및 환경', description: '취업 지원, 장비, 프로젝트' },
-  { title: '강사 및 추가', description: '강사 등록, 추가 제공' },
+  { title: '기본정보', description: '강의명, 카테고리' },
+  { title: '특화', description: '선택' },
+  { title: '일정/장소', description: '운영, 장소' },
+  { title: '모집/비용', description: '절차, 자격' },
+  { title: '옵션', description: '장비, 프로젝트' },
+  { title: '강사', description: '강사, 추가' },
 ]
 
 type LectureFormStepsProps = {
@@ -61,16 +63,23 @@ export function LectureFormSteps({
         </div>
       )}
 
-      {/* Step 2: 일정 및 장소 */}
+      {/* Step 2: 특화 커리큘럼 (선택) */}
       {currentStep === 1 && (
+        <div className="space-y-6">
+          <LectureCreateSpecialCurriculumFields />
+        </div>
+      )}
+
+      {/* Step 3: 일정 및 장소 */}
+      {currentStep === 2 && (
         <div className="space-y-6">
           <LectureCreateLocationFields selectTriggerClassName={selectTriggerClassName} />
           <LectureCreateScheduleFields />
         </div>
       )}
 
-      {/* Step 3: 모집 및 비용 */}
-      {currentStep === 2 && (
+      {/* Step 4: 모집 및 비용 */}
+      {currentStep === 3 && (
         <div className="space-y-6">
           <LectureCreateRecruitProcedureFields selectTriggerClassName={selectTriggerClassName} />
           <LectureCreateQualificationFields selectTriggerClassName={selectTriggerClassName} />
@@ -78,8 +87,8 @@ export function LectureFormSteps({
         </div>
       )}
 
-      {/* Step 4: 옵션 및 환경 */}
-      {currentStep === 3 && (
+      {/* Step 5: 옵션 및 환경 */}
+      {currentStep === 4 && (
         <div className="space-y-6">
           <LectureCreateOptionsFields />
           <LectureCreateEquipmentFields selectTriggerClassName={selectTriggerClassName} />
@@ -87,8 +96,8 @@ export function LectureFormSteps({
         </div>
       )}
 
-      {/* Step 5: 강사 및 추가 정보 */}
-      {currentStep === 4 && (
+      {/* Step 6: 강사 및 추가 정보 */}
+      {currentStep === 5 && (
         <div className="space-y-6">
           <LectureCreateTeachersFields />
           <LectureCreateAddsFields />

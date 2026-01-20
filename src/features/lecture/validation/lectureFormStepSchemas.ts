@@ -7,8 +7,8 @@ import { LECTURE_DAYS } from '@/features/lecture/types/lecture.type'
  * 각 단계 전환 시 해당 단계의 필드만 검증
  */
 
-// Step 1: 기본 정보 (BasicInfo, Category, Curriculum)
-export const step1Schema = z.object({
+// Step 0: 기본 정보 (BasicInfo, Category, Curriculum)
+export const step0Schema = z.object({
   lectureName: z.string().trim().min(1, '강의명은 필수입니다.'),
   lectureImageFile: z.any().optional().nullable(),
   categoryId: z.number().positive('카테고리를 선택해 주세요.').optional().nullable(),
@@ -19,6 +19,23 @@ export const step1Schema = z.object({
         level: z.enum(['NONE', 'BASIC', 'ADVANCED']),
       }),
     )
+    .optional(),
+})
+
+// Step 1: 특화 커리큘럼 (SpecialCurriculum) - 선택적 (추가 시 제목은 필수)
+export const step1Schema = z.object({
+  specialCurriculums: z
+    .array(
+      z.object({
+        title: z
+          .string()
+          .min(1, '제목은 필수입니다.')
+          .max(20, '제목은 20자 이내로 입력해 주세요.')
+          .refine(val => val.trim().length > 0, '제목은 공백만 입력할 수 없습니다.'),
+        sortOrder: z.number().int().positive('순서는 1 이상이어야 합니다.'),
+      }),
+    )
+    .max(5, '특화 커리큘럼은 최대 5개까지 등록할 수 있습니다.')
     .optional(),
 })
 
@@ -131,13 +148,21 @@ export const step5Schema = z.object({
     .optional(),
 })
 
-// 단계별 스키마 배열
-export const stepSchemas = [step1Schema, step2Schema, step3Schema, step4Schema, step5Schema] as const
+// 단계별 스키마 배열 (6단계)
+export const stepSchemas = [
+  step0Schema,
+  step1Schema,
+  step2Schema,
+  step3Schema,
+  step4Schema,
+  step5Schema,
+] as const
 
-// 단계별 필드 이름
+// 단계별 필드 이름 (6단계)
 export const stepFields = {
   0: ['lectureName', 'lectureImageFile', 'categoryId', 'curriculums'],
-  1: [
+  1: ['specialCurriculums'],
+  2: [
     'lectureLoc',
     'location',
     'days',
@@ -149,8 +174,8 @@ export const stepFields = {
     'totalTimes',
     'deadlineDate',
   ],
-  2: ['recruitProcedures', 'quals', 'recruitType', 'subsidy', 'lectureFee', 'eduSubsidy', 'maxCapacity', 'goal'],
-  3: [
+  3: ['recruitProcedures', 'quals', 'recruitType', 'subsidy', 'lectureFee', 'eduSubsidy', 'maxCapacity', 'goal'],
+  4: [
     'books',
     'resume',
     'mockInterview',
@@ -165,7 +190,7 @@ export const stepFields = {
     'projectTool',
     'projectMentor',
   ],
-  4: ['teachers', 'adds'],
+  5: ['teachers', 'adds'],
 } as const
 
 export type StepIndex = keyof typeof stepFields

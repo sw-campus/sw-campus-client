@@ -11,6 +11,7 @@ export { LectureCreateQualificationFields } from '@/features/lecture/components/
 export { LectureCreateRecruitProcedureFields } from '@/features/lecture/components/lecture-create/sections/RecruitProcedureFields'
 export { LectureCreateScheduleFields } from '@/features/lecture/components/lecture-create/sections/ScheduleFields'
 export { LectureCreateTeachersFields } from '@/features/lecture/components/lecture-create/sections/TeachersFields'
+export { LectureCreateSpecialCurriculumFields } from '@/features/lecture/components/lecture-create/sections/SpecialCurriculumFields'
 
 export { lectureCreateFormDefaultValues } from '@/features/lecture/components/lecture-create/defaultValues'
 
