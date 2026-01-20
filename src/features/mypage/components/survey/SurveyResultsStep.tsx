@@ -27,6 +27,7 @@ interface SurveyResultsStepProps {
   survey: SurveyResponse | null | undefined
   onEditBasic: () => void
   onRetakeAptitude: () => void
+  onClose?: () => void
 }
 
 const RECOMMENDED_JOB_ICONS: Record<RecommendedJob, LucideIcon> = {
@@ -45,6 +46,7 @@ export function SurveyResultsStep({
   survey,
   onEditBasic,
   onRetakeAptitude,
+  onClose,
 }: SurveyResultsStepProps) {
   const [showRetakeConfirm, setShowRetakeConfirm] = useState(false)
   const basicSurvey = survey?.basicSurvey
@@ -247,22 +249,30 @@ export function SurveyResultsStep({
         </div>
       )}
 
-      {/* 성향 테스트 다시하기 (완료 시) */}
-      {status?.hasAptitudeTest && (
-        <div className="text-center">
-          <Button
-            variant="outline"
-            onClick={handleRetakeClick}
-            className="gap-2 text-gray-600"
-          >
-            <RefreshCw className="h-4 w-4" />
-            성향 테스트 다시하기
+      {/* 버튼 영역 */}
+      <div className="flex flex-col items-center gap-3">
+        {onClose && (
+          <Button onClick={onClose} className="w-full max-w-xs">
+            확인
           </Button>
-          <p className="mt-2 text-xs text-gray-400">
-            다시 테스트하면 기존 결과가 덮어씌워집니다
-          </p>
-        </div>
-      )}
+        )}
+
+        {status?.hasAptitudeTest && (
+          <div className="text-center">
+            <Button
+              variant="outline"
+              onClick={handleRetakeClick}
+              className="w-full max-w-xs gap-2 text-gray-600"
+            >
+              <RefreshCw className="h-4 w-4" />
+              성향 테스트 다시하기
+            </Button>
+            <p className="mt-2 text-xs text-gray-400">
+              다시 테스트하면 기존 결과가 덮어씌워집니다
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* 성향 테스트 재응시 확인 모달 */}
       <Dialog open={showRetakeConfirm} onOpenChange={setShowRetakeConfirm}>

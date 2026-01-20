@@ -263,6 +263,7 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
                 survey={survey}
                 onEditBasic={handleEditBasic}
                 onRetakeAptitude={handleRetakeAptitude}
+                onClose={onComplete}
               />
             </motion.div>
           )}
