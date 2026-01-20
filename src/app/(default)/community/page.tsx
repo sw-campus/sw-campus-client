@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -17,7 +17,7 @@ import { useBoardCategories } from '@/features/community/hooks/useBoardCategorie
 import { usePosts } from '@/features/community/hooks/usePosts'
 import { useAuthStore } from '@/store/authStore'
 
-export default function CommunityPage() {
+function CommunityContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const categoryIdParam = searchParams.get('categoryId')
@@ -353,5 +353,13 @@ export default function CommunityPage() {
         onSelect={handleLectureSelect}
       />
     </div>
+  )
+}
+
+export default function CommunityPage() {
+  return (
+    <Suspense fallback={null}>
+      <CommunityContent />
+    </Suspense>
   )
 }
