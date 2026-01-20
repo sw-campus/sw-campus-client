@@ -1,8 +1,21 @@
 'use client'
 
+import { useState } from 'react'
+
 import Image from 'next/image'
 import { LuPencil, LuTrash2 } from 'react-icons/lu'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent as AlertContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -39,14 +52,15 @@ export function BannerDetailModal({
   isToggling,
   isDeleting,
 }: BannerDetailModalProps) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
   if (!banner) return null
 
   const periodStatus = getBannerPeriodStatus(banner.startDate, banner.endDate)
 
   const handleDelete = () => {
-    if (confirm('정말로 이 배너를 삭제하시겠습니까?')) {
-      onDelete(banner.id)
-    }
+    onDelete(banner.id)
+    setIsDeleteDialogOpen(false)
   }
 
   return (
@@ -143,10 +157,28 @@ export function BannerDetailModal({
               <LuPencil className="mr-2 h-4 w-4" />
               수정
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              <LuTrash2 className="mr-2 h-4 w-4" />
-              삭제
-            </Button>
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={isDeleting}>
+                  <LuTrash2 className="mr-2 h-4 w-4" />
+                  삭제
+                </Button>
+              </AlertDialogTrigger>
+              <AlertContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>배너 삭제</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    정말로 이 배너를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>취소</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+                    {isDeleting ? '삭제 중...' : '삭제'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertContent>
+            </AlertDialog>
           </div>
         </div>
       </DialogContent>

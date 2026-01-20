@@ -16,13 +16,18 @@ import type { CategoryTreeNode } from '@/features/category'
 import { ensureSessionActive } from '@/lib/axios'
 import { useAuthStore } from '@/store/authStore'
 
+export interface NavCategoryItem extends CategoryTreeNode {
+  type?: 'LECTURE' | 'BOARD'
+  link?: string
+}
+
 export default function Header({
   categories,
   onOpenNav,
   onCategoryEnter,
   onOtherNavEnter,
 }: {
-  categories: CategoryTreeNode[]
+  categories: NavCategoryItem[]
   onOpenNav: () => void
   onCategoryEnter: (id: number) => void
   onOtherNavEnter: () => void
@@ -97,20 +102,48 @@ export default function Header({
       </div>
 
       <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 font-semibold text-gray-800 lg:flex">
-        {categories.map(category => (
-          <Link
-            key={category.categoryId}
-            href={`/lectures/search?categoryIds=${category.categoryId}&size=12`}
-            onMouseEnter={() => onCategoryEnter(category.categoryId)}
-            onFocus={() => onCategoryEnter(category.categoryId)}
-            onClick={() => onCategoryEnter(category.categoryId)}
-          >
-            {category.categoryName}
-          </Link>
-        ))}
+        {categories
+          .filter(c => !c.type || c.type === 'LECTURE')
+          .map(category => {
+            const href = category.link || `/lectures/search?categoryIds=${category.categoryId}&size=12`
+            const uniqueKey = category.type
+              ? `${category.type}-${category.categoryId}`
+              : `LECTURE-${category.categoryId}`
+
+            return (
+              <Link
+                key={uniqueKey}
+                href={href}
+                onMouseEnter={() => onCategoryEnter(category.categoryId)}
+                onFocus={() => onCategoryEnter(category.categoryId)}
+                onClick={() => onCategoryEnter(category.categoryId)}
+              >
+                {category.categoryName}
+              </Link>
+            )
+          })}
+
         <Link href="/organizations" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
           훈련 기관
         </Link>
+
+        {categories
+          .filter(c => c.type === 'BOARD')
+          .map(category => {
+            const href = category.link || `/community?categoryId=${category.categoryId}`
+            const uniqueKey = `${category.type}-${category.categoryId}`
+
+            return (
+              <Link
+                key={uniqueKey}
+                href={href}
+                onMouseEnter={onOtherNavEnter}
+                onFocus={onOtherNavEnter}
+              >
+                {category.categoryName}
+              </Link>
+            )
+          })}
       </nav>
 
       {/* 아이콘 */}
