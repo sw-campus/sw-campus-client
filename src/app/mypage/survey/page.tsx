@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -27,9 +27,9 @@ export default function SurveyCreatePage() {
     router.back()
   }
 
-  const handleStepChange = (step: SurveyStep) => {
+  const handleStepChange = useCallback((step: SurveyStep) => {
     setCurrentStep(step)
-  }
+  }, [])
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
