@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 
-import { OrganizationDetailPageClient } from '@/features/organization/components/OrganizationDetailPageClient'
+import { OrganizationDetailPageClient } from '@/features/organization/components/organization-detail-page-client'
 
 interface OrganizationDetailPageProps {
   params: Promise<{

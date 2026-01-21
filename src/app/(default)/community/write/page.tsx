@@ -4,11 +4,11 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { FiArrowLeft } from 'react-icons/fi'
 
-import type { CreatePostRequest } from '@/features/community/api/postApi.types'
-import { PostForm } from '@/features/community/components/PostForm'
-import { useBoardCategories } from '@/features/community/hooks/useBoardCategories'
-import { useCreatePost } from '@/features/community/hooks/useCreatePost'
-import { useAuthStore } from '@/store/authStore'
+import type { CreatePostRequest } from '@/features/community/api/post-api.types'
+import { PostForm } from '@/features/community/components/post-form'
+import { useBoardCategories } from '@/features/community/hooks/use-board-categories'
+import { useCreatePost } from '@/features/community/hooks/use-create-post'
+import { useAuthStore } from '@/store/auth-store'
 
 export default function WritePostPage() {
   const router = useRouter()

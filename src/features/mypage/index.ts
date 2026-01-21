@@ -4,11 +4,11 @@ export {
   type CompletedLecture,
   type CertificateStatus,
   type ReviewStatus,
-} from './api/completedLectures.api'
+} from './api/completed-lectures.api'
 
 // Hooks
-export { useCompletedLecturesQuery, completedLecturesQueryKey } from './hooks/useCompletedLecturesQuery'
+export { useCompletedLecturesQuery, completedLecturesQueryKey } from './hooks/use-completed-lectures-query'
 
 // Components
-export { ActivitySummary } from './components/ActivitySummary'
-export { ReviewManagementSection } from './components/ManagementSection'
+export { ActivitySummary } from './components/activity-summary'
+export { ReviewManagementSection } from './components/management-section'

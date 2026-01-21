@@ -2,7 +2,7 @@
 
 import { GoogleGenerativeAI, SchemaType, type Schema } from '@google/generative-ai'
 
-import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
+import type { LectureDetail } from '@/features/lecture/api/lecture-api.types'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -249,7 +249,8 @@ export async function compareCoursesWithAI(
       모의면접: ${lecture.services?.mockInterview ? '있음' : '없음'}
       취업지원: ${lecture.services?.employmentHelp ? '있음' : '없음'}
       프로젝트 수: ${lecture.project?.num ?? 0}회
-      커리큘럼: ${lecture.curriculum?.map(c => `${c.name}(${c.level === 'BASIC' ? '기본' : c.level === 'ADVANCED' ? '심화' : (c.level ?? '')})`).join(', ') || '정보 없음'}
+      메인 커리큘럼: ${lecture.curriculum?.map(c => `${c.name}(${c.level === 'BASIC' ? '기본' : c.level === 'ADVANCED' ? '심화' : (c.level ?? '')})`).join(', ') || '정보 없음'}
+      특화 커리큘럼: ${lecture.specialCurriculums?.map(sc => sc.title).join(', ') || '없음'}
       선발절차: ${lecture.steps?.join(', ') || '정보 없음'}
       지원자격: ${lecture.quals?.map(q => `[${q.type}] ${q.text}`).join(', ') || '정보 없음'}
     `
@@ -277,7 +278,7 @@ export async function compareCoursesWithAI(
           {"sectionKey": "equipment", "comment": "시설 및 장비 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
           {"sectionKey": "project", "comment": "프로젝트 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
           {"sectionKey": "job", "comment": "취업지원 서비스 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"},
-          {"sectionKey": "curriculum", "comment": "커리큘럼 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"}
+          {"sectionKey": "curriculum", "comment": "메인 커리큘럼과 특화 커리큘럼을 종합한 비교 코멘트 (1-2문장)", "advantage": "left" 또는 "right" 또는 "equal"}
         ],
         "finalRecommendation": {
           "recommended": "left" 또는 "right",

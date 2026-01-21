@@ -1,0 +1,133 @@
+'use client'
+
+import AddressInput from '@/features/auth/components/address-input'
+import CertificateUploadSection from '@/features/auth/components/certificate-upload-section'
+import EmailAuthInput from '@/features/auth/components/email-auth-input'
+import LabeledInput from '@/features/auth/components/labeled-input'
+import NicknameInput from '@/features/auth/components/nick-name-input'
+import OrganizationSearchSelect from '@/features/auth/components/organization-search-select'
+import PasswordFields from '@/features/auth/components/password-fields'
+import PhoneAuthInput from '@/features/auth/components/phone-auth-input'
+import { useSignupOrganizationForm } from '@/features/auth/hooks/use-signup-organization-form'
+
+const INPUT_BASE_CLASS =
+  'h-10 rounded-md border border-gray-200 bg-gray-50 px-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100'
+
+export default function SignupOrganizationFormView() {
+  const {
+    email,
+    isSendingEmail,
+    isEmailVerified,
+    password,
+    passwordConfirm,
+    isPasswordMatched,
+    name,
+    nickname,
+    phone,
+    organizationId,
+    organizationName,
+    certificateImage,
+    isSubmitting,
+
+    isNicknameChecking,
+    nicknameCheckState,
+
+    setEmail,
+    setPassword,
+    setPasswordConfirm,
+    setName,
+    setNickname,
+    setPhone,
+    handleSelectExistingOrg,
+    handleInputNewOrg,
+
+    handleSendEmailAuth,
+    handleCheckPasswordMatch,
+    handleCheckNickname,
+    handleFileChange,
+    handleSubmit,
+    resetPasswordValidation,
+    handleCertificateVerifyPlaceholder,
+  } = useSignupOrganizationForm()
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-xl rounded-2xl border border-gray-200 bg-white/90 p-5 text-gray-900 shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-8"
+    >
+      {/* 이메일 + 인증 */}
+      <EmailAuthInput
+        email={email}
+        isEmailVerified={isEmailVerified}
+        isSendingEmail={isSendingEmail}
+        onEmailChange={setEmail}
+        onClickAuth={() => handleSendEmailAuth('organization')}
+      />
+
+      {/* 비밀번호 + 비밀번호 확인 */}
+      <PasswordFields
+        password={password}
+        passwordConfirm={passwordConfirm}
+        isPasswordMatched={isPasswordMatched}
+        onChangePassword={value => {
+          setPassword(value)
+          resetPasswordValidation()
+        }}
+        onChangePasswordConfirm={value => {
+          setPasswordConfirm(value)
+          resetPasswordValidation()
+        }}
+        onCheckPasswordMatch={handleCheckPasswordMatch}
+      />
+
+      {/* 이름 */}
+      <LabeledInput
+        label="이름"
+        type="text"
+        placeholder="이름을 입력하세요"
+        value={name}
+        onChangeValue={setName}
+        className={INPUT_BASE_CLASS}
+      />
+
+      {/* 닉네임 */}
+      <NicknameInput
+        value={nickname}
+        onChange={setNickname}
+        onClickCheck={handleCheckNickname}
+        isChecking={isNicknameChecking}
+        checkState={nicknameCheckState}
+      />
+
+      {/* 기관 선택/입력 */}
+      <OrganizationSearchSelect
+        organizationId={organizationId}
+        organizationName={organizationName}
+        onSelectExisting={handleSelectExistingOrg}
+        onInputNew={handleInputNewOrg}
+      />
+
+      {/* 전화번호 + 인증 (기존 UI를 재사용 컴포넌트로 교체) */}
+      <PhoneAuthInput value={phone} onChange={setPhone} />
+
+      {/* 주소 */}
+      <AddressInput />
+
+      {/* 재직증명서 (파일 선택) */}
+      <CertificateUploadSection
+        certificateImage={certificateImage}
+        onChangeFile={handleFileChange}
+        onClickVerify={handleCertificateVerifyPlaceholder}
+      />
+
+      {/* 회원가입 버튼 */}
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="mt-6 h-10 w-full rounded-md bg-orange-500 font-semibold text-white transition hover:bg-orange-600 disabled:opacity-60"
+      >
+        {isSubmitting ? '가입 처리중...' : '회원가입'}
+      </button>
+    </form>
+  )
+}

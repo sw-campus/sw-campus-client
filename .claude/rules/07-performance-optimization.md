@@ -1,6 +1,38 @@
 # 07. 성능 최적화
 
-> React/Next.js 애플리케이션 성능 최적화 규칙 (Vercel Best Practices 기반)
+> React 19 + Next.js 15 애플리케이션 성능 최적화 규칙
+
+---
+
+## 0. React 버전 및 자동 최적화 (CRITICAL)
+
+### 현재 스택
+- **React 19** + **React Compiler** (자동 메모이제이션)
+- **Next.js 15** (App Router)
+
+### useMemo / useCallback / React.memo 사용 금지
+
+React 19의 React Compiler가 **자동으로 메모이제이션을 처리**하므로 수동 최적화 훅이 불필요합니다.
+
+```typescript
+// ❌ 금지: 수동 메모이제이션 (React Compiler가 자동 처리)
+const sortedItems = useMemo(() => items.sort((a, b) => a.order - b.order), [items])
+const handleClick = useCallback(() => doSomething(id), [id])
+const MemoizedComponent = React.memo(MyComponent)
+
+// ✅ 권장: 그냥 작성 (React Compiler가 최적화)
+const sortedItems = [...items].sort((a, b) => a.order - b.order)
+const handleClick = () => doSomething(id)
+function MyComponent() { ... }
+```
+
+**규칙:**
+- ❌ `useMemo` 사용 금지
+- ❌ `useCallback` 사용 금지
+- ❌ `React.memo` 사용 금지
+- ✅ 일반 함수/변수로 작성 → Compiler가 필요 시 자동 최적화
+
+**참고:** 배열 mutation 방지를 위한 `[...array].sort()`는 최적화가 아닌 **불변성 유지**이므로 계속 사용
 
 ---
 
@@ -157,7 +189,7 @@ export default function LecturePage({ params }: Props) {
 
 ---
 
-## 4. 리렌더 최적화 (HIGH)
+## 4. 상태 관리 최적화 (HIGH)
 
 ### 4.1 함수형 setState 사용
 
@@ -165,14 +197,14 @@ setState에서 이전 상태를 참조할 때 **함수형 업데이트**를 사�
 
 ```typescript
 // ❌ 잘못된 예: 직접 상태 참조 (stale closure 위험)
-const addItem = useCallback((newItem: Item) => {
-  setItems([...items, newItem]);  // items가 오래된 값일 수 있음
-}, [items]);  // items 변경 시 함수 재생성
+const addItem = (newItem: Item) => {
+  setItems([...items, newItem])  // items가 오래된 값일 수 있음
+}
 
 // ✅ 올바른 예: 함수형 업데이트
-const addItem = useCallback((newItem: Item) => {
-  setItems(prev => [...prev, newItem]);  // 항상 최신 상태
-}, []);  // 의존성 없음 - 안정적인 참조
+const addItem = (newItem: Item) => {
+  setItems(prev => [...prev, newItem])  // 항상 최신 상태
+}
 ```
 
 ### 4.2 지연 상태 초기화
@@ -192,6 +224,11 @@ const [data, setData] = useState(() => expensiveComputation(items));
 ## 5. 성능 최적화 체크리스트
 
 ```
+□ React Compiler 자동 최적화
+  □ useMemo 사용 없음
+  □ useCallback 사용 없음
+  □ React.memo 사용 없음
+
 □ Waterfall 제거
   □ 독립적인 API 호출에 Promise.all() 사용
   □ 동일 데이터는 같은 queryKey로 캐시 공유
@@ -204,7 +241,7 @@ const [data, setData] = useState(() => expensiveComputation(items));
   □ Suspense 경계로 점진적 로딩
   □ 클라이언트 컴포넌트에 필요한 props만 전달
 
-□ 리렌더 최적화
+□ 상태 관리 최적화
   □ setState에 함수형 업데이트 사용
   □ 비용 큰 초기화에 useState(() => ...) 사용
 ```

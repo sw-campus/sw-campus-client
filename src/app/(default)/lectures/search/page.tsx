@@ -9,9 +9,9 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCategoryTree } from '@/features/category'
 import type { CategoryTreeNode } from '@/features/category/types/category.type'
-import { LectureList } from '@/features/lecture/components/LectureList'
-import { LectureSearchSidebar } from '@/features/lecture/components/lecture-search/LectureSearchSidebar'
-import { useSearchLectureQuery } from '@/features/lecture/hooks/useSearchLectureQuery'
+import { LectureList } from '@/features/lecture/components/lecture-list'
+import { LectureSearchSidebar } from '@/features/lecture/components/lecture-search/lecture-search-sidebar'
+import { useSearchLectureQuery } from '@/features/lecture/hooks/use-search-lecture-query'
 import {
   SORT_OPTIONS,
   DEFAULT_SORT,
@@ -22,7 +22,7 @@ import {
   FilterGroupKey,
   DEFAULT_PAGE_SIZE,
 } from '@/features/lecture/types/filter.type'
-import { mapLectureResponseToSummary } from '@/features/lecture/utils/mapLectureResponseToSummary'
+import { mapLectureResponseToSummary } from '@/features/lecture/utils/map-lecture-response-to-summary'
 import { trackSearch } from '@/lib/analytics'
 
 const filterSelectTriggerClass =
