@@ -65,8 +65,8 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
           </button>
         </div>
 
-        {isPasswordMatched === true && <p className="mt-1 text-xs text-green-400">비밀번호가 일치합니다.</p>}
-        {isPasswordMatched === false && <p className="mt-1 text-xs text-red-400">비밀번호가 일치하지 않습니다.</p>}
+        {isPasswordMatched === true && <p className="mt-1 text-xs text-success">비밀번호가 일치합니다.</p>}
+        {isPasswordMatched === false && <p className="mt-1 text-xs text-destructive">비밀번호가 일치하지 않습니다.</p>}
       </div>
     </>
   )

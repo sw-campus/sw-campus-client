@@ -45,10 +45,10 @@ export default function NicknameInput({
         </button>
       </div>
 
-      {checkState === 'available' && <p className="mt-1 text-xs text-green-400">사용 가능한 닉네임입니다.</p>}
-      {checkState === 'unavailable' && <p className="mt-1 text-xs text-red-400">이미 사용 중인 닉네임입니다.</p>}
+      {checkState === 'available' && <p className="mt-1 text-xs text-success">사용 가능한 닉네임입니다.</p>}
+      {checkState === 'unavailable' && <p className="mt-1 text-xs text-destructive">이미 사용 중인 닉네임입니다.</p>}
       {checkState === 'error' && (
-        <p className="mt-1 text-xs text-red-400">닉네임 확인에 실패했습니다. 다시 시도해 주세요.</p>
+        <p className="mt-1 text-xs text-destructive">닉네임 확인에 실패했습니다. 다시 시도해 주세요.</p>
       )}
     </div>
   )

@@ -18,8 +18,8 @@ export function LectureFilterTabs({ categories, selected, onSelect }: LectureFil
               onClick={() => onSelect(c)}
               className={`rounded-full px-4 py-2 text-sm transition ${
                 active
-                  ? 'bg-orange-500 font-semibold text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-primary font-semibold text-primary-foreground shadow-md'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
               {c}

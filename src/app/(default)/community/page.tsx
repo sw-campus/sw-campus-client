@@ -17,6 +17,8 @@ import { useBoardCategories } from '@/features/community/hooks/use-board-categor
 import { usePosts } from '@/features/community/hooks/use-posts'
 import { useAuthStore } from '@/store/auth-store'
 
+const POSTS_PER_PAGE = 10
+
 function CommunityContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -54,7 +56,7 @@ function CommunityContent() {
     keyword: selectedLecture ? selectedLecture.name : keywordParam || undefined,
     tags: selectedTags,
     page,
-    size: 10,
+    size: POSTS_PER_PAGE,
     sort,
   })
   const isLoading = isCategoriesLoading || isPostsLoading

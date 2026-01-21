@@ -108,7 +108,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
         <h2 className="text-lg font-bold text-gray-900">
           댓글
           {totalCount > 0 && (
-            <span className="ml-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-orange-500 px-2 text-sm font-semibold text-white">
+            <span className="ml-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-primary px-2 text-sm font-semibold text-primary-foreground">
               {totalCount}
             </span>
           )}

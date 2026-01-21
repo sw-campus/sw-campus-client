@@ -49,8 +49,8 @@ export function CategoryTabs({ categories, selectedCategoryId, onSelect }: Categ
             className={cn(
               'shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all',
               selectedCategoryId === null
-                ? 'bg-orange-500 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+                ? 'bg-primary text-primary-foreground shadow-md'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80',
             )}
           >
             전체
@@ -63,8 +63,8 @@ export function CategoryTabs({ categories, selectedCategoryId, onSelect }: Categ
               className={cn(
                 'shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-all',
                 activeParentId === category.id
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
               )}
             >
               {category.name}
@@ -84,8 +84,8 @@ export function CategoryTabs({ categories, selectedCategoryId, onSelect }: Categ
               className={cn(
                 'shrink-0 rounded-lg border px-3 py-1.5 text-sm whitespace-nowrap transition-all',
                 selectedCategoryId === selectedParent!.id
-                  ? 'border-orange-400 bg-orange-50 text-orange-600'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50',
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border bg-background text-muted-foreground hover:border-border/80 hover:bg-muted/50',
               )}
             >
               전체
@@ -98,8 +98,8 @@ export function CategoryTabs({ categories, selectedCategoryId, onSelect }: Categ
                 className={cn(
                   'shrink-0 rounded-lg border px-3 py-1.5 text-sm whitespace-nowrap transition-all',
                   selectedCategoryId === child.id
-                    ? 'border-orange-400 bg-orange-50 text-orange-600'
-                    : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50',
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border bg-background text-muted-foreground hover:border-border/80 hover:bg-muted/50',
                 )}
               >
                 {child.name}

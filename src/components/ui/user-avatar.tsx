@@ -3,16 +3,16 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 
-// 닉네임 기반 색상 팔레트 (배경색, 텍스트색)
+// 닉네임 기반 색상 팔레트 (시맨틱 디자인 토큰 사용)
 const AVATAR_COLORS = [
-  { bg: 'bg-gradient-to-br from-orange-100 to-amber-100', text: 'text-orange-700' },
-  { bg: 'bg-gradient-to-br from-blue-100 to-sky-100', text: 'text-blue-700' },
-  { bg: 'bg-gradient-to-br from-green-100 to-emerald-100', text: 'text-green-700' },
-  { bg: 'bg-gradient-to-br from-purple-100 to-violet-100', text: 'text-purple-700' },
-  { bg: 'bg-gradient-to-br from-pink-100 to-rose-100', text: 'text-pink-700' },
-  { bg: 'bg-gradient-to-br from-teal-100 to-cyan-100', text: 'text-teal-700' },
-  { bg: 'bg-gradient-to-br from-indigo-100 to-blue-100', text: 'text-indigo-700' },
-  { bg: 'bg-gradient-to-br from-amber-100 to-yellow-100', text: 'text-amber-700' },
+  { bg: 'bg-primary/15', text: 'text-primary' },
+  { bg: 'bg-secondary', text: 'text-secondary-foreground' },
+  { bg: 'bg-accent', text: 'text-accent-foreground' },
+  { bg: 'bg-muted', text: 'text-muted-foreground' },
+  { bg: 'bg-destructive/15', text: 'text-destructive' },
+  { bg: 'bg-primary/10', text: 'text-primary' },
+  { bg: 'bg-secondary/80', text: 'text-secondary-foreground' },
+  { bg: 'bg-accent/80', text: 'text-accent-foreground' },
 ] as const
 
 /**

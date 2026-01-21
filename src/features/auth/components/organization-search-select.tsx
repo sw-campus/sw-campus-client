@@ -82,9 +82,9 @@ export default function OrganizationSearchSelect({
       </div>
 
       {/* 선택된 기관 표시 */}
-      {organizationId && <p className="mt-1 text-xs text-green-600">✓ 기존 기관 선택됨: {organizationName}</p>}
+      {organizationId && <p className="mt-1 text-xs text-success">✓ 기존 기관 선택됨: {organizationName}</p>}
       {!organizationId && keyword.trim() && (
-        <p className="mt-1 text-xs text-yellow-600">새 기관으로 등록됩니다: {keyword}</p>
+        <p className="mt-1 text-xs text-warning">새 기관으로 등록됩니다: {keyword}</p>
       )}
 
       {/* 검색 결과 드롭다운 */}
