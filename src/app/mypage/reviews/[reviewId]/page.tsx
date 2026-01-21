@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react'
 import { Star } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { CATEGORY_LABELS, type ReviewCategory } from '@/features/lecture/api/reviewApi.types'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { CATEGORY_LABELS, type ReviewCategory } from '@/features/lecture/api/review-api.types'
 import { api } from '@/lib/axios'
 
 type ReviewDetail = {

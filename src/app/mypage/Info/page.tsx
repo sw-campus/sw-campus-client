@@ -4,10 +4,10 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
-import { OrgInfoForm } from '@/features/mypage/components/Organization/OrgInfoForm'
-import { PersonalInfoForm } from '@/features/mypage/components/Personal/PersonalForm'
-import { useAuthStore } from '@/store/authStore'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { OrgInfoForm } from '@/features/mypage/components/Organization/org-info-form'
+import { PersonalInfoForm } from '@/features/mypage/components/Personal/personal-form'
+import { useAuthStore } from '@/store/auth-store'
 
 export default function OrgInfoPage() {
   const router = useRouter()

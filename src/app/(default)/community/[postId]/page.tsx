@@ -29,15 +29,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/AlertDialog'
-import { ClickableTag } from '@/features/community/components/ClickableTag'
-import { CommentSection } from '@/features/community/components/CommentSection'
-import { PostNavigation } from '@/features/community/components/PostNavigation'
-import { useDeletePost } from '@/features/community/hooks/useDeletePost'
-import { usePostDetail } from '@/features/community/hooks/usePostDetail'
-import { useToggleLike, useToggleBookmark, useTogglePin } from '@/features/community/hooks/usePostInteractions'
-import { formatRelativeTime } from '@/lib/formatRelativeTime'
-import { useAuthStore } from '@/store/authStore'
+} from '@/components/ui/alert-dialog'
+import { ClickableTag } from '@/features/community/components/clickable-tag'
+import { CommentSection } from '@/features/community/components/comment-section'
+import { PostNavigation } from '@/features/community/components/post-navigation'
+import { useDeletePost } from '@/features/community/hooks/use-delete-post'
+import { usePostDetail } from '@/features/community/hooks/use-post-detail'
+import { useToggleLike, useToggleBookmark, useTogglePin } from '@/features/community/hooks/use-post-interactions'
+import { formatRelativeTime } from '@/lib/format-relative-time'
+import { useAuthStore } from '@/store/auth-store'
 
 export default function PostDetailPage() {
   const params = useParams()

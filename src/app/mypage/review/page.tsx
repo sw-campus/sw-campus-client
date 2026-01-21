@@ -4,8 +4,8 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
-import { ReviewForm } from '@/features/mypage/components/review/ReviewForm'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { ReviewForm } from '@/features/mypage/components/review/review-form'
 
 export default function ReviewCreatePage() {
   const router = useRouter()

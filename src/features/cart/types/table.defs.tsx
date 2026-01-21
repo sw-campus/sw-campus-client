@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { TableCell, TableRow } from '@/components/ui/Table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import {
   formatBoolean,
   formatCourseTime,
@@ -11,8 +11,8 @@ import {
   formatPcType,
   formatRecruitType,
   formatText,
-} from '@/features/cart/utils/cartCompareFormatters'
-import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
+} from '@/features/cart/utils/cart-compare-formatters'
+import type { LectureDetail } from '@/features/lecture/api/lecture-api.types'
 import { cn } from '@/lib/utils'
 
 export type Detail = LectureDetail | null | undefined

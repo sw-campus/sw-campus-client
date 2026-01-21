@@ -4,8 +4,8 @@ import { useCallback, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
-import { SurveyContainer, type SurveyStep } from '@/features/mypage/components/survey/SurveyContainer'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { SurveyContainer, type SurveyStep } from '@/features/mypage/components/survey/survey-container'
 
 const STEP_TITLES: Record<SurveyStep, string> = {
   basic: '기초 설문',

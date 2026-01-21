@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 
 import Script from 'next/script'
 
-import SignupForm from '@/app/(auth)/signup/personal/SignupForm'
+import SignupForm from '@/app/(auth)/signup/personal/signup-form'
 
 export default function SignupPersonalPage() {
   return (

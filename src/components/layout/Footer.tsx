@@ -4,9 +4,9 @@ import { useState } from 'react'
 
 import Link from 'next/link'
 
-import PrivacyContent from '@/components/legal/PrivacyContent'
-import TermsContent from '@/components/legal/TermsContent'
-import Modal from '@/components/ui/Modal'
+import PrivacyContent from '@/components/legal/privacy-content'
+import TermsContent from '@/components/legal/terms-content'
+import Modal from '@/components/ui/modal'
 
 export default function Footer() {
   const [openTerms, setOpenTerms] = useState(false)

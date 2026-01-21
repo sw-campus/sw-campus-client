@@ -1,11 +1,11 @@
 // Components
-export { AdminSidebar } from './components/AdminSidebar'
-export { StatCard } from './components/dashboard/StatCard'
-export { VisitorLineChart } from './components/dashboard/VisitorLineChart'
-export { DistributionDonutChart } from './components/dashboard/DistributionDonutChart'
-export { FeatureCard } from './components/FeatureCard'
-export { MemberStatusTable } from './components/MemberStatusTable'
-export { AdminDashboard } from './components/dashboard/AdminDashboard'
+export { AdminSidebar } from './components/admin-sidebar'
+export { StatCard } from './components/dashboard/stat-card'
+export { VisitorLineChart } from './components/dashboard/visitor-line-chart'
+export { DistributionDonutChart } from './components/dashboard/distribution-donut-chart'
+export { FeatureCard } from './components/feature-card'
+export { MemberStatusTable } from './components/member-status-table'
+export { AdminDashboard } from './components/dashboard/admin-dashboard'
 
 // Organization Components
 export {
@@ -28,8 +28,8 @@ export { BannerCreateModal, BannerManagementPage, BannerTable } from './componen
 export { ReviewApprovalPage, ReviewDetailModal, ReviewTable } from './components/review'
 
 // Member Components
-export { MemberPage } from './components/member/MemberPage'
-export { MemberTable } from './components/member/MemberTable'
+export { MemberPage } from './components/member/member-page'
+export { MemberTable } from './components/member/member-table'
 
 // Survey Components
 export {
@@ -49,7 +49,7 @@ export {
   useOrganizationStatsQuery,
   useApproveOrganizationMutation,
   useRejectOrganizationMutation,
-} from './hooks/useOrganizations'
+} from './hooks/use-organizations'
 
 export {
   useLecturesQuery,
@@ -57,7 +57,7 @@ export {
   useLectureStatsQuery,
   useApproveLectureMutation,
   useRejectLectureMutation,
-} from './hooks/useLectures'
+} from './hooks/use-lectures'
 
 export {
   useReviewsQuery,
@@ -65,16 +65,16 @@ export {
   useReviewStats,
   useApproveReviewMutation,
   useRejectReviewMutation,
-} from './hooks/useReviews'
+} from './hooks/use-reviews'
 
 export {
   useBannersQuery,
   useBannerStatsQuery,
   useCreateBannerMutation,
   useToggleBannerActiveMutation,
-} from './hooks/useBanners'
+} from './hooks/use-banners'
 
-export { useMembersQuery, useMemberStatsQuery } from './hooks/useMembers'
+export { useMembersQuery, useMemberStatsQuery } from './hooks/use-members'
 
 export {
   useQuestionSetsQuery,
@@ -90,10 +90,10 @@ export {
   useAddOptionMutation,
   useUpdateOptionMutation,
   useDeleteOptionMutation,
-} from './hooks/useSurvey'
+} from './hooks/use-survey'
 
-export { useDashboardStats } from './hooks/useDashboardStats'
-export type { DashboardStats, MemberDistribution, PendingCounts } from './hooks/useDashboardStats'
+export { useDashboardStats } from './hooks/use-dashboard-stats'
+export type { DashboardStats, MemberDistribution, PendingCounts } from './hooks/use-dashboard-stats'
 
 // Types
 export type {

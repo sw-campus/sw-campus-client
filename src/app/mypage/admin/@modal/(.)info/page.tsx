@@ -4,8 +4,8 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
-import { PersonalInfoForm } from '@/features/mypage/components/Personal/PersonalForm'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { PersonalInfoForm } from '@/features/mypage/components/Personal/personal-form'
 
 export default function AdminInfoModal() {
   const router = useRouter()

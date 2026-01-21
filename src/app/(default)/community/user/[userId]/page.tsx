@@ -6,10 +6,10 @@ import Link from 'next/link'
 import { useParams, notFound } from 'next/navigation'
 import { FiArrowLeft, FiCalendar, FiFileText, FiUser, FiChevronLeft, FiChevronRight, FiList, FiGrid } from 'react-icons/fi'
 
-import { Avatar, AvatarFallback } from '@/components/ui/Avatar'
-import { PostList } from '@/features/community/components/PostList'
-import { useUserProfile, useUserPosts } from '@/features/community/hooks/useUserProfile'
-import { DEFAULT_POST_SORT } from '@/features/community/api/postApi.types'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { PostList } from '@/features/community/components/post-list'
+import { useUserProfile, useUserPosts } from '@/features/community/hooks/use-user-profile'
+import { DEFAULT_POST_SORT } from '@/features/community/api/post-api.types'
 
 export default function UserProfilePage() {
   const params = useParams()

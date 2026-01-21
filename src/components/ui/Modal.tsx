@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 
 import { createPortal } from 'react-dom'
 
-import { useIsMounted } from '@/hooks/useIsMounted'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 
 interface ModalProps {
   isOpen: boolean
