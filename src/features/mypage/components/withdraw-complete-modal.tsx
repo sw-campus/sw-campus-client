@@ -43,7 +43,7 @@ export function WithdrawCompleteModal({ open, oauthProviders }: WithdrawComplete
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-[480px]" onPointerDownOutside={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-green-600">
+          <DialogTitle className="flex items-center gap-2 text-success">
             <LuBadgeCheck className="h-5 w-5" />
             탈퇴 완료
           </DialogTitle>

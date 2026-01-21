@@ -390,8 +390,8 @@ export function PostForm({
         ) : (
           <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
             <label htmlFor="body" className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-800">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-100">
-                <FiFileText className="h-3.5 w-3.5 text-green-600" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-success/15">
+                <FiFileText className="h-3.5 w-3.5 text-success" />
               </div>
               내용 <span className="text-orange-500">*</span>
             </label>
@@ -425,7 +425,7 @@ export function PostForm({
             <span>태그</span>
             <span className="text-xs font-normal text-gray-500">(쉼표로 구분)</span>
             {selectedLecture && (
-              <span className="ml-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+              <span className="ml-1 rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success">
                 + 강의 정보 자동 추가
               </span>
             )}

@@ -172,7 +172,7 @@ export function OptionEditor({ questionId, questionSetId, options, part, isEdita
                   <span className="text-muted-foreground text-xs">{JOB_TYPE_LABEL[option.jobType]}</span>
                 )}
                 {showIsCorrect && option.isCorrect && (
-                  <span className="text-xs text-green-600">정답</span>
+                  <span className="text-xs text-success">정답</span>
                 )}
               </div>
             )
@@ -272,7 +272,7 @@ export function OptionEditor({ questionId, questionSetId, options, part, isEdita
                             <span className="text-muted-foreground text-xs">{JOB_TYPE_LABEL[option.jobType]}</span>
                           )}
                           {showIsCorrect && option.isCorrect && (
-                            <span className="text-xs text-green-600">정답</span>
+                            <span className="text-xs text-success">정답</span>
                           )}
                           {isEditable && (
                             <>

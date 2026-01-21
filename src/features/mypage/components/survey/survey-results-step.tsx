@@ -99,13 +99,13 @@ export function SurveyResultsStep({
         {/* 설문조사 완료 상태 표시 */}
         <div className="mt-3">
           {status?.hasAptitudeTest ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-              <span className="h-2 w-2 rounded-full bg-green-500" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-1 text-sm font-medium text-success">
+              <span className="h-2 w-2 rounded-full bg-success" />
               설문조사가 완료되었습니다
             </span>
           ) : status?.hasBasicSurvey ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-700">
-              <span className="h-2 w-2 rounded-full bg-amber-500" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1 text-sm font-medium text-warning">
+              <span className="h-2 w-2 rounded-full bg-warning" />
               기초 설문 완료 (성향 테스트 미완료)
             </span>
           ) : null}
@@ -134,8 +134,8 @@ export function SurveyResultsStep({
 
       {/* 성향 테스트 미완료 시 안내 */}
       {!status?.hasAptitudeTest && (
-        <div className="rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 p-6 text-center">
-          <Sparkles className="mx-auto h-10 w-10 text-amber-500" />
+        <div className="rounded-xl border-2 border-dashed border-warning/50 bg-warning/10 p-6 text-center">
+          <Sparkles className="mx-auto h-10 w-10 text-warning" />
           <h3 className="mt-3 font-semibold text-gray-900">
             성향 테스트를 완료하면 맞춤 직무를 추천받을 수 있어요!
           </h3>
@@ -144,7 +144,7 @@ export function SurveyResultsStep({
           </p>
           <Button
             onClick={handleRetakeClick}
-            className="mt-4 bg-amber-500 hover:bg-amber-600"
+            className="mt-4 bg-warning text-warning-foreground hover:bg-warning/90"
           >
             <Sparkles className="mr-2 h-4 w-4" />
             성향 테스트 시작
@@ -157,14 +157,14 @@ export function SurveyResultsStep({
         <div
           className={`rounded-xl border p-4 ${
             status?.canUseBasicRecommendation
-              ? 'border-green-200 bg-green-50'
+              ? 'border-success/30 bg-success/10'
               : 'border-gray-200 bg-gray-50'
           }`}
         >
           <div className="flex items-center gap-2">
             <div
               className={`h-3 w-3 rounded-full ${
-                status?.canUseBasicRecommendation ? 'bg-green-500' : 'bg-gray-300'
+                status?.canUseBasicRecommendation ? 'bg-success' : 'bg-gray-300'
               }`}
             />
             <span className="font-medium text-gray-900">AI 기본 추천</span>
@@ -178,14 +178,14 @@ export function SurveyResultsStep({
         <div
           className={`rounded-xl border p-4 ${
             status?.canUsePreciseRecommendation
-              ? 'border-green-200 bg-green-50'
+              ? 'border-success/30 bg-success/10'
               : 'border-gray-200 bg-gray-50'
           }`}
         >
           <div className="flex items-center gap-2">
             <div
               className={`h-3 w-3 rounded-full ${
-                status?.canUsePreciseRecommendation ? 'bg-green-500' : 'bg-gray-300'
+                status?.canUsePreciseRecommendation ? 'bg-success' : 'bg-gray-300'
               }`}
             />
             <span className="font-medium text-gray-900">AI 정밀 추천</span>

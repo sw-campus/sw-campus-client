@@ -247,7 +247,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
       case 1:
         return { icon: Brain, label: 'Part 1: 논리 및 사고력', color: 'text-blue-600' }
       case 2:
-        return { icon: Lightbulb, label: 'Part 2: 끈기 및 학습 태도', color: 'text-green-600' }
+        return { icon: Lightbulb, label: 'Part 2: 끈기 및 학습 태도', color: 'text-success' }
       case 3:
         return { icon: Target, label: 'Part 3: 직무 성향', color: 'text-purple-600' }
       default:
@@ -327,7 +327,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
                     onClick={() => handleSelectAnswer(option.value)}
                     className={`w-full rounded-xl border-2 p-4 text-left transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
                       isSelected
-                        ? 'border-amber-500 bg-amber-50'
+                        ? 'border-warning bg-warning/10'
                         : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                     }`}
                   >
@@ -335,7 +335,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
                       <div
                         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-medium ${
                           isSelected
-                            ? 'bg-amber-500 text-white'
+                            ? 'bg-warning text-warning-foreground'
                             : 'bg-gray-100 text-gray-600'
                         }`}
                       >
@@ -370,7 +370,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
           <Button
             onClick={handleSubmit}
             disabled={!isAllAnswered() || submitAptitudeTest.isPending}
-            className="bg-amber-500 hover:bg-amber-600"
+            className="bg-warning text-warning-foreground hover:bg-warning/90"
           >
             {submitAptitudeTest.isPending ? '제출 중...' : '결과 확인'}
           </Button>

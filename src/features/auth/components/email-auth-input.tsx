@@ -39,7 +39,7 @@ const EmailAuthInput: React.FC<EmailAuthInputProps> = ({
         </button>
       </div>
       {isEmailVerified ? (
-        <p className="mt-1 text-xs text-green-400">이메일 인증이 완료되었습니다.</p>
+        <p className="mt-1 text-xs text-success">이메일 인증이 완료되었습니다.</p>
       ) : (
         <p className="mt-1 text-xs text-gray-500">인증 메일을 보낸 후, 메일함에서 인증 버튼을 눌러 주세요.</p>
       )}

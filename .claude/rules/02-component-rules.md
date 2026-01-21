@@ -56,6 +56,104 @@ export function Counter() {
 }
 ```
 
+### 1.4 useSearchParams Suspense 경계 (CRITICAL)
+
+`useSearchParams()` 훅을 사용하는 컴포넌트는 **반드시 Suspense로 감싸야** 합니다.
+Next.js 정적 생성(SSG) 시 search params를 빌드 타임에 알 수 없어 CSR bailout 에러가 발생합니다.
+
+```typescript
+// ❌ 빌드 에러: useSearchParams() should be wrapped in a suspense boundary
+// page.tsx
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+
+export default function Page() {
+  const searchParams = useSearchParams()  // 에러!
+  return <div>{searchParams.get('q')}</div>
+}
+```
+
+```typescript
+// ✅ 올바른 패턴: Suspense로 감싸기
+// page.tsx (서버 컴포넌트)
+import { Suspense } from 'react'
+import { SearchContent } from './SearchContent'
+
+export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <SearchContent />
+    </Suspense>
+  )
+}
+
+// SearchContent.tsx (클라이언트 컴포넌트)
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+
+export function SearchContent() {
+  const searchParams = useSearchParams()
+  return <div>{searchParams.get('q')}</div>
+}
+```
+
+**규칙:**
+- ✅ `useSearchParams()` 사용 컴포넌트는 Suspense 필수
+- ✅ 페이지를 서버 컴포넌트로 유지하고, 클라이언트 부분만 분리
+- ✅ 간접 사용(훅 내부)도 동일하게 적용
+- ❌ 페이지 전체에 `'use client'` + `useSearchParams()` 조합 금지
+
+**간접 사용 예시:**
+```typescript
+// useOAuthUrls 훅이 내부에서 useSearchParams() 사용
+// → 이 훅을 사용하는 컴포넌트도 Suspense 필요
+
+// page.tsx
+import { Suspense } from 'react'
+import { OAuthButtons } from './OAuthButtons'
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <OAuthButtons />  {/* 내부에서 useOAuthUrls → useSearchParams 사용 */}
+    </Suspense>
+  )
+}
+```
+
+**대안: loading.tsx 사용**
+
+Next.js는 `loading.tsx` 파일을 자동으로 Suspense boundary로 인식합니다.
+해당 라우트 폴더에 `loading.tsx`를 추가하면 페이지 전체에 자동 적용됩니다.
+
+```
+app/
+├── search/
+│   ├── page.tsx        # useSearchParams 사용
+│   └── loading.tsx     # 자동 Suspense boundary 역할
+```
+
+```typescript
+// app/search/loading.tsx
+export default function Loading() {
+  return <div>Loading...</div>  // 또는 스켈레톤 UI
+}
+
+// app/search/page.tsx - Suspense 없이도 동작
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+
+export default function SearchPage() {
+  const searchParams = useSearchParams()  // loading.tsx가 Suspense 역할
+  return <div>{searchParams.get('q')}</div>
+}
+```
+
+**주의:** `loading.tsx`는 페이지 전체를 감싸므로, 부분적인 Suspense가 필요하면 명시적 `<Suspense>` 사용 권장
+
 ---
 
 ## 2. 컴포넌트 분류별 규칙
@@ -169,6 +267,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ```
 □ "use client"가 정말 필요한가?
+□ useSearchParams() 사용 시 Suspense로 감쌌는가?
 □ 적절한 폴더에 위치하는가?
   - 전역 UI → components/ui/
   - 전역 레이아웃 → components/layout/

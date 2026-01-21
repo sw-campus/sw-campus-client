@@ -6,6 +6,7 @@ export interface ApiUserProfileResponse {
   nickname: string
   joinedAt: string
   postCount: number
+  commentedPostCount: number
 }
 
 export interface UserProfile {
@@ -13,4 +14,5 @@ export interface UserProfile {
   nickname: string
   joinedAt: Date
   postCount: number
+  commentedPostCount: number
 }

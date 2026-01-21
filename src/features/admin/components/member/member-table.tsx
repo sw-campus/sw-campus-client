@@ -25,12 +25,12 @@ const ROLE_CONFIG: Record<MemberRole, { label: string; icon: React.ElementType; 
   ORGANIZATION: {
     label: '기관회원',
     icon: LuBuilding,
-    className: 'bg-emerald-500 text-white',
+    className: 'bg-success text-success-foreground',
   },
   ADMIN: {
     label: '관리자',
     icon: LuShield,
-    className: 'bg-amber-500 text-white',
+    className: 'bg-warning text-warning-foreground',
   },
 }
 

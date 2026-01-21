@@ -19,7 +19,7 @@ export function ReviewCompleteModal({ isOpen, onClose }: ReviewCompleteModalProp
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              className="h-full w-full text-green-600"
+              className="h-full w-full text-success"
             >
               <path d="M20 6L9 17l-5-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

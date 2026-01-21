@@ -171,9 +171,9 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
   const getApprovalStatusUI = (status: string) => {
     const s = (status || '').toUpperCase()
-    if (s === APPROVAL_STATUS.APPROVED) return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
-    if (s === APPROVAL_STATUS.REJECTED) return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
-    return { label: '대기중', dot: 'bg-amber-500', text: 'text-amber-700' }
+    if (s === APPROVAL_STATUS.APPROVED) return { label: '승인됨', dot: 'bg-success', text: 'text-success' }
+    if (s === APPROVAL_STATUS.REJECTED) return { label: '반려됨', dot: 'bg-destructive', text: 'text-destructive' }
+    return { label: '대기중', dot: 'bg-warning', text: 'text-warning' }
   }
 
   const formContent = (
@@ -268,9 +268,9 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                       <div className="space-y-2">
                         {/* 기존 재직증명서 등록 여부 표시 */}
                         {field.value && !certificateFile && (
-                          <div className="flex items-center gap-2 rounded-md border border-green-200 bg-green-50 px-3 py-2">
-                            <span className="text-green-600">✅</span>
-                            <span className="text-sm font-medium text-green-700">재직증명서 등록됨</span>
+                          <div className="flex items-center gap-2 rounded-md border border-success/30 bg-success/10 px-3 py-2">
+                            <span className="text-success">✅</span>
+                            <span className="text-sm font-medium text-success">재직증명서 등록됨</span>
                           </div>
                         )}
                         {/* 새 파일 업로드 */}
@@ -301,9 +301,9 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                 </div>
 
                 {/* 시설 이미지 안내 */}
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                  <p className="text-sm font-medium text-amber-800">📷 시설 사진 권장 비율</p>
-                  <p className="mt-1 text-xs text-amber-700">16:9 비율 권장 (예: 1920x1080px, 1280x720px)</p>
+                <div className="rounded-lg border border-warning/30 bg-warning/10 p-3">
+                  <p className="text-sm font-medium text-warning">📷 시설 사진 권장 비율</p>
+                  <p className="mt-1 text-xs text-warning/80">16:9 비율 권장 (예: 1920x1080px, 1280x720px)</p>
                 </div>
 
                 <div>

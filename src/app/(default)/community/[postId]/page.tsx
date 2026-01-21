@@ -16,8 +16,9 @@ import {
   FiShare2,
   FiCheck,
   FiMapPin,
-  FiUser,
 } from 'react-icons/fi'
+
+import { UserAvatar } from '@/components/ui/user-avatar'
 
 import {
   AlertDialog,
@@ -33,6 +34,7 @@ import {
 import { ClickableTag } from '@/features/community/components/clickable-tag'
 import { CommentSection } from '@/features/community/components/comment-section'
 import { PostNavigation } from '@/features/community/components/post-navigation'
+import { UserProfileLink } from '@/features/community/components/user-profile-link'
 import { useDeletePost } from '@/features/community/hooks/use-delete-post'
 import { usePostDetail } from '@/features/community/hooks/use-post-detail'
 import { useToggleLike, useToggleBookmark, useTogglePin } from '@/features/community/hooks/use-post-interactions'
@@ -134,6 +136,39 @@ export default function PostDetailPage() {
   }
 
   if (error || !post) {
+    // 비로그인 상태에서 인증 에러인 경우 로그인 안내 표시
+    const errorStatus = (error as { response?: { status?: number } } | null)?.response?.status
+    const isAuthError = errorStatus === 401 || errorStatus === 403
+
+    if (!isLoggedIn && isAuthError) {
+      return (
+        <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 sm:px-6 sm:py-8 md:px-8">
+          <div className="mx-auto w-full lg:max-w-3xl">
+            <Link
+              href="/community"
+              className="mb-4 ml-4 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900 active:scale-95 sm:mb-6 sm:ml-0"
+            >
+              <FiArrowLeft className="h-4 w-4" />
+              <span>목록</span>
+            </Link>
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-16">
+              <div className="mb-4 rounded-full bg-orange-100 p-4">
+                <FiEye className="h-8 w-8 text-orange-500" />
+              </div>
+              <p className="mb-2 text-lg font-semibold text-gray-700">로그인이 필요합니다</p>
+              <p className="mb-6 text-sm text-gray-500">게시글 내용을 확인하려면 로그인해 주세요.</p>
+              <Link
+                href={`/login?returnUrl=${encodeURIComponent(pathname)}`}
+                className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-600 active:scale-95"
+              >
+                로그인하기
+              </Link>
+            </div>
+          </div>
+        </main>
+      )
+    }
+
     return (
       <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 sm:px-6 sm:py-8 md:px-8">
         <div className="mx-auto flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-20 lg:max-w-3xl">
@@ -195,7 +230,7 @@ export default function PostDetailPage() {
               onClick={handleShare}
               className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all active:scale-95 ${
                 isCopied
-                  ? 'bg-green-50 text-green-600'
+                  ? 'bg-success/10 text-success'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -231,19 +266,19 @@ export default function PostDetailPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             {/* 작성자 */}
             <div className="flex items-center gap-3">
-              <Link
-                href={`/community/user/${post.authorId}`}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-amber-100 ring-2 ring-white transition-transform hover:scale-105 sm:h-10 sm:w-10"
+              <UserProfileLink
+                userId={post.authorId}
+                className="transition-transform hover:scale-105"
               >
-                <FiUser className="h-5 w-5 text-orange-600 sm:h-4 sm:w-4" />
-              </Link>
+                <UserAvatar nickname={post.authorNickname ?? '익명'} size="md" avatarClassName="ring-2 ring-white" />
+              </UserProfileLink>
               <div className="flex flex-col">
-                <Link
-                  href={`/community/user/${post.authorId}`}
+                <UserProfileLink
+                  userId={post.authorId}
                   className="font-semibold text-gray-900 transition-colors hover:text-orange-600"
                 >
                   {post.authorNickname ?? '익명'}
-                </Link>
+                </UserProfileLink>
                 <div className="flex items-center gap-1.5 text-xs text-gray-500">
                   <span title={formattedDate}>{relativeTime}</span>
                   <span className="hidden text-gray-300 sm:inline">·</span>
@@ -339,11 +374,11 @@ export default function PostDetailPage() {
                 disabled={isBookmarking}
                 className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-all active:scale-95 sm:flex-none sm:px-4 ${
                   post.isBookmarked
-                    ? 'border-amber-200 bg-amber-50 text-amber-600'
+                    ? 'border-warning/30 bg-warning/10 text-warning'
                     : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
-                <FiBookmark className={`h-4 w-4 ${post.isBookmarked ? 'fill-amber-500' : ''}`} />
+                <FiBookmark className={`h-4 w-4 ${post.isBookmarked ? 'fill-warning' : ''}`} />
                 <span>북마크</span>
               </button>
 

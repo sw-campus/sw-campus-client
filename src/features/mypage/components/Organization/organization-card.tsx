@@ -80,11 +80,11 @@ export function OrganizationCard({ onEditClick }: OrganizationCardProps) {
     const s = status.toUpperCase()
     switch (s) {
       case APPROVAL_STATUS.APPROVED:
-        return 'text-green-600 bg-green-50 border-green-200'
+        return 'text-success bg-success/10 border-success/30'
       case APPROVAL_STATUS.PENDING:
-        return 'text-amber-600 bg-amber-50 border-amber-200'
+        return 'text-warning bg-warning/10 border-warning/30'
       case APPROVAL_STATUS.REJECTED:
-        return 'text-red-600 bg-red-50 border-red-200'
+        return 'text-destructive bg-destructive/10 border-destructive/30'
       default:
         return 'text-gray-600 bg-gray-50 border-gray-200'
     }

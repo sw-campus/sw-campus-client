@@ -124,9 +124,9 @@ export const QUESTION_SET_STATUS_LABEL: Record<QuestionSetStatus, string> = {
 }
 
 export const QUESTION_SET_STATUS_COLOR: Record<QuestionSetStatus, string> = {
-  DRAFT: 'bg-amber-500 text-white',
-  PUBLISHED: 'bg-emerald-500 text-white',
-  ARCHIVED: 'bg-slate-500 text-white',
+  DRAFT: 'bg-warning text-warning-foreground',
+  PUBLISHED: 'bg-success text-success-foreground',
+  ARCHIVED: 'bg-muted text-muted-foreground',
 }
 
 export const QUESTION_TYPE_LABEL: Record<QuestionType, string> = {

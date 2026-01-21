@@ -26,8 +26,8 @@ export function AptitudeContinueModal({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onLater()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle2 className="h-8 w-8 text-green-600" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success/15">
+            <CheckCircle2 className="h-8 w-8 text-success" />
           </div>
           <DialogTitle className="text-xl">기초 설문이 완료되었습니다!</DialogTitle>
           <DialogDescription className="text-base">
@@ -36,11 +36,11 @@ export function AptitudeContinueModal({
         </DialogHeader>
 
         <div className="mt-4 space-y-3">
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-            <h4 className="mb-3 font-medium text-amber-800">
+          <div className="rounded-lg border border-warning/30 bg-warning/10 p-4">
+            <h4 className="mb-3 font-medium text-warning">
               성향 테스트 완료 시 혜택
             </h4>
-            <ul className="space-y-2 text-sm text-amber-700">
+            <ul className="space-y-2 text-sm text-warning">
               <li className="flex items-center gap-2">
                 <Target className="h-4 w-4 flex-shrink-0" />
                 <span>나에게 맞는 직무 추천 (프론트엔드/백엔드/데이터)</span>
@@ -66,7 +66,7 @@ export function AptitudeContinueModal({
             나중에 하기
           </Button>
           <Button
-            className="flex-1 bg-amber-500 hover:bg-amber-600"
+            className="flex-1 bg-warning text-warning-foreground hover:bg-warning/90"
             onClick={onContinue}
           >
             성향 테스트 시작

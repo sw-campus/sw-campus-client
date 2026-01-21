@@ -40,13 +40,13 @@ const ROLE_OPTIONS: {
     label: '기관회원',
     value: 'ORGANIZATION',
     icon: LuBuilding,
-    activeClass: 'bg-emerald-500 text-white',
+    activeClass: 'bg-success text-success-foreground',
   },
   {
     label: '관리자',
     value: 'ADMIN',
     icon: LuShield,
-    activeClass: 'bg-amber-500 text-white',
+    activeClass: 'bg-warning text-warning-foreground',
   },
 ]
 

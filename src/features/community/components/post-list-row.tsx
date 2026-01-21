@@ -5,11 +5,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FiEye, FiHeart, FiMessageCircle, FiTrendingUp, FiMapPin } from 'react-icons/fi'
 
+import { UserAvatar } from '@/components/ui/user-avatar'
 import { formatRelativeTime } from '@/lib/format-relative-time'
 
 import type { Post } from '../api/post-api.types'
 import { BOOTCAMP_DIARY_CATEGORY_NAME } from '../constants'
 import { ClickableTag } from './clickable-tag'
+import { UserProfileLink } from './user-profile-link'
 
 interface PostListRowProps {
   post: Post
@@ -95,13 +97,20 @@ export function PostListRow({ post }: PostListRowProps) {
 
             {/* 작성자 정보 */}
             <div className="mt-2 flex items-center gap-1.5 text-sm sm:mt-3 sm:gap-2">
-              <Link
-                href={`/community/user/${post.authorId}`}
+              <UserProfileLink
+                userId={post.authorId}
+                onClick={e => e.stopPropagation()}
+                className="transition-transform hover:scale-105"
+              >
+                <UserAvatar nickname={post.authorNickname} size="xs" />
+              </UserProfileLink>
+              <UserProfileLink
+                userId={post.authorId}
                 onClick={e => e.stopPropagation()}
                 className="font-medium text-gray-700 transition-colors hover:text-orange-600"
               >
                 {post.authorNickname}
-              </Link>
+              </UserProfileLink>
               <span className="h-1 w-1 rounded-full bg-gray-300" />
               <span className="text-gray-500" title={post.createdAt.toLocaleString('ko-KR')}>
                 {relativeTime}

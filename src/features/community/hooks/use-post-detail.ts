@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useAuthStore } from '@/store/auth-store'
 
-import { getPost } from '../api/post-api.client'
+import { getPost, getPostPublic } from '../api/post-api.client'
 import type { PostDetail } from '../api/post-api.types'
 import { postKeys } from './use-posts'
 
@@ -30,7 +30,8 @@ export function usePostDetail(postId: number) {
 
   return useQuery<PostDetail, Error>({
     queryKey: postKeys.detail(postId),
-    queryFn: () => getPost(postId),
+    // 비로그인 사용자는 인증 없이 요청 (게시글 헤더 표시를 위해)
+    queryFn: () => isLoggedIn ? getPost(postId) : getPostPublic(postId),
     enabled: !!postId && hasHydrated,
   })
 }
