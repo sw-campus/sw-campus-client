@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { PiRobotDuotone } from 'react-icons/pi'
 import { FiLogIn, FiUser, FiMenu, FiLogOut } from 'react-icons/fi'
+import { PiRobotDuotone } from 'react-icons/pi'
 
 import { HeaderIconAction } from '@/components/layout/header/HeaderIconAction'
 import { LogoutDialog } from '@/components/layout/header/LogoutDialog'
@@ -16,13 +16,18 @@ import type { CategoryTreeNode } from '@/features/category'
 import { ensureSessionActive } from '@/lib/axios'
 import { useAuthStore } from '@/store/authStore'
 
+export interface NavCategoryItem extends CategoryTreeNode {
+  type?: 'LECTURE' | 'BOARD'
+  link?: string
+}
+
 export default function Header({
   categories,
   onOpenNav,
   onCategoryEnter,
   onOtherNavEnter,
 }: {
-  categories: CategoryTreeNode[]
+  categories: NavCategoryItem[]
   onOpenNav: () => void
   onCategoryEnter: (id: number) => void
   onOtherNavEnter: () => void
@@ -70,10 +75,10 @@ export default function Header({
   }
 
   return (
-    <header className="sticky top-0 z-50 mx-auto mt-4 flex w-full max-w-7xl items-center justify-between rounded-full border border-white/15 bg-white/10 px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:mt-6 sm:px-6 md:px-10 md:py-4">
+    <header className="sticky top-0 z-50 mx-auto mt-4 flex w-full max-w-7xl items-center justify-between rounded-full border border-gray-200 bg-white/60 px-4 py-3 shadow-lg backdrop-blur-xl sm:mt-6 sm:px-6 md:px-10 md:py-4">
       <div className="flex flex-1 items-center gap-3 sm:gap-6 md:gap-8">
         {/* 햄버거 버튼 */}
-        <button type="button" className="text-white lg:hidden" onClick={onOpenNav}>
+        <button type="button" className="text-gray-800 lg:hidden" onClick={onOpenNav}>
           <FiMenu size={22} />
         </button>
 
@@ -89,32 +94,60 @@ export default function Header({
           />
 
           {/* 로고 텍스트: 작은 화면에서 숨김 */}
-          <div className="hidden h-12 translate-y-px flex-col justify-center leading-none font-extrabold tracking-tight text-white sm:flex">
+          <div className="hidden h-12 translate-y-px flex-col justify-center leading-none font-extrabold tracking-tight text-gray-800 sm:flex">
             <span>SOFTWARE</span>
             <span>CAMPUS</span>
           </div>
         </Link>
       </div>
 
-      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 font-semibold text-white lg:flex">
-        {categories.map(category => (
-          <Link
-            key={category.categoryId}
-            href={`/lectures/search?categoryIds=${category.categoryId}&size=12`}
-            onMouseEnter={() => onCategoryEnter(category.categoryId)}
-            onFocus={() => onCategoryEnter(category.categoryId)}
-            onClick={() => onCategoryEnter(category.categoryId)}
-          >
-            {category.categoryName}
-          </Link>
-        ))}
+      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 font-semibold text-gray-800 lg:flex">
+        {categories
+          .filter(c => !c.type || c.type === 'LECTURE')
+          .map(category => {
+            const href = category.link || `/lectures/search?categoryIds=${category.categoryId}&size=12`
+            const uniqueKey = category.type
+              ? `${category.type}-${category.categoryId}`
+              : `LECTURE-${category.categoryId}`
+
+            return (
+              <Link
+                key={uniqueKey}
+                href={href}
+                onMouseEnter={() => onCategoryEnter(category.categoryId)}
+                onFocus={() => onCategoryEnter(category.categoryId)}
+                onClick={() => onCategoryEnter(category.categoryId)}
+              >
+                {category.categoryName}
+              </Link>
+            )
+          })}
+
         <Link href="/organizations" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
           훈련 기관
         </Link>
+
+        {categories
+          .filter(c => c.type === 'BOARD')
+          .map(category => {
+            const href = category.link || `/community?categoryId=${category.categoryId}`
+            const uniqueKey = `${category.type}-${category.categoryId}`
+
+            return (
+              <Link
+                key={uniqueKey}
+                href={href}
+                onMouseEnter={onOtherNavEnter}
+                onFocus={onOtherNavEnter}
+              >
+                {category.categoryName}
+              </Link>
+            )
+          })}
       </nav>
 
       {/* 아이콘 */}
-      <div className="flex items-center gap-3 text-lg text-white sm:gap-4 sm:text-xl md:gap-6">
+      <div className="flex items-center gap-3 text-lg text-gray-800 sm:gap-4 sm:text-xl md:gap-6">
         {!hasHydrated ? (
           // 하이드레이션 전에는 아무것도 표시하지 않음
           <div className="h-6 w-12 sm:w-24" />

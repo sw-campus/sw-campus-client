@@ -30,7 +30,7 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
   return (
     <MotionLink
       href={`/lectures/${id}`}
-      className="group border-border/50 bg-card/40 text-card-foreground hover:border-accent hover:shadow-accent/10 relative flex h-full flex-col overflow-hidden rounded-xl border p-4 shadow-sm backdrop-blur-2xl transition-all duration-300 hover:shadow-2xl sm:p-5 md:p-6"
+      className="group text-card-foreground relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white/80 p-4 shadow-sm backdrop-blur-2xl transition-all duration-300 hover:border-orange-300 hover:shadow-xl hover:shadow-orange-100/50 sm:p-5 md:p-6"
       initial="rest"
       whileHover="hover"
       animate="rest"
@@ -60,25 +60,27 @@ export function LectureCard({ lecture }: { lecture: Lecture }) {
 
         <div className="mb-4 h-19">
           {/* 제목 */}
-          <h3 className="mb-2 line-clamp-2 text-lg leading-6 font-extrabold tracking-tight sm:text-xl sm:leading-7 md:text-2xl">{title}</h3>
+          <h3 className="mb-2 line-clamp-2 text-lg leading-6 font-extrabold tracking-tight sm:text-xl sm:leading-7 md:text-2xl">
+            {title}
+          </h3>
 
           {/* 기관명 */}
           <p className="text-muted-foregroundtruncate line-clamp-1 text-sm leading-5">{organization}</p>
         </div>
 
         {/* 별점 */}
-        <div className="mb-3 flex items-center gap-1.5">
+        <div className="mb-3 flex items-center gap-2 sm:gap-1.5">
           <span className={normalizedScore > 0 ? 'text-amber-500' : 'text-muted-foreground'}>★</span>
-          <span className="text-base font-semibold tabular-nums">{normalizedScore.toFixed(1)}</span>
-          <span className="text-muted-foreground text-sm tabular-nums">({normalizedReviewCount})</span>
+          <span className="text-sm font-semibold tabular-nums sm:text-base">{normalizedScore.toFixed(1)}</span>
+          <span className="text-muted-foreground text-xs tabular-nums sm:text-sm">({normalizedReviewCount})</span>
         </div>
 
-        <p className="text-muted-foreground mb-5 text-xs">
+        <p className="text-muted-foreground mb-5 text-sm sm:text-xs">
           {periodStart} ~ {periodEnd}
         </p>
 
         {/* 태그 */}
-        <div className="mb-6 flex h-5 flex-nowrap items-center gap-1.5 overflow-hidden whitespace-nowrap">
+        <div className="mb-6 flex h-6 flex-nowrap items-center gap-1.5 overflow-hidden whitespace-nowrap sm:h-5">
           {tags.slice(1).map(tag => (
             <span
               key={tag.id}

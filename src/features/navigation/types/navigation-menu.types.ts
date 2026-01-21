@@ -5,6 +5,7 @@ export type NavLinkItem = {
 
 export type MobileNavGroup = {
   title: string
+  href?: string
   items: Array<{
     title: string
     href: string

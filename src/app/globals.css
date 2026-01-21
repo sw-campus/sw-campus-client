@@ -9,12 +9,12 @@
    * - UI 요소 간의 일관된 z-index 관리를 위해 의미 있는 이름 사용
    * - 숫자가 높을수록 더 앞에 표시됨
    * ======================================== */
-  --z-dropdown: 50;      /* 드롭다운 메뉴, 툴팁 */
-  --z-sticky: 100;       /* 스티키 헤더, 사이드바 */
-  --z-fixed: 200;        /* 고정 네비게이션 (LectureTabNav 등) */
-  --z-modal: 500;        /* 모달, 다이얼로그 */
-  --z-toast: 1000;       /* 토스트 알림 */
-  --z-max: 9999;         /* 최상위 (긴급/특수 상황에만 사용) */
+  --z-dropdown: 50; /* 드롭다운 메뉴, 툴팁 */
+  --z-sticky: 100; /* 스티키 헤더, 사이드바 */
+  --z-fixed: 200; /* 고정 네비게이션 (LectureTabNav 등) */
+  --z-modal: 500; /* 모달, 다이얼로그 */
+  --z-toast: 1000; /* 토스트 알림 */
+  --z-max: 9999; /* 최상위 (긴급/특수 상황에만 사용) */
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -128,7 +128,28 @@ html {
     @apply relative flex flex-1 flex-col gap-4 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 md:px-8;
   }
   .custom-card {
-    @apply mx-auto w-full max-w-7xl overflow-x-auto rounded-2xl border border-white/10 bg-white/40 p-4 shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-6 md:p-8;
+    @apply mx-auto w-full max-w-7xl overflow-x-auto rounded-2xl border border-gray-200 bg-white/70 p-4 shadow-lg backdrop-blur-xl sm:rounded-3xl sm:p-6 md:p-8;
+  }
+
+  /* 부트캠프 성장일기 템플릿 스타일 */
+  .prose .diary-template {
+    @apply flex flex-col gap-2;
+  }
+
+  .prose .diary-section {
+    @apply rounded-xl border-l-4 border-orange-500 bg-gradient-to-br from-orange-50 to-amber-50 p-5;
+  }
+
+  .prose .diary-section h3 {
+    @apply mt-0 mb-3 text-base font-semibold text-orange-700;
+  }
+
+  .prose .diary-section h3 small {
+    @apply text-xs font-normal text-gray-500;
+  }
+
+  .prose .diary-section > div {
+    @apply text-gray-700 leading-relaxed;
   }
 }
 
@@ -139,5 +160,19 @@ html {
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* 스켈레톤 shimmer 애니메이션 */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 1.5s infinite;
   }
 }

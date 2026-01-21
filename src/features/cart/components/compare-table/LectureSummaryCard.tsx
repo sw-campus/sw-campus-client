@@ -13,14 +13,12 @@ type Side = 'left' | 'right'
 export function LectureSummaryCard({
   side,
   title,
-  orgName,
   thumbnailUrl,
   lectureId,
   onClear,
 }: {
   side: Side
   title: string
-  orgName?: string | null
   thumbnailUrl?: string | null
   lectureId?: string | null
   onClear: () => void

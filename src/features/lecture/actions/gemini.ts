@@ -1,6 +1,6 @@
 'use server'
 
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenerativeAI, SchemaType, type Schema } from '@google/generative-ai'
 
 import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
 
@@ -106,15 +106,46 @@ export interface FinalRecommendation {
 }
 
 /**
+ * AI 추천 수준
+ * - basic: 기초 설문만 완료 (희망 직무, 수업 방식, 예산 기반)
+ * - precise: 성향 테스트까지 완료 (추천 직무까지 반영)
+ */
+export type RecommendationLevel = 'basic' | 'precise'
+
+/**
  * AI 비교 분석 전체 결과
  */
 export interface ComparisonResult {
   sectionComments: SectionComment[]
   finalRecommendation: FinalRecommendation
+  recommendationLevel: RecommendationLevel
 }
 
 /**
- * 사용자 설문조사 정보 타입 (서버에서 받아온 데이터)
+ * AI 비교 분석에 사용되는 설문 입력 타입 (새 JSONB 구조 기반)
+ */
+export interface AiSurveyInput {
+  // 기초 설문
+  major: string
+  programmingExperience: {
+    hasExperience: boolean
+    bootcampName: string | null
+  }
+  preferredLearningMethod: 'ONLINE' | 'OFFLINE' | 'MIXED'
+  desiredJobs: string[]
+  affordableBudgetRange: string
+
+  // 성향 테스트 결과 (정밀 추천용)
+  recommendedJob?: 'FRONTEND' | 'BACKEND' | 'DATA' | 'FULLSTACK'
+
+  // 메타 정보
+  userLocation: string | null
+  recommendationLevel: RecommendationLevel
+}
+
+/**
+ * @deprecated Use AiSurveyInput instead
+ * 사용자 설문조사 정보 타입 (구버전 호환용)
  */
 export interface UserSurvey {
   major: string | null
@@ -124,7 +155,61 @@ export interface UserSurvey {
   hasGovCard: boolean | null
   affordableAmount: number | null
   exists: boolean
-  userLocation: string | null // 사용자 거주지 주소
+  userLocation: string | null
+}
+
+// Label constants for prompt generation
+const LEARNING_METHOD_LABELS: Record<string, string> = {
+  ONLINE: '온라인',
+  OFFLINE: '오프라인',
+  MIXED: '혼합(온/오프)',
+}
+
+const BUDGET_LABELS: Record<string, string> = {
+  UNDER_50: '50만원 미만',
+  RANGE_50_100: '50~100만원',
+  RANGE_100_200: '100~200만원',
+  OVER_200: '200만원 이상',
+}
+
+const RECOMMENDED_JOB_LABELS: Record<string, string> = {
+  FRONTEND: '프론트엔드 개발자',
+  BACKEND: '백엔드 개발자',
+  DATA: '데이터 분석가/AI 엔지니어',
+  FULLSTACK: '풀스택 개발자',
+}
+
+/**
+ * 사용자 정보를 기반으로 AI 프롬프트 생성
+ * 기본/정밀 추천에 따라 다른 프롬프트 생성
+ */
+function buildUserInfoPrompt(survey: AiSurveyInput): string {
+  const levelLabel = survey.recommendationLevel === 'precise' ? '정밀 추천' : '기본 추천'
+
+  let prompt = `
+      [사용자 정보 - ${levelLabel}]
+      거주지: ${survey.userLocation ?? '정보 없음'}
+      전공: ${survey.major || '정보 없음'}
+      프로그래밍 경험: ${survey.programmingExperience.hasExperience ? '있음' : '없음'}${survey.programmingExperience.bootcampName ? ` (${survey.programmingExperience.bootcampName} 수료)` : ''}
+      선호 수업 방식: ${LEARNING_METHOD_LABELS[survey.preferredLearningMethod] ?? survey.preferredLearningMethod}
+      희망 직무: ${survey.desiredJobs.length > 0 ? survey.desiredJobs.join(', ') : '정보 없음'}
+      교육비 부담 가능: ${BUDGET_LABELS[survey.affordableBudgetRange] ?? survey.affordableBudgetRange}`
+
+  if (survey.recommendationLevel === 'precise' && survey.recommendedJob) {
+    prompt += `
+
+      [성향 테스트 결과]
+      AI 추천 직무: ${RECOMMENDED_JOB_LABELS[survey.recommendedJob] ?? survey.recommendedJob}
+
+      ※ 성향 테스트 기반 '정밀 추천'입니다.
+      희망 직무와 추천 직무가 다르면 두 가지 모두 고려하세요.`
+  } else {
+    prompt += `
+
+      ※ 기초 설문 기반 '기본 추천'입니다.`
+  }
+
+  return prompt
 }
 
 /**
@@ -133,7 +218,7 @@ export interface UserSurvey {
 export async function compareCoursesWithAI(
   leftLecture: LectureDetail,
   rightLecture: LectureDetail,
-  userSurvey: UserSurvey,
+  userSurvey: AiSurveyInput,
 ): Promise<ComparisonResult> {
   if (!process.env.GEMINI_API_KEY) {
     console.warn('GEMINI_API_KEY is missing')
@@ -169,18 +254,12 @@ export async function compareCoursesWithAI(
       지원자격: ${lecture.quals?.map(q => `[${q.type}] ${q.text}`).join(', ') || '정보 없음'}
     `
 
+    const userInfoPrompt = buildUserInfoPrompt(userSurvey)
+
     const prompt = `
       너는 부트캠프/교육과정 선택을 도와주는 전문 AI 상담사야.
       아래 사용자 정보와 두 강의 정보를 바탕으로, 사용자에게 어떤 강의가 더 적합한지 비교 분석해줘.
-
-      [사용자 정보]
-      거주지: ${userSurvey.userLocation ?? '정보 없음'}
-      전공: ${userSurvey.major ?? '정보 없음'}
-      부트캠프 수료 경험: ${userSurvey.bootcampCompleted === null ? '정보 없음' : userSurvey.bootcampCompleted ? '있음' : '없음'}
-      희망 직무: ${userSurvey.wantedJobs ?? '정보 없음'}
-      보유 자격증: ${userSurvey.licenses ?? '정보 없음'}
-      내일배움카드 보유: ${userSurvey.hasGovCard === null ? '정보 없음' : userSurvey.hasGovCard ? '보유' : '미보유'}
-      수강 가능 금액: ${userSurvey.affordableAmount ? userSurvey.affordableAmount.toLocaleString() + '원' : '정보 없음'}
+      ${userInfoPrompt}
 
       ${formatLecture(leftLecture, 'A (왼쪽)')}
 
@@ -208,16 +287,63 @@ export async function compareCoursesWithAI(
       }
 
       주의사항:
-      - 사용자의 희망 직무, 예산, 내일배움카드 보유 여부를 중요하게 고려해줘
+      - 사용자의 희망 직무, 예산, 선호 수업 방식을 중요하게 고려해줘
       - 비용 대비 효과, 커리큘럼 적합성, 취업 지원 서비스를 종합적으로 평가해줘
       - 코멘트는 친근하고 이해하기 쉬운 한국어로 작성해줘
       - JSON만 출력하고 다른 텍스트는 출력하지 마
+      - advantage 값은 반드시 "left", "right", "equal" 중 하나여야 해
+      - recommended 값은 반드시 "left" 또는 "right" 중 하나여야 해
+      - 두 강의 모두 정보가 없거나 'NONE', '정보 없음'인 항목은 "두 강의 모두 해당 정보가 공개되지 않아 비교가 어려워요" 같이 자연스럽게 표현하고 advantage는 "equal"로 설정해줘
+      - 기술적인 용어(NONE, null 등)를 그대로 노출하지 말고, 사용자 친화적인 표현으로 바꿔줘
     `
+
+    // JSON Schema로 응답 구조 강제
+    const responseSchema: Schema = {
+      type: SchemaType.OBJECT,
+      properties: {
+        sectionComments: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              sectionKey: {
+                type: SchemaType.STRING,
+                format: 'enum',
+                enum: ['education', 'cost', 'benefits', 'goal', 'quals', 'steps', 'equipment', 'project', 'job', 'curriculum'],
+              },
+              comment: { type: SchemaType.STRING },
+              advantage: {
+                type: SchemaType.STRING,
+                format: 'enum',
+                enum: ['left', 'right', 'equal'],
+              },
+            },
+            required: ['sectionKey', 'comment', 'advantage'],
+          },
+        },
+        finalRecommendation: {
+          type: SchemaType.OBJECT,
+          properties: {
+            recommended: {
+              type: SchemaType.STRING,
+              format: 'enum',
+              enum: ['left', 'right'],
+            },
+            reason: { type: SchemaType.STRING },
+            summary: { type: SchemaType.STRING },
+          },
+          required: ['recommended', 'reason', 'summary'],
+        },
+      },
+      required: ['sectionComments', 'finalRecommendation'],
+    }
 
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: 'application/json',
+        responseSchema,
+        temperature: 0, // 0으로 설정하여 동일 입력에 동일 출력 보장
       },
     })
     const response = await result.response
@@ -235,9 +361,13 @@ export async function compareCoursesWithAI(
     }
 
     try {
-      const parsed = JSON.parse(jsonStr) as ComparisonResult
-      return parsed
-    } catch (parseError) {
+      const parsed = JSON.parse(jsonStr) as Omit<ComparisonResult, 'recommendationLevel'>
+      // recommendationLevel은 서버 응답이 아닌 입력값에서 설정
+      return {
+        ...parsed,
+        recommendationLevel: userSurvey.recommendationLevel,
+      }
+    } catch {
       console.error('JSON Parse Error. Raw Text:', text)
       throw new Error('AI 응답을 분석할 수 없습니다.')
     }

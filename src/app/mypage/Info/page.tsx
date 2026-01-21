@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -11,12 +11,8 @@ import { useAuthStore } from '@/store/authStore'
 
 export default function OrgInfoPage() {
   const router = useRouter()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const { userType } = useAuthStore()
-
-  useEffect(() => {
-    setOpen(true)
-  }, [])
 
   const handleOpenChange = (next: boolean) => {
     if (!next) {

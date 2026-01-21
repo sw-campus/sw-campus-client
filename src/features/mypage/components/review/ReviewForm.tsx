@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
+import { APPROVAL_STATUS } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 
 type ReviewFormProps = {
@@ -21,8 +22,11 @@ type ReviewFormProps = {
   onSaveSuccess?: () => void // 저장 성공 시 콜백 (목록 갱신 등)
 }
 
+const MAX_COMMENT_LENGTH = 250
+const MIN_DETAIL_COMMENT_LENGTH = 10
+
 const reviewSchema = z.object({
-  comment: z.string().max(500, '총평은 최대 500자입니다').optional().or(z.literal('')),
+  comment: z.string().max(MAX_COMMENT_LENGTH, `총평은 최대 ${MAX_COMMENT_LENGTH}자입니다`).optional().or(z.literal('')),
 })
 
 const allowedCategories = ['TEACHER', 'CURRICULUM', 'MANAGEMENT', 'FACILITY', 'PROJECT'] as const
@@ -44,7 +48,11 @@ const detailScoreSchema = z.object({
       message: '카테고리 값이 올바르지 않습니다.',
     }),
   score: z.number().int().min(1, '점수는 1점 이상이어야 합니다').max(5, '점수는 5점 이하여야 합니다'),
-  comment: z.string().trim().min(20, '세부 의견은 20자 이상이어야 합니다').max(500, '세부 의견은 최대 500자입니다'),
+  comment: z
+    .string()
+    .trim()
+    .min(10, '세부 의견은 10자 이상이어야 합니다')
+    .max(MAX_COMMENT_LENGTH, `세부 의견은 최대 ${MAX_COMMENT_LENGTH}자입니다`),
 })
 
 const updateReviewSchema = z.object({
@@ -110,7 +118,7 @@ export function ReviewForm({
           if (!mounted) return
           setResolvedReviewId(res.data?.reviewId ?? null)
           setComment(res.data?.comment ?? '')
-          setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === 'APPROVED')
+          setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === APPROVAL_STATUS.APPROVED)
 
           const details = Array.isArray(res.data?.detailScores) ? res.data.detailScores : []
           setDetailScores(
@@ -128,7 +136,7 @@ export function ReviewForm({
           if (!mounted) return
           setResolvedReviewId(res.data?.reviewId ?? reviewId)
           setComment(res.data?.comment ?? '')
-          setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === 'APPROVED')
+          setServerApproved(String(res.data?.approvalStatus ?? '').toUpperCase() === APPROVAL_STATUS.APPROVED)
 
           const details = Array.isArray(res.data?.detailScores) ? res.data.detailScores : []
           setDetailScores(
@@ -168,8 +176,14 @@ export function ReviewForm({
         const issues = parsed.error.issues
         const detailedMessage = issues
           .map(issue => {
-            const path = issue.path && issue.path.length > 0 ? issue.path.join('.') : ''
-            return path ? `${path}: ${issue.message}` : issue.message
+            // detailScores.{index}.comment 형태의 경로를 사용자 친화적으로 변환
+            if (issue.path.length >= 3 && issue.path[0] === 'detailScores') {
+              const idx = issue.path[1] as number
+              const category = detailScores[idx]?.category as AllowedCategory
+              const categoryLabel = CATEGORY_LABELS[category] || category
+              return `[${categoryLabel}] ${issue.message}`
+            }
+            return issue.message
           })
           .join('\n')
         throw new Error(detailedMessage || '입력값을 확인해주세요')
@@ -234,10 +248,27 @@ export function ReviewForm({
             value={comment}
             onChange={e => setComment(e.target.value)}
             rows={2}
-            className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
+            className={`w-full resize-y rounded-md border bg-transparent px-1 py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:outline-none ${
+              comment.length > MAX_COMMENT_LENGTH
+                ? 'border-red-400 focus:border-red-400 focus:ring-red-200'
+                : 'border-transparent focus:border-amber-300 focus:ring-amber-200'
+            }`}
             placeholder="후기를 입력하세요"
             disabled={effectiveReadOnly || loading || saveMutation.isPending}
           />
+          <div className="mt-1 flex justify-end">
+            <span
+              className={`text-xs ${
+                comment.length > MAX_COMMENT_LENGTH
+                  ? 'font-semibold text-red-500'
+                  : comment.length > MAX_COMMENT_LENGTH * 0.8
+                    ? 'text-amber-500'
+                    : 'text-gray-400'
+              }`}
+            >
+              {comment.length} / {MAX_COMMENT_LENGTH}자{comment.length > MAX_COMMENT_LENGTH && ' (초과)'}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -280,30 +311,73 @@ export function ReviewForm({
                     setDetailScores(prev => prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)))
                   }
                   rows={2}
-                  className="w-full resize-y rounded-md border border-transparent bg-transparent px-1 py-1 text-sm text-gray-800 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none"
-                  placeholder="세부 의견을 입력하세요"
+                  className={`w-full resize-y rounded-md border bg-transparent px-1 py-1 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-none ${
+                    (d.comment?.length ?? 0) > MAX_COMMENT_LENGTH ||
+                    ((d.comment?.length ?? 0) > 0 && (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH)
+                      ? 'border-red-400 focus:border-red-400 focus:ring-red-200'
+                      : 'border-transparent focus:border-amber-300 focus:ring-amber-200'
+                  }`}
+                  placeholder="세부 의견을 입력하세요 (10자 이상)"
                   disabled={effectiveReadOnly || loading || saveMutation.isPending}
                 />
+                <div className="mt-1 flex justify-end">
+                  <span
+                    className={`text-xs ${
+                      (d.comment?.length ?? 0) > MAX_COMMENT_LENGTH
+                        ? 'font-semibold text-red-500'
+                        : (d.comment?.length ?? 0) > 0 && (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH
+                          ? 'text-red-500'
+                          : (d.comment?.length ?? 0) > MAX_COMMENT_LENGTH * 0.8
+                            ? 'text-amber-500'
+                            : 'text-gray-400'
+                    }`}
+                  >
+                    {d.comment?.length ?? 0} / {MAX_COMMENT_LENGTH}자
+                    {(d.comment?.length ?? 0) > MAX_COMMENT_LENGTH && ' (초과)'}
+                    {(d.comment?.length ?? 0) > 0 &&
+                      (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH &&
+                      ` (최소 ${MIN_DETAIL_COMMENT_LENGTH}자)`}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <Button
-        type="button"
-        onClick={() => {
-          if (effectiveReadOnly) {
-            onClose?.()
-            return
-          }
-          void onSave()
-        }}
-        disabled={loading || (!effectiveReadOnly && saveMutation.isPending)}
-        className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
-      >
-        {loading ? '불러오는 중...' : effectiveReadOnly ? '닫기' : saveMutation.isPending ? '저장 중...' : '저장'}
-      </Button>
+      {/* 승인된 리뷰 안내 (readOnly 모드) */}
+      {effectiveReadOnly && !loading && <p className="text-sm text-gray-500">승인된 리뷰는 수정할 수 없습니다.</p>}
+
+      {/* 저장 버튼 (수정 가능할 때만 표시) */}
+      {!effectiveReadOnly &&
+        (() => {
+          const isCommentExceeded = comment.length > MAX_COMMENT_LENGTH
+          const isDetailExceeded = detailScores.some(d => (d.comment?.length ?? 0) > MAX_COMMENT_LENGTH)
+          const isDetailTooShort = detailScores.some(
+            d => (d.comment?.length ?? 0) > 0 && (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH,
+          )
+          const isInvalid = isCommentExceeded || isDetailExceeded || isDetailTooShort
+
+          return (
+            <>
+              {isCommentExceeded || isDetailExceeded ? (
+                <p className="text-sm font-medium text-red-500">
+                  글자수를 초과한 항목이 있습니다. 250자 이내로 작성해주세요.
+                </p>
+              ) : isDetailTooShort ? (
+                <p className="text-sm font-medium text-red-500">세부 의견은 최소 10자 이상 작성해주세요.</p>
+              ) : null}
+              <Button
+                type="button"
+                onClick={() => void onSave()}
+                disabled={loading || saveMutation.isPending || isInvalid}
+                className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+              >
+                {loading ? '불러오는 중...' : saveMutation.isPending ? '저장 중...' : '저장'}
+              </Button>
+            </>
+          )
+        })()}
 
       {!reviewId && <p className="text-xs text-gray-500"></p>}
     </div>

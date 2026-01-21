@@ -1,13 +1,17 @@
 'use client'
 
+import { useEffect } from 'react'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import { Autoplay, Pagination } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { trackBannerClick } from '@/lib/analytics'
+import { useBannerBackgroundStore } from '@/store/bannerBackground.store'
 
 import { useBannersByTypeQuery } from '../hooks/useBannerQuery'
 
@@ -28,6 +32,24 @@ function isExternalLink(url: string): boolean {
 
 export default function LargeBanner() {
   const { data: banners, isLoading } = useBannersByTypeQuery('BIG')
+  const setBackgroundColor = useBannerBackgroundStore(state => state.setBackgroundColor)
+
+  // 초기 배경색 설정 (첫 번째 배너)
+  useEffect(() => {
+    if (banners && banners.length > 0) {
+      setBackgroundColor(banners[0].backgroundColor || null)
+    }
+    // 컴포넌트 언마운트 시 배경색 초기화
+    return () => setBackgroundColor(null)
+  }, [banners, setBackgroundColor])
+
+  // 슬라이드 변경 시 배경색 업데이트
+  const handleSlideChange = (swiper: SwiperType) => {
+    if (banners && banners.length > 0) {
+      const realIndex = swiper.realIndex
+      setBackgroundColor(banners[realIndex]?.backgroundColor || null)
+    }
+  }
 
   // 로딩 중이거나 데이터 없으면 빈 상태 표시
   if (isLoading) {
@@ -53,16 +75,17 @@ export default function LargeBanner() {
   }
 
   return (
-    <div className="mx-auto mt-4 w-full max-w-7xl overflow-hidden rounded-2xl sm:mt-6 sm:rounded-3xl">
+    <div className="mx-auto mt-4 w-full max-w-7xl overflow-hidden rounded-2xl border border-gray-200 shadow-lg sm:mt-6 sm:rounded-3xl">
       <Swiper
         modules={[Pagination, Autoplay]}
         slidesPerView={1}
         loop={true}
         pagination={{ clickable: true }}
         autoplay={{
-          delay: 3000,
+          delay: 5000,
           disableOnInteraction: false,
         }}
+        onSlideChange={handleSlideChange}
       >
         {banners.map((banner, index) => {
           const href = getBannerLink(banner)

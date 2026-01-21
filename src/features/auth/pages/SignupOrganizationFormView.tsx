@@ -11,7 +11,7 @@ import PhoneAuthInput from '@/features/auth/components/PhoneAuthInput'
 import { useSignupOrganizationForm } from '@/features/auth/hooks/useSignupOrganizationForm'
 
 const INPUT_BASE_CLASS =
-  'h-10 rounded-md border border-white/15 bg-white/10 px-3 text-white placeholder:text-white/45 outline-none focus:border-white/35 focus:bg-white/15'
+  'h-10 rounded-md border border-gray-200 bg-gray-50 px-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100'
 
 export default function SignupOrganizationFormView() {
   const {
@@ -53,7 +53,7 @@ export default function SignupOrganizationFormView() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-xl rounded-2xl border border-white/15 bg-white/10 p-5 text-white shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-8"
+      className="w-full max-w-xl rounded-2xl border border-gray-200 bg-white/90 p-5 text-gray-900 shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-8"
     >
       {/* 이메일 + 인증 */}
       <EmailAuthInput
@@ -124,7 +124,7 @@ export default function SignupOrganizationFormView() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-6 h-10 w-full rounded-md bg-white/85 font-semibold text-black transition hover:bg-white disabled:opacity-60"
+        className="mt-6 h-10 w-full rounded-md bg-orange-500 font-semibold text-white transition hover:bg-orange-600 disabled:opacity-60"
       >
         {isSubmitting ? '가입 처리중...' : '회원가입'}
       </button>

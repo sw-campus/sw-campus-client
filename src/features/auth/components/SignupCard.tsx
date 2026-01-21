@@ -25,9 +25,9 @@ export default function SignupCard({ title, imageSrc, imageAlt, onClick, childre
           onClick()
         }
       }}
-      className={`flex flex-1 cursor-pointer flex-col items-center rounded-3xl border border-white/15 bg-white/10 p-5 text-center text-white shadow-xl backdrop-blur-xl transition-transform hover:-translate-y-0.5 hover:bg-white/15 md:p-6 ${className ?? ''}`}
+      className={`flex flex-1 cursor-pointer flex-col items-center rounded-3xl border border-gray-200 bg-white/90 p-5 text-center text-gray-900 shadow-xl backdrop-blur-xl transition-transform hover:-translate-y-0.5 hover:bg-white md:p-6 ${className ?? ''}`}
     >
-      <div className="relative mb-4 h-24 w-full overflow-hidden rounded-2xl bg-white/5 md:h-28">
+      <div className="relative mb-4 h-24 w-full overflow-hidden rounded-2xl bg-gray-100 md:h-28">
         <Image
           src={imageSrc}
           alt={imageAlt}
@@ -37,7 +37,7 @@ export default function SignupCard({ title, imageSrc, imageAlt, onClick, childre
         />
       </div>
 
-      <div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-5 py-1 text-sm font-semibold text-white">
+      <div className="inline-flex items-center rounded-full border border-gray-200 bg-gray-100 px-5 py-1 text-sm font-semibold text-gray-900">
         {title}
       </div>
 

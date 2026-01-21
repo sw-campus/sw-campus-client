@@ -12,6 +12,7 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import { ImageUploadInput } from '@/components/ui/image-upload-input'
+import { APPROVAL_STATUS, type ApprovalStatus } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 
 type MyOrganizationResponse = {
@@ -21,10 +22,10 @@ type MyOrganizationResponse = {
   representativeName: string
   phone: string
   location: string
-  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
+  approvalStatus: ApprovalStatus | string
   certificateKey: string
   govAuth: string
-  facilityImageUrl1: string
+  facilityImageUrl: string
   facilityImageUrl2: string
   facilityImageUrl3: string
   facilityImageUrl4: string
@@ -40,7 +41,7 @@ const orgInfoSchema = z.object({
   logoUrl: z.string().optional(),
   certificateKey: z.string().optional(),
   govAuth: z.string().optional(),
-  facilityImageUrl1: z.string().optional(),
+  facilityImageUrl: z.string().optional(),
   facilityImageUrl2: z.string().optional(),
   facilityImageUrl3: z.string().optional(),
   facilityImageUrl4: z.string().optional(),
@@ -59,7 +60,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
   const [isPending, setIsPending] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [organizationId, setOrganizationId] = useState<number | null>(null)
   const [approvalStatus, setApprovalStatus] = useState<string>('')
 
   const methods = useForm<OrgInfoFormValues>({
@@ -73,7 +73,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
       logoUrl: '',
       certificateKey: '',
       govAuth: '',
-      facilityImageUrl1: '',
+      facilityImageUrl: '',
       facilityImageUrl2: '',
       facilityImageUrl3: '',
       facilityImageUrl4: '',
@@ -104,7 +104,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
         const data = res.data
 
-        setOrganizationId(data.organizationId ?? null)
         setApprovalStatus(data.approvalStatus ?? '')
 
         methods.reset({
@@ -115,7 +114,7 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
           logoUrl: data.logoUrl ?? '',
           certificateKey: data.certificateKey ?? '',
           govAuth: data.govAuth ?? '',
-          facilityImageUrl1: data.facilityImageUrl1 ?? '',
+          facilityImageUrl: data.facilityImageUrl ?? '',
           facilityImageUrl2: data.facilityImageUrl2 ?? '',
           facilityImageUrl3: data.facilityImageUrl3 ?? '',
           facilityImageUrl4: data.facilityImageUrl4 ?? '',
@@ -165,10 +164,10 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
   }
 
   const getApprovalStatusUI = (status: string) => {
-    const s = (status || '').toLowerCase()
-    if (s === 'approved') return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
-    if (s === 'rejected') return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
-    return { label: '승인 대기', dot: 'bg-amber-500', text: 'text-amber-700' }
+    const s = (status || '').toUpperCase()
+    if (s === APPROVAL_STATUS.APPROVED) return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
+    if (s === APPROVAL_STATUS.REJECTED) return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
+    return { label: '대기중', dot: 'bg-amber-500', text: 'text-amber-700' }
   }
 
   const formContent = (
@@ -291,11 +290,17 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                   />
                 </div>
 
+                {/* 시설 이미지 안내 */}
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                  <p className="text-sm font-medium text-amber-800">📷 시설 사진 권장 비율</p>
+                  <p className="mt-1 text-xs text-amber-700">16:9 비율 권장 (예: 1920x1080px, 1280x720px)</p>
+                </div>
+
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-800">업체시설1</label>
                   <Controller
                     control={methods.control}
-                    name="facilityImageUrl1"
+                    name="facilityImageUrl"
                     render={({ field }) => (
                       <ImageUploadInput currentUrl={field.value} file={facilityFile1} onFileChange={setFacilityFile1} />
                     )}

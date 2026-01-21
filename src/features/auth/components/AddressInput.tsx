@@ -7,6 +7,28 @@ import { toast } from 'sonner'
 import { INPUT_BASE_CLASS } from '@/features/auth/inputBaseClass'
 import { useSignupStore } from '@/store/signupStore'
 
+/** Daum 우편번호 서비스 응답 타입 */
+interface DaumPostcodeData {
+  roadAddress: string
+  jibunAddress: string
+  zonecode: string
+}
+
+/** Daum 우편번호 서비스 인스턴스 타입 */
+interface DaumPostcodeInstance {
+  open: () => void
+}
+
+/** Daum 우편번호 서비스 생성자 옵션 */
+interface DaumPostcodeOptions {
+  oncomplete: (data: DaumPostcodeData) => void
+}
+
+/** Daum 전역 객체 타입 */
+interface DaumGlobal {
+  Postcode: new (options: DaumPostcodeOptions) => DaumPostcodeInstance
+}
+
 type AddressInputProps = {
   autoOpen?: boolean
   variant?: 'dark' | 'light'
@@ -20,23 +42,23 @@ export default function AddressInput({ autoOpen = false, variant = 'dark' }: Add
   const { address, detailAddress, setDetailAddress } = useSignupStore()
 
   const inputClass = variant === 'light' ? INPUT_LIGHT_CLASS : `${INPUT_BASE_CLASS} w-full flex-1`
-  const labelClass = variant === 'light' ? 'mb-1 block text-sm font-medium text-gray-800' : 'mb-1 block text-white/75'
+  const labelClass = variant === 'light' ? 'mb-1 block text-sm font-medium text-gray-800' : 'mb-1 block text-gray-700'
   const buttonClass =
     variant === 'light'
       ? 'h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800'
-      : 'h-10 rounded-md bg-white/85 px-4 font-semibold text-black transition hover:bg-white'
+      : 'h-10 rounded-md bg-orange-500 px-4 font-semibold text-white transition hover:bg-orange-600'
 
   const handleSearchAddress = () => {
     if (typeof window === 'undefined') return
 
-    const { daum } = window as any
+    const daum = (window as Window & { daum?: DaumGlobal }).daum
     if (!daum || !daum.Postcode) {
       toast.error('주소 검색 스크립트가 아직 로드되지 않았어요. 잠시 후 다시 시도해 주세요.')
       return
     }
 
     new daum.Postcode({
-      oncomplete: (data: any) => {
+      oncomplete: (data: DaumPostcodeData) => {
         const fullAddress = data.roadAddress || data.jibunAddress
         useSignupStore.getState().setAddress(fullAddress)
       },
@@ -49,7 +71,7 @@ export default function AddressInput({ autoOpen = false, variant = 'dark' }: Add
 
     const tryOpen = () => {
       if (typeof window === 'undefined') return false
-      const { daum } = window as any
+      const daum = (window as Window & { daum?: DaumGlobal }).daum
       if (!daum || !daum.Postcode) return false
       handleSearchAddress()
       return true

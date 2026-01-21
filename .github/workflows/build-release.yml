@@ -9,7 +9,7 @@ on:
       skip_manifest:
         description: 'Skip manifest update'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 permissions:
@@ -74,12 +74,13 @@ jobs:
           echo "Building RELEASE image with tag $TAG"
           
           docker build \
+            --build-arg NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }} \
             --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} \
-            --build-arg NEXT_PUBLIC_S3_HOSTNAME=${{ secrets.NEXT_PUBLIC_S3_HOSTNAME }} \
             --build-arg NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID }} \
+            --build-arg NEXT_PUBLIC_S3_HOSTNAME=${{ secrets.NEXT_PUBLIC_S3_HOSTNAME }} \
             --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }} \
             --build-arg NEXT_PUBLIC_GITHUB_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GITHUB_CLIENT_ID }} \
-            --build-arg NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }} \
+            --build-arg NEXT_PUBLIC_KAKAO_CLIENT_ID=${{ secrets.NEXT_PUBLIC_KAKAO_CLIENT_ID }} \
             -t $IMAGE:$TAG .
             
           docker push $IMAGE:$TAG
@@ -160,6 +161,6 @@ jobs:
         if: steps.cpr.outputs.pull-request-number
         run: |
           cd manifest
-          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} --squash --delete-branch
+          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} --merge --delete-branch
         env:
           GH_TOKEN: ${{ secrets.MANIFEST_REPO_TOKEN }}

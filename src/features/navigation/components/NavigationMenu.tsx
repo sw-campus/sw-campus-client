@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import type { NavCategoryItem } from '@/components/layout/header/Header'
 import { useCategoryTree } from '@/features/category'
 import { NavigationMenuDesktop } from '@/features/navigation/components/NavigationMenu.desktop'
 import { NavigationMenuMobileOverlay } from '@/features/navigation/components/NavigationMenu.mobile'
@@ -15,18 +16,21 @@ export default function Navigation({
   onClose,
   onDesktopEnter,
   onDesktopLeave,
+  categories,
 }: {
   open: boolean
   onClose: () => void
   onDesktopEnter?: () => void
   onDesktopLeave?: () => void
+  categories?: NavCategoryItem[]
 }) {
   const CLOSE_DELAY_MS = 180
 
   const router = useRouter()
   const showDesktop = useDesktopNavigationStore(state => state.showDesktopNav)
   const activeMenu = useDesktopNavigationStore(state => state.activeMenu)
-  const { data: categoryTree } = useCategoryTree()
+  const { data: serverCategories } = useCategoryTree()
+  const categoryTree = categories || serverCategories
 
   const closeTimerRef = useRef<number | null>(null)
 

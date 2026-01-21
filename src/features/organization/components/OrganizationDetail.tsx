@@ -20,6 +20,7 @@ import {
 } from '@/features/lecture/api/reviewApi.types'
 import { LectureList } from '@/features/lecture/components/LectureList'
 import { formatDate, StarRating } from '@/features/lecture/components/detail/DetailShared'
+import PhotoSlider from '@/features/lecture/components/detail/PhotoSlider'
 import type { Lecture } from '@/features/lecture/types/lecture.type'
 
 import type { OrganizationDetail as OrganizationDetailType } from '../types/organization.type'
@@ -27,6 +28,7 @@ import type { OrganizationDetail as OrganizationDetailType } from '../types/orga
 interface OrganizationDetailProps {
   organization: OrganizationDetailType
   lectures?: Lecture[]
+  isCoursesError?: boolean
 }
 
 function OrganizationReviewCard({ review }: { review: Review }) {
@@ -275,7 +277,7 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
   )
 }
 
-export function OrganizationDetail({ organization, lectures = [] }: OrganizationDetailProps) {
+export function OrganizationDetail({ organization, lectures = [], isCoursesError = false }: OrganizationDetailProps) {
   // Collect facility images that exist
   const facilityImages = [
     organization.facilityImageUrl,
@@ -364,21 +366,8 @@ export function OrganizationDetail({ organization, lectures = [] }: Organization
               {facilityImages.length > 0 && (
                 <section>
                   <h2 className="text-foreground mb-5 text-xl font-bold">{organization.name}의 현장이에요.</h2>
-                  <div className="grid w-full grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
-                    {facilityImages.map((url, index) => (
-                      <div
-                        key={url}
-                        className="group bg-muted relative aspect-square overflow-hidden rounded-xl shadow-sm transition-all duration-200 hover:shadow-lg"
-                      >
-                        <Image
-                          src={url}
-                          alt={`${organization.name} 현장 이미지 ${index + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 50vw, 20vw"
-                          className="object-cover object-center transition-transform duration-300 group-hover:scale-110"
-                        />
-                      </div>
-                    ))}
+                  <div className="mx-auto max-w-4xl">
+                    <PhotoSlider photos={facilityImages} />
                   </div>
                 </section>
               )}
@@ -403,7 +392,13 @@ export function OrganizationDetail({ organization, lectures = [] }: Organization
           {/* 등록된 프로그램 */}
           <TabsContent value="programs">
             <section>
-              {lectures.length > 0 ? (
+              {isCoursesError ? (
+                <Card className="bg-card/40 flex h-60 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl">
+                  <div className="mb-3 text-4xl">⚠️</div>
+                  <p className="text-destructive text-lg font-medium">프로그램 목록을 불러오는 데 실패했습니다.</p>
+                  <p className="text-muted-foreground mt-2 text-sm">잠시 후 다시 시도해주세요.</p>
+                </Card>
+              ) : lectures.length > 0 ? (
                 <LectureList lectures={lectures} />
               ) : (
                 <Card className="bg-card/40 flex h-60 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl">

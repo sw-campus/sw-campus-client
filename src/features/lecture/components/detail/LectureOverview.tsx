@@ -15,11 +15,12 @@ interface Props {
   org?: OrganizationDetail
   displaySummary: string
   isLoading: boolean
+  isOrgLoading: boolean
   isAiLoading: boolean
   isAiSummary: boolean
 }
 
-export default function LectureOverview({ lecture, org, displaySummary, isLoading, isAiLoading, isAiSummary }: Props) {
+export default function LectureOverview({ lecture, org, displaySummary, isLoading, isOrgLoading, isAiLoading, isAiSummary }: Props) {
   return (
     <div className="space-y-12">
       {/* 프로그램 요약 */}
@@ -67,34 +68,44 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
       </Section>
 
       {/* 교육기관 정보 */}
-      {org && (
+      {(org || isOrgLoading) && (
         <Section title="교육기관 정보">
-          <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:gap-5 sm:p-6">
-            <div className="flex items-center gap-4 sm:contents">
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-white sm:h-16 sm:w-16">
-                {org.logoUrl ? (
-                  <Image src={org.logoUrl} alt={org.name} fill sizes="64px" className="object-contain p-1" />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gray-50 text-xs text-gray-400">
-                    Logo
-                  </div>
-                )}
-              </div>
-              <div className="flex-1 sm:flex-1">
-                <h4 className="text-base font-bold text-gray-900 sm:text-lg">{org.name}</h4>
-                <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-gray-600 sm:mt-1 sm:text-sm">
-                  {org.description || '기관 소개가 없습니다.'}
-                </p>
+          {isOrgLoading ? (
+            <div className="flex animate-pulse flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:gap-5 sm:p-6">
+              <div className="h-14 w-14 shrink-0 rounded-full bg-gray-200 sm:h-16 sm:w-16" />
+              <div className="flex-1 space-y-2">
+                <div className="h-5 w-32 rounded bg-gray-200" />
+                <div className="h-4 w-48 rounded bg-gray-200" />
               </div>
             </div>
-            <Button
-              asChild
-              variant="outline"
-              className="w-full shrink-0 rounded-lg border-gray-200 text-gray-700 hover:bg-gray-50 sm:w-auto"
-            >
-              <Link href={`/organizations/${org.id}`}>자세히 보기</Link>
-            </Button>
-          </div>
+          ) : org ? (
+            <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:gap-5 sm:p-6">
+              <div className="flex items-center gap-4 sm:contents">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-white sm:h-16 sm:w-16">
+                  {org.logoUrl ? (
+                    <Image src={org.logoUrl} alt={org.name} fill sizes="64px" className="object-contain p-1" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gray-50 text-xs text-gray-400">
+                      Logo
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 sm:flex-1">
+                  <h4 className="text-base font-bold text-gray-900 sm:text-lg">{org.name}</h4>
+                  <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-gray-600 sm:mt-1 sm:text-sm">
+                    {org.description || '기관 소개가 없습니다.'}
+                  </p>
+                </div>
+              </div>
+              <Button
+                asChild
+                variant="outline"
+                className="w-full shrink-0 rounded-lg border-gray-200 text-gray-700 hover:bg-gray-50 sm:w-auto"
+              >
+                <Link href={`/organizations/${org.id}`}>자세히 보기</Link>
+              </Button>
+            </div>
+          ) : null}
         </Section>
       )}
 

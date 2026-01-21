@@ -72,22 +72,19 @@ export function mapApiLectureDetailToLectureDetail(api: ApiLectureDetail): Lectu
             if (typeof t === 'string') {
               return { name: t, desc: '', imageUrl: undefined }
             }
-            const teacher = (t as any)?.teacher ?? t
-            const name = teacher?.teacherName ?? teacher?.name ?? (t as any)?.teacherName ?? (t as any)?.name ?? ''
+            // 중첩된 teacher 객체가 있으면 사용, 없으면 직접 접근
+            const teacher = t.teacher ?? t
+            const name = teacher.teacherName ?? teacher.name ?? t.teacherName ?? t.name ?? ''
             const desc =
-              teacher?.teacherDescription ??
-              teacher?.teacherDesc ??
-              teacher?.desc ??
-              (t as any)?.teacherDescription ??
-              (t as any)?.teacherDesc ??
-              (t as any)?.desc ??
+              teacher.teacherDescription ??
+              teacher.teacherDesc ??
+              teacher.desc ??
+              t.teacherDescription ??
+              t.teacherDesc ??
+              t.desc ??
               ''
             const imageUrl =
-              teacher?.teacherImageUrl ??
-              teacher?.imageUrl ??
-              (t as any)?.teacherImageUrl ??
-              (t as any)?.imageUrl ??
-              undefined
+              teacher.teacherImageUrl ?? teacher.imageUrl ?? t.teacherImageUrl ?? t.imageUrl ?? undefined
             return { name, desc, imageUrl }
           })
           .filter(t => Boolean(t.name))

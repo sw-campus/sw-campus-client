@@ -1,4 +1,3 @@
-import tsPlugin from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
@@ -18,9 +17,6 @@ const eslintConfig = defineConfig([
         tsconfigRootDir: process.cwd(),
       },
     },
-    plugins: {
-      '@typescript-eslint': tsPlugin,
-    },
     rules: {
       // TypeScript 규칙
       '@typescript-eslint/no-explicit-any': 'warn', // any 타입 사용하면 막지는 않고 경고만
@@ -35,6 +31,9 @@ const eslintConfig = defineConfig([
       '@typescript-eslint/explicit-module-boundary-types': 'off', // api 함수 반환 타입 명시하지 않음(app router)
       '@typescript-eslint/explicit-function-return-type': 'off', // 함수 반환 타입 명시하지 않음
       '@typescript-eslint/no-non-null-assertion': 'off', // optional chaining 쓰세요(app router)
+
+      // React Hooks 규칙
+      'react-hooks/set-state-in-effect': 'warn', // SSR 하이드레이션, URL 동기화 등 정당한 케이스 허용
 
       // Next.js 규칙
       '@next/next/no-html-link-for-pages': 'off', // app router에서는 의미 없음

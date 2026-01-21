@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 
 import Script from 'next/script'
 
+import DynamicBackground from '@/components/common/DynamicBackground'
+import KakaoChannelButton from '@/components/common/KakaoChannelButton'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -50,11 +52,11 @@ export default function RootLayout({
         </>
       )}
       <body className="relative flex min-h-screen flex-col">
-        <div className="pointer-events-none fixed inset-0 -z-20 bg-[url('/images/bg-3.jpg')] bg-cover bg-top bg-no-repeat" />
-        <div className="pointer-events-none fixed inset-0 -z-10 bg-black/40" />
+        <DynamicBackground />
         <QueryClientProviderWrapper>
           {children}
           <Toaster richColors closeButton position="bottom-center" />
+          <KakaoChannelButton />
         </QueryClientProviderWrapper>
       </body>
     </html>

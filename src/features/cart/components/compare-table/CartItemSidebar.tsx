@@ -4,10 +4,10 @@ import { useState } from 'react'
 
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
+import { FiChevronDown } from 'react-icons/fi'
 import { PiRobotDuotone } from 'react-icons/pi'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import type { CartItem } from '@/features/cart/types/cart.type'
 import { setDragLectureId } from '@/features/cart/utils/cartCompareDnd'
 import { cn } from '@/lib/utils'

@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { useReviewDetailQuery } from '@/features/admin/hooks/useReviews'
 import {
+  REVIEW_AUTH_STATUS,
   REVIEW_AUTH_STATUS_COLOR,
   REVIEW_AUTH_STATUS_LABEL,
   type DetailScore,
@@ -128,7 +129,7 @@ export function ReviewDetailModal({
         )}
 
         <DialogFooter>
-          {(detail?.approvalStatus ?? review.reviewApprovalStatus) === 'PENDING' && (
+          {(detail?.approvalStatus ?? review.reviewApprovalStatus) === REVIEW_AUTH_STATUS.PENDING && (
             <>
               <Button
                 onClick={handleApprove}

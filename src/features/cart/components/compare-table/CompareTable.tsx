@@ -16,7 +16,6 @@ import {
 } from '@/features/cart/types/table.defs'
 import type { ComparisonResult } from '@/features/lecture/actions/gemini'
 import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
-import { cn } from '@/lib/utils'
 
 function sectionRow(label: string, rowKey: string) {
   return (

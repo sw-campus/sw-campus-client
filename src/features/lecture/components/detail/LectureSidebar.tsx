@@ -46,8 +46,8 @@ export default function LectureSidebar({ lecture }: Props) {
   return (
     <>
       {/* 모바일: 하단 고정 바 */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95 p-3 backdrop-blur-xl lg:hidden">
-        <div className="mx-auto flex max-w-md items-center gap-2">
+      <div className="fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur-xl sm:px-6 lg:hidden">
+        <div className="mx-auto flex max-w-lg items-center gap-3">
           <Button
             size="lg"
             className="h-12 flex-1 rounded-xl bg-orange-400 text-base font-bold text-white shadow-lg shadow-orange-200 hover:bg-orange-500 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none"
@@ -79,14 +79,14 @@ export default function LectureSidebar({ lecture }: Props) {
                 item={{ lectureId: String(lecture.id) }}
                 variant="outline"
                 size="lg"
-                className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50"
+                className="h-12 w-full rounded-xl border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
               >
                 AI 심층 비교
               </AddToCartButton>
               <Button
                 variant="outline"
                 size="lg"
-                className="h-12 w-full rounded-xl border-gray-200 hover:bg-gray-50"
+                className="h-12 w-full rounded-xl border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 onClick={handleShare}
               >
                 공유하기

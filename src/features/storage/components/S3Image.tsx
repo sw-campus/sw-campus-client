@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- 동적 presigned URL을 처리하는 유틸리티 컴포넌트 */
 'use client'
 
 import { ImgHTMLAttributes, ReactNode } from 'react'

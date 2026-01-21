@@ -21,16 +21,12 @@ export const useImageUpload = () => {
 
     try {
       if (file.size <= MULTIPART_THRESHOLD) {
-        // 단일 업로드
-        const { presignedUrl, key, url } = await storageApi.getPresignedUrl({
-          fileName: file.name,
-          contentType: file.type,
-          category,
-        })
+        // 단일 업로드 (FormData를 통해 백엔드에서 S3로 업로드)
+        setProgress(50)
+        const result = await storageApi.uploadImage(file, category)
+        setProgress(100)
 
-        await storageApi.uploadToS3(presignedUrl, file, file.type, p => setProgress(p))
-
-        return { key, url, fileName: file.name }
+        return { key: result.key, url: result.url, fileName: file.name }
       } else {
         // 멀티파트 업로드
         const { uploadId, key } = await storageApi.initMultipartUpload({

@@ -1,4 +1,5 @@
 import {
+  APPROVAL_STATUS,
   APPROVAL_STATUS_COLOR,
   APPROVAL_STATUS_FILTER_LABEL,
   APPROVAL_STATUS_LABEL,
@@ -15,6 +16,9 @@ export type ReviewAuthStatusFilter = ApprovalStatusFilter
 
 // MutationOptions 타입 re-export
 export type { MutationOptions }
+
+// 승인 상태 상수
+export const REVIEW_AUTH_STATUS = APPROVAL_STATUS
 
 // 승인 상태 한국어 라벨
 export const REVIEW_AUTH_STATUS_LABEL = APPROVAL_STATUS_LABEL

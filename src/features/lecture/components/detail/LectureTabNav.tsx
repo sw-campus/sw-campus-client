@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+
 import { createPortal } from 'react-dom'
 
+import { useIsMounted } from '@/hooks/useIsMounted'
 import { cn } from '@/lib/utils'
 
 /**
@@ -34,7 +36,7 @@ export default function LectureTabNav() {
   // ========================================
   const [activeTab, setActiveTab] = useState('overview')
   const [isFixed, setIsFixed] = useState(false)
-  const [mounted, setMounted] = useState(false) // 클라이언트 사이드 마운트 여부 (Portal용)
+  const isMounted = useIsMounted()
   const [tabPosition, setTabPosition] = useState({ left: 0, width: 0 })
   const placeholderRef = useRef<HTMLDivElement>(null)
 
@@ -59,13 +61,6 @@ export default function LectureTabNav() {
       setActiveTab(id)
     }
   }
-
-  // ========================================
-  // 클라이언트 사이드 마운트 감지
-  // ========================================
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   // ========================================
   // 스크롤 및 리사이즈 이벤트 처리
@@ -96,7 +91,7 @@ export default function LectureTabNav() {
       if (placeholderRef.current) {
         const rect = placeholderRef.current.getBoundingClientRect()
         setIsFixed(rect.top <= 0)
-        
+
         // 2. 위치 업데이트 (가로 스크롤 시에도 올바른 위치 유지)
         setTabPosition({
           left: rect.left + window.scrollX,
@@ -138,7 +133,7 @@ export default function LectureTabNav() {
   // 탭 콘텐츠 (고정/비고정 상태 모두에서 재사용)
   // ========================================
   const tabContent = (
-    <nav className="no-scrollbar flex w-full items-center gap-2 overflow-x-auto px-4 py-3 sm:gap-4 sm:px-6">
+    <nav className="no-scrollbar flex w-full items-center gap-1.5 overflow-x-auto px-3 py-2.5 sm:gap-4 sm:px-6 sm:py-3">
       {TABS.map(tab => (
         <button
           key={tab.id}
@@ -146,10 +141,10 @@ export default function LectureTabNav() {
           aria-current={activeTab === tab.id ? 'page' : undefined}
           type="button"
           className={cn(
-            'group relative shrink-0 rounded-xl px-4 py-2 text-base transition-all duration-200 sm:px-5 sm:text-lg',
+            'group relative shrink-0 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 sm:px-5 sm:py-2 sm:text-lg',
             activeTab === tab.id
               ? 'bg-white font-extrabold text-gray-900 shadow-sm ring-1 ring-gray-200'
-              : 'font-semibold text-gray-500 hover:bg-gray-100/50 hover:text-gray-700',
+              : 'font-semibold text-gray-700 hover:bg-gray-100 hover:text-gray-900',
           )}
         >
           <span>{tab.label}</span>
@@ -170,9 +165,7 @@ export default function LectureTabNav() {
       */}
       <div ref={placeholderRef} className={isFixed ? 'h-[56px]' : ''}>
         {!isFixed && (
-          <div className="rounded-t-2xl bg-white/90 ring-1 ring-white/30 backdrop-blur-xl">
-            {tabContent}
-          </div>
+          <div className="rounded-t-2xl bg-white/90 ring-1 ring-white/30 backdrop-blur-xl">{tabContent}</div>
         )}
       </div>
 
@@ -182,18 +175,20 @@ export default function LectureTabNav() {
         - 부모 요소의 overflow, transform 등에 영향받지 않음
         - z-[var(--z-fixed)]: globals.css에 정의된 고정 요소용 z-index 토큰 사용
       */}
-      {mounted && isFixed && createPortal(
-        <div 
-          className="fixed top-0 z-[var(--z-fixed)] rounded-t-2xl border-b border-gray-200/50 bg-white/95 shadow-sm backdrop-blur-xl"
-          style={{
-            left: `${tabPosition.left}px`,
-            width: `${tabPosition.width}px`,
-          }}
-        >
-          {tabContent}
-        </div>,
-        document.body
-      )}
+      {isMounted &&
+        isFixed &&
+        createPortal(
+          <div
+            className="fixed top-0 z-[var(--z-fixed)] rounded-t-2xl border-b border-gray-200/50 bg-white/95 shadow-sm backdrop-blur-xl"
+            style={{
+              left: `${tabPosition.left}px`,
+              width: `${tabPosition.width}px`,
+            }}
+          >
+            {tabContent}
+          </div>,
+          document.body,
+        )}
     </>
   )
 }
