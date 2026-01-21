@@ -36,9 +36,6 @@ function CheckIcon({ checked }: { checked: boolean }) {
 }
 
 export default function LectureIntro({ lecture }: Props) {
-  // 지원 서비스 데이터 확인 (하나라도 true인지)
-  const hasAnyService = Object.values(lecture.services).some(Boolean)
-
   // 프로젝트 정보 확인
   const hasProjectInfo =
     lecture.project.num > 0 ||
@@ -62,12 +59,12 @@ export default function LectureIntro({ lecture }: Props) {
                 return (
                   <div
                     key={idx}
-                    className="flex items-start gap-4 rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:ring-orange-100"
+                    className="flex items-start gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:ring-orange-100 sm:gap-4 sm:px-5 sm:py-4"
                   >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xs font-bold text-orange-600 sm:h-7 sm:w-7 sm:text-sm">
                       {idx + 1}
                     </div>
-                    <p className="text-base leading-relaxed text-gray-900">{cleanLine}</p>
+                    <p className="text-sm leading-relaxed text-gray-900 sm:text-base">{cleanLine}</p>
                   </div>
                 )
               })}
@@ -85,9 +82,23 @@ export default function LectureIntro({ lecture }: Props) {
               >
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-gray-50">
                   {teacher.imageUrl ? (
-                    <Image src={teacher.imageUrl} alt={teacher.name} fill className="object-cover" />
+                    <Image src={teacher.imageUrl} alt={teacher.name} fill sizes="64px" className="object-cover" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-2xl">🧑‍🏫</div>
+                    <div className="flex h-full w-full items-center justify-center bg-gray-100">
+                      <svg
+                        className="h-8 w-8 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                        />
+                      </svg>
+                    </div>
                   )}
                 </div>
                 <div>

@@ -27,15 +27,15 @@ export default function LectureCurriculum({ curriculum }: Props) {
             return (
               <div
                 key={idx}
-                className="flex items-center justify-between rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm hover:bg-gray-50/50"
+                className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm hover:bg-gray-50/50 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5 sm:py-4"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-500">
                     {idx + 1}
                   </span>
-                  <span className="font-medium text-gray-900">{item.name}</span>
+                  <span className="text-sm font-medium text-gray-900 sm:text-base">{item.name}</span>
                 </div>
-                <Badge variant="outline" className={`shrink-0 border ${badgeColor} rounded-md px-2.5 py-1 font-medium`}>
+                <Badge variant="outline" className={`shrink-0 self-start border ${badgeColor} rounded-md px-2 py-0.5 text-xs font-medium sm:self-auto sm:px-2.5 sm:py-1`}>
                   {levelText}
                 </Badge>
               </div>

@@ -1,26 +1,52 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import { APPROVAL_STATUS, type ApprovalStatus } from '@/features/admin/types/approval.type'
 import OrganizationAside from '@/features/mypage/components/Organization/OrganizationAside'
 import OrganizationMain from '@/features/mypage/components/Organization/OrganizationMain'
+import { api } from '@/lib/axios'
 import { useAuthStore } from '@/store/authStore'
+
+type MyOrganizationResponse = {
+  approvalStatus: ApprovalStatus | string
+}
 
 export default function MyPage() {
   const router = useRouter()
   const { userType } = useAuthStore()
-  const [isOrgPasswordOpen, setIsOrgPasswordOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'orgInfo' | 'lectureManage' | 'myInfo'>('orgInfo')
+  const [isApproved, setIsApproved] = useState(false)
+
+  // 기관 승인 상태 조회
+  useEffect(() => {
+    if (userType === 'ORGANIZATION') {
+      api
+        .get<MyOrganizationResponse>('/mypage/organization')
+        .then(res => {
+          const status = res.data.approvalStatus?.toUpperCase()
+          setIsApproved(status === APPROVAL_STATUS.APPROVED)
+        })
+        .catch(() => {
+          setIsApproved(false)
+        })
+    }
+  }, [userType])
 
   // 기관 마이페이지
   if (userType === 'ORGANIZATION') {
     const handleOpenOrgInfo = () => {
-      setIsOrgPasswordOpen(true)
+      setActiveTab('orgInfo')
     }
 
     const handleOpenLectureManage = () => {
-      setIsOrgPasswordOpen(false)
+      setActiveTab('lectureManage')
+    }
+
+    const handleOpenMyInfo = () => {
+      setActiveTab('myInfo')
     }
 
     const openInfoModal = () => {
@@ -34,10 +60,16 @@ export default function MyPage() {
     return (
       <div className="custom-container">
         <div className="custom-card">
-          <div className="relative z-10 flex w-full gap-6">
-            <OrganizationAside onClickOrgInfo={handleOpenOrgInfo} onClickLectureManage={handleOpenLectureManage} />
+          <div className="relative z-10 flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
+            <OrganizationAside
+              active={activeTab}
+              onClickOrgInfo={handleOpenOrgInfo}
+              onClickLectureManage={handleOpenLectureManage}
+              onClickMyInfo={handleOpenMyInfo}
+              isApproved={isApproved}
+            />
             <OrganizationMain
-              isOrgPasswordOpen={isOrgPasswordOpen}
+              activeTab={activeTab}
               openInfoModal={openInfoModal}
               onOpenProductModal={openProductModal}
             />

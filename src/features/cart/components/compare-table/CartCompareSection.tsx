@@ -2,30 +2,37 @@
 
 import { useState } from 'react'
 
-import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { AiFinalRecommendation } from '@/features/cart/components/AiFinalRecommendation'
 import { AiFloatingButton } from '@/features/cart/components/AiFloatingButton'
 import { CartItemSidebar } from '@/features/cart/components/compare-table/CartItemSidebar'
 import { CompareTable } from '@/features/cart/components/compare-table/CompareTable'
 import { LectureSummaryCard } from '@/features/cart/components/compare-table/LectureSummaryCard'
+import { useAiCompare } from '@/features/cart/hooks/useAiCompare'
 import { useCartComparePageModel } from '@/features/cart/hooks/useCartComparePageModel'
 import { getDragLectureId } from '@/features/cart/utils/cartCompareDnd'
-import type { ComparisonResult } from '@/features/lecture/actions/gemini'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 
-const LABEL_COL_GRID_CLASS = 'md:grid-cols-[13.75rem_1fr_1px_1fr]'
-const LABEL_COL_TABLE_CLASS = 'w-[13.75rem]'
+const LABEL_COL_GRID_CLASS = 'grid-cols-2 md:grid-cols-[13.75rem_minmax(0,1fr)_1px_minmax(0,1fr)]'
+const LABEL_COL_TABLE_CLASS = 'w-[5.5rem] md:w-[13.75rem]'
 
 export default function CartCompareSection() {
+  const router = useRouter()
   const [isLeftOver, setIsLeftOver] = useState(false)
   const [isRightOver, setIsRightOver] = useState(false)
-
-  // AI 분석 상태
-  const [aiResult, setAiResult] = useState<ComparisonResult | null>(null)
-  const [isAiLoading, setIsAiLoading] = useState(false)
+  const [isSurveyDialogOpen, setIsSurveyDialogOpen] = useState(false)
 
   const isLoggedIn = useAuthStore(state => state.isLoggedIn)
 
@@ -41,8 +48,6 @@ export default function CartCompareSection() {
     right,
     leftDetail,
     rightDetail,
-    leftOrgName,
-    rightOrgName,
     leftDetailResolved,
     rightDetailResolved,
     canUseItem,
@@ -51,81 +56,30 @@ export default function CartCompareSection() {
     dropLecture,
   } = useCartComparePageModel()
 
+  // AI 분석 훅 (TanStack Query 캐싱 적용)
+  const {
+    result: aiResult,
+    isLoading: isAiLoading,
+    analyze: runAiAnalyze,
+    clearResult: handleClearAi,
+  } = useAiCompare({
+    leftId,
+    rightId,
+    leftDetail,
+    rightDetail,
+    isLoggedIn,
+  })
+
   // AI 분석이 가능한지 여부
   const canAnalyze = Boolean(leftDetail && rightDetail && isLoggedIn)
 
-  // AI 분석 실행 핸들러
+  // AI 분석 실행 핸들러 (캐싱 적용)
   const handleAiAnalyze = async () => {
-    if (!leftDetail || !rightDetail) {
-      toast.error('두 강의를 모두 선택해주세요')
-      return
+    const result = await runAiAnalyze()
+    // 설문조사 필요 시 다이얼로그 오픈
+    if (result && 'needsSurvey' in result && result.needsSurvey) {
+      setIsSurveyDialogOpen(true)
     }
-
-    if (!isLoggedIn) {
-      toast.error('로그인이 필요한 기능입니다')
-      return
-    }
-
-    setIsAiLoading(true)
-    setAiResult(null)
-
-    // 1단계: 모듈 동적 로딩
-    let compareCoursesWithAI: typeof import('@/features/lecture/actions/gemini').compareCoursesWithAI
-    let getSurvey: typeof import('@/features/mypage/api/survey.api').getSurvey
-    let getProfile: typeof import('@/features/mypage/api/survey.api').getProfile
-
-    try {
-      const [geminiModule, surveyModule] = await Promise.all([
-        import('@/features/lecture/actions/gemini'),
-        import('@/features/mypage/api/survey.api'),
-      ])
-      compareCoursesWithAI = geminiModule.compareCoursesWithAI
-      getSurvey = surveyModule.getSurvey
-      getProfile = surveyModule.getProfile
-    } catch (error) {
-      console.error('Module Loading Error:', error)
-      toast.error('서비스 모듈을 불러오는데 실패했습니다. 페이지를 새로고침해주세요.')
-      setIsAiLoading(false)
-      return
-    }
-
-    // 2단계: 사용자 데이터 조회
-    let survey: Awaited<ReturnType<typeof getSurvey>>
-    let profile: Awaited<ReturnType<typeof getProfile>>
-
-    try {
-      ;[survey, profile] = await Promise.all([getSurvey(), getProfile()])
-    } catch (error) {
-      console.error('User Data Fetch Error:', error)
-      toast.error('사용자 정보를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.')
-      setIsAiLoading(false)
-      return
-    }
-
-    if (!survey.exists) {
-      toast.warning('설문조사를 먼저 작성해주세요. 더 정확한 추천을 받을 수 있습니다.')
-    }
-
-    // 3단계: AI 비교 분석 실행
-    try {
-      const result = await compareCoursesWithAI(leftDetail, rightDetail, {
-        ...survey,
-        userLocation: profile.location,
-      })
-      setAiResult(result)
-      toast.success('AI 분석이 완료되었습니다!')
-    } catch (error) {
-      console.error('AI Analysis Error:', error)
-      const errorMessage = error instanceof Error ? error.message : 'AI 분석 중 오류가 발생했습니다.'
-      toast.error(`${errorMessage} 잠시 후 다시 시도해주세요.`)
-    } finally {
-      setIsAiLoading(false)
-    }
-  }
-
-  // AI 분석 초기화
-  const handleClearAi = () => {
-    setAiResult(null)
   }
 
   // 비활성 이유 메시지
@@ -138,22 +92,22 @@ export default function CartCompareSection() {
   // 강의 드롭 핸들러 (AI 결과 초기화 포함)
   const handleDropLecture = (side: 'left' | 'right', lectureId: string) => {
     dropLecture(side, lectureId)
-    setAiResult(null)
+    handleClearAi()
   }
 
   // 강의 선택 해제 핸들러 (AI 결과 초기화 포함)
   const handleClearLeft = () => {
     setLeftId(null)
-    setAiResult(null)
+    handleClearAi()
   }
 
   const handleClearRight = () => {
     setRightId(null)
-    setAiResult(null)
+    handleClearAi()
   }
 
   return (
-    <div className="mx-auto grid w-full gap-4 overflow-x-hidden py-6 md:grid-cols-[280px_1fr]">
+    <div className="mx-auto grid w-full gap-4 py-4 pb-40 md:py-6 lg:grid-cols-[280px_minmax(0,1fr)]">
       <CartItemSidebar
         items={items}
         isLoading={isLoading}
@@ -164,14 +118,21 @@ export default function CartCompareSection() {
       />
 
       <Card>
-        <CardHeader>
+        <CardHeader className="hidden md:block">
           <CardTitle className="text-base">과정비교 페이지</CardTitle>
           <div className="text-muted-foreground text-sm">
             사이드바에서 강의를 드래그해서 왼쪽/오른쪽 영역에 놓으면 비교표가 업데이트됩니다.
           </div>
         </CardHeader>
+        {/* 모바일 헤더 */}
+        <CardHeader className="pb-2 md:hidden">
+          <CardTitle className="text-sm">과정 비교</CardTitle>
+          <div className="text-muted-foreground text-xs">
+            AI 심층 비교 목록에서 강의를 선택하세요
+          </div>
+        </CardHeader>
         <CardContent className="space-y-3">
-          <div className={cn('grid grid-cols-1 overflow-hidden rounded-md', LABEL_COL_GRID_CLASS)}>
+          <div className={cn('grid rounded-md', LABEL_COL_GRID_CLASS)}>
             <div aria-hidden className="bg-muted/10 hidden md:block" />
             <div
               className={cn(isLeftOver && 'bg-muted/20')}
@@ -196,7 +157,6 @@ export default function CartCompareSection() {
               <LectureSummaryCard
                 side="left"
                 title={left?.title ?? ''}
-                orgName={leftOrgName}
                 thumbnailUrl={leftDetail?.thumbnailUrl}
                 lectureId={leftId}
                 onClear={handleClearLeft}
@@ -228,7 +188,6 @@ export default function CartCompareSection() {
               <LectureSummaryCard
                 side="right"
                 title={right?.title ?? ''}
-                orgName={rightOrgName}
                 thumbnailUrl={rightDetail?.thumbnailUrl}
                 lectureId={rightId}
                 onClear={handleClearRight}
@@ -252,6 +211,7 @@ export default function CartCompareSection() {
               rightTitle={right?.title ?? 'B과정'}
               leftId={leftId}
               rightId={rightId}
+              recommendationLevel={aiResult.recommendationLevel}
             />
           )}
         </CardContent>
@@ -265,7 +225,27 @@ export default function CartCompareSection() {
         onAnalyze={handleAiAnalyze}
         onClear={handleClearAi}
         disabledReason={getDisabledReason()}
+        className="bottom-36 md:bottom-10"
       />
+
+      <Dialog open={isSurveyDialogOpen} onOpenChange={setIsSurveyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>설문조사가 필요합니다</DialogTitle>
+            <DialogDescription>
+              AI 비교 분석을 위해서는 설문조사 결과가 필요합니다.
+              <br />
+              마이페이지에서 설문조사를 진행하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSurveyDialogOpen(false)}>
+              취소
+            </Button>
+            <Button onClick={() => router.push('/mypage/survey')}>확인</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

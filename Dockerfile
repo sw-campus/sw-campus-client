@@ -1,31 +1,43 @@
 # Next.js 프로덕션 이미지
 FROM node:20-alpine AS base
 
-# 의존성 설치 단계
+# 의존성 설치 단계 
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # package.json과 package-lock.json 복사 (있으면)
 COPY package.json package-lock.json* ./
-RUN npm ci || npm install
+RUN npm install
 
 # 빌드 단계
 FROM base AS builder
 WORKDIR /app
 
+# 빌드 시 필요한 환경 변수 (--build-arg로 전달)
+ARG NODE_ENV=production
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_S3_HOSTNAME
+ARG NEXT_PUBLIC_GA_ID
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ARG NEXT_PUBLIC_GITHUB_CLIENT_ID
+ARG NEXT_PUBLIC_KAKAO_CLIENT_ID
+ARG NEXT_PUBLIC_BASE_URL
+
+ENV NODE_ENV=$NODE_ENV
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_S3_HOSTNAME=$NEXT_PUBLIC_S3_HOSTNAME
+ENV NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_GITHUB_CLIENT_ID=$NEXT_PUBLIC_GITHUB_CLIENT_ID
+ENV NEXT_PUBLIC_KAKAO_CLIENT_ID=$NEXT_PUBLIC_KAKAO_CLIENT_ID
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+ENV NEXT_TELEMETRY_DISABLED=1
+
 # 의존성 복사
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# 빌드 인자 (기본값 설정)
-ARG NEXT_PUBLIC_API_URL=http://localhost:8080
-
-# 환경 변수 설정 (빌드 시 필요)
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-
-# Next.js 빌드
 RUN npm run build
 
 # 프로덕션 이미지
@@ -51,4 +63,3 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]
-

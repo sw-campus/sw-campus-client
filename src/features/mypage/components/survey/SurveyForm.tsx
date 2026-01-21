@@ -18,12 +18,9 @@ const surveySchema = z.object({
   major: z.string().min(1, '전공을 입력해주세요.'),
   bootcampCompleted: z.boolean(),
   wantedJobs: z.string().min(1, '희망 직무를 입력해주세요.'),
-  licenses: z.string().min(1, '자격증을 입력해주세요.'),
+  licenses: z.string().optional(),
   hasGovCard: z.boolean(),
-  affordableAmount: z
-    .union([z.number(), z.string()])
-    .transform(v => (typeof v === 'string' ? Number(v) : v))
-    .refine(v => Number.isFinite(v) && v >= 0, '가능 금액은 0 이상 숫자여야 합니다.'),
+  affordableAmount: z.number().min(0, '가능 금액은 0 이상 숫자여야 합니다.'),
 })
 type SurveyFormValues = z.infer<typeof surveySchema>
 
@@ -95,7 +92,8 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
           hasGovCard: !!data.hasGovCard,
           affordableAmount: data.affordableAmount ?? 0,
         })
-      } catch (e: any) {
+      } catch {
+        // API 오류 시 기본값 사용
       } finally {
         if (mounted) setIsLoading(false)
       }
@@ -112,6 +110,12 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
     setIsPending(true)
     try {
       await upsertSurvey.mutateAsync(values)
+      // notify other parts of the app that survey is saved
+      try {
+        window.dispatchEvent(new Event('survey:saved'))
+      } catch (error) {
+        console.error(error)
+      }
       toast.success('설문조사가 저장되었습니다.')
       router.back()
     } catch (error) {
@@ -161,7 +165,7 @@ export function SurveyForm({ embedded = false }: { embedded?: boolean }) {
 
             <div>
               <label htmlFor="licenses" className="mb-1 block text-sm font-medium text-gray-800">
-                자격증<span className="text-red-500">*</span>
+                자격증 (선택)
               </label>
               <textarea id="licenses" rows={3} {...register('licenses')} className={TEXTAREA_CLASS} />
               {errors.licenses && <p className="mt-1 text-xs text-red-600">{errors.licenses.message}</p>}

@@ -1,7 +1,6 @@
 import {
   EquipmentType,
   LectureDay,
-  LectureAuthStatus,
   LectureLocation,
   LocalDateString,
   LocalTimeString,
@@ -23,6 +22,7 @@ export interface LectureStepCreateRequest {
 }
 
 export interface LectureTeacherCreateRequest {
+  teacherId?: number | null // 기존 강사 선택 시 ID
   teacherName: string
   teacherDescription?: string | null
   teacherImageUrl?: string | null
@@ -40,6 +40,7 @@ export interface LectureCurriculumRequest {
 }
 
 export interface LectureCreateRequest {
+  orgId?: number | null // 기관 ID (백엔드에서 로그인 사용자 기준으로 설정)
   lectureName: string
   days: LectureDay[]
   startTime: LocalTimeString
@@ -75,8 +76,8 @@ export interface LectureCreateRequest {
   projectTool?: string | null
   projectMentor?: boolean | null
 
-  startAt: LocalDateString
-  endAt: LocalDateString
+  startAt?: LocalDateString | null
+  endAt?: LocalDateString | null
   deadline?: LocalDateString | null
 
   totalDays: number

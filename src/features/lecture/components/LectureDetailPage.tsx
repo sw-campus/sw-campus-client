@@ -1,11 +1,11 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { getLectureDetail, type LectureDetail } from '@/features/lecture/api/lectureApi'
+import { getLectureDetail } from '@/features/lecture/api/lectureApi'
 import { fetchOrganizationDetail } from '@/features/organization/api/organizationApi'
 
 import LectureCurriculum from './detail/LectureCurriculum'
@@ -26,76 +26,60 @@ export default function LectureDetailPage({ lectureId }: Props) {
     staleTime: 1000 * 60,
   })
 
-  const { data: org } = useQuery({
-    queryKey: ['organization', data?.orgId],
-    queryFn: () => fetchOrganizationDetail(data!.orgId),
-    enabled: !!data?.orgId,
-  })
+  const lecture = data
 
-  // 더미 데이터 (로딩/에러/데이터 없음 시)
-  const mock: LectureDetail = {
-    id: lectureId,
-    orgId: 1,
-    title: '지역사회 지역혁신프로젝트 기업연계형 SW 직무교육 1기',
-    orgName: '한국소프트웨어인재개발원',
-    tags: ['KDT', '인재추천', '입반선발'],
-    lectureLoc: 'OFFLINE',
-    categoryName: '백엔드',
-    thumbnailUrl: '',
-    recruitType: 'CARD_REQUIRED',
-    summary:
-      'KDT(우수형) 백엔드 부트캠프입니다.\n취업을 위한 인재추천, 입반선발 전형이 있으며, 선발전형 통과테스트가 있습니다.',
-    schedule: {
-      recruitPeriod: '2025-12-28',
-      coursePeriod: { start: '2025-12-30', end: '2026-07-28' },
-      days: '월, 화, 수, 목, 금',
-      time: '09:00 - 19:00',
-      totalHours: 60,
-      totalDays: 20,
-    },
-    support: {
-      tuition: 2800000,
-      stipend: '훈련장려금 월 11만 6천원',
-      extraSupport: '특별훈련수당 월 20만원',
-    },
-    location: '서울시 금천구',
-    recruitStatus: 'RECRUITING',
-    photos: ['', '', '', ''],
-    steps: ['서류심사', '면접', '최종합격'],
-    benefits: ['인재추천', '인턴십 진행'],
-    goal: '',
-    maxCapacity: 0,
-    equipment: { pc: '', merit: '' },
-    services: { books: false, resume: false, mockInterview: false, employmentHelp: false, afterCompletion: false },
-    project: { num: 0, time: 0, team: '', tool: '', mentor: false },
-    curriculum: [],
-    teachers: [],
-    quals: [],
-  }
-
-  const lecture = data ?? mock
-
-  // Gemini 요약 Query
-  const { data: aiSummary, isLoading: isAiLoading } = useQuery({
-    queryKey: ['lectureSummary', lectureId, lecture?.title],
-    queryFn: async () => {
-      if (!lecture) return null
-      // Server Action 호출
-      const { generateGeminiSummary } = await import('@/features/lecture/actions/gemini')
-      return generateGeminiSummary(lecture)
-    },
-    enabled: !!lecture,
-    staleTime: Infinity,
+  // 종속 쿼리 병렬 실행 (organization, aiSummary)
+  const [{ data: org, isLoading: isOrgLoading }, { data: aiSummary, isLoading: isAiLoading }] = useQueries({
+    queries: [
+      {
+        queryKey: ['organization', data?.orgId],
+        queryFn: async () => {
+          if (!data?.orgId) return null
+          return fetchOrganizationDetail(data.orgId)
+        },
+        enabled: !!data?.orgId,
+      },
+      {
+        queryKey: ['lectureSummary', lectureId, data?.title],
+        queryFn: async () => {
+          if (!data) return null
+          const { generateGeminiSummary } = await import('@/features/lecture/actions/gemini')
+          return generateGeminiSummary(data)
+        },
+        enabled: !!data,
+        staleTime: Infinity,
+        gcTime: 60 * 60 * 1000,
+      },
+    ],
   })
 
   // 실제 표시할 요약: AI 요약 우선, 없으면 기본(매퍼) 요약
-  const displaySummary = aiSummary ?? lecture.summary
+  const displaySummary = aiSummary ?? lecture?.summary ?? ''
 
+  // 로딩 중
   if (isLoading) {
-    return <div className="text-muted-foreground py-20 text-center">로딩 중...</div>
+    return (
+      <div className="custom-container">
+        <div className="custom-card">
+          <div className="flex items-center justify-center py-20">
+            <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+          </div>
+        </div>
+      </div>
+    )
   }
-  if (isError) {
-    return <div className="text-destructive py-20 text-center">데이터를 불러오지 못했습니다.</div>
+
+  // 에러 또는 데이터 없음
+  if (isError || !lecture) {
+    return (
+      <div className="custom-container">
+        <div className="custom-card">
+          <div className="text-muted-foreground py-20 text-center">
+            <p className="text-lg">강의 정보를 찾을 수 없습니다.</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -106,7 +90,14 @@ export default function LectureDetailPage({ lectureId }: Props) {
           <div className="w-full overflow-hidden rounded-3xl bg-white/60 ring-1 ring-white/30 backdrop-blur-xl">
             <div className="relative aspect-16/6 w-full bg-white/30">
               {lecture.thumbnailUrl ? (
-                <Image src={lecture.thumbnailUrl} alt="대표 이미지" fill className="object-cover" priority />
+                <Image
+                  src={lecture.thumbnailUrl}
+                  alt="대표 이미지"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 1152px"
+                  className="object-contain"
+                  priority
+                />
               ) : (
                 <div className="text-muted-foreground flex h-full items-center justify-center text-sm">대표 이미지</div>
               )}
@@ -127,13 +118,11 @@ export default function LectureDetailPage({ lectureId }: Props) {
                 </CardContent>
               </Card>
 
-              {/* Sticky Tabs */}
-              <div className="sticky top-0 z-20 pb-4">
-                <LectureTabNav />
-              </div>
+              {/* 탭 네비게이션 (Sticky) - 카드와 붙어서 보이도록 */}
+              <LectureTabNav />
 
-              {/* 본문 카드 (통합) */}
-              <Card className="rounded-2xl bg-white/70 ring-1 ring-white/30 backdrop-blur-xl">
+              {/* 본문 카드 (통합) - 탭과 붙어서 보이도록 상단 모서리 제거 */}
+              <Card className="rounded-t-none rounded-b-2xl bg-white/70 ring-1 ring-white/30 backdrop-blur-xl">
                 <CardContent className="space-y-16 p-6 md:p-8">
                   {/* 모집개요 */}
                   <div id="overview" className="scroll-mt-28">
@@ -142,7 +131,9 @@ export default function LectureDetailPage({ lectureId }: Props) {
                       org={org}
                       displaySummary={displaySummary}
                       isLoading={isLoading}
+                      isOrgLoading={isOrgLoading}
                       isAiLoading={isAiLoading}
+                      isAiSummary={!!aiSummary}
                     />
                   </div>
 
@@ -163,7 +154,7 @@ export default function LectureDetailPage({ lectureId }: Props) {
                   <Separator />
 
                   {/* 후기 */}
-                  <div id="review" className="min-h-[300px] scroll-mt-28">
+                  <div id="review" className="min-h-75 scroll-mt-28">
                     <LectureReviews lectureId={lectureId} />
                   </div>
                 </CardContent>
@@ -175,6 +166,8 @@ export default function LectureDetailPage({ lectureId }: Props) {
               <LectureSidebar lecture={lecture} />
             </aside>
           </div>
+          {/* 모바일 하단 고정바 공간 확보 */}
+          <div className="h-20 lg:hidden" />
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { toDigitsOnly } from '@/features/lecture/utils/inputFormat'
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 type Props = {
@@ -16,7 +17,6 @@ type Props = {
 export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
   const {
     control,
-    setValue,
     formState: { errors },
   } = useFormContext<LectureFormValues>()
 
@@ -25,7 +25,9 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
   return (
     <>
       <Field>
-        <FieldLabel>강의명</FieldLabel>
+        <FieldLabel>
+          강의명<span className="ml-1 text-xl font-bold text-red-600">*</span>
+        </FieldLabel>
         <FieldContent>
           <Controller
             control={control}
@@ -46,14 +48,16 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
             name="totalTimes"
             render={({ field }) => (
               <Input
-                type="number"
+                type="text"
                 inputMode="numeric"
-                min={1}
-                step={1}
+                pattern="[0-9]*"
                 placeholder="예) 960"
                 {...field}
-                value={String(field.value ?? 1)}
-                onChange={e => field.onChange(e.target.value === '' ? 1 : Number(e.target.value))}
+                value={field.value === null || field.value === undefined ? '' : String(field.value)}
+                onChange={e => {
+                  const next = toDigitsOnly(e.target.value)
+                  field.onChange(next === '' ? null : Number(next))
+                }}
               />
             )}
           />
@@ -65,6 +69,7 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
 
       <Field>
         <FieldLabel>대표 이미지</FieldLabel>
+        <FieldDescription>권장 사이즈: 1152x432px (16:6 비율)</FieldDescription>
         <FieldContent>
           <Controller
             control={control}
@@ -79,7 +84,6 @@ export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
                     className="hidden"
                     onChange={e => {
                       const file = e.target.files?.[0] ?? null
-                      console.log('Lecture image changed:', file)
                       onChange(file)
                     }}
                   />

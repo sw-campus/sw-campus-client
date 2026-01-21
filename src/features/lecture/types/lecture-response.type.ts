@@ -34,6 +34,7 @@ export interface LectureCurriculumResponseDto {
 
 export interface LectureResponseDto {
   lectureId: number
+  categoryId: number | null
   orgId: number
   orgName: string | null
 

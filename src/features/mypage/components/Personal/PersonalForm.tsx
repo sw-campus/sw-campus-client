@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import AddressInput from '@/features/auth/components/AddressInput'
 import { api } from '@/lib/axios'
+import { useAuthStore } from '@/store/authStore'
 import { useSignupStore } from '@/store/signupStore'
 
 const profileSchema = z.object({
@@ -38,7 +39,7 @@ type MyProfileResponse = {
 // 모달 스크린샷처럼: 라운드, 얇은 보더, 포커스 앰버 컬러
 
 const INPUT_CLASS =
-  'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
+  'h-10 sm:h-11 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
 
 // AddressInput(daum.Postcode)이 동작하려면 postcode 스크립트가 필요합니다.
 const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
@@ -46,7 +47,7 @@ const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
 const loadDaumPostcodeScript = () => {
   if (typeof window === 'undefined') return
 
-  const w = window as any
+  const w = window as unknown as { daum?: { Postcode?: unknown } }
   // 이미 로드되어 있으면 종료
   if (w.daum?.Postcode) return
 
@@ -60,11 +61,14 @@ const loadDaumPostcodeScript = () => {
   document.body.appendChild(script)
 }
 
-export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
+export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: boolean; onSuccess?: () => void }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
+  const [isCheckingNickname, setIsCheckingNickname] = useState(false)
+  const [showAddressEditor, setShowAddressEditor] = useState(false)
 
-  const { setAddress, setDetailAddress } = useSignupStore()
+  const { setAddress, setDetailAddress, address, detailAddress } = useSignupStore()
+  const { setNickname } = useAuthStore()
   const [profileEmail, setProfileEmail] = useState<string>('')
   const [profileName, setProfileName] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
@@ -85,6 +89,31 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
     register,
   } = methods
 
+  const onCheckNickname = async () => {
+    try {
+      const nickname = (methods.getValues('nickname') || '').trim()
+      if (!nickname) {
+        toast.error('닉네임을 입력해주세요.')
+        return
+      }
+      setIsCheckingNickname(true)
+      const res = await api.get('/members/nickname/check', { params: { nickname } })
+      const data = res?.data as unknown as { available?: boolean; exists?: boolean }
+      const available =
+        typeof data?.available === 'boolean' ? data.available : typeof data?.exists === 'boolean' ? !data.exists : true // 명확한 필드가 없으면 200 응답 기준으로 사용 가능 처리
+
+      if (available) {
+        toast.success('사용 가능한 닉네임입니다.')
+      } else {
+        toast.error('이미 사용 중인 닉네임입니다.')
+      }
+    } catch {
+      toast.error('닉네임 확인에 실패했습니다.')
+    } finally {
+      setIsCheckingNickname(false)
+    }
+  }
+
   useEffect(() => {
     let mounted = true
 
@@ -103,13 +132,14 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
         methods.reset({
           nickname: data.nickname ?? '',
           phone: data.phone ?? '',
-          location: data.location ?? '',
+          location: '',
         })
 
-        // AddressInput(store) 값 세팅
-        setAddress(data.location ?? '')
+        // 주소는 백엔드 값으로 초기 세팅 (수정 시 AddressInput 노출)
+        const loc = (data.location ?? '').trim()
+        setAddress(loc)
         setDetailAddress('')
-      } catch (e) {
+      } catch {
         toast.error('내 정보 조회에 실패했습니다.')
       } finally {
         if (mounted) setIsLoading(false)
@@ -126,9 +156,28 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
   const onSubmit = async (values: ProfileFormValues) => {
     setIsPending(true)
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
+      const location = [address, detailAddress].filter(Boolean).join(' ').trim()
+      if (!location) {
+        toast.error('주소를 입력해주세요.')
+        return
+      }
+
+      await api.patch('/mypage/profile', {
+        nickname: values.nickname,
+        phone: values.phone,
+        location,
+      })
+      // 전역 상태 업데이트 (헤더 닉네임 반영)
+      setNickname(values.nickname)
       toast.success('저장되었습니다.')
-      router.back()
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        router.back()
+        router.refresh()
+      }
+    } catch {
+      toast.error('저장에 실패했습니다.')
     } finally {
       setIsPending(false)
     }
@@ -157,13 +206,23 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
               <label htmlFor="nickname" className="mb-1 block text-sm font-medium text-gray-800">
                 닉네임
               </label>
-              <input
-                id="nickname"
-                type="text"
-                placeholder="예) dev master"
-                {...register('nickname')}
-                className={INPUT_CLASS}
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  id="nickname"
+                  type="text"
+                  placeholder="예) dev master"
+                  {...register('nickname')}
+                  className={INPUT_CLASS}
+                />
+                <button
+                  type="button"
+                  onClick={onCheckNickname}
+                  disabled={isCheckingNickname || isLoading}
+                  className="h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+                >
+                  {isCheckingNickname ? '확인 중...' : '인증'}
+                </button>
+              </div>
               {errors.nickname && <p className="mt-1 text-xs text-red-600">{errors.nickname.message}</p>}
             </div>
 
@@ -182,7 +241,22 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
             </div>
 
             <div>
-              <AddressInput />
+              {!showAddressEditor ? (
+                <div className="flex items-center gap-2">
+                  <div className={`${INPUT_CLASS} flex flex-1 items-center bg-gray-50`}>
+                    <span className="truncate">{address || '주소를 입력해주세요.'}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddressEditor(true)}
+                    className="h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+                  >
+                    수정
+                  </button>
+                </div>
+              ) : (
+                <AddressInput autoOpen variant="light" />
+              )}
             </div>
           </FieldGroup>
 
@@ -212,10 +286,10 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
 
   // 단독 페이지/컴포넌트로 렌더링될 때의 카드 UI
   return (
-    <div className="mx-auto w-full">
+    <div className="mx-auto w-full max-w-2xl">
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-8 py-6">
+        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-4 sm:px-8 sm:py-6">
           <h2 className="text-xl font-semibold text-gray-900">개인 정보 수정</h2>
 
           <button
@@ -229,7 +303,7 @@ export function PersonalInfoForm({ embedded = false }: { embedded?: boolean }) {
         </div>
 
         {/* Body */}
-        <div className="px-8 py-6">{formContent}</div>
+        <div className="px-4 py-4 sm:px-8 sm:py-6">{formContent}</div>
       </div>
     </div>
   )

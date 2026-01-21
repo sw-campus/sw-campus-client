@@ -3,7 +3,6 @@ import { toLocalTimeString, toLocalDateString } from '@/features/lecture/utils/i
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 
 export const mapLectureFormToCreateRequest = (values: LectureFormValues): LectureCreateRequest => {
-  console.log('Mapper received lectureImageFile:', values.lectureImageFile)
   // 파일명은 로깅/참조용으로 전송되며, 실제 파일은 FormData를 통해 서버로 전송되어 S3에 업로드됩니다.
   const lectureImageUrl = values.lectureImageFile?.name ?? null
 
@@ -23,6 +22,7 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     : undefined
 
   return {
+    orgId: values.orgId ?? undefined,
     lectureName: values.lectureName,
     days: values.days,
     startTime: toLocalTimeString(values.startTime),
@@ -49,8 +49,8 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     projectTeam: values.projectTeam?.trim() ? values.projectTeam.trim() : null,
     projectTool: values.projectTool?.trim() ? values.projectTool.trim() : null,
     projectMentor: values.projectMentor ?? null,
-    startAt: toLocalDateString(values.startAtDate),
-    endAt: toLocalDateString(values.endAtDate),
+    startAt: values.startAtDate ? toLocalDateString(values.startAtDate) : null,
+    endAt: values.endAtDate ? toLocalDateString(values.endAtDate) : null,
     deadline: values.deadlineDate ? toLocalDateString(values.deadlineDate) : null,
     totalDays: values.totalDays,
     totalTimes: values.totalTimes,
@@ -58,9 +58,10 @@ export const mapLectureFormToCreateRequest = (values: LectureFormValues): Lectur
     quals: values.quals?.length ? values.quals : undefined,
     teachers: values.teachers?.length
       ? values.teachers.map(t => ({
+          teacherId: t.teacherId ?? null,
           teacherName: t.teacherName,
           teacherDescription: t.teacherDescription ?? null,
-          teacherImageUrl: t.teacherImageFile?.name ?? null,
+          teacherImageUrl: t.teacherId ? null : (t.teacherImageFile?.name ?? null), // 기존 강사는 이미지 업로드 불필요
         }))
       : undefined,
     adds: values.adds?.length ? values.adds : undefined,

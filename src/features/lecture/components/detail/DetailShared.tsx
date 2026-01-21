@@ -61,13 +61,16 @@ export function StarRating({
   )
 }
 
-export function Section({ title, children }: { title: string; children: ReactNode }) {
+export function Section({ title, children, action }: { title: ReactNode; children: ReactNode; action?: ReactNode }) {
   return (
     <div className="space-y-4 pt-2">
-      <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900">
-        <span className="block h-4 w-1 rounded-full bg-orange-400" />
-        {title}
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900">
+          <span className="block h-4 w-1 rounded-full bg-orange-400" />
+          {title}
+        </h3>
+        {action ? <div className="pl-3">{action}</div> : null}
+      </div>
       <div className="pl-3">{children}</div>
     </div>
   )
@@ -75,7 +78,7 @@ export function Section({ title, children }: { title: string; children: ReactNod
 
 export function InfoBox({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-gray-50/50 p-6">
+    <div className="rounded-2xl border border-gray-200 bg-gray-50/50 p-6 shadow-sm">
       <div className="space-y-3">{children}</div>
     </div>
   )
@@ -83,9 +86,9 @@ export function InfoBox({ children }: { children: ReactNode }) {
 
 export function InfoRow({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="flex items-start gap-6">
-      <span className="w-24 shrink-0 text-xs font-medium whitespace-nowrap text-gray-500">{label}</span>
-      <span className="text-sm text-gray-900">{children}</span>
+    <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-6">
+      <span className="text-sm font-medium text-gray-600 sm:w-24 sm:shrink-0 sm:text-xs sm:text-gray-800">{label}</span>
+      <span className="text-sm font-semibold text-gray-900">{children}</span>
     </div>
   )
 }
@@ -108,7 +111,7 @@ export function RequirementItem({
 }) {
   const isRequired = type === 'REQUIRED'
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-white/60 px-4 py-3 backdrop-blur transition-colors hover:bg-white/80">
+    <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-colors hover:bg-gray-50">
       <Badge
         className={`shrink-0 rounded-md border px-2.5 py-1 text-xs font-bold shadow-sm ${
           isRequired
@@ -126,7 +129,7 @@ export function RequirementItem({
 
 export function InlineBadge({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex h-9 items-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 align-middle text-base font-bold text-gray-900 shadow-sm">
+    <span className="inline-flex h-9 items-center rounded-lg border border-gray-400 bg-white px-3 py-1.5 align-middle text-base font-bold text-gray-900 shadow-sm">
       {children}
     </span>
   )

@@ -8,20 +8,35 @@ import { processApplicationSteps } from '@/features/lecture/utils/processApplica
 import { type OrganizationDetail } from '@/features/organization/types/organization.type'
 
 import { Section, InfoBox, InfoRow, RequirementItem, InlineBadge, formatDateDot, formatKRW } from './DetailShared'
+import PhotoSlider from './PhotoSlider'
 
 interface Props {
   lecture: LectureDetail
   org?: OrganizationDetail
   displaySummary: string
   isLoading: boolean
+  isOrgLoading: boolean
   isAiLoading: boolean
+  isAiSummary: boolean
 }
 
-export default function LectureOverview({ lecture, org, displaySummary, isLoading, isAiLoading }: Props) {
+export default function LectureOverview({ lecture, org, displaySummary, isLoading, isOrgLoading, isAiLoading, isAiSummary }: Props) {
   return (
     <div className="space-y-12">
       {/* 프로그램 요약 */}
-      <Section title="프로그램 요약">
+      <Section
+        title={
+          <span className="flex items-center gap-2">
+            프로그램 요약
+            {isAiSummary && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-2.5 py-0.5 text-xs font-medium text-white shadow-sm">
+                <span>✨</span>
+                AI 요약
+              </span>
+            )}
+          </span>
+        }
+      >
         {isLoading ? (
           <div className="text-muted-foreground py-4 text-center">기본 정보 로딩 중...</div>
         ) : isAiLoading ? (
@@ -30,7 +45,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
             <span>AI가 강의를 분석하여 요약하고 있습니다...</span>
           </div>
         ) : (
-          <div className="text-lg leading-loose font-medium text-gray-900">
+          <div className="text-lg leading-loose font-medium text-gray-800">
             {displaySummary
               .split('\n')
               .filter(line => line.trim())
@@ -53,32 +68,44 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
       </Section>
 
       {/* 교육기관 정보 */}
-      {org && (
+      {(org || isOrgLoading) && (
         <Section title="교육기관 정보">
-          <div className="flex flex-col gap-5 rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:flex-row sm:items-center">
-            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-white">
-              {org.logoUrl ? (
-                <Image src={org.logoUrl} alt={org.name} fill className="object-contain p-1" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gray-50 text-xs text-gray-400">
-                  Logo
+          {isOrgLoading ? (
+            <div className="flex animate-pulse flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:gap-5 sm:p-6">
+              <div className="h-14 w-14 shrink-0 rounded-full bg-gray-200 sm:h-16 sm:w-16" />
+              <div className="flex-1 space-y-2">
+                <div className="h-5 w-32 rounded bg-gray-200" />
+                <div className="h-4 w-48 rounded bg-gray-200" />
+              </div>
+            </div>
+          ) : org ? (
+            <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:gap-5 sm:p-6">
+              <div className="flex items-center gap-4 sm:contents">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-white sm:h-16 sm:w-16">
+                  {org.logoUrl ? (
+                    <Image src={org.logoUrl} alt={org.name} fill sizes="64px" className="object-contain p-1" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gray-50 text-xs text-gray-400">
+                      Logo
+                    </div>
+                  )}
                 </div>
-              )}
+                <div className="flex-1 sm:flex-1">
+                  <h4 className="text-base font-bold text-gray-900 sm:text-lg">{org.name}</h4>
+                  <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-gray-600 sm:mt-1 sm:text-sm">
+                    {org.description || '기관 소개가 없습니다.'}
+                  </p>
+                </div>
+              </div>
+              <Button
+                asChild
+                variant="outline"
+                className="w-full shrink-0 rounded-lg border-gray-200 text-gray-700 hover:bg-gray-50 sm:w-auto"
+              >
+                <Link href={`/organizations/${org.id}`}>자세히 보기</Link>
+              </Button>
             </div>
-            <div className="flex-1">
-              <h4 className="text-lg font-bold text-gray-900">{org.name}</h4>
-              <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-gray-600">
-                {org.description || '기관 소개가 없습니다.'}
-              </p>
-            </div>
-            <Button
-              asChild
-              variant="outline"
-              className="shrink-0 rounded-lg border-gray-200 text-gray-700 hover:bg-gray-50"
-            >
-              <Link href={`/organizations/${org.id}`}>자세히 보기</Link>
-            </Button>
-          </div>
+          ) : null}
         </Section>
       )}
 
@@ -105,7 +132,7 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
       <Section title="수강료 & 지원금">
         <InfoBox>
           {/* 내배카 */}
-          <InfoRow label="내배카">
+          <InfoRow label="내배카 여부">
             {lecture.recruitType === 'CARD_REQUIRED' ? (
               <span className="text-primary font-bold">필요함 💳</span>
             ) : (
@@ -160,13 +187,30 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
 
           return (
             <>
-              <div className="scrollbar-hide overflow-x-auto pb-4">
+              {/* 모바일: 수직 레이아웃 */}
+              <div className="flex flex-col gap-3 sm:hidden">
+                {applicationSteps.length > 0 ? (
+                  applicationSteps.map((step, idx) => (
+                    <div key={idx} className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm ring-1 ring-black/5">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-500">
+                        {idx + 1}
+                      </div>
+                      <span className="text-sm font-bold text-gray-900">{step}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-muted-foreground text-sm">등록된 지원 절차가 없습니다.</div>
+                )}
+              </div>
+
+              {/* 태블릿/데스크톱: 가로 스크롤 레이아웃 */}
+              <div className="scrollbar-hide hidden overflow-x-auto pb-4 sm:block">
                 <div className="flex min-w-max items-center gap-4">
                   {applicationSteps.length > 0 ? (
                     applicationSteps.map((step, idx) => (
                       <div key={idx} className="flex items-center">
                         <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:ring-orange-100">
-                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-500">
                             {idx + 1}
                           </div>
                           <span className="font-bold text-gray-900">{step}</span>
@@ -201,11 +245,11 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
 
               {/* 합격 후 사전과제 안내 */}
               {hasPreTask && (
-                <div className="mt-4 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-5 py-4">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
+                <div className="mt-3 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 sm:mt-4 sm:px-5 sm:py-4">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
                     ✓
                   </div>
-                  <span className="font-bold text-blue-700">합격 후: 사전과제 진행</span>
+                  <span className="text-sm font-bold text-blue-700 sm:text-base">합격 후: 사전과제 진행</span>
                 </div>
               )}
             </>
@@ -213,19 +257,13 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
         })()}
       </Section>
 
-      {/* 학습공간 사진 */}
+      {/* 학습공간 사진 - 슬라이드 */}
       <Section title="학습 공간 사진">
-        <div className="grid grid-cols-4 gap-3">
-          {lecture.photos.slice(0, 4).map((src, idx) => (
-            <div key={idx} className="border-border/50 relative aspect-4/3 overflow-hidden rounded-xl border bg-white">
-              {src ? (
-                <Image src={src} alt={`학습공간 ${idx + 1}`} fill className="object-cover" />
-              ) : (
-                <div className="text-muted-foreground flex h-full items-center justify-center text-xs">이미지</div>
-              )}
-            </div>
-          ))}
-        </div>
+        {lecture.photos.filter(src => src).length > 0 ? (
+          <PhotoSlider photos={lecture.photos.filter(src => src)} />
+        ) : (
+          <div className="text-muted-foreground py-8 text-center text-sm">등록된 학습 공간 사진이 없습니다.</div>
+        )}
       </Section>
 
       {/* 추가 제공 항목 */}

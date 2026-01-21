@@ -62,7 +62,7 @@ export const MOCK_ORG_DETAILS: OrganizationDetail[] = [
     name: '멋쟁이사자처럼',
     description:
       '멋쟁이사자처럼은 대한민국 최대 규모의 IT 창업 동아리이자 교육 기관입니다. 2013년에 설립되어 전국 대학교에서 운영되고 있으며, 비전공자도 쉽게 프로그래밍을 배울 수 있도록 체계적인 커리큘럼을 제공합니다.',
-    certificateUrl: null,
+    certificateKey: null,
     govAuth: 'K-Digital Training',
     facilityImageUrl: `${FACILITY_IMAGE}?random=1`,
     facilityImageUrl2: `${FACILITY_IMAGE}?random=2`,
@@ -76,7 +76,7 @@ export const MOCK_ORG_DETAILS: OrganizationDetail[] = [
     name: '원티드랩',
     description:
       "원티드랩은 AI 기반 채용 매칭 플랫폼 '원티드'를 운영하는 HR 테크 기업입니다. 채용 시장에서 쌓은 경험을 바탕으로 실무 중심의 부트캠프 프로그램을 제공하고 있습니다.",
-    certificateUrl: null,
+    certificateKey: null,
     govAuth: 'K-Digital Training',
     facilityImageUrl: `${FACILITY_IMAGE}?random=5`,
     facilityImageUrl2: `${FACILITY_IMAGE}?random=6`,
@@ -90,7 +90,7 @@ export const MOCK_ORG_DETAILS: OrganizationDetail[] = [
     name: '코드스테이츠',
     description:
       '코드스테이츠는 소프트웨어 엔지니어링, 데이터 사이언스, 프로덕트 매니지먼트 등 IT 분야의 실무 중심 교육을 제공하는 부트캠프입니다.',
-    certificateUrl: null,
+    certificateKey: null,
     govAuth: 'K-Digital Training',
     facilityImageUrl: `${FACILITY_IMAGE}?random=9`,
     facilityImageUrl2: `${FACILITY_IMAGE}?random=10`,
@@ -104,7 +104,7 @@ export const MOCK_ORG_DETAILS: OrganizationDetail[] = [
     name: '멀티캠퍼스',
     description:
       '멀티캠퍼스는 삼성SDS의 교육 사업 부문에서 분사한 IT 교육 전문 기관입니다. 30년 이상의 역사를 가진 국내 최고의 IT 교육 기관입니다.',
-    certificateUrl: null,
+    certificateKey: null,
     govAuth: null,
     facilityImageUrl: `${FACILITY_IMAGE}?random=13`,
     facilityImageUrl2: `${FACILITY_IMAGE}?random=14`,
@@ -118,7 +118,7 @@ export const MOCK_ORG_DETAILS: OrganizationDetail[] = [
     name: '패스트캠퍼스',
     description:
       "패스트캠퍼스는 '세상의 모든 직장인을 위한 실무 교육'을 슬로건으로 IT, 비즈니스, 디자인 등 다양한 분야의 온오프라인 강의를 제공합니다.",
-    certificateUrl: null,
+    certificateKey: null,
     govAuth: 'K-Digital Credit',
     facilityImageUrl: `${FACILITY_IMAGE}?random=17`,
     facilityImageUrl2: `${FACILITY_IMAGE}?random=18`,
@@ -132,7 +132,7 @@ export const MOCK_ORG_DETAILS: OrganizationDetail[] = [
     name: '한국경제신문',
     description:
       '한국경제신문은 1964년 창간된 대한민국 대표 경제 전문 일간지입니다. 디지털 전환 시대에 발맞춰 다양한 IT 교육 프로그램을 운영합니다.',
-    certificateUrl: null,
+    certificateKey: null,
     govAuth: 'K-Digital Training',
     facilityImageUrl: `${FACILITY_IMAGE}?random=21`,
     facilityImageUrl2: `${FACILITY_IMAGE}?random=22`,

@@ -12,9 +12,8 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import { ImageUploadInput } from '@/components/ui/image-upload-input'
-import AddressInput from '@/features/auth/components/AddressInput'
+import { APPROVAL_STATUS, type ApprovalStatus } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
-import { useSignupStore } from '@/store/signupStore'
 
 type MyOrganizationResponse = {
   organizationId: number
@@ -23,10 +22,10 @@ type MyOrganizationResponse = {
   representativeName: string
   phone: string
   location: string
-  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | string
-  certificateUrl: string
+  approvalStatus: ApprovalStatus | string
+  certificateKey: string
   govAuth: string
-  facilityImageUrl1: string
+  facilityImageUrl: string
   facilityImageUrl2: string
   facilityImageUrl3: string
   facilityImageUrl4: string
@@ -37,13 +36,12 @@ type MyOrganizationResponse = {
 const orgInfoSchema = z.object({
   organizationName: z.string().min(1, '기관명을 입력해주세요.'),
   representativeName: z.string().min(1, '대표자명을 입력해주세요.'),
-  phone: z.string().min(1, '연락처를 입력해주세요.'),
   description: z.string().optional(),
   homepage: z.string().optional(),
   logoUrl: z.string().optional(),
-  certificateUrl: z.string().optional(),
+  certificateKey: z.string().optional(),
   govAuth: z.string().optional(),
-  facilityImageUrl1: z.string().optional(),
+  facilityImageUrl: z.string().optional(),
   facilityImageUrl2: z.string().optional(),
   facilityImageUrl3: z.string().optional(),
   facilityImageUrl4: z.string().optional(),
@@ -51,46 +49,18 @@ const orgInfoSchema = z.object({
 })
 
 type OrgInfoFormValues = z.infer<typeof orgInfoSchema>
-
-// ✅ PersonalForm과 동일한 인풋 톤
 const INPUT_CLASS =
   'h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
 
 const TEXTAREA_CLASS =
   'w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
 
-// ✅ AddressInput(daum.Postcode)이 동작하려면 postcode 스크립트가 필요합니다.
-const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
-
-const loadDaumPostcodeScript = () => {
-  if (typeof window === 'undefined') return
-
-  const w = window as unknown as { daum?: { Postcode?: unknown } }
-  // 이미 로드되어 있으면 종료
-  if (w.daum?.Postcode) return
-
-  // 이미 스크립트 태그가 있으면 종료
-  if (document.getElementById(DAUM_POSTCODE_SCRIPT_ID)) return
-
-  const script = document.createElement('script')
-  script.id = DAUM_POSTCODE_SCRIPT_ID
-  script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
-  script.async = true
-  document.body.appendChild(script)
-}
-
 export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter()
 
   const [isPending, setIsPending] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-
-  // ✅ 수정 불가 정보는 텍스트로 노출
-  const [organizationId, setOrganizationId] = useState<number | null>(null)
   const [approvalStatus, setApprovalStatus] = useState<string>('')
-
-  // ✅ AddressInput(store)
-  const { address, detailAddress, setAddress, setDetailAddress } = useSignupStore()
 
   const methods = useForm<OrgInfoFormValues>({
     resolver: zodResolver(orgInfoSchema),
@@ -98,13 +68,12 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     defaultValues: {
       organizationName: '',
       representativeName: '',
-      phone: '',
       description: '',
       homepage: '',
       logoUrl: '',
-      certificateUrl: '',
+      certificateKey: '',
       govAuth: '',
-      facilityImageUrl1: '',
+      facilityImageUrl: '',
       facilityImageUrl2: '',
       facilityImageUrl3: '',
       facilityImageUrl4: '',
@@ -128,8 +97,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     let mounted = true
 
     const load = async () => {
-      loadDaumPostcodeScript()
-
       setIsLoading(true)
       try {
         const res = await api.get<MyOrganizationResponse>('/mypage/organization')
@@ -137,28 +104,22 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
 
         const data = res.data
 
-        setOrganizationId(data.organizationId ?? null)
         setApprovalStatus(data.approvalStatus ?? '')
 
         methods.reset({
           organizationName: data.organizationName ?? '',
           representativeName: data.representativeName ?? '',
-          phone: data.phone ?? '',
           description: data.description ?? '',
           homepage: data.homepage ?? '',
           logoUrl: data.logoUrl ?? '',
-          certificateUrl: data.certificateUrl ?? '',
+          certificateKey: data.certificateKey ?? '',
           govAuth: data.govAuth ?? '',
-          facilityImageUrl1: data.facilityImageUrl1 ?? '',
+          facilityImageUrl: data.facilityImageUrl ?? '',
           facilityImageUrl2: data.facilityImageUrl2 ?? '',
           facilityImageUrl3: data.facilityImageUrl3 ?? '',
           facilityImageUrl4: data.facilityImageUrl4 ?? '',
-          location: data.location ?? '',
+          location: '',
         })
-
-        // AddressInput(store) 값 세팅
-        setAddress(data.location ?? '')
-        setDetailAddress('')
       } catch {
         toast.error('기관 정보 조회에 실패했습니다.')
       } finally {
@@ -171,19 +132,16 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
     return () => {
       mounted = false
     }
-  }, [methods, setAddress, setDetailAddress])
+  }, [methods])
 
   const onSubmit = async (_values: OrgInfoFormValues) => {
     setIsPending(true)
     try {
-      // AddressInput은 store 기반이므로 여기서 location 조합
-      const _nextLocation = detailAddress?.trim() ? `${address ?? ''} ${detailAddress}`.trim() : (address ?? '').trim()
       const fd = new FormData()
       // 텍스트 필드 (Swagger 스펙 기반)
       fd.append('organizationName', methods.getValues('organizationName') ?? '')
       fd.append('description', methods.getValues('description') ?? '')
-      fd.append('phone', methods.getValues('phone') ?? '')
-      fd.append('location', _nextLocation)
+
       fd.append('homepage', methods.getValues('homepage') ?? '')
       fd.append('govAuth', methods.getValues('govAuth') ?? '')
 
@@ -199,19 +157,17 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       toast.success('저장되었습니다.')
-      router.back()
+      router.push('/')
     } finally {
       setIsPending(false)
     }
   }
 
-  // 상태 표시용 UI 설정 (색상/라벨)
   const getApprovalStatusUI = (status: string) => {
-    const s = (status || '').toLowerCase()
-    if (s === 'approved') return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
-    if (s === 'rejected') return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
-    // pending 또는 기타 상태는 보류로 표시
-    return { label: '승인 대기', dot: 'bg-amber-500', text: 'text-amber-700' }
+    const s = (status || '').toUpperCase()
+    if (s === APPROVAL_STATUS.APPROVED) return { label: '승인됨', dot: 'bg-green-500', text: 'text-green-700' }
+    if (s === APPROVAL_STATUS.REJECTED) return { label: '반려됨', dot: 'bg-red-500', text: 'text-red-700' }
+    return { label: '대기중', dot: 'bg-amber-500', text: 'text-amber-700' }
   }
 
   const formContent = (
@@ -219,14 +175,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <FieldSet>
           <FieldGroup className="grid grid-cols-1 gap-6">
-            {/* 수정 불가: 기관 ID */}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-800">기관 ID</label>
-              <div className={`${INPUT_CLASS} flex items-center bg-gray-50`}>
-                <span className="truncate">{organizationId ?? '-'}</span>
-              </div>
-            </div>
-
             {/* 수정 불가: 승인 상태 */}
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-800">승인 상태</label>
@@ -260,36 +208,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
             </div>
 
             <div>
-              <label htmlFor="representativeName" className="mb-1 block text-sm font-medium text-gray-800">
-                대표자명
-              </label>
-              <input
-                id="representativeName"
-                type="text"
-                placeholder="예) 홍길동"
-                {...register('representativeName')}
-                className={INPUT_CLASS}
-              />
-              {errors.representativeName && (
-                <p className="mt-1 text-xs text-red-600">{errors.representativeName.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-800">
-                연락처
-              </label>
-              <input
-                id="phone"
-                type="text"
-                placeholder="예) 010-1234-5678"
-                {...register('phone')}
-                className={INPUT_CLASS}
-              />
-              {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone.message}</p>}
-            </div>
-
-            <div>
               <label htmlFor="description" className="mb-1 block text-sm font-medium text-gray-800">
                 기관 소개
               </label>
@@ -300,11 +218,6 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                 {...register('description')}
                 className={TEXTAREA_CLASS}
               />
-            </div>
-
-            {/* 주소(검색 버튼 포함) */}
-            <div>
-              <AddressInput />
             </div>
 
             <div>
@@ -340,13 +253,26 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                   <label className="mb-1 block text-sm font-medium text-gray-800">재직증명서</label>
                   <Controller
                     control={methods.control}
-                    name="certificateUrl"
+                    name="certificateKey"
                     render={({ field }) => (
-                      <ImageUploadInput
-                        currentUrl={field.value}
-                        file={certificateFile}
-                        onFileChange={setCertificateFile}
-                      />
+                      <div className="space-y-2">
+                        {/* 기존 재직증명서 등록 여부 표시 */}
+                        {field.value && !certificateFile && (
+                          <div className="flex items-center gap-2 rounded-md border border-green-200 bg-green-50 px-3 py-2">
+                            <span className="text-green-600">✅</span>
+                            <span className="text-sm font-medium text-green-700">재직증명서 등록됨</span>
+                          </div>
+                        )}
+                        {/* 새 파일 업로드 */}
+                        <ImageUploadInput
+                          currentUrl={undefined}
+                          file={certificateFile}
+                          onFileChange={setCertificateFile}
+                        />
+                        {field.value && !certificateFile && (
+                          <p className="text-xs text-gray-500">새 파일을 업로드하면 기존 파일이 대체됩니다.</p>
+                        )}
+                      </div>
                     )}
                   />
                 </div>
@@ -364,11 +290,17 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
                   />
                 </div>
 
+                {/* 시설 이미지 안내 */}
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                  <p className="text-sm font-medium text-amber-800">📷 시설 사진 권장 비율</p>
+                  <p className="mt-1 text-xs text-amber-700">16:9 비율 권장 (예: 1920x1080px, 1280x720px)</p>
+                </div>
+
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-800">업체시설1</label>
                   <Controller
                     control={methods.control}
-                    name="facilityImageUrl1"
+                    name="facilityImageUrl"
                     render={({ field }) => (
                       <ImageUploadInput currentUrl={field.value} file={facilityFile1} onFileChange={setFacilityFile1} />
                     )}

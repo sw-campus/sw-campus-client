@@ -4,12 +4,14 @@ import AddressInput from '@/features/auth/components/AddressInput'
 import CertificateUploadSection from '@/features/auth/components/CertificateUploadSection'
 import EmailAuthInput from '@/features/auth/components/EmailAuthInput'
 import LabeledInput from '@/features/auth/components/LabeledInput'
+import NicknameInput from '@/features/auth/components/NickNameInput'
+import OrganizationSearchSelect from '@/features/auth/components/OrganizationSearchSelect'
 import PasswordFields from '@/features/auth/components/PasswordFields'
 import PhoneAuthInput from '@/features/auth/components/PhoneAuthInput'
 import { useSignupOrganizationForm } from '@/features/auth/hooks/useSignupOrganizationForm'
 
 const INPUT_BASE_CLASS =
-  'h-9 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white'
+  'h-10 rounded-md border border-gray-200 bg-gray-50 px-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100'
 
 export default function SignupOrganizationFormView() {
   const {
@@ -22,9 +24,13 @@ export default function SignupOrganizationFormView() {
     name,
     nickname,
     phone,
+    organizationId,
     organizationName,
     certificateImage,
     isSubmitting,
+
+    isNicknameChecking,
+    nicknameCheckState,
 
     setEmail,
     setPassword,
@@ -32,10 +38,12 @@ export default function SignupOrganizationFormView() {
     setName,
     setNickname,
     setPhone,
-    setOrganizationName,
+    handleSelectExistingOrg,
+    handleInputNewOrg,
 
     handleSendEmailAuth,
     handleCheckPasswordMatch,
+    handleCheckNickname,
     handleFileChange,
     handleSubmit,
     resetPasswordValidation,
@@ -45,7 +53,7 @@ export default function SignupOrganizationFormView() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-xl rounded-xl bg-white/90 p-8 shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
+      className="w-full max-w-xl rounded-2xl border border-gray-200 bg-white/90 p-5 text-gray-900 shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-8"
     >
       {/* 이메일 + 인증 */}
       <EmailAuthInput
@@ -76,35 +84,31 @@ export default function SignupOrganizationFormView() {
       <LabeledInput
         label="이름"
         type="text"
-        placeholder="name"
+        placeholder="이름을 입력하세요"
         value={name}
         onChangeValue={setName}
         className={INPUT_BASE_CLASS}
       />
 
       {/* 닉네임 */}
-      <LabeledInput
-        label="닉네임"
-        type="text"
-        placeholder="nickname"
+      <NicknameInput
         value={nickname}
-        onChangeValue={setNickname}
-        className={INPUT_BASE_CLASS}
+        onChange={setNickname}
+        onClickCheck={handleCheckNickname}
+        isChecking={isNicknameChecking}
+        checkState={nicknameCheckState}
       />
 
-      {/* 기관명 */}
-      <LabeledInput
-        label="기관명"
-        type="text"
-        name="organizationName"
-        placeholder="기관명을 입력해 주세요"
-        value={organizationName}
-        onChangeValue={setOrganizationName}
-        className={INPUT_BASE_CLASS}
+      {/* 기관 선택/입력 */}
+      <OrganizationSearchSelect
+        organizationId={organizationId}
+        organizationName={organizationName}
+        onSelectExisting={handleSelectExistingOrg}
+        onInputNew={handleInputNewOrg}
       />
 
       {/* 전화번호 + 인증 (기존 UI를 재사용 컴포넌트로 교체) */}
-      <PhoneAuthInput value={phone} onChange={setPhone} onClickAuth={() => {}} />
+      <PhoneAuthInput value={phone} onChange={setPhone} />
 
       {/* 주소 */}
       <AddressInput />
@@ -120,7 +124,7 @@ export default function SignupOrganizationFormView() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-6 h-9 w-full rounded-md bg-neutral-900 font-semibold text-white disabled:opacity-60"
+        className="mt-6 h-10 w-full rounded-md bg-orange-500 font-semibold text-white transition hover:bg-orange-600 disabled:opacity-60"
       >
         {isSubmitting ? '가입 처리중...' : '회원가입'}
       </button>

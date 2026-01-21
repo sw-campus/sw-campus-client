@@ -12,7 +12,7 @@ export function ImageUploadInput({
   onFileChange,
   buttonText = '업로드',
   accept = 'image/*',
-  previewSize = 40,
+  previewSize = 80,
   disabled,
 }: {
   currentUrl?: string
@@ -29,7 +29,9 @@ export function ImageUploadInput({
   const isImageUrl = (url: string | undefined | null) => {
     if (!url) return false
     if (url.startsWith('blob:')) return true
-    return /(\.png|\.jpg|\.jpeg|\.gif|\.webp|\.bmp|\.svg)$/i.test(url)
+    // S3 등 쿼리 파라미터가 붙은 URL에서 확장자 체크를 위해 쿼리 제거
+    const urlWithoutQuery = url.split('?')[0]
+    return /(\.png|\.jpg|\.jpeg|\.gif|\.webp|\.bmp|\.svg)$/i.test(urlWithoutQuery)
   }
 
   return (
@@ -55,7 +57,8 @@ export function ImageUploadInput({
             alt="미리보기"
             width={previewSize}
             height={previewSize}
-            className="h-10 w-10 rounded border object-cover"
+            className="rounded border object-cover"
+            style={{ width: previewSize, height: previewSize }}
             unoptimized
           />
         ) : currentUrl && isImageUrl(currentUrl) ? (
@@ -64,11 +67,12 @@ export function ImageUploadInput({
             alt="미리보기"
             width={previewSize}
             height={previewSize}
-            className="h-10 w-10 rounded border object-cover"
+            className="rounded border object-cover"
+            style={{ width: previewSize, height: previewSize }}
             unoptimized
           />
         ) : (
-          <div className="h-10 w-10 rounded border bg-gray-50" />
+          <div className="rounded border bg-gray-50" style={{ width: previewSize, height: previewSize }} />
         )}
         <span className="text-muted-foreground text-sm">{hasPreview ? '미리보기' : '선택된 파일 없음'}</span>
       </div>

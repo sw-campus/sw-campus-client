@@ -5,13 +5,12 @@ import { INPUT_BASE_CLASS } from '@/features/auth/inputBaseClass'
 type PhoneAuthInputProps = {
   value: string | null
   onChange: (value: string | null) => void
-  onClickAuth: () => void
 }
 
-export default function PhoneAuthInput({ value, onChange, onClickAuth }: PhoneAuthInputProps) {
+export default function PhoneAuthInput({ value, onChange }: PhoneAuthInputProps) {
   return (
     <div className="mb-4">
-      <label className="mb-1 block text-neutral-700" htmlFor="signup-phone">
+      <label className="mb-1 block text-gray-700" htmlFor="signup-phone">
         전화번호
       </label>
 
@@ -19,18 +18,16 @@ export default function PhoneAuthInput({ value, onChange, onClickAuth }: PhoneAu
         <input
           id="signup-phone"
           type="tel"
-          placeholder="phone"
+          placeholder="전화번호를 입력하세요"
           className={`${INPUT_BASE_CLASS} w-full flex-1`}
           value={value ?? ''}
-          onChange={e => onChange(e.target.value || null)}
+          maxLength={11}
+          onChange={e => {
+            const val = e.target.value.replace(/[^0-9]/g, '')
+            if (val.length > 11) return
+            onChange(val || null)
+          }}
         />
-        <button
-          type="button"
-          onClick={onClickAuth}
-          className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white"
-        >
-          인증
-        </button>
       </div>
     </div>
   )

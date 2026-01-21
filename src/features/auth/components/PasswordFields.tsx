@@ -1,7 +1,6 @@
 import React from 'react'
 
-const INPUT_BASE_CLASS =
-  'h-9 rounded-md border border-neutral-300 bg-neutral-100 px-3 outline-none focus:border-neutral-500 focus:bg-white'
+import { INPUT_BASE_CLASS } from '@/features/auth/inputBaseClass'
 
 interface PasswordFieldsProps {
   // 현재 비밀번호 값
@@ -36,10 +35,10 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
     <>
       {/* 비밀번호 */}
       <div className="mb-4">
-        <label className="mb-1 block text-neutral-700">비밀번호</label>
+        <label className="mb-1 block text-gray-700">비밀번호</label>
         <input
           type="password"
-          placeholder="password"
+          placeholder="비밀번호를 입력하세요"
           className={`${INPUT_BASE_CLASS} w-full`}
           value={password}
           onChange={e => onChangePassword(e.target.value)}
@@ -48,11 +47,11 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
 
       {/* 비밀번호 확인 + 확인 버튼 */}
       <div className="mb-4">
-        <label className="mb-1 block text-neutral-700">비밀번호 확인</label>
+        <label className="mb-1 block text-gray-700">비밀번호 확인</label>
         <div className="flex gap-2">
           <input
             type="password"
-            placeholder="password"
+            placeholder="비밀번호를 다시 입력하세요"
             className={`${INPUT_BASE_CLASS} w-full flex-1`}
             value={passwordConfirm}
             onChange={e => onChangePasswordConfirm(e.target.value)}
@@ -60,14 +59,14 @@ const PasswordFields: React.FC<PasswordFieldsProps> = ({
           <button
             type="button"
             onClick={onCheckPasswordMatch}
-            className="h-9 rounded-md bg-neutral-900 px-4 font-semibold text-white"
+            className="h-10 rounded-md bg-orange-500 px-4 font-semibold text-white transition hover:bg-orange-600"
           >
             확인
           </button>
         </div>
 
-        {isPasswordMatched === true && <p className="mt-1 text-xs text-green-600">비밀번호가 일치합니다.</p>}
-        {isPasswordMatched === false && <p className="mt-1 text-xs text-red-600">비밀번호가 일치하지 않습니다.</p>}
+        {isPasswordMatched === true && <p className="mt-1 text-xs text-green-400">비밀번호가 일치합니다.</p>}
+        {isPasswordMatched === false && <p className="mt-1 text-xs text-red-400">비밀번호가 일치하지 않습니다.</p>}
       </div>
     </>
   )

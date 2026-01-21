@@ -1,13 +1,24 @@
 import type { Metadata, Viewport } from 'next'
 
+import Script from 'next/script'
+
+import DynamicBackground from '@/components/common/DynamicBackground'
+import KakaoChannelButton from '@/components/common/KakaoChannelButton'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
 
 import './globals.css'
 
+const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID
+
 export const metadata: Metadata = {
   title: '소프트웨어캠퍼스',
   description: '소프트웨어캠퍼스',
+  icons: {
+    icon: '/icons/icon.png',
+    shortcut: '/icons/favicon.ico',
+    apple: '/icons/apple-icon.png',
+  },
 }
 
 export const viewport: Viewport = {
@@ -24,12 +35,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      {/* Google Analytics */}
+      {GA_TRACKING_ID && (
+        <>
+          <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} strategy="afterInteractive" />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA_TRACKING_ID}', {
+              cookie_domain: window.location.hostname === 'localhost' ? 'none' : 'auto',
+              });
+            `}
+          </Script>
+        </>
+      )}
       <body className="relative flex min-h-screen flex-col">
-        <div className="pointer-events-none fixed inset-0 -z-20 bg-[url('/images/bg.jpg')] bg-cover bg-top bg-no-repeat" />
-        <div className="pointer-events-none fixed inset-0 -z-10 bg-black/40" />
+        <DynamicBackground />
         <QueryClientProviderWrapper>
           {children}
           <Toaster richColors closeButton position="bottom-center" />
+          <KakaoChannelButton />
         </QueryClientProviderWrapper>
       </body>
     </html>

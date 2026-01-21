@@ -2,6 +2,8 @@ import { z } from 'zod'
 
 import { api } from '@/lib/axios'
 
+import type { Provider } from './hooks/useOAuthUrls'
+
 interface OAuthLoginResponse {
   name?: string
   nickname?: string
@@ -17,9 +19,9 @@ export const checkEmailStatus = async (email: string) => {
   return res.data
 }
 
-// 이메일 인증 메일 보내기
+// 이메일 인증 메일 보내기 (타임아웃 30초 - 이메일 발송이 오래 걸릴 수 있음)
 export const sendEmailAuth = async (email: string, signupType: 'personal' | 'organization' = 'personal') => {
-  const res = await api.post('/auth/email/send', { email, signupType })
+  const res = await api.post('/auth/email/send', { email, signupType }, { timeout: 30_000 })
   return res.data
 }
 
@@ -27,6 +29,14 @@ export const sendEmailAuth = async (email: string, signupType: 'personal' | 'org
 export const getVerifiedEmail = async () => {
   const res = await api.get('/auth/email/verified')
   return res.data
+}
+
+// 닉네임 중복 검사
+export const checkNicknameAvailability = async (nickname: string) => {
+  const res = await api.get('/members/nickname/check', {
+    params: { nickname },
+  })
+  return res.data as { available: boolean }
 }
 
 // 개인 회원가입
@@ -48,8 +58,9 @@ export const signupOrganization = async (payload: {
   password: string
   name: string
   nickname: string
-  phone: string
-  location: string
+  phone: string | null
+  location: string | null
+  organizationId: number | null
   organizationName: string
   certificateImage: File
 }) => {
@@ -62,8 +73,12 @@ export const signupOrganization = async (payload: {
   formData.append('nickname', payload.nickname)
 
   // 기관 회원 필수/선택 필드
-  if (payload.phone) formData.append('phone', payload.phone)
-  if (payload.location) formData.append('location', payload.location)
+  // 백엔드 스펙: phone/location은 필수
+  formData.append('phone', (payload.phone ?? '').toString())
+  formData.append('location', (payload.location ?? '').toString())
+  if (payload.organizationId) {
+    formData.append('organizationId', payload.organizationId.toString())
+  }
   formData.append('organizationName', payload.organizationName)
 
   // 재직증명서 (필수)
@@ -86,6 +101,12 @@ export const login = async (payload: { email: string; password: string }) => {
   return res.data
 }
 
+// 임시 비밀번호 발급 요청
+export const requestTemporaryPassword = async (payload: { name: string; phone: string; email: string }) => {
+  const res = await api.post('/auth/password/temporary', payload)
+  return res.data
+}
+
 // 로그아웃
 export const logout = async () => {
   const res = await api.post(
@@ -104,6 +125,9 @@ const baseSignupSchema = z.object({
   password: z
     .string()
     .min(8, '비밀번호는 8자 이상이어야 합니다.')
+    .regex(/[A-Z]/, '비밀번호에 대문자가 1개 이상 포함되어야 합니다.')
+    .regex(/[a-z]/, '비밀번호에 소문자가 1개 이상 포함되어야 합니다.')
+    .regex(/[0-9]/, '비밀번호에 숫자가 1개 이상 포함되어야 합니다.')
     .regex(/[!@#$%^&*(),.?":{}|<>]/, '비밀번호에 특수문자가 1개 이상 포함되어야 합니다.'),
   name: z.string().trim().min(1, '이름은 필수 입력값입니다.'),
   nickname: z.string().trim().min(1, '닉네임은 필수 입력값입니다.'),
@@ -112,22 +136,30 @@ const baseSignupSchema = z.object({
 // 개인 회원가입 유효성 검증 스키마
 export const signupSchema = baseSignupSchema.extend({
   // 개인 회원은 전화번호/주소를 선택 입력으로 허용
-  phone: z.string().nullable(),
+  phone: z
+    .string()
+    .nullable()
+    .refine(val => !val || /^\d{11}$/.test(val), '전화번호는 11자리 숫자여야 합니다.'),
   location: z.string().nullable(),
 })
 
 // 기관 회원가입 유효성 검증 스키마
 export const organizationSignupSchema = baseSignupSchema.extend({
-  phone: z.string().nullable(),
+  phone: z
+    .string()
+    .nullable()
+    .refine(val => !val || /^\d{11}$/.test(val), '전화번호는 11자리 숫자여야 합니다.'),
   location: z.string().nullable(),
+  organizationId: z.number().nullable(),
   organizationName: z.string().trim().min(1, '기관명은 필수 입력값입니다.'),
   certificateImage: z.instanceof(File, { message: '재직증명서는 필수입니다.' }),
 })
 
-// OAuth 로그인 (Google / GitHub)
-export const oauthLogin = async (provider: 'google' | 'github', code: string): Promise<OAuthLoginResponse> => {
+// OAuth 로그인 (Google / GitHub / Kakao)
+export const oauthLogin = async (provider: Provider, code: string): Promise<OAuthLoginResponse> => {
+  const safeCode = encodeURIComponent(code)
   const res = await api.post<OAuthLoginResponse>(`/auth/oauth/${provider}`, {
-    code,
+    code: safeCode,
   })
   return res.data
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 import { useCartLecturesWithDetailQuery } from '@/features/cart/hooks/useCartLecturesWithDetailQuery'
 import type { CartItem } from '@/features/cart/types/cart.type'
@@ -54,11 +54,8 @@ export function useCartComparePageModel(): Resolved {
     if (rightId && !items.some(i => i.lectureId === rightId)) setRightId(null)
   }, [items, leftId, rightId, setLeftId, setRightId])
 
-  const itemById = useMemo(() => {
-    const map = new Map<string, CartItem>()
-    for (const item of items) map.set(item.lectureId, item)
-    return map
-  }, [items])
+  const itemById = new Map<string, CartItem>()
+  for (const item of items) itemById.set(item.lectureId, item)
 
   const left = (leftId ? itemById.get(leftId) : null) ?? null
   const right = (rightId ? itemById.get(rightId) : null) ?? null

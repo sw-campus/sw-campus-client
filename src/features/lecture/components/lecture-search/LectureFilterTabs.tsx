@@ -8,21 +8,25 @@ interface LectureFilterTabsProps {
 
 export function LectureFilterTabs({ categories, selected, onSelect }: LectureFilterTabsProps) {
   return (
-    <div className="mb-6 flex gap-3 whitespace-nowrap">
-      {categories.map(c => {
-        const active = c === selected
-        return (
-          <button
-            key={c}
-            onClick={() => onSelect(c)}
-            className={`rounded-full px-4 py-2 text-sm transition ${
-              active ? 'bg-black/70 font-semibold text-orange-300' : 'bg-black/20 text-gray-300 hover:bg-black/40'
-            }`}
-          >
-            {c}
-          </button>
-        )
-      })}
+    <div className="scrollbar-hide -mx-4 mb-4 overflow-x-auto px-4 sm:mx-0 sm:mb-6 sm:px-0">
+      <div className="flex gap-2 whitespace-nowrap sm:gap-3">
+        {categories.map(c => {
+          const active = c === selected
+          return (
+            <button
+              key={c}
+              onClick={() => onSelect(c)}
+              className={`rounded-full px-4 py-2 text-sm transition ${
+                active
+                  ? 'bg-orange-500 font-semibold text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {c}
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }

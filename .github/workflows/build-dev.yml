@@ -1,0 +1,99 @@
+name: Build Dev Image
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+      tag: ${{ steps.meta.outputs.tag }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine Image Meta
+        id: meta
+        run: |
+          IMAGE=ghcr.io/sw-campus/sw-campus-client
+          TAG=RHSA-${{ github.sha }}
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push Image
+        run: |
+          IMAGE=${{ steps.meta.outputs.image }}
+          TAG=${{ steps.meta.outputs.tag }}
+
+          # NEXT_PUBLIC_ variables only for build
+          # develop 환경: VM IP + 서버 포트로 직접 연결
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=${{ secrets.DEV_NEXT_PUBLIC_API_URL }} \
+            --build-arg NEXT_PUBLIC_BASE_URL=${{ secrets.DEV_NEXT_PUBLIC_BASE_URL }} \
+            --build-arg NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID }} \
+            --build-arg NEXT_PUBLIC_S3_HOSTNAME=${{ secrets.NEXT_PUBLIC_S3_HOSTNAME }} \
+            --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }} \
+            --build-arg NEXT_PUBLIC_GITHUB_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GITHUB_CLIENT_ID }} \
+            --build-arg NEXT_PUBLIC_KAKAO_CLIENT_ID=${{ secrets.NEXT_PUBLIC_KAKAO_CLIENT_ID }} \
+            -t $IMAGE:$TAG .
+            
+          docker push $IMAGE:$TAG
+
+      # Manifest 업데이트
+      - name: Checkout manifest repo
+        uses: actions/checkout@v4
+        with:
+          repository: sw-campus/sw-campus-manifest
+          token: ${{ secrets.MANIFEST_REPO_TOKEN }}
+          ref: develop
+          path: manifest
+
+      - name: Update client image tag in manifest
+        run: |
+          cd manifest
+          TAG=${{ steps.meta.outputs.tag }}
+          sed -i '/repository: ghcr.io\/sw-campus\/sw-campus-client$/,/pullPolicy:/ s|tag: ".*"|tag: "'$TAG'"|' k8s/environments/develop/values.yaml
+
+      - name: Create Pull Request to manifest repo
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.MANIFEST_REPO_TOKEN }}
+          path: manifest
+          branch: auto-update/client-dev-${{ github.sha }}
+          base: develop
+          title: "chore(client): update dev image to ${{ steps.meta.outputs.tag }}"
+          body: |
+            🤖 Auto-generated PR from client dev build
+            
+            - **Image**: `ghcr.io/sw-campus/sw-campus-client:${{ steps.meta.outputs.tag }}`
+            - **Commit**: ${{ github.sha }}
+          delete-branch: true
+
+      - name: Merge PR
+        if: steps.cpr.outputs.pull-request-number
+        run: |
+          cd manifest
+          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} --merge --delete-branch
+        env:
+          GH_TOKEN: ${{ secrets.MANIFEST_REPO_TOKEN }}
+

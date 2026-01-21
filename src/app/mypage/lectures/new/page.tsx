@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -9,11 +9,7 @@ import { LectureCreateForm } from '@/features/lecture/components/lecture-create/
 
 export default function LectureCreatePage() {
   const router = useRouter()
-  const [open, setOpen] = useState(false)
-
-  useEffect(() => {
-    setOpen(true)
-  }, [])
+  const [open, setOpen] = useState(true)
 
   const handleOpenChange = (next: boolean) => {
     if (!next) router.back()
@@ -22,12 +18,12 @@ export default function LectureCreatePage() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-[700px]">
+      <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-175">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>교육과정 등록</DialogTitle>
         </DialogHeader>
 
-        <div className="max-h-[75vh] overflow-y-auto px-6 pb-6">
+        <div id="lecture-create-scroll-area" className="max-h-[75vh] overflow-y-auto px-6 pb-6">
           <LectureCreateForm />
         </div>
       </DialogContent>

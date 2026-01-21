@@ -2,15 +2,18 @@
 
 import { FormEvent, useState } from 'react'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { login as loginApi } from '@/features/auth/authApi'
+import { getProfile } from '@/features/mypage/api/survey.api'
+import { parseUserType, parseUserName, parseNickname, type LoginResponse } from '@/lib/parseLoginResponse'
 import { useAuthStore } from '@/store/authStore'
 
 export function useLoginForm() {
   const router = useRouter()
-  const { login: setLogin, setUserType: setAuthUserType } = useAuthStore()
+  const searchParams = useSearchParams()
+  const { login: setLogin, setUserType: setAuthUserType, setNickname } = useAuthStore()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -27,29 +30,37 @@ export function useLoginForm() {
     try {
       setIsLoading(true)
 
-      const data = await loginApi({ email, password })
+      const data = (await loginApi({ email, password })) as LoginResponse | null
 
-      let userName = email.split('@')[0]
+      const userName = parseUserName(data, email.split('@')[0])
+      const userType = parseUserType(data)
 
-      let userType: 'ORGANIZATION' | 'PERSONAL' | null = null
-
-      if (data) {
-        userName = (data as any).name ?? (data as any).nickname ?? userName
-
-        if ((data as any).userType === 'ORGANIZATION' || (data as any).userType === 'PERSONAL') {
-          userType = (data as any).userType
-        } else if ((data as any).userType === 'organization' || (data as any).userType === 'personal') {
-          userType = (data as any).userType === 'organization' ? 'ORGANIZATION' : 'PERSONAL'
-        } else if ((data as any).role) {
-          userType = (data as any).role === 'ORGANIZATION' ? 'ORGANIZATION' : 'PERSONAL'
-        } else if ((data as any).isOrganization !== undefined) {
-          userType = (data as any).isOrganization ? 'ORGANIZATION' : 'PERSONAL'
-        }
-      }
       setAuthUserType(userType)
-
       setLogin(userName)
-      router.push('/')
+
+      // 닉네임 설정: 응답에 있으면 사용, 없으면 프로필 조회
+      try {
+        const nickFromResponse = parseNickname(data)
+        if (nickFromResponse) {
+          setNickname(nickFromResponse)
+        } else {
+          const profile = await getProfile()
+          if (profile?.nickname) setNickname(profile.nickname)
+        }
+      } catch {
+        // ignore nickname fetch errors
+      }
+
+      // returnUrl이 있으면 해당 페이지로, 없으면 관리자는 /admin, 그 외에는 홈으로 리다이렉트
+      const returnUrl = searchParams.get('returnUrl')
+      if (returnUrl && returnUrl.startsWith('/')) {
+        // 상대 경로만 허용 (Open Redirect 방지)
+        router.push(returnUrl)
+      } else if (userType === 'ADMIN') {
+        router.push('/admin')
+      } else {
+        router.push('/')
+      }
     } catch (error) {
       console.error(error)
       toast.error('이메일 또는 비밀번호를 다시 확인해주세요.')

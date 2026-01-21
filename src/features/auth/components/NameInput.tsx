@@ -10,13 +10,13 @@ type NameInputProps = {
 export default function NameInput({ value, onChange }: NameInputProps) {
   return (
     <div className="mb-4">
-      <label className="mb-1 block text-neutral-700" htmlFor="signup-name">
+      <label className="mb-1 block text-gray-700" htmlFor="signup-name">
         이름
       </label>
       <input
         id="signup-name"
         type="text"
-        placeholder="name"
+        placeholder="이름을 입력하세요"
         className={`${INPUT_BASE_CLASS} w-full`}
         value={value}
         required
