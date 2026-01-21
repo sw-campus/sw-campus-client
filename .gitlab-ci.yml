@@ -38,6 +38,7 @@ build-dev:
       when: manual
   variables:
     TAG: "RHSA-$CI_COMMIT_SHA"
+    DOCKER_HOST: tcp://docker:2375
   script:
     - |
       echo "Building DEV image with tag $TAG"
@@ -45,17 +46,16 @@ build-dev:
       docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
 
       docker build \
-        --build-arg NEXT_PUBLIC_API_URL=$DEV_NEXT_PUBLIC_API_URL \
-        --build-arg NEXT_PUBLIC_BASE_URL=$DEV_NEXT_PUBLIC_BASE_URL \
-        --build-arg NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID \
-        --build-arg NEXT_PUBLIC_S3_HOSTNAME=$NEXT_PUBLIC_S3_HOSTNAME \
-        --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID \
-        --build-arg NEXT_PUBLIC_GITHUB_CLIENT_ID=$NEXT_PUBLIC_GITHUB_CLIENT_ID \
-        --build-arg NEXT_PUBLIC_KAKAO_CLIENT_ID=$NEXT_PUBLIC_KAKAO_CLIENT_ID \
+        --build-arg NEXT_PUBLIC_API_URL="${DEV_NEXT_PUBLIC_API_URL}" \
+        --build-arg NEXT_PUBLIC_BASE_URL="${DEV_NEXT_PUBLIC_BASE_URL}" \
+        --build-arg NEXT_PUBLIC_GA_ID="${NEXT_PUBLIC_GA_ID}" \
+        --build-arg NEXT_PUBLIC_S3_HOSTNAME="${NEXT_PUBLIC_S3_HOSTNAME}" \
+        --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID="${DEV_NEXT_PUBLIC_GOOGLE_CLIENT_ID}" \
+        --build-arg NEXT_PUBLIC_GITHUB_CLIENT_ID="${DEV_NEXT_PUBLIC_GITHUB_CLIENT_ID}" \
+        --build-arg NEXT_PUBLIC_KAKAO_CLIENT_ID="${DEV_NEXT_PUBLIC_KAKAO_CLIENT_ID}" \
         -t $IMAGE_NAME:$TAG .
 
       docker push $IMAGE_NAME:$TAG
-
       echo "IMAGE_TAG=$TAG" >> build.env
   artifacts:
     reports:
