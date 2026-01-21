@@ -53,9 +53,9 @@ export const APPROVAL_STATUS_FILTER_LABEL: Record<ApprovalStatusFilter, string> 
  * 승인 상태 배지 색상 (통계 카드와 동일한 색상 체계)
  */
 export const APPROVAL_STATUS_COLOR: Record<ApprovalStatus, string> = {
-  PENDING: 'bg-amber-500 text-white',
-  APPROVED: 'bg-emerald-500 text-white',
-  REJECTED: 'bg-rose-500 text-white',
+  PENDING: 'bg-warning text-warning-foreground',
+  APPROVED: 'bg-success text-success-foreground',
+  REJECTED: 'bg-destructive text-destructive-foreground',
 }
 
 /**

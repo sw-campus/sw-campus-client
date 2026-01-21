@@ -178,12 +178,12 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
   const getCertStatusColor = (status?: string) => {
     switch (status) {
       case APPROVAL_STATUS.APPROVED:
-        return 'bg-green-50 text-green-700 border-green-200'
+        return 'bg-success/10 text-success border-success/30'
       case APPROVAL_STATUS.REJECTED:
-        return 'bg-red-50 text-red-700 border-red-200'
+        return 'bg-destructive/10 text-destructive border-destructive/30'
       case APPROVAL_STATUS.PENDING:
       default:
-        return 'bg-yellow-50 text-yellow-700 border-yellow-200'
+        return 'bg-warning/10 text-warning border-warning/30'
     }
   }
 

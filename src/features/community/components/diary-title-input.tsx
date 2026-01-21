@@ -78,7 +78,7 @@ export function DiaryTitleInput({
             ) : (
               <p className="text-muted-foreground text-xs">5자 이상 입력해주세요</p>
             )}
-            <span className={`text-xs font-medium ${summary.length >= 5 ? 'text-green-600' : 'text-red-500'}`}>
+            <span className={`text-xs font-medium ${summary.length >= 5 ? 'text-success' : 'text-destructive'}`}>
               {summary.length}/50
             </span>
           </div>

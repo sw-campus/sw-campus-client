@@ -187,9 +187,9 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
                     disabled={!isClickable || isActive}
                     className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
                       isActive
-                        ? 'bg-amber-500 text-white'
+                        ? 'bg-warning text-warning-foreground'
                         : isCompleted
-                          ? `bg-green-500 text-white${isClickable ? ' hover:bg-green-600 cursor-pointer' : ''}`
+                          ? `bg-success text-success-foreground${isClickable ? ' hover:bg-success/90 cursor-pointer' : ''}`
                           : 'bg-gray-100 text-gray-400'
                     } ${isClickable && !isActive ? 'hover:scale-110' : ''}`}
                     title={isClickable && !isActive ? `${step.label}(으)로 이동` : undefined}
@@ -198,7 +198,7 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
                   </button>
                   <span
                     className={`mt-2 text-xs font-medium ${
-                      isActive ? 'text-amber-600' : isCompleted ? 'text-green-600' : 'text-gray-400'
+                      isActive ? 'text-warning' : isCompleted ? 'text-success' : 'text-gray-400'
                     }`}
                   >
                     {step.label}
@@ -207,7 +207,7 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
                 {index < steps.length - 1 && (
                   <div
                     className={`mx-4 h-0.5 flex-1 transition-colors ${
-                      isCompleted ? 'bg-green-500' : 'bg-gray-200'
+                      isCompleted ? 'bg-success' : 'bg-gray-200'
                     }`}
                   />
                 )}

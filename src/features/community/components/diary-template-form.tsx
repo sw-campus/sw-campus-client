@@ -64,7 +64,7 @@ function getTextLength(html: string): number {
 // 글자 수 표시 컴포넌트
 function CharCount({ current, min }: { current: number; min: number }) {
   return (
-    <span className={`text-xs font-medium ${current >= min ? 'text-green-600' : 'text-red-500'}`}>
+    <span className={`text-xs font-medium ${current >= min ? 'text-success' : 'text-destructive'}`}>
       {current}/{min}자
     </span>
   )

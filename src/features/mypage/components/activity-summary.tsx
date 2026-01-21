@@ -74,21 +74,21 @@ export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
                     className={`h-3 w-5 rounded ${
                       hasBasicSurvey
                         ? hasAptitudeTest
-                          ? 'bg-green-500'
-                          : 'bg-amber-500'
+                          ? 'bg-success'
+                          : 'bg-warning'
                         : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   />
                   <div
-                    className={`h-3 w-5 rounded ${hasAptitudeTest ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+                    className={`h-3 w-5 rounded ${hasAptitudeTest ? 'bg-success' : 'bg-gray-300 dark:bg-gray-600'}`}
                   />
                 </div>
                 <span
                   className={`text-lg font-bold ${
                     hasAptitudeTest
-                      ? 'text-green-600'
+                      ? 'text-success'
                       : hasBasicSurvey
-                        ? 'text-amber-600'
+                        ? 'text-warning'
                         : 'text-muted-foreground'
                   }`}
                 >

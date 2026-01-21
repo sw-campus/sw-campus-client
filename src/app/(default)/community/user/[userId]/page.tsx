@@ -125,7 +125,7 @@ export default function UserProfilePage() {
                     <p className="mt-0.5 text-xs text-gray-500 sm:text-sm">작성글</p>
                   </div>
                   <div className={`flex flex-col items-center justify-center ${isOwnProfile ? 'border-r border-gray-200' : ''}`}>
-                    <p className="text-xl font-bold text-green-600 sm:text-2xl">{formatNumber(profile.commentedPostCount)}</p>
+                    <p className="text-xl font-bold text-success sm:text-2xl">{formatNumber(profile.commentedPostCount)}</p>
                     <p className="mt-0.5 text-xs text-gray-500 sm:text-sm">댓글</p>
                   </div>
                   {isOwnProfile && (
@@ -150,7 +150,7 @@ export default function UserProfilePage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center justify-center gap-1.5 rounded-full py-2.5 text-xs font-medium transition-all sm:gap-2 sm:py-3 sm:text-sm ${
                 activeTab === tab.id
-                  ? 'bg-orange-500 text-white shadow-md shadow-orange-200'
+                  ? 'bg-primary text-primary-foreground shadow-md'
                   : 'bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >

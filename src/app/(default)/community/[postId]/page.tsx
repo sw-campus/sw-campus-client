@@ -197,7 +197,7 @@ export default function PostDetailPage() {
               onClick={handleShare}
               className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all active:scale-95 ${
                 isCopied
-                  ? 'bg-green-50 text-green-600'
+                  ? 'bg-success/10 text-success'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -341,11 +341,11 @@ export default function PostDetailPage() {
                 disabled={isBookmarking}
                 className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-all active:scale-95 sm:flex-none sm:px-4 ${
                   post.isBookmarked
-                    ? 'border-amber-200 bg-amber-50 text-amber-600'
+                    ? 'border-warning/30 bg-warning/10 text-warning'
                     : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
-                <FiBookmark className={`h-4 w-4 ${post.isBookmarked ? 'fill-amber-500' : ''}`} />
+                <FiBookmark className={`h-4 w-4 ${post.isBookmarked ? 'fill-warning' : ''}`} />
                 <span>북마크</span>
               </button>
 
