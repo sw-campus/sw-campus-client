@@ -13,10 +13,10 @@ import {
 } from 'react-icons/fi'
 
 import { UserAvatar } from '@/components/ui/user-avatar'
-import { useUserProfile, useUserPosts, useUserCommentedPosts } from '@/features/community/hooks/useUserProfile'
-import { DEFAULT_POST_SORT } from '@/features/community/api/postApi.types'
-import { useBookmarksQuery } from '@/features/mypage/hooks/useBookmarksQuery'
-import { useCurrentMemberQuery } from '@/features/mypage/hooks/useCurrentMemberQuery'
+import { useUserProfile, useUserPosts, useUserCommentedPosts } from '@/features/community/hooks/use-user-profile'
+import { DEFAULT_POST_SORT } from '@/features/community/api/post-api.types'
+import { useBookmarksQuery } from '@/features/mypage/hooks/use-bookmarks-query'
+import { useCurrentMemberQuery } from '@/features/mypage/hooks/use-current-member-query'
 
 import { PostCard, BookmarkCard, CardSkeleton, EmptyState, Pagination } from './_components'
 

@@ -2,7 +2,7 @@
 
 import { GoogleGenerativeAI, SchemaType, type Schema } from '@google/generative-ai'
 
-import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
+import type { LectureDetail } from '@/features/lecture/api/lecture-api.types'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 

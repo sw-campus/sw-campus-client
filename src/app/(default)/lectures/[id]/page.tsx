@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 
-import LectureDetailPage from '@/features/lecture/components/LectureDetailPage'
+import LectureDetailPage from '@/features/lecture/components/lecture-detail-page'
 import { env } from '@/lib/env'
 
 type Props = {

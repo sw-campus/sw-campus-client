@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 
-import { ProfileCard } from '@/features/mypage/components/ProfileCard'
+import { ProfileCard } from '@/features/mypage/components/profile-card'
 
 export default function AdminMyPage() {
   const router = useRouter()

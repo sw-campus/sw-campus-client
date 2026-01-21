@@ -2,9 +2,9 @@
 
 import { motion, useReducedMotion, type Variants } from 'framer-motion'
 
-import LargeBanner from '@/features/banner/components/LargeBanner'
-import MidBanner from '@/features/banner/components/MidBanner'
-import LectureSection from '@/features/lecture/components/LectureSection'
+import LargeBanner from '@/features/banner/components/large-banner'
+import MidBanner from '@/features/banner/components/mid-banner'
+import LectureSection from '@/features/lecture/components/lecture-section'
 
 const container: Variants = {
   hidden: {},

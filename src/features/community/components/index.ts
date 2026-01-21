@@ -1,5 +1,5 @@
 // Community components exports
-export { PostCard } from './PostCard'
-export { PostList } from './PostList'
-export { CategoryTabs } from './CategoryTabs'
-export { PostForm } from './PostForm'
+export { PostCard } from './post-card'
+export { PostList } from './post-list'
+export { CategoryTabs } from './category-tabs'
+export { PostForm } from './post-form'

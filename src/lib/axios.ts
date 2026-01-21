@@ -1,7 +1,7 @@
 import axios, { AxiosHeaders, type AxiosRequestConfig } from 'axios'
 import { toast } from 'sonner'
 
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/auth-store'
 
 import { env } from './env'
 

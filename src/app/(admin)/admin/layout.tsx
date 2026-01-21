@@ -1,5 +1,5 @@
-import { AdminGuard } from '@/components/guards/AdminGuard'
-import HeaderSection from '@/components/layout/header/HeaderSection'
+import { AdminGuard } from '@/components/guards/admin-guard'
+import HeaderSection from '@/components/layout/header/header-section'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (

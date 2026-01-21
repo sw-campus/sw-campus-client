@@ -1,7 +1,7 @@
 // Community hooks exports
-export { useBoardCategories, boardCategoryKeys } from './useBoardCategories'
-export { usePosts, useInvalidatePosts, postKeys } from './usePosts'
-export { usePostDetail } from './usePostDetail'
-export { useCreatePost } from './useCreatePost'
-export { useUpdatePost } from './useUpdatePost'
-export { useDeletePost } from './useDeletePost'
+export { useBoardCategories, boardCategoryKeys } from './use-board-categories'
+export { usePosts, useInvalidatePosts, postKeys } from './use-posts'
+export { usePostDetail } from './use-post-detail'
+export { useCreatePost } from './use-create-post'
+export { useUpdatePost } from './use-update-post'
+export { useDeletePost } from './use-delete-post'
