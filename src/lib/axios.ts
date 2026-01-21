@@ -162,7 +162,9 @@ function isAuthPublicFlowRequest(config?: AxiosRequestConfig): boolean {
     return (
       /\/categories/i.test(url) ||
       /\/banners/i.test(url) ||
-      /\/lectures/i.test(url)
+      /\/lectures/i.test(url) ||
+      /\/users\/\d+\/(profile|posts|commented-posts)/i.test(url) ||
+      /\/community\/posts/i.test(url)
     )
   }
 

@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import { FiMessageCircle, FiSend, FiX } from 'react-icons/fi'
+import { useState } from 'react'
+import { FiMessageCircle, FiSend } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/authStore'
@@ -14,14 +14,22 @@ interface CommentSectionProps {
   postId: number
 }
 
+export interface ReplyFormProps {
+  replyToId: number | null
+  body: string
+  setBody: (value: string) => void
+  onSubmit: (e: React.FormEvent) => void
+  onCancel: () => void
+  isCreating: boolean
+}
+
 export function CommentSection({ postId }: CommentSectionProps) {
   const { isLoggedIn } = useAuthStore()
   const { data: comments = [], isLoading } = useComments(postId)
   const { mutate: createComment, isPending: isCreating } = useCreateComment()
 
   const [body, setBody] = useState('')
-  const [replyTo, setReplyTo] = useState<{ id: number; nickname?: string } | null>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [replyTo, setReplyTo] = useState<{ id: number } | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,24 +51,30 @@ export function CommentSection({ postId }: CommentSectionProps) {
   }
 
   const handleReply = (parentId: number) => {
-    // 부모 댓글 찾기
-    const findComment = (list: Comment[], id: number): Comment | undefined => {
-      for (const comment of list) {
-        if (comment.id === id) return comment
-        const found = findComment(comment.replies, id)
-        if (found) return found
-      }
-      return undefined
-    }
-
-    const parent = findComment(comments, parentId)
-    setReplyTo({ id: parentId, nickname: parent?.authorNickname })
-    textareaRef.current?.focus()
+    setReplyTo({ id: parentId })
+    setBody('')
   }
 
-  // 댓글 총 개수 (대댓글 포함)
+  const handleCancelReply = () => {
+    setReplyTo(null)
+    setBody('')
+  }
+
+  const replyFormProps: ReplyFormProps = {
+    replyToId: replyTo?.id ?? null,
+    body,
+    setBody,
+    onSubmit: handleSubmit,
+    onCancel: handleCancelReply,
+    isCreating,
+  }
+
+  // 댓글 총 개수 (대댓글 포함, 삭제된 댓글 제외)
   const getTotalCount = (list: Comment[]): number => {
-    return list.reduce((acc: number, comment: Comment) => acc + 1 + getTotalCount(comment.replies), 0)
+    return list.reduce((acc: number, comment: Comment) => {
+      const current = comment.isDeleted ? 0 : 1
+      return acc + current + getTotalCount(comment.replies)
+    }, 0)
   }
 
   const totalCount = getTotalCount(comments)
@@ -101,44 +115,31 @@ export function CommentSection({ postId }: CommentSectionProps) {
         </h2>
       </div>
 
-      {/* 댓글 입력 폼 */}
+      {/* 새 댓글 입력 폼 (답글 작성 중이 아닐 때만 표시) */}
       {isLoggedIn ? (
-        <form onSubmit={handleSubmit} className="mb-8">
-          {/* 대댓글 표시 */}
-          {replyTo && (
-            <div className="mb-3 flex items-center gap-2 rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-2.5 text-sm">
-              <span className="font-medium text-orange-700">@{replyTo.nickname}</span>
-              <span className="text-orange-600/70">님에게 답글 작성 중</span>
-              <button
-                type="button"
-                onClick={() => setReplyTo(null)}
-                className="ml-auto flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-orange-100 active:scale-90"
-              >
-                <FiX className="h-3.5 w-3.5 text-orange-600" />
-              </button>
+        !replyTo && (
+          <form onSubmit={handleSubmit} className="mb-8">
+            <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm transition-shadow focus-within:border-orange-300 focus-within:shadow-lg focus-within:shadow-orange-100/50">
+              <textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="댓글을 입력하세요..."
+                className="min-h-[80px] w-full resize-none border-0 bg-transparent p-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 sm:min-h-[100px]"
+                rows={3}
+              />
+              <div className="flex items-center justify-end border-t border-gray-100 bg-gray-50/50 px-3 py-2">
+                <Button
+                  type="submit"
+                  disabled={isCreating || !body.trim()}
+                  className="h-10 gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-4 font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-200/50 active:scale-95 disabled:opacity-50 sm:h-9"
+                >
+                  <FiSend className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+                  {isCreating ? '등록 중...' : '등록'}
+                </Button>
+              </div>
             </div>
-          )}
-          <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm transition-shadow focus-within:border-orange-300 focus-within:shadow-lg focus-within:shadow-orange-100/50">
-            <textarea
-              ref={textareaRef}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder={replyTo ? '답글을 입력하세요...' : '댓글을 입력하세요...'}
-              className="min-h-[80px] w-full resize-none border-0 bg-transparent p-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 sm:min-h-[100px]"
-              rows={3}
-            />
-            <div className="flex items-center justify-end border-t border-gray-100 bg-gray-50/50 px-3 py-2">
-              <Button
-                type="submit"
-                disabled={isCreating || !body.trim()}
-                className="h-10 gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-4 font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-200/50 active:scale-95 disabled:opacity-50 sm:h-9"
-              >
-                <FiSend className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-                {isCreating ? '등록 중...' : '등록'}
-              </Button>
-            </div>
-          </div>
-        </form>
+          </form>
+        )
       ) : (
         <div className="mb-8 rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white p-6 text-center">
           <p className="text-sm text-gray-500">
@@ -160,6 +161,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
               comment={comment}
               postId={postId}
               onReply={handleReply}
+              replyFormProps={replyFormProps}
             />
           ))}
         </div>

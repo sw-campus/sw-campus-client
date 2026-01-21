@@ -88,7 +88,7 @@ export default function UserProfilePage() {
         <div className="relative w-full px-4 pb-4 sm:px-8 sm:pb-8">
           {profileLoading ? (
             <div className="w-full space-y-4">
-              <div className="absolute -top-10 left-4 h-20 w-20 animate-pulse rounded-xl bg-gray-200 ring-4 ring-white sm:-top-16 sm:left-8 sm:h-32 sm:w-32 sm:rounded-2xl" />
+              <div className="absolute -top-10 left-4 h-20 w-20 animate-pulse rounded-full bg-gray-200 ring-4 ring-white sm:-top-16 sm:left-8 sm:h-32 sm:w-32" />
               <div className="w-full pt-12 sm:pt-20">
                 <div className="h-7 w-32 animate-pulse rounded-lg bg-gray-200 sm:h-8 sm:w-40" />
                 <div className="mt-3 flex gap-2 sm:mt-4 sm:gap-3">
@@ -103,7 +103,7 @@ export default function UserProfilePage() {
                 nickname={profile.nickname ?? '익명'}
                 size="xl"
                 initialLength={2}
-                avatarClassName="absolute -top-10 left-4 rounded-xl ring-4 ring-white sm:-top-16 sm:left-8 sm:rounded-2xl"
+                avatarClassName="absolute -top-10 left-4 ring-4 ring-white sm:-top-16 sm:left-8"
               />
 
               <div className="w-full pt-12 sm:pt-20">
