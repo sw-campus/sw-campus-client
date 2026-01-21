@@ -18,6 +18,13 @@ const refreshClient = axios.create({
   timeout: 10_000,
 })
 
+// 인증 없이 공개 API 호출용 클라이언트 (쿠키도 보내지 않음)
+export const publicApi = axios.create({
+  baseURL: env.NEXT_PUBLIC_API_URL,
+  withCredentials: false,
+  timeout: 10_000,
+})
+
 // 401/토큰만료 시 중복 로그아웃/토스트/리다이렉트를 막기 위한 플래그
 let isHandlingUnauthorized = false
 let isRefreshing = false
@@ -164,7 +171,7 @@ function isAuthPublicFlowRequest(config?: AxiosRequestConfig): boolean {
       /\/banners/i.test(url) ||
       /\/lectures/i.test(url) ||
       /\/users\/\d+\/(profile|posts|commented-posts)/i.test(url) ||
-      /\/community\/posts/i.test(url)
+      /\/posts(\/\d+)?(\/adjacent)?(\?.*)?$/i.test(url)
     )
   }
 
@@ -278,9 +285,6 @@ api.interceptors.response.use(
     // ✅ 토큰 만료/인증 실패 → 자동 로그아웃 (확장된 상태/에러코드)
     // refresh/login/logout 호출 중에는 무시하여 루프 방지
     if (isAuthExpired(status, errorCode) && !/auth\/(refresh|logout|login)/i.test(requestUrl)) {
-      // 회원가입/인증 플로우에서는 401이 나도 로그인으로 보내지 않는다.
-      if (suppressUnauthorizedRedirect) return Promise.reject(error)
-
       const originalRequest = error.config || {}
 
       if (!isRefreshing) {
@@ -293,7 +297,8 @@ api.interceptors.response.use(
       return (refreshPromise as Promise<string | null>)
         .then(newToken => {
           if (!newToken) {
-            clearAuthState({ notify: true, redirectToLogin: true })
+            // 공개 API면 조용히 인증만 정리하고 리다이렉트 안 함
+            clearAuthState({ notify: !suppressUnauthorizedRedirect, redirectToLogin: !suppressUnauthorizedRedirect })
             return Promise.reject(error)
           }
           // 새 토큰으로 원 요청 재시도
@@ -313,7 +318,7 @@ api.interceptors.response.use(
           return api.request(originalRequest)
         })
         .catch(err => {
-          clearAuthState({ notify: true, redirectToLogin: true })
+          clearAuthState({ notify: !suppressUnauthorizedRedirect, redirectToLogin: !suppressUnauthorizedRedirect })
           return Promise.reject(err)
         })
     }

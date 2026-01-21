@@ -4,8 +4,8 @@ import Image from 'next/image'
 import { FiEye, FiHeart, FiMessageCircle } from 'react-icons/fi'
 import { LuFileText } from 'react-icons/lu'
 
-import { Post } from '@/features/community/api/postApi.types'
-import { formatRelativeTime } from '@/lib/formatRelativeTime'
+import { Post } from '@/features/community/api/post-api.types'
+import { formatRelativeTime } from '@/lib/format-relative-time'
 
 interface PostCardProps {
   post: Post

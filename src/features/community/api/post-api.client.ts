@@ -1,4 +1,4 @@
-import { api } from '@/lib/axios'
+import { api, publicApi } from '@/lib/axios'
 
 import {
   ApiPageResponse,
@@ -90,6 +90,15 @@ export async function getPosts(params: PostSearchParams = {}): Promise<PagedPost
  */
 export async function getPost(postId: number): Promise<PostDetail> {
   const { data } = await api.get<ApiPostDetailResponse>(`/posts/${postId}`)
+  return mapApiPostDetailToPostDetail(data)
+}
+
+/**
+ * 게시글 상세 조회 API (인증 없이)
+ * 비로그인 사용자용 - 인증 헤더 없이 요청
+ */
+export async function getPostPublic(postId: number): Promise<PostDetail> {
+  const { data } = await publicApi.get<ApiPostDetailResponse>(`/posts/${postId}`)
   return mapApiPostDetailToPostDetail(data)
 }
 

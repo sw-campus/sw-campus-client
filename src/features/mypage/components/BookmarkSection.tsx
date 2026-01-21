@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation'
 import { LuBookmark, LuFileText, LuMessageCircle, LuHeart } from 'react-icons/lu'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { formatRelativeTime } from '@/lib/formatRelativeTime'
+import { formatRelativeTime } from '@/lib/format-relative-time'
 
-import { useBookmarksQuery } from '../hooks/useBookmarksQuery'
+import { useBookmarksQuery } from '../hooks/use-bookmarks-query'
 
 export function BookmarkSection() {
   const router = useRouter()

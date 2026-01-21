@@ -136,6 +136,39 @@ export default function PostDetailPage() {
   }
 
   if (error || !post) {
+    // 비로그인 상태에서 인증 에러인 경우 로그인 안내 표시
+    const errorStatus = (error as { response?: { status?: number } } | null)?.response?.status
+    const isAuthError = errorStatus === 401 || errorStatus === 403
+
+    if (!isLoggedIn && isAuthError) {
+      return (
+        <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 sm:px-6 sm:py-8 md:px-8">
+          <div className="mx-auto w-full lg:max-w-3xl">
+            <Link
+              href="/community"
+              className="mb-4 ml-4 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900 active:scale-95 sm:mb-6 sm:ml-0"
+            >
+              <FiArrowLeft className="h-4 w-4" />
+              <span>목록</span>
+            </Link>
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-16">
+              <div className="mb-4 rounded-full bg-orange-100 p-4">
+                <FiEye className="h-8 w-8 text-orange-500" />
+              </div>
+              <p className="mb-2 text-lg font-semibold text-gray-700">로그인이 필요합니다</p>
+              <p className="mb-6 text-sm text-gray-500">게시글 내용을 확인하려면 로그인해 주세요.</p>
+              <Link
+                href={`/login?returnUrl=${encodeURIComponent(pathname)}`}
+                className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-600 active:scale-95"
+              >
+                로그인하기
+              </Link>
+            </div>
+          </div>
+        </main>
+      )
+    }
+
     return (
       <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 sm:px-6 sm:py-8 md:px-8">
         <div className="mx-auto flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-20 lg:max-w-3xl">

@@ -4,8 +4,8 @@ import Image from 'next/image'
 import { FiEye, FiHeart, FiMessageCircle } from 'react-icons/fi'
 import { LuFileText } from 'react-icons/lu'
 
-import { BookmarkWithPost } from '@/features/community/api/interactionApi.client'
-import { formatRelativeTime } from '@/lib/formatRelativeTime'
+import { BookmarkWithPost } from '@/features/community/api/interaction-api.client'
+import { formatRelativeTime } from '@/lib/format-relative-time'
 
 interface BookmarkCardProps {
   bookmark: BookmarkWithPost

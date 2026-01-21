@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 
-import { getMyBookmarks, type BookmarkWithPost } from '@/features/community/api/interactionApi.client'
+import { getMyBookmarks, type BookmarkWithPost } from '@/features/community/api/interaction-api.client'
 
 export const bookmarksQueryKey = ['mypage', 'bookmarks'] as const
 
