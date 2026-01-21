@@ -259,13 +259,25 @@ try {
 
 ## 파일 네이밍 컨벤션
 
+### 파일명 (kebab-case)
+
 | 유형 | 패턴 | 예시 |
 |------|------|------|
-| 컴포넌트 | PascalCase | `CourseCard.tsx` |
-| 훅 | camelCase + use prefix | `useCourseQuery.ts` |
-| 타입 | `{domain}.type.ts` | `course.type.ts` |
-| API | `{domain}Api.ts` | `courseApi.ts` |
-| 스토어 | `{domain}.store.ts` | `cart.store.ts` |
+| 컴포넌트 | kebab-case.tsx | `course-card.tsx` |
+| 훅 | use-{name}.ts | `use-course-query.ts` |
+| API | {domain}-api.ts | `course-api.ts` |
+| 타입 | {domain}.type.ts | `course.type.ts` |
+| 스토어 | {domain}.store.ts | `cart.store.ts` |
+
+### 코드 내 네이밍
+
+| 유형 | 패턴 | 예시 |
+|------|------|------|
+| 컴포넌트 export | PascalCase | `CourseCard` |
+| 변수 | camelCase | `userName` |
+| 상수 | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
+| 함수 | camelCase + 동사 | `fetchUserData()` |
+| 타입/인터페이스 | PascalCase | `User`, `LectureResponse` |
 
 ---
 

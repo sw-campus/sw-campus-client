@@ -176,13 +176,15 @@ pnpm build
 
 ## 코딩 규칙
 
-### 파일 네이밍
+### 파일 네이밍 (kebab-case)
 | 구분 | 패턴 | 예시 |
 |------|------|------|
-| 컴포넌트 | PascalCase.tsx | `CourseCard.tsx` |
-| Hook | use{Domain}.ts | `useCourseQuery.ts` |
-| API | {domain}Api.ts | `courseApi.ts` |
+| 컴포넌트 | kebab-case.tsx | `course-card.tsx` |
+| Hook | use-{name}.ts | `use-course-query.ts` |
+| API | {domain}-api.ts | `course-api.ts` |
 | 타입 | {domain}.type.ts | `course.type.ts` |
+
+> 파일명은 kebab-case, export 이름은 PascalCase/camelCase
 
 ### 컴포넌트 규칙
 
