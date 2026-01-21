@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { PagedPosts } from '../api/postApi.types'
-import { getUserProfile, getUserPosts } from '../api/userProfileApi.client'
+import { getUserProfile, getUserPosts, getUserCommentedPosts } from '../api/userProfileApi.client'
 import { UserProfile } from '../api/userProfileApi.types'
 
 export const userProfileKeys = {
@@ -11,6 +11,8 @@ export const userProfileKeys = {
   profile: (userId: number) => [...userProfileKeys.all, 'profile', userId] as const,
   posts: (userId: number, params: { page?: number; size?: number; sort?: string }) =>
     [...userProfileKeys.all, 'posts', userId, params] as const,
+  commentedPosts: (userId: number, params: { page?: number; size?: number; sort?: string }) =>
+    [...userProfileKeys.all, 'commentedPosts', userId, params] as const,
 }
 
 /**
@@ -35,6 +37,21 @@ export function useUserPosts(
   return useQuery<PagedPosts, Error>({
     queryKey: userProfileKeys.posts(userId, params),
     queryFn: () => getUserPosts(userId, params),
+    staleTime: 1000 * 60, // 1분간 캐시
+    enabled: !!userId,
+  })
+}
+
+/**
+ * 유저가 댓글 단 게시글 목록 조회 훅
+ */
+export function useUserCommentedPosts(
+  userId: number,
+  params: { page?: number; size?: number; sort?: string } = {}
+) {
+  return useQuery<PagedPosts, Error>({
+    queryKey: userProfileKeys.commentedPosts(userId, params),
+    queryFn: () => getUserCommentedPosts(userId, params),
     staleTime: 1000 * 60, // 1분간 캐시
     enabled: !!userId,
   })

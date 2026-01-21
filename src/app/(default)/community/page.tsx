@@ -36,7 +36,7 @@ function CommunityContent() {
   // 글쓰기 버튼 클릭 핸들러
   const handleWriteClick = () => {
     if (!isLoggedIn) {
-      toast.error('로그인이 필요합니다', {
+      toast.info('로그인이 필요합니다', {
         description: '글을 작성하려면 먼저 로그인해주세요.',
         action: {
           label: '로그인',

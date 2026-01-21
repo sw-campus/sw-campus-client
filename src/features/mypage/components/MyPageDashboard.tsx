@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 
 import { ActivitySummary } from './ActivitySummary'
+import { BookmarkSection } from './BookmarkSection'
 import { ReviewManagementSection } from './ManagementSection'
 import { ProfileCard } from './ProfileCard'
 
@@ -27,10 +28,11 @@ export function MyPageDashboard() {
 
       {/* Main Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Left Column: Profile + Activity Summary */}
+        {/* Left Column: Profile + Activity Summary + Bookmarks */}
         <div className="flex flex-col gap-6">
           <ProfileCard onEditClick={handleEditProfile} />
           <ActivitySummary onEditSurvey={handleEditSurvey} />
+          <BookmarkSection />
         </div>
 
         {/* Right Column: Review Management */}

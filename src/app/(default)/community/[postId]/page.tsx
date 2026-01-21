@@ -16,8 +16,9 @@ import {
   FiShare2,
   FiCheck,
   FiMapPin,
-  FiUser,
 } from 'react-icons/fi'
+
+import { UserAvatar } from '@/components/ui/user-avatar'
 
 import {
   AlertDialog,
@@ -33,6 +34,7 @@ import {
 import { ClickableTag } from '@/features/community/components/ClickableTag'
 import { CommentSection } from '@/features/community/components/CommentSection'
 import { PostNavigation } from '@/features/community/components/PostNavigation'
+import { UserProfileLink } from '@/features/community/components/UserProfileLink'
 import { useDeletePost } from '@/features/community/hooks/useDeletePost'
 import { usePostDetail } from '@/features/community/hooks/usePostDetail'
 import { useToggleLike, useToggleBookmark, useTogglePin } from '@/features/community/hooks/usePostInteractions'
@@ -231,19 +233,19 @@ export default function PostDetailPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             {/* 작성자 */}
             <div className="flex items-center gap-3">
-              <Link
-                href={`/community/user/${post.authorId}`}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-amber-100 ring-2 ring-white transition-transform hover:scale-105 sm:h-10 sm:w-10"
+              <UserProfileLink
+                userId={post.authorId}
+                className="transition-transform hover:scale-105"
               >
-                <FiUser className="h-5 w-5 text-orange-600 sm:h-4 sm:w-4" />
-              </Link>
+                <UserAvatar nickname={post.authorNickname ?? '익명'} size="md" avatarClassName="ring-2 ring-white" />
+              </UserProfileLink>
               <div className="flex flex-col">
-                <Link
-                  href={`/community/user/${post.authorId}`}
+                <UserProfileLink
+                  userId={post.authorId}
                   className="font-semibold text-gray-900 transition-colors hover:text-orange-600"
                 >
                   {post.authorNickname ?? '익명'}
-                </Link>
+                </UserProfileLink>
                 <div className="flex items-center gap-1.5 text-xs text-gray-500">
                   <span title={formattedDate}>{relativeTime}</span>
                   <span className="hidden text-gray-300 sm:inline">·</span>

@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 
-import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { FiCornerDownRight, FiEdit2, FiHeart, FiMessageCircle, FiMoreVertical, FiTrash2, FiUser } from 'react-icons/fi'
+import { FiCornerDownRight, FiEdit2, FiHeart, FiMessageCircle, FiMoreVertical, FiTrash2 } from 'react-icons/fi'
+
+import { UserAvatar } from '@/components/ui/user-avatar'
 
 import {
   AlertDialog,
@@ -28,6 +29,7 @@ import { useAuthStore } from '@/store/authStore'
 
 import type { Comment } from '../api/commentApi.types'
 import { useDeleteComment, useUpdateComment, useToggleCommentLike } from '../hooks/useComments'
+import { UserProfileLink } from './UserProfileLink'
 
 interface CommentItemProps {
   comment: Comment
@@ -112,19 +114,19 @@ export function CommentItem({ comment, postId, onReply, depth = 0 }: CommentItem
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             {depth > 0 && <FiCornerDownRight className="h-4 w-4 text-orange-400" />}
-            <Link
-              href={`/community/user/${comment.authorId}`}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-amber-100 ring-2 ring-white transition-transform hover:scale-110"
+            <UserProfileLink
+              userId={comment.authorId}
+              className="transition-transform hover:scale-110"
             >
-              <FiUser className="h-3.5 w-3.5 text-orange-600" />
-            </Link>
+              <UserAvatar nickname={comment.authorNickname} size="sm" avatarClassName="ring-2 ring-white" />
+            </UserProfileLink>
             <div className="flex items-center gap-2">
-              <Link
-                href={`/community/user/${comment.authorId}`}
+              <UserProfileLink
+                userId={comment.authorId}
                 className="font-semibold text-gray-800 transition-colors hover:text-orange-600"
               >
                 {comment.authorNickname}
-              </Link>
+              </UserProfileLink>
               <span className="h-1 w-1 rounded-full bg-gray-300" />
               <span className="text-xs text-gray-400" title={comment.createdAt.toLocaleString('ko-KR')}>
                 {relativeTime}
