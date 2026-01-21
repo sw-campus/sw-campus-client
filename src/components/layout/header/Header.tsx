@@ -8,13 +8,13 @@ import { useRouter } from 'next/navigation'
 import { FiLogIn, FiUser, FiMenu, FiLogOut } from 'react-icons/fi'
 import { PiRobotDuotone } from 'react-icons/pi'
 
-import { HeaderIconAction } from '@/components/layout/header/HeaderIconAction'
-import { LogoutDialog } from '@/components/layout/header/LogoutDialog'
-import { useLogout } from '@/features/auth/hooks/useLogout'
-import { useCartLecturesQuery } from '@/features/cart/hooks/useCartLecturesQuery'
+import { HeaderIconAction } from '@/components/layout/header/header-icon-action'
+import { LogoutDialog } from '@/components/layout/header/logout-dialog'
+import { useLogout } from '@/features/auth/hooks/use-logout'
+import { useCartLecturesQuery } from '@/features/cart/hooks/use-cart-lectures-query'
 import type { CategoryTreeNode } from '@/features/category'
 import { ensureSessionActive } from '@/lib/axios'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/store/auth-store'
 
 export interface NavCategoryItem extends CategoryTreeNode {
   type?: 'LECTURE' | 'BOARD'

@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next'
 
 import Script from 'next/script'
 
-import DynamicBackground from '@/components/common/DynamicBackground'
-import KakaoChannelButton from '@/components/common/KakaoChannelButton'
+import DynamicBackground from '@/components/common/dynamic-background'
+import KakaoChannelButton from '@/components/common/kakao-channel-button'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { Toaster } from '@/components/ui/sonner'
 
