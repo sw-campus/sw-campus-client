@@ -81,6 +81,8 @@ jobs:
             --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }} \
             --build-arg NEXT_PUBLIC_GITHUB_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GITHUB_CLIENT_ID }} \
             --build-arg NEXT_PUBLIC_KAKAO_CLIENT_ID=${{ secrets.NEXT_PUBLIC_KAKAO_CLIENT_ID }} \
+            --build-arg NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY=${{ secrets.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY }} \
+            --build-arg NEXT_PUBLIC_KAKAO_CHANNEL_ID=${{ secrets.NEXT_PUBLIC_KAKAO_CHANNEL_ID }} \
             -t $IMAGE:$TAG .
             
           docker push $IMAGE:$TAG
