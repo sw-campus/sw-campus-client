@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react'
 
 import { useMutation } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { Star } from 'lucide-react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
+import { CharacterCounter } from '@/components/ui/character-counter'
 import { APPROVAL_STATUS } from '@/features/admin/types/approval.type'
 import { api } from '@/lib/axios'
 
@@ -225,13 +227,16 @@ export function ReviewForm({
       onSaveSuccess?.()
       onClose?.()
     } catch (e) {
-      const message = e instanceof Error ? e.message : '리뷰 저장에 실패했습니다.'
-      toast.error(message)
+      // API 에러는 axios 인터셉터에서 처리, 유효성 검증 에러만 여기서 표시
+      if (!isAxiosError(e)) {
+        const message = e instanceof Error ? e.message : '리뷰 저장에 실패했습니다.'
+        toast.error(message)
+      }
     }
   }
 
   const content = (
-    <div className="space-y-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="space-y-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
       {/* 생성 모드일 때 강의명 표시 */}
       {isCreateMode && lectureName && (
         <div className="mb-2">
@@ -242,32 +247,22 @@ export function ReviewForm({
 
       {/* 총평: 버블 스타일 */}
       <div className="space-y-1.5">
-        <label className="mb-1 block text-sm font-semibold text-gray-900">총평</label>
-        <div className="rounded-xl border border-gray-100 bg-gray-50 p-2">
+        <label className="mb-1 block text-sm font-semibold text-foreground">총평</label>
+        <div className="rounded-xl border border-border bg-muted p-2">
           <textarea
             value={comment}
             onChange={e => setComment(e.target.value)}
             rows={2}
-            className={`w-full resize-y rounded-md border bg-transparent px-1 py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:outline-none ${
+            className={`w-full resize-y rounded-md border bg-transparent px-1 py-1 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:outline-none ${
               comment.length > MAX_COMMENT_LENGTH
-                ? 'border-red-400 focus:border-red-400 focus:ring-red-200'
-                : 'border-transparent focus:border-amber-300 focus:ring-amber-200'
+                ? 'border-destructive focus:border-destructive focus:ring-destructive/20'
+                : 'border-transparent focus:border-ring focus:ring-ring/20'
             }`}
             placeholder="후기를 입력하세요"
             disabled={effectiveReadOnly || loading || saveMutation.isPending}
           />
           <div className="mt-1 flex justify-end">
-            <span
-              className={`text-xs ${
-                comment.length > MAX_COMMENT_LENGTH
-                  ? 'font-semibold text-red-500'
-                  : comment.length > MAX_COMMENT_LENGTH * 0.8
-                    ? 'text-amber-500'
-                    : 'text-gray-400'
-              }`}
-            >
-              {comment.length} / {MAX_COMMENT_LENGTH}자{comment.length > MAX_COMMENT_LENGTH && ' (초과)'}
-            </span>
+            <CharacterCounter current={comment.length} max={MAX_COMMENT_LENGTH} warningThreshold={MAX_COMMENT_LENGTH * 0.8} />
           </div>
         </div>
       </div>
@@ -276,9 +271,9 @@ export function ReviewForm({
       {detailScores.length > 0 && (
         <div className="space-y-2.5">
           {detailScores.map((d, idx) => (
-            <div key={`${d.category}-${idx}`} className="rounded-xl border border-gray-100 bg-white p-2.5 shadow-sm">
+            <div key={`${d.category}-${idx}`} className="rounded-xl border border-border bg-card p-2.5 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-900">
+                <span className="text-sm font-semibold text-foreground">
                   {CATEGORY_LABELS[d.category as AllowedCategory] || d.category}
                 </span>
                 <div className="flex items-center gap-1">
@@ -297,47 +292,38 @@ export function ReviewForm({
                         className="p-0.5 text-yellow-500 disabled:opacity-50"
                         disabled={effectiveReadOnly || loading || saveMutation.isPending}
                       >
-                        <Star className={`h-4 w-4 ${selected ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                        <Star className={`h-4 w-4 ${selected ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/40'}`} />
                       </button>
                     )
                   })}
                   <span className="ml-2 min-w-6 text-right text-sm font-bold text-yellow-600">{d.score || 0}</span>
                 </div>
               </div>
-              <div className="mt-1.5 rounded-xl border border-gray-100 bg-gray-50 p-2">
+              <div className="mt-1.5 rounded-xl border border-border bg-muted p-2">
                 <textarea
                   value={d.comment ?? ''}
                   onChange={e =>
                     setDetailScores(prev => prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)))
                   }
                   rows={2}
-                  className={`w-full resize-y rounded-md border bg-transparent px-1 py-1 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-none ${
+                  className={`w-full resize-y rounded-md border bg-transparent px-1 py-1 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:outline-none ${
                     (d.comment?.length ?? 0) > MAX_COMMENT_LENGTH ||
                     ((d.comment?.length ?? 0) > 0 && (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH)
-                      ? 'border-red-400 focus:border-red-400 focus:ring-red-200'
-                      : 'border-transparent focus:border-amber-300 focus:ring-amber-200'
+                      ? 'border-destructive focus:border-destructive focus:ring-destructive/20'
+                      : 'border-transparent focus:border-ring focus:ring-ring/20'
                   }`}
                   placeholder="세부 의견을 입력하세요 (10자 이상)"
                   disabled={effectiveReadOnly || loading || saveMutation.isPending}
                 />
-                <div className="mt-1 flex justify-end">
-                  <span
-                    className={`text-xs ${
-                      (d.comment?.length ?? 0) > MAX_COMMENT_LENGTH
-                        ? 'font-semibold text-red-500'
-                        : (d.comment?.length ?? 0) > 0 && (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH
-                          ? 'text-red-500'
-                          : (d.comment?.length ?? 0) > MAX_COMMENT_LENGTH * 0.8
-                            ? 'text-amber-500'
-                            : 'text-gray-400'
-                    }`}
-                  >
-                    {d.comment?.length ?? 0} / {MAX_COMMENT_LENGTH}자
-                    {(d.comment?.length ?? 0) > MAX_COMMENT_LENGTH && ' (초과)'}
-                    {(d.comment?.length ?? 0) > 0 &&
-                      (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH &&
-                      ` (최소 ${MIN_DETAIL_COMMENT_LENGTH}자)`}
-                  </span>
+                <div className="mt-1 flex items-center justify-end gap-2">
+                  {(d.comment?.length ?? 0) > 0 && (d.comment?.length ?? 0) < MIN_DETAIL_COMMENT_LENGTH && (
+                    <span className="text-xs text-destructive">최소 {MIN_DETAIL_COMMENT_LENGTH}자</span>
+                  )}
+                  <CharacterCounter
+                    current={d.comment?.length ?? 0}
+                    max={MAX_COMMENT_LENGTH}
+                    warningThreshold={MAX_COMMENT_LENGTH * 0.8}
+                  />
                 </div>
               </div>
             </div>
@@ -346,7 +332,7 @@ export function ReviewForm({
       )}
 
       {/* 승인된 리뷰 안내 (readOnly 모드) */}
-      {effectiveReadOnly && !loading && <p className="text-sm text-gray-500">승인된 리뷰는 수정할 수 없습니다.</p>}
+      {effectiveReadOnly && !loading && <p className="text-sm text-muted-foreground">승인된 리뷰는 수정할 수 없습니다.</p>}
 
       {/* 저장 버튼 (수정 가능할 때만 표시) */}
       {!effectiveReadOnly &&
@@ -371,7 +357,7 @@ export function ReviewForm({
                 type="button"
                 onClick={() => void onSave()}
                 disabled={loading || saveMutation.isPending || isInvalid}
-                className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+                className="h-11 w-full"
               >
                 {loading ? '불러오는 중...' : saveMutation.isPending ? '저장 중...' : '저장'}
               </Button>
@@ -379,7 +365,7 @@ export function ReviewForm({
           )
         })()}
 
-      {!reviewId && <p className="text-xs text-gray-500"></p>}
+      {!reviewId && <p className="text-xs text-muted-foreground"></p>}
     </div>
   )
 

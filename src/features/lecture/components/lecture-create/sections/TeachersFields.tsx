@@ -8,6 +8,7 @@ import { FiChevronDown, FiChevronUp, FiSearch, FiTrash2, FiUpload, FiX } from 'r
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
+import { CharacterCounter } from '@/components/ui/character-counter'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -16,6 +17,8 @@ import { useSearchTeachersQuery } from '@/features/lecture/hooks/useSearchTeache
 import type { LectureFormValues } from '@/features/lecture/validation/lectureFormSchema'
 import { useDebounce } from '@/hooks/useDebounce'
 import { cn } from '@/lib/utils'
+
+const MAX_TEACHER_DESCRIPTION_LENGTH = 200
 
 export function LectureCreateTeachersFields() {
   const {
@@ -184,13 +187,21 @@ function TeacherItem({ control, index, totalCount, onMove, onRemove }: TeacherIt
         control={control}
         name={`teachers.${index}.teacherDescription`}
         render={({ field }) => (
-          <Textarea
-            placeholder="강사 소개"
-            {...field}
-            value={field.value ?? ''}
-            disabled={isExistingTeacher}
-            className={isExistingTeacher ? 'bg-muted' : ''}
-          />
+          <div className="space-y-1">
+            <Textarea
+              placeholder="강사 소개"
+              maxLength={MAX_TEACHER_DESCRIPTION_LENGTH}
+              {...field}
+              value={field.value ?? ''}
+              disabled={isExistingTeacher}
+              className={isExistingTeacher ? 'bg-muted' : ''}
+            />
+            {!isExistingTeacher && (
+              <div className="flex justify-end">
+                <CharacterCounter current={field.value?.length ?? 0} max={MAX_TEACHER_DESCRIPTION_LENGTH} />
+              </div>
+            )}
+          </div>
         )}
       />
 
