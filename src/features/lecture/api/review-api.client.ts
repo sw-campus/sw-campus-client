@@ -1,12 +1,20 @@
 import { api } from '@/lib/axios'
 
-import type { Review, ReviewPageResponse, ReviewSortType } from './review-api.types'
+import type { Review, ReviewBlindStatus, ReviewListResponse, ReviewPageResponse, ReviewSortType } from './review-api.types'
 
 /**
- * 강의별 승인된 후기 조회 API
+ * 강의별 승인된 후기 조회 API (블라인드 필터링 적용)
  */
-export async function getLectureReviews(lectureId: string | number): Promise<Review[]> {
-  const { data } = await api.get<Review[]>(`/lectures/${lectureId}/reviews`)
+export async function getLectureReviews(lectureId: string | number): Promise<ReviewListResponse> {
+  const { data } = await api.get<ReviewListResponse>(`/lectures/${lectureId}/reviews`)
+  return data
+}
+
+/**
+ * 리뷰 블라인드 상태 조회 API
+ */
+export async function getBlindStatus(): Promise<ReviewBlindStatus> {
+  const { data } = await api.get<ReviewBlindStatus>(`/reviews/blind-status`)
   return data
 }
 
