@@ -38,6 +38,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: lectureName,
     description,
+    alternates: {
+      canonical: `${env.NEXT_PUBLIC_BASE_URL}/lectures/${id}`,
+    },
     openGraph: {
       title: `${lectureName} | 소프트웨어캠퍼스`,
       description,
