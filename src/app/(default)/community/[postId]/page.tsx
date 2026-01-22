@@ -43,6 +43,9 @@ export async function generateMetadata({ params }: PostDetailPageProps): Promise
   return {
     title: postTitle,
     description: postDescription || '소프트웨어캠퍼스 커뮤니티 게시글입니다.',
+    alternates: {
+      canonical: `${env.NEXT_PUBLIC_BASE_URL}/community/${postId}`,
+    },
     openGraph: {
       title: `${postTitle} | 소프트웨어캠퍼스`,
       description: postDescription || '소프트웨어캠퍼스 커뮤니티 게시글입니다.',
