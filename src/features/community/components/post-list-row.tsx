@@ -93,7 +93,7 @@ export function PostListRow({ post }: PostListRowProps) {
             )}
           </div>
 
-          {/* 하단: 작성자 정보 + 통계 */}
+          {/* 하단: 작성자 정보 + 통계 (썸네일 없을 때) */}
           <div className="mt-3 flex items-center justify-between">
             {/* 작성자 정보 */}
             <div className="flex items-center gap-2 text-sm">
@@ -117,8 +117,8 @@ export function PostListRow({ post }: PostListRowProps) {
               </span>
             </div>
 
-            {/* 통계 */}
-            <div className="flex items-center gap-3 text-sm text-gray-500 sm:gap-4">
+            {/* 통계 - 썸네일 없을 때 또는 모바일에서 표시 */}
+            <div className={`flex items-center gap-3 text-sm text-gray-500 sm:gap-4 ${post.thumbnailUrl ? 'sm:hidden' : ''}`}>
               <span className="flex items-center gap-1 transition-colors group-hover:text-gray-700">
                 <FiEye className="h-4 w-4" />
                 <span className="tabular-nums">{post.viewCount}</span>
@@ -137,15 +137,32 @@ export function PostListRow({ post }: PostListRowProps) {
 
         {/* 썸네일 영역 (오른쪽) - 있을 때만 표시 */}
         {post.thumbnailUrl && (
-          <div className="relative hidden h-20 w-28 shrink-0 overflow-hidden rounded-xl sm:block sm:h-24 sm:w-36">
-            <Image
-              src={post.thumbnailUrl}
-              alt={post.title}
-              fill
-              sizes="(max-width: 640px) 112px, 144px"
-              quality={85}
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-            />
+          <div className="hidden shrink-0 flex-col items-end gap-2 sm:flex">
+            <div className="relative h-20 w-28 overflow-hidden rounded-xl sm:h-24 sm:w-36">
+              <Image
+                src={post.thumbnailUrl}
+                alt={post.title}
+                fill
+                sizes="(max-width: 640px) 112px, 144px"
+                quality={85}
+                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              />
+            </div>
+            {/* 통계 - 썸네일 아래에 표시 */}
+            <div className="flex items-center gap-3 text-sm text-gray-500">
+              <span className="flex items-center gap-1 transition-colors group-hover:text-gray-700">
+                <FiEye className="h-3.5 w-3.5" />
+                <span className="tabular-nums">{post.viewCount}</span>
+              </span>
+              <span className={`flex items-center gap-1 transition-colors ${isPopular ? 'text-rose-500' : 'group-hover:text-rose-500'}`}>
+                <FiHeart className={`h-3.5 w-3.5 ${isPopular ? 'fill-rose-500' : ''}`} />
+                <span className="tabular-nums">{post.likeCount}</span>
+              </span>
+              <span className="flex items-center gap-1 transition-colors group-hover:text-blue-500">
+                <FiMessageCircle className="h-3.5 w-3.5" />
+                <span className="tabular-nums">{post.commentCount}</span>
+              </span>
+            </div>
           </div>
         )}
       </div>
