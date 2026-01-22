@@ -60,7 +60,7 @@ export function ReviewManagementSection() {
   }
 
   const isReadOnly = (lecture: CompletedLecture): boolean => {
-    return lecture.reviewStatus === APPROVAL_STATUS.APPROVED || lecture.reviewStatus === APPROVAL_STATUS.REJECTED
+    return lecture.reviewStatus === APPROVAL_STATUS.APPROVED
   }
 
   const handleFileSelect = (file: File) => {
