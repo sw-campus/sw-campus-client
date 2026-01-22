@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { formatRelativeTime } from '@/lib/format-relative-time'
 import { cn } from '@/lib/utils'
 
 import type { Notification, NotificationType } from '../api/notification.api'
@@ -44,21 +45,6 @@ function getNotificationMessage(type: NotificationType, senderNickname: string):
     default:
       return '새 알림이 있습니다.'
   }
-}
-
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMin = Math.floor(diffMs / (1000 * 60))
-  const diffHour = Math.floor(diffMs / (1000 * 60 * 60))
-  const diffDay = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-
-  if (diffMin < 1) return '방금 전'
-  if (diffMin < 60) return `${diffMin}분 전`
-  if (diffHour < 24) return `${diffHour}시간 전`
-  if (diffDay < 7) return `${diffDay}일 전`
-  return date.toLocaleDateString('ko-KR')
 }
 
 function NotificationItem({
@@ -135,7 +121,7 @@ function NotificationItem({
           )}
         </div>
         <span className="mt-1 block text-xs text-muted-foreground">
-          {formatRelativeTime(notification.createdAt)}
+          {formatRelativeTime(new Date(notification.createdAt))}
         </span>
       </div>
     </DropdownMenuItem>

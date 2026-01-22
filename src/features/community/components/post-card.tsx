@@ -92,17 +92,16 @@ export function PostCard({ post }: PostCardProps) {
             {post.title}
           </h3>
 
-          {/* 태그 영역 */}
-          {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.filter(tag => !tag.match(/^\d+월 \d+주차$/)).length > 0 && (
-            <div className="mt-2 flex h-6 gap-1.5 overflow-hidden">
-              {post.tags
+          {/* 태그 영역 - 일관된 카드 높이 유지를 위해 항상 렌더링 */}
+          <div className="mt-2 flex h-6 gap-1.5 overflow-hidden">
+            {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME &&
+              post.tags
                 .filter(tag => !tag.match(/^\d+월 \d+주차$/))
                 .slice(0, 2)
                 .map(tag => (
                   <ClickableTag key={tag} tag={tag} maxLength={8} />
                 ))}
-            </div>
-          )}
+          </div>
 
           {/* 푸터 영역 */}
           <div className="mt-auto flex items-center justify-between pt-3 text-xs">

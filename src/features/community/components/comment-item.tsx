@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { FiEdit2, FiHeart, FiMessageCircle, FiMoreVertical, FiSend, FiTrash2, FiX } from 'react-icons/fi'
 
 import { UserAvatar } from '@/components/ui/user-avatar'
+import { cn } from '@/lib/utils'
 
 import {
   AlertDialog,
@@ -51,6 +52,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isHighlighted, setIsHighlighted] = useState(false)
 
   // 인라인 답글 입력폼용 ref
   const replyTextareaRef = useRef<HTMLTextAreaElement>(null)
@@ -70,9 +72,9 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
       const hash = window.location.hash
       if (hash === `#comment-${comment.id}` && commentRef.current) {
         commentRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        commentRef.current.classList.add('animate-highlight')
+        setIsHighlighted(true)
         setTimeout(() => {
-          commentRef.current?.classList.remove('animate-highlight')
+          setIsHighlighted(false)
         }, 2500)
       }
     }
@@ -130,7 +132,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
 
     // 대댓글이 있으면 "삭제된 댓글입니다" 표시
     return (
-      <div ref={commentRef} id={`comment-${comment.id}`} className="flex">
+      <div ref={commentRef} id={`comment-${comment.id}`} className={cn('flex', { 'animate-highlight': isHighlighted })}>
         {/* 왼쪽: 아바타 + 스레드 라인 */}
         <div className="mr-3 flex flex-col items-center">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100">
@@ -177,7 +179,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
   }
 
   return (
-    <div ref={commentRef} id={`comment-${comment.id}`} className="flex">
+    <div ref={commentRef} id={`comment-${comment.id}`} className={cn('flex', { 'animate-highlight': isHighlighted })}>
       {/* 왼쪽: 아바타 + 스레드 라인 */}
       <div className="mr-3 flex flex-col items-center">
         <UserProfileLink

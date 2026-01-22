@@ -29,7 +29,7 @@ export function useSSE() {
     eventSourceRef.current = eventSource
 
     eventSource.addEventListener('connect', () => {
-      console.warn('SSE connected')
+      // SSE 연결 성공
     })
 
     eventSource.addEventListener('notification', (event) => {
