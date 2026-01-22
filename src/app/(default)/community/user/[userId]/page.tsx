@@ -3,42 +3,48 @@
 import { useState } from 'react'
 
 import Link from 'next/link'
-import { useParams, notFound } from 'next/navigation'
-import { FiArrowLeft, FiCalendar, FiFileText, FiUser, FiChevronLeft, FiChevronRight, FiList, FiGrid } from 'react-icons/fi'
+import { useParams, useRouter, notFound } from 'next/navigation'
+import {
+  FiArrowLeft,
+  FiCalendar,
+  FiFileText,
+  FiMessageCircle,
+  FiBookmark,
+} from 'react-icons/fi'
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { PostList } from '@/features/community/components/PostList'
-import { useUserProfile, useUserPosts } from '@/features/community/hooks/useUserProfile'
-import { DEFAULT_POST_SORT } from '@/features/community/api/postApi.types'
+import { UserAvatar } from '@/components/ui/user-avatar'
+import { useUserProfile, useUserPosts, useUserCommentedPosts } from '@/features/community/hooks/use-user-profile'
+import { DEFAULT_POST_SORT } from '@/features/community/api/post-api.types'
+import { useBookmarksQuery } from '@/features/mypage/hooks/use-bookmarks-query'
+import { useCurrentMemberQuery } from '@/features/mypage/hooks/use-current-member-query'
+
+import { PostCard, BookmarkCard, CardSkeleton, EmptyState, Pagination } from './_components'
+
+type TabType = 'posts' | 'commented' | 'bookmarks'
 
 export default function UserProfilePage() {
   const params = useParams()
+  const router = useRouter()
   const userId = Number(params.userId)
 
-  const [page, setPage] = useState(0)
+  const [activeTab, setActiveTab] = useState<TabType>('posts')
+  const [postsPage, setPostsPage] = useState(0)
+  const [commentedPage, setCommentedPage] = useState(0)
   const [sort] = useState(DEFAULT_POST_SORT)
-  // ViewType 상태 관리 (로컬 스토리지 연동) - lazy initialization으로 초기값 설정
-  const [viewType, setViewType] = useState<'list' | 'card'>(() => {
-    if (typeof window === 'undefined') return 'list'
-    const saved = localStorage.getItem('community-post-view-type') as 'list' | 'card' | null
-    return saved === 'card' || saved === 'list' ? saved : 'list'
-  })
 
   const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(userId)
-  const { data: postsData, isLoading: postsLoading } = useUserPosts(userId, { page, size: 10, sort })
-  const isLoading = profileLoading || postsLoading
+  const { data: postsData, isLoading: postsLoading } = useUserPosts(userId, { page: postsPage, size: 10, sort })
+  const { data: commentedData, isLoading: commentedLoading } = useUserCommentedPosts(userId, { page: commentedPage, size: 10, sort })
+  const { data: currentMember } = useCurrentMemberQuery()
 
-  const handleViewChange = (type: 'list' | 'card') => {
-    setViewType(type)
-    localStorage.setItem('community-post-view-type', type)
-  }
+  const isOwnProfile = currentMember?.userId === userId
+
+  // 자기 프로필일 때만 북마크 API 호출
+  const { data: bookmarks, isLoading: bookmarksLoading } = useBookmarksQuery({ enabled: isOwnProfile })
 
   if (profileError) {
     notFound()
   }
-
-  const pageInfo = postsData?.page
-  const totalPages = pageInfo?.totalPages ?? 1
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('ko-KR', {
@@ -48,68 +54,86 @@ export default function UserProfilePage() {
     }).format(date)
   }
 
+  // 숫자 포맷팅 (1234 → 1,234)
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('ko-KR').format(num)
+  }
+
+  // 탭 데이터
+  const tabs = [
+    { id: 'posts' as const, label: '작성한 글', icon: FiFileText, count: profile?.postCount ?? 0 },
+    { id: 'commented' as const, label: '댓글 단 글', icon: FiMessageCircle, count: profile?.commentedPostCount ?? 0 },
+    ...(isOwnProfile ? [{ id: 'bookmarks' as const, label: '북마크', icon: FiBookmark, count: bookmarks?.length ?? 0 }] : []),
+  ]
+
   return (
-    <div className="custom-container mx-auto max-w-4xl py-6 sm:py-8">
+    <div className="mx-auto flex w-full max-w-4xl flex-col items-stretch px-4 py-6 sm:px-6 sm:py-8">
       {/* 뒤로가기 */}
       <Link
         href="/community"
-        className="mb-5 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-700 active:scale-95 sm:mb-6"
+        className="mb-5 inline-flex items-center gap-2 rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 transition-all hover:bg-gray-200 hover:text-gray-900 active:scale-95 sm:mb-6"
       >
         <FiArrowLeft className="h-4 w-4" />
-        커뮤니티로 돌아가기
+        커뮤니티
       </Link>
 
       {/* 프로필 헤더 */}
-      <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-sm sm:mb-8">
-        {/* 상단 그라데이션 배너 */}
-        <div className="h-20 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-400 sm:h-24" />
+      <div className="mb-6 w-full self-stretch overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 sm:mb-8 sm:rounded-3xl">
+        {/* 커버 이미지 */}
+        <div className="relative h-24 bg-gradient-to-br from-orange-400 via-amber-400 to-orange-500 sm:h-40">
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          <div className="absolute -bottom-1 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent" />
+        </div>
 
-        {/* 프로필 정보 */}
-        <div className="relative px-5 pb-5 sm:px-6 sm:pb-6">
-          {isLoading ? (
-            <div className="space-y-4 pt-10">
-              <div className="absolute -top-8 left-5 h-16 w-16 rounded-2xl bg-gray-200 ring-4 ring-white sm:-top-10 sm:left-6 sm:h-20 sm:w-20" />
-              <div className="h-7 w-40 rounded-lg bg-gray-200" />
-              <div className="flex gap-4">
-                <div className="h-5 w-32 rounded bg-gray-200" />
-                <div className="h-5 w-24 rounded bg-gray-200" />
+        <div className="relative w-full px-4 pb-4 sm:px-8 sm:pb-8">
+          {profileLoading ? (
+            <div className="w-full space-y-4">
+              <div className="absolute -top-10 left-4 h-20 w-20 animate-pulse rounded-full bg-gray-200 ring-4 ring-white sm:-top-16 sm:left-8 sm:h-32 sm:w-32" />
+              <div className="w-full pt-12 sm:pt-20">
+                <div className="h-7 w-32 animate-pulse rounded-lg bg-gray-200 sm:h-8 sm:w-40" />
+                <div className="mt-3 flex gap-2 sm:mt-4 sm:gap-3">
+                  <div className="h-8 w-28 animate-pulse rounded-lg bg-gray-200 sm:h-10 sm:w-32 sm:rounded-xl" />
+                </div>
+                <div className="mt-4 h-[60px] w-full animate-pulse rounded-xl bg-gray-200 sm:mt-6 sm:h-[72px] sm:rounded-2xl" />
               </div>
             </div>
           ) : profile ? (
             <>
-              {/* 아바타 */}
-              <Avatar className="absolute -top-8 left-5 h-16 w-16 rounded-2xl ring-4 ring-white sm:-top-10 sm:left-6 sm:h-20 sm:w-20">
-                <AvatarFallback className="rounded-2xl bg-gradient-to-br from-orange-100 to-amber-100 text-lg font-bold text-orange-700 sm:text-xl">
-                  {profile.nickname?.slice(0, 2) ?? '익명'}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                nickname={profile.nickname ?? '익명'}
+                size="xl"
+                initialLength={2}
+                avatarClassName="absolute -top-10 left-4 ring-4 ring-white sm:-top-16 sm:left-8"
+              />
 
-              <div className="pt-10 sm:pt-12">
-                <h1 className="mb-3 text-xl font-bold text-gray-900 sm:mb-4 sm:text-2xl">
+              <div className="w-full pt-12 sm:pt-20">
+                <h1 className="text-xl font-bold text-gray-900 sm:text-3xl">
                   {profile.nickname}
                 </h1>
 
-                {/* 통계 배지 */}
-                <div className="flex flex-wrap gap-3">
-                  <div className="inline-flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 ring-1 ring-gray-100">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100">
-                      <FiCalendar className="h-3.5 w-3.5 text-blue-600" />
-                    </div>
-                    <div className="text-sm">
-                      <span className="text-gray-500">가입일</span>
-                      <span className="ml-1.5 font-semibold text-gray-800">{formatDate(profile.joinedAt)}</span>
-                    </div>
+                <div className="mt-3 sm:mt-4">
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 sm:gap-2 sm:px-4 sm:py-2">
+                    <FiCalendar className="h-3.5 w-3.5 text-gray-500 sm:h-4 sm:w-4" />
+                    <span className="text-xs text-gray-600 sm:text-sm">{formatDate(profile.joinedAt)} 가입</span>
                   </div>
+                </div>
 
-                  <div className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 px-3 py-2 ring-1 ring-orange-100">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-orange-100 to-amber-100">
-                      <FiFileText className="h-3.5 w-3.5 text-orange-600" />
-                    </div>
-                    <div className="text-sm">
-                      <span className="text-gray-500">작성 글</span>
-                      <span className="ml-1.5 font-bold text-orange-600">{profile.postCount}개</span>
-                    </div>
+                {/* 활동 통계 */}
+                <div className={`mt-4 grid w-full rounded-xl bg-gray-50 py-3 sm:mt-6 sm:rounded-2xl sm:py-4 ${isOwnProfile ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                  <div className="flex flex-col items-center justify-center border-r border-gray-200">
+                    <p className="text-xl font-bold text-orange-600 sm:text-2xl">{formatNumber(profile.postCount)}</p>
+                    <p className="mt-0.5 text-xs text-gray-500 sm:text-sm">작성글</p>
                   </div>
+                  <div className={`flex flex-col items-center justify-center ${isOwnProfile ? 'border-r border-gray-200' : ''}`}>
+                    <p className="text-xl font-bold text-success sm:text-2xl">{formatNumber(profile.commentedPostCount)}</p>
+                    <p className="mt-0.5 text-xs text-gray-500 sm:text-sm">댓글</p>
+                  </div>
+                  {isOwnProfile && (
+                    <div className="flex flex-col items-center justify-center">
+                      <p className="text-xl font-bold text-blue-600 sm:text-2xl">{formatNumber(bookmarks?.length ?? 0)}</p>
+                      <p className="mt-0.5 text-xs text-gray-500 sm:text-sm">북마크</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </>
@@ -117,113 +141,128 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* 작성 게시글 */}
-      <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 sm:text-lg">
-            작성한 게시글
-            <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-gray-100 px-2 text-xs font-semibold text-gray-600">
-              {postsData?.page?.totalElements ?? 0}
-            </span>
-          </h2>
-
-          {/* 뷰 타입 전환 */}
-          <div className="flex shrink-0 items-center gap-0.5 rounded-xl border border-gray-200 bg-gray-50 p-0.5">
+      {/* 탭 네비게이션 */}
+      <div className="mb-4 w-full sm:mb-6">
+        <div className={`grid w-full gap-2 ${isOwnProfile ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          {tabs.map(tab => (
             <button
-              onClick={() => handleViewChange('list')}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all active:scale-90 ${
-                viewType === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center justify-center gap-1.5 rounded-full py-2.5 text-xs font-medium transition-all sm:gap-2 sm:py-3 sm:text-sm ${
+                activeTab === tab.id
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50 hover:text-gray-900'
               }`}
-              aria-label="리스트형 보기"
             >
-              <FiList className="h-4 w-4" />
+              <tab.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{tab.id === 'posts' ? '작성글' : tab.id === 'commented' ? '댓글' : '북마크'}</span>
+              <span className={`rounded-full px-1.5 py-0.5 text-[10px] sm:px-2 sm:text-xs ${
+                activeTab === tab.id
+                  ? 'bg-white/20 text-white'
+                  : 'bg-gray-100 text-gray-500'
+              }`}>
+                {formatNumber(tab.count)}
+              </span>
             </button>
-            <button
-              onClick={() => handleViewChange('card')}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all active:scale-90 ${
-                viewType === 'card' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'
-              }`}
-              aria-label="카드형 보기"
-            >
-              <FiGrid className="h-4 w-4" />
-            </button>
-          </div>
+          ))}
         </div>
+      </div>
 
-        <PostList posts={postsData?.posts ?? []} isLoading={isLoading} viewType={viewType} />
-
-        {/* 페이지네이션 */}
-        {totalPages > 1 && (
-          <div className="mt-8 flex flex-col items-center gap-4">
-            <div className="flex items-center gap-1">
-              {/* 이전 */}
-              <button
-                onClick={() => setPage(p => Math.max(0, p - 1))}
-                disabled={page === 0}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all hover:bg-gray-50 active:scale-95 disabled:opacity-40 disabled:hover:bg-white sm:h-9 sm:w-9"
-                aria-label="이전 페이지"
-              >
-                <FiChevronLeft className="h-5 w-5 sm:h-4 sm:w-4" />
-              </button>
-
-              {/* 페이지 번호 */}
-              <div className="flex items-center gap-1 px-1">
-                {(() => {
-                  const maxVisible = 5
-                  let start = Math.max(0, page - Math.floor(maxVisible / 2))
-                  const end = Math.min(totalPages - 1, start + maxVisible - 1)
-                  if (end - start + 1 < maxVisible) {
-                    start = Math.max(0, end - maxVisible + 1)
-                  }
-                  const pages = []
-                  for (let i = start; i <= end; i++) {
-                    pages.push(i)
-                  }
-                  return pages.map(pageNum => (
-                    <button
-                      key={pageNum}
-                      onClick={() => setPage(pageNum)}
-                      className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-medium transition-all active:scale-95 sm:h-9 sm:w-9 ${
-                        pageNum === page
-                          ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/50'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      {pageNum + 1}
-                    </button>
-                  ))
-                })()}
-              </div>
-
-              {/* 다음 */}
-              <button
-                onClick={() => setPage(p => p + 1)}
-                disabled={page >= totalPages - 1}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all hover:bg-gray-50 active:scale-95 disabled:opacity-40 disabled:hover:bg-white sm:h-9 sm:w-9"
-                aria-label="다음 페이지"
-              >
-                <FiChevronRight className="h-5 w-5 sm:h-4 sm:w-4" />
-              </button>
-            </div>
-
-            {/* 페이지 정보 */}
-            <p className="text-sm text-gray-500">
-              <span className="font-medium text-gray-700">{page + 1}</span>
-              <span className="mx-1">/</span>
-              <span>{totalPages}</span>
-              <span className="ml-1">페이지</span>
-            </p>
+      {/* 탭 컨텐츠 */}
+      <div className="w-full">
+        {/* 작성한 글 탭 */}
+        {activeTab === 'posts' && (
+          <div className="min-h-[300px] w-full space-y-3 sm:min-h-[400px] sm:space-y-4">
+            {postsLoading ? (
+              <>
+                <CardSkeleton />
+                <CardSkeleton />
+                <CardSkeleton />
+              </>
+            ) : postsData?.posts && postsData.posts.length > 0 ? (
+              <>
+                {postsData.posts.map(post => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onClick={() => router.push(`/community/${post.id}`)}
+                  />
+                ))}
+                <Pagination
+                  page={postsPage}
+                  totalPages={postsData.page?.totalPages ?? 1}
+                  onPageChange={setPostsPage}
+                />
+              </>
+            ) : (
+              <EmptyState
+                icon={FiFileText}
+                title="작성한 게시글이 없습니다"
+                description="아직 게시글을 작성하지 않았어요"
+              />
+            )}
           </div>
         )}
 
-        {/* 게시글 없음 */}
-        {!isLoading && postsData?.posts.length === 0 && (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-16">
-            <div className="mb-4 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 p-4">
-              <FiUser className="h-8 w-8 text-gray-300" />
-            </div>
-            <p className="text-lg font-semibold text-gray-700">작성한 게시글이 없습니다</p>
-            <p className="mt-1.5 text-sm text-gray-500">아직 게시글을 작성하지 않았어요</p>
+        {/* 댓글 단 글 탭 */}
+        {activeTab === 'commented' && (
+          <div className="min-h-[300px] w-full space-y-3 sm:min-h-[400px] sm:space-y-4">
+            {commentedLoading ? (
+              <>
+                <CardSkeleton />
+                <CardSkeleton />
+                <CardSkeleton />
+              </>
+            ) : commentedData?.posts && commentedData.posts.length > 0 ? (
+              <>
+                {commentedData.posts.map(post => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onClick={() => router.push(`/community/${post.id}`)}
+                  />
+                ))}
+                <Pagination
+                  page={commentedPage}
+                  totalPages={commentedData.page?.totalPages ?? 1}
+                  onPageChange={setCommentedPage}
+                />
+              </>
+            ) : (
+              <EmptyState
+                icon={FiMessageCircle}
+                title="댓글 단 게시글이 없습니다"
+                description="아직 댓글을 작성하지 않았어요"
+              />
+            )}
+          </div>
+        )}
+
+        {/* 북마크 탭 */}
+        {activeTab === 'bookmarks' && isOwnProfile && (
+          <div className="min-h-[300px] w-full space-y-3 sm:min-h-[400px] sm:space-y-4">
+            {bookmarksLoading ? (
+              <>
+                <CardSkeleton />
+                <CardSkeleton />
+                <CardSkeleton />
+              </>
+            ) : bookmarks && bookmarks.length > 0 ? (
+              bookmarks.map(bookmark => (
+                <BookmarkCard
+                  key={bookmark.bookmarkId}
+                  bookmark={bookmark}
+                  onClick={() => router.push(`/community/${bookmark.postId}`)}
+                />
+              ))
+            ) : (
+              <EmptyState
+                icon={FiBookmark}
+                title="북마크한 글이 없습니다"
+                description="마음에 드는 글을 북마크해보세요"
+              />
+            )}
           </div>
         )}
       </div>

@@ -1,3 +1,3 @@
-export { CertificateApprovalPage } from './CertificateApprovalPage'
-export { CertificateTable } from './CertificateTable'
-export { CertificateDetailModal } from './CertificateDetailModal'
+export { CertificateApprovalPage } from './certificate-approval-page'
+export { CertificateTable } from './certificate-table'
+export { CertificateDetailModal } from './certificate-detail-modal'

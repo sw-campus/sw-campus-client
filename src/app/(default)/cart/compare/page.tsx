@@ -1,4 +1,4 @@
-import CartCompareSection from '@/features/cart/components/compare-table/CartCompareSection'
+import CartCompareSection from '@/features/cart/components/compare-table/cart-compare-section'
 
 export default function Page() {
   return (

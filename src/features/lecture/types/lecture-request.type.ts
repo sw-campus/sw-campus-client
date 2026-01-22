@@ -32,6 +32,11 @@ export interface LectureAddCreateRequest {
   addName: string
 }
 
+export interface SpecialCurriculumRequest {
+  title: string
+  sortOrder: number
+}
+
 export type CurriculumLevel = 'NONE' | 'BASIC' | 'ADVANCED'
 
 export interface LectureCurriculumRequest {
@@ -88,6 +93,7 @@ export interface LectureCreateRequest {
   teachers?: LectureTeacherCreateRequest[]
   adds?: LectureAddCreateRequest[]
   curriculums?: LectureCurriculumRequest[]
+  specialCurriculums?: SpecialCurriculumRequest[]
 }
 
 export interface LectureCreateResponse {

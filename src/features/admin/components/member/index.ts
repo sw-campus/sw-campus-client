@@ -1,2 +1,2 @@
-export { MemberPage } from './MemberPage'
-export { MemberTable } from './MemberTable'
+export { MemberPage } from './member-page'
+export { MemberTable } from './member-table'

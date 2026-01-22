@@ -75,9 +75,9 @@ export const BANNER_PERIOD_STATUS_LABEL: Record<BannerPeriodStatus, string> = {
  * 배너 기간 상태 색상 (통계 카드와 동일한 색상 체계)
  */
 export const BANNER_PERIOD_STATUS_COLOR: Record<Exclude<BannerPeriodStatus, 'ALL'>, string> = {
-  SCHEDULED: 'bg-amber-500 text-white',
-  ACTIVE: 'bg-emerald-500 text-white',
-  ENDED: 'bg-gray-400 text-white',
+  SCHEDULED: 'bg-warning text-warning-foreground',
+  ACTIVE: 'bg-success text-success-foreground',
+  ENDED: 'bg-muted text-muted-foreground',
 }
 
 /**

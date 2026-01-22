@@ -26,7 +26,7 @@ lint:
       - .pnpm-store/
 
 
-# Build Dev (develop 브랜치)
+# Build Dev (develop 브랜치 전용)
 build-dev:
   stage: build
   image: docker:24
@@ -34,7 +34,7 @@ build-dev:
     - docker:24-dind
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
-    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH == "develop" && $CI_PIPELINE_SOURCE == "web"
       when: manual
   variables:
     TAG: "RHSA-$CI_COMMIT_SHA"
@@ -82,8 +82,8 @@ update-manifest-dev:
       git config user.email "gitlab-ci@${CI_SERVER_HOST}"
       git checkout develop
 
-      # 이미지 태그 업데이트
-      sed -i "/repository:.*sw-campus-client$/,/pullPolicy:/ s|tag: \".*\"|tag: \"$TAG\"|" k8s/environments/develop/values.yaml
+      # 수정된 sed 패턴: frontend/client
+      sed -i "/repository:.*frontend\/client/,/pullPolicy:/ s|tag: \".*\"|tag: \"$TAG\"|" k8s/environments/develop/values.yaml
 
       git add .
       if git diff --staged --quiet; then
@@ -94,7 +94,7 @@ update-manifest-dev:
       fi
 
 
-# Build Release (main 브랜치)
+# Build Release (main 브랜치 전용)
 build-release:
   stage: build
   image: docker:24
@@ -102,17 +102,15 @@ build-release:
     - docker:24-dind
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /\[skip ci\]/
-    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "web"
       when: manual
   before_script:
     - apk add --no-cache nodejs npm jq
   script:
     - |
-      # package.json에서 버전 읽기
       CURRENT_VERSION=$(node -p "require('./package.json').version")
       echo "Current version: $CURRENT_VERSION"
 
-      # 버전 파싱 및 증가
       MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
       MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
       PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
@@ -124,11 +122,9 @@ build-release:
       echo "VERSION_TAG=$VERSION_TAG" >> build.env
       echo "NEW_VERSION=$NEW_VERSION" >> build.env
 
-      # package.json 업데이트
       jq ".version = \"$NEW_VERSION\"" package.json > package.json.tmp
       mv package.json.tmp package.json
 
-      # Docker 빌드 & 푸시
       docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
 
       docker build \
@@ -169,7 +165,6 @@ commit-version-bump:
       git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
       git push origin HEAD:main
 
-      # 태그 생성
       git tag -f "$VERSION_TAG"
       git push origin "$VERSION_TAG" -f
 
@@ -193,26 +188,12 @@ update-manifest-release:
       git config user.email "gitlab-ci@${CI_SERVER_HOST}"
       git checkout release
 
-      # 이미지 태그 업데이트
-      sed -i "/repository:.*sw-campus-client$/,/pullPolicy:/ s|tag: \".*\"|tag: \"$VERSION_TAG\"|" k8s/environments/release/values.yaml
-
-      # MR용 브랜치 생성
-      BRANCH_NAME="auto-update/client-$VERSION_TAG"
-      git checkout -b "$BRANCH_NAME"
+      sed -i "/repository:.*frontend\/client/,/pullPolicy:/ s|tag: \".*\"|tag: \"$VERSION_TAG\"|" k8s/environments/release/values.yaml
 
       git add .
-      git commit -m "chore(client): update prod image to $VERSION_TAG"
-      git push origin "$BRANCH_NAME"
-
-      # GitLab API로 MR 생성
-      curl --request POST \
-        --header "PRIVATE-TOKEN: ${MANIFEST_TOKEN}" \
-        --header "Content-Type: application/json" \
-        --data "{
-          \"source_branch\": \"$BRANCH_NAME\",
-          \"target_branch\": \"release\",
-          \"title\": \"chore(client): update prod image to $VERSION_TAG\",
-          \"description\": \"Auto-generated MR from Client build\n\n- **Image**: \`$CI_REGISTRY_IMAGE:$VERSION_TAG\`\n- **Commit**: $CI_COMMIT_SHA\",
-          \"remove_source_branch\": true
-        }" \
-        "https://${CI_SERVER_HOST}/api/v4/projects/${MANIFEST_PROJECT_ID}/merge_requests"
+      if git diff --staged --quiet; then
+        echo "No changes to commit"
+      else
+        git commit -m "chore(client): update prod image to $VERSION_TAG"
+        git push origin release
+      fi

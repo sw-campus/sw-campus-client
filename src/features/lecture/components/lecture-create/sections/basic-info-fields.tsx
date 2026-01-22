@@ -1,0 +1,105 @@
+'use client'
+
+import type { RefObject } from 'react'
+
+import { Controller, useFormContext, useWatch } from 'react-hook-form'
+
+import { Button } from '@/components/ui/button'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { toDigitsOnly } from '@/features/lecture/utils/input-format'
+import type { LectureFormValues } from '@/features/lecture/validation/lecture-form-schema'
+
+type Props = {
+  imageInputRef: RefObject<HTMLInputElement | null>
+}
+
+export function LectureCreateBasicInfoFields({ imageInputRef }: Props) {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<LectureFormValues>()
+
+  const lectureImageFile = useWatch({ control, name: 'lectureImageFile' })
+
+  return (
+    <>
+      <Field>
+        <FieldLabel>
+          강의명<span className="ml-1 text-xl font-bold text-red-600">*</span>
+        </FieldLabel>
+        <FieldContent>
+          <Controller
+            control={control}
+            name="lectureName"
+            render={({ field }) => <Input placeholder="강의명을 입력하세요." {...field} />}
+          />
+          {errors.lectureName && (
+            <FieldDescription className="text-red-600">{errors.lectureName.message}</FieldDescription>
+          )}
+        </FieldContent>
+      </Field>
+
+      <Field>
+        <FieldLabel>총 교육시간</FieldLabel>
+        <FieldContent>
+          <Controller
+            control={control}
+            name="totalTimes"
+            render={({ field }) => (
+              <Input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                placeholder="예) 960"
+                {...field}
+                value={field.value === null || field.value === undefined ? '' : String(field.value)}
+                onChange={e => {
+                  const next = toDigitsOnly(e.target.value)
+                  field.onChange(next === '' ? null : Number(next))
+                }}
+              />
+            )}
+          />
+          {errors.totalTimes && (
+            <FieldDescription className="text-red-600">{errors.totalTimes.message}</FieldDescription>
+          )}
+        </FieldContent>
+      </Field>
+
+      <Field>
+        <FieldLabel>대표 이미지</FieldLabel>
+        <FieldDescription>권장 사이즈: 1152x432px (16:6 비율)</FieldDescription>
+        <FieldContent>
+          <Controller
+            control={control}
+            name="lectureImageFile"
+            render={({ field: { onChange }, fieldState }) => (
+              <>
+                <div className="flex items-center gap-3">
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => {
+                      const file = e.target.files?.[0] ?? null
+                      onChange(file)
+                    }}
+                  />
+                  <Button type="button" onClick={() => imageInputRef.current?.click()}>
+                    업로드
+                  </Button>
+                  <span className="text-muted-foreground text-sm">{lectureImageFile?.name ?? '선택된 파일 없음'}</span>
+                </div>
+                {fieldState.error && (
+                  <FieldDescription className="text-red-600">{fieldState.error.message}</FieldDescription>
+                )}
+              </>
+            )}
+          />
+        </FieldContent>
+      </Field>
+    </>
+  )
+}

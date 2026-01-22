@@ -1,4 +1,4 @@
-'use client'
+import { Suspense } from 'react'
 
 import { SignupHeader, SignupCards } from '@/features/auth/components'
 
@@ -17,7 +17,9 @@ export default function SignupSelectPage() {
         <div className="relative z-10 w-full max-w-3xl rounded-3xl border border-white/15 bg-white/10 px-6 py-6 shadow-xl backdrop-blur-xl md:px-8 md:py-8">
           <div className="flex flex-col items-center gap-6 md:gap-8">
             <SignupHeader />
-            <SignupCards />
+            <Suspense fallback={null}>
+              <SignupCards />
+            </Suspense>
           </div>
         </div>
       </section>

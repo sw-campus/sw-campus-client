@@ -1,5 +1,5 @@
 import { AdminSidebar } from '@/features/admin'
-import { AdminDashboard } from '@/features/admin/components/dashboard/AdminDashboard'
+import { AdminDashboard } from '@/features/admin/components/dashboard/admin-dashboard'
 
 export default function AdminPage() {
   return (

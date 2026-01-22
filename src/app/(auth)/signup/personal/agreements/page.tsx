@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 
-import SignupAgreementsView from '@/features/auth/pages/SignupAgreementsView'
+import SignupAgreementsView from '@/features/auth/pages/signup-agreements-view'
 
 export default function SignupPersonalAgreementsPage() {
   return (
