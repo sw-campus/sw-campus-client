@@ -15,7 +15,7 @@ import {
 // Mapper functions
 
 
-function mapApiPostDetailToPostDetail(apiPost: ApiPostDetailResponse): PostDetail {
+export function mapApiPostDetailToPostDetail(apiPost: ApiPostDetailResponse): PostDetail {
   return {
     id: apiPost.id,
     title: apiPost.title,

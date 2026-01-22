@@ -1,48 +1,18 @@
-'use client'
+import type { Metadata } from 'next'
 
-import { motion, useReducedMotion, type Variants } from 'framer-motion'
+import HomeContent from './home-content'
 
-import LargeBanner from '@/features/banner/components/large-banner'
-import MidBanner from '@/features/banner/components/mid-banner'
-import LectureSection from '@/features/lecture/components/lecture-section'
-
-const container: Variants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.04,
-    },
-  },
-}
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, ease: 'easeOut' },
+export const metadata: Metadata = {
+  title: '소프트웨어캠퍼스 - 국비지원 IT 부트캠프 비교',
+  description:
+    '국비지원 IT 부트캠프를 한눈에 비교하세요. 강의 정보, 수강 후기, 취업률까지 모든 정보를 제공합니다.',
+  openGraph: {
+    title: '소프트웨어캠퍼스 - 국비지원 IT 부트캠프 비교',
+    description:
+      '국비지원 IT 부트캠프를 한눈에 비교하세요. 강의 정보, 수강 후기, 취업률까지 모든 정보를 제공합니다.',
   },
 }
 
 export default function Home() {
-  const reduceMotion = useReducedMotion()
-
-  return (
-    <motion.div
-      variants={container}
-      initial={reduceMotion ? false : 'hidden'}
-      animate={reduceMotion ? undefined : 'show'}
-    >
-      <motion.div variants={fadeUp}>
-        <LargeBanner />
-      </motion.div>
-      <motion.div variants={fadeUp}>
-        <MidBanner />
-      </motion.div>
-      <motion.div variants={fadeUp}>
-        <LectureSection />
-      </motion.div>
-    </motion.div>
-  )
+  return <HomeContent />
 }

@@ -15,4 +15,7 @@ export const env = {
   isLocal,
 
   NEXT_PUBLIC_API_URL: required(process.env.NEXT_PUBLIC_API_URL, 'NEXT_PUBLIC_API_URL'),
+  NEXT_PUBLIC_BASE_URL: isProd
+    ? required(process.env.NEXT_PUBLIC_BASE_URL, 'NEXT_PUBLIC_BASE_URL')
+    : (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
 }
