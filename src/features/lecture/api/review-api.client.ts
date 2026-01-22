@@ -1,6 +1,6 @@
 import { api } from '@/lib/axios'
 
-import type { Review, ReviewBlindStatus, ReviewListResponse, ReviewPageResponse, ReviewSortType } from './review-api.types'
+import type { ReviewBlindStatus, ReviewListResponse, ReviewPageResponse, ReviewSortType } from './review-api.types'
 
 /**
  * 강의별 승인된 후기 조회 API (블라인드 필터링 적용)
