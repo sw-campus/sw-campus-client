@@ -13,6 +13,7 @@ import { POST_SORT_OPTIONS, DEFAULT_POST_SORT } from '@/features/community/api/p
 import { LectureSearchModal, type SelectedLecture } from '@/features/community/components/lecture-search-modal'
 import { PostList } from '@/features/community/components/post-list'
 import { SearchBar } from '@/features/community/components/search-bar'
+import { TagInput } from '@/features/community/components/tag-input'
 import { useBoardCategories } from '@/features/community/hooks/use-board-categories'
 import { usePosts } from '@/features/community/hooks/use-posts'
 import { useAuthStore } from '@/store/auth-store'
@@ -24,9 +25,9 @@ function CommunityContent() {
   const searchParams = useSearchParams()
   const categoryIdParam = searchParams.get('categoryId')
   const keywordParam = searchParams.get('keyword') ?? ''
-  const tagsParam = searchParams.get('tags')
+  const tagsParams = searchParams.getAll('tags')
   const selectedCategoryId = categoryIdParam ? Number(categoryIdParam) : null
-  const selectedTags = tagsParam ? [tagsParam] : undefined
+  const selectedTags = tagsParams.length > 0 ? tagsParams : undefined
 
   const [page, setPage] = useState(0)
   const [sort, setSort] = useState(DEFAULT_POST_SORT)
@@ -73,8 +74,8 @@ function CommunityContent() {
     setPage(0)
   }
 
-  // 태그 필터 초기화
-  const handleClearTagFilter = () => {
+  // 태그 변경 핸들러
+  const handleTagsChange = (tags: string[]) => {
     const params = new URLSearchParams()
     if (selectedCategoryId !== null) {
       params.set('categoryId', selectedCategoryId.toString())
@@ -82,9 +83,23 @@ function CommunityContent() {
     if (keywordParam) {
       params.set('keyword', keywordParam)
     }
+    tags.forEach(tag => {
+      params.append('tags', tag)
+    })
     const queryString = params.toString()
     router.push(queryString ? `/community?${queryString}` : '/community')
     setPage(0)
+  }
+
+  // 개별 태그 삭제 핸들러
+  const handleRemoveTag = (tagToRemove: string) => {
+    const newTags = tagsParams.filter(tag => tag !== tagToRemove)
+    handleTagsChange(newTags)
+  }
+
+  // 태그 필터 초기화 (전체)
+  const handleClearTagFilter = () => {
+    handleTagsChange([])
   }
 
   const _handleCategorySelect = (categoryId: number | null) => {
@@ -97,6 +112,9 @@ function CommunityContent() {
     if (keywordParam) {
       params.set('keyword', keywordParam)
     }
+    tagsParams.forEach(tag => {
+      params.append('tags', tag)
+    })
     const queryString = params.toString()
     router.push(queryString ? `/community?${queryString}` : '/community')
   }
@@ -111,6 +129,9 @@ function CommunityContent() {
     if (keyword) {
       params.set('keyword', keyword)
     }
+    tagsParams.forEach(tag => {
+      params.append('tags', tag)
+    })
     const queryString = params.toString()
     router.push(queryString ? `/community?${queryString}` : '/community')
   }
@@ -132,22 +153,29 @@ function CommunityContent() {
 
   return (
     <div className="custom-container mx-auto w-full max-w-7xl">
-      {/* 1. 상단 헤더 영역 */}
-      <div className="mb-5 sm:mb-6">
+      {/* 1. 상단 헤더 영역 - 2026 트렌드: Bold 타이포그래피 + Calm UI */}
+      <div className="mb-8 sm:mb-10">
         <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">부트캠프 수강일기</h1>
-            <p className="mt-1 text-sm text-gray-500 sm:mt-2 sm:text-base">
-              매주 배운 내용과 성장 과정을 기록하고 공유하세요
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 px-3 py-1">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange-500" />
+              <span className="text-xs font-semibold text-orange-700">커뮤니티</span>
+            </div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
+              부트캠프 <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">수강일기</span>
+            </h1>
+            <p className="max-w-lg text-base text-gray-500 sm:text-lg">
+              매주 배운 내용과 성장 과정을 기록하고, 동료들과 함께 성장하세요
             </p>
           </div>
 
-          {/* 데스크탑 글쓰기 버튼 */}
+          {/* 데스크탑 글쓰기 버튼 - Liquid Glass 스타일 */}
           <div className="hidden sm:block">
             <Button
               onClick={handleWriteClick}
-              className="h-10 gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 text-sm font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-300/50"
+              className="group relative h-11 gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 px-6 text-sm font-bold shadow-lg shadow-orange-200/60 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-orange-300/60"
             >
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <FiEdit3 className="h-4 w-4" />
               글쓰기
             </Button>
@@ -155,116 +183,141 @@ function CommunityContent() {
         </div>
       </div>
 
-      {/* 2. 툴바 영역 */}
-      <div className="mb-5 rounded-2xl border border-gray-200/60 bg-white p-3 shadow-sm sm:mb-6 sm:p-4">
+      {/* 2. 툴바 영역 - 2026 트렌드: Calm UI + 더 여유로운 스페이싱 */}
+      <div className="mb-6 overflow-hidden rounded-3xl border border-gray-200/40 bg-white/80 p-4 shadow-sm backdrop-blur-xl sm:mb-8 sm:p-5">
         {/* 모바일: 세로 배치 / 데스크탑: 가로 배치 */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          {/* 검색창 */}
-          <div className="w-full sm:max-w-sm">
-            <SearchBar value={keywordParam} onChange={handleSearch} placeholder="검색어를 입력하세요" />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            {/* 검색창 */}
+            <div className="w-full sm:max-w-md">
+              <SearchBar value={keywordParam} onChange={handleSearch} placeholder="제목, 내용, 작성자로 검색..." />
+            </div>
+
+            {/* 필터 및 컨트롤 */}
+            <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-hide sm:pb-0">
+              {/* 강의 필터 */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsLectureModalOpen(true)}
+                className={`h-10 shrink-0 gap-2 rounded-xl border px-4 text-sm font-medium transition-all duration-200 active:scale-95 ${
+                  selectedLecture
+                    ? 'border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 shadow-sm shadow-orange-100/50'
+                    : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                <FiFilter className="h-4 w-4" />
+                <span>강의 필터</span>
+                {selectedLecture && (
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white shadow-sm">
+                    1
+                  </span>
+                )}
+              </Button>
+
+              {/* 정렬 선택 */}
+              <Select
+                value={sort}
+                onValueChange={value => {
+                  setSort(value)
+                  setPage(0)
+                }}
+              >
+                <SelectTrigger className="h-10 w-[120px] shrink-0 rounded-xl border-gray-200 bg-white text-sm font-medium">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {POST_SORT_OPTIONS.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* 구분선 */}
+              <div className="h-6 w-px shrink-0 bg-gray-200/80" />
+
+              {/* 뷰 타입 전환 - 더 세련된 토글 */}
+              <div className="flex shrink-0 items-center gap-1 rounded-xl bg-gray-100/80 p-1">
+                <button
+                  onClick={() => handleViewChange('list')}
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 active:scale-90 ${
+                    viewType === 'list'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                  aria-label="리스트형 보기"
+                >
+                  <FiList className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => handleViewChange('card')}
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 active:scale-90 ${
+                    viewType === 'card'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                  aria-label="카드형 보기"
+                >
+                  <FiGrid className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* 필터 및 컨트롤 */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide sm:pb-0">
-            {/* 강의 필터 */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsLectureModalOpen(true)}
-              className={`h-10 shrink-0 gap-1.5 rounded-xl border px-3 text-sm font-medium transition-all active:scale-95 sm:h-9 sm:text-[13px] ${
-                selectedLecture
-                  ? 'border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700'
-                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
-              }`}
-            >
-              <FiFilter className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-              <span>강의 필터</span>
-              {selectedLecture && (
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">
-                  1
-                </span>
-              )}
-            </Button>
-
-            {/* 정렬 선택 */}
-            <Select
-              value={sort}
-              onValueChange={value => {
-                setSort(value)
-                setPage(0)
-              }}
-            >
-              <SelectTrigger className="h-10 w-[110px] shrink-0 rounded-xl border-gray-200 bg-white text-sm sm:h-9 sm:w-[100px] sm:text-[13px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {POST_SORT_OPTIONS.map(option => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* 구분선 */}
-            <div className="h-5 w-px shrink-0 bg-gray-200" />
-
-            {/* 뷰 타입 전환 */}
-            <div className="flex shrink-0 items-center gap-0.5 rounded-xl border border-gray-200 bg-gray-50 p-0.5">
-              <button
-                onClick={() => handleViewChange('list')}
-                className={`flex h-9 w-9 items-center justify-center rounded-lg transition-all active:scale-90 sm:h-8 sm:w-8 ${
-                  viewType === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'
-                }`}
-                aria-label="리스트형 보기"
-              >
-                <FiList className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => handleViewChange('card')}
-                className={`flex h-9 w-9 items-center justify-center rounded-lg transition-all active:scale-90 sm:h-8 sm:w-8 ${
-                  viewType === 'card' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'
-                }`}
-                aria-label="카드형 보기"
-              >
-                <FiGrid className="h-4 w-4" />
-              </button>
-            </div>
+          {/* 태그 입력 */}
+          <div className="w-full sm:max-w-md">
+            <TagInput
+              tags={tagsParams}
+              onTagsChange={handleTagsChange}
+              placeholder="태그 입력 후 Enter"
+            />
           </div>
         </div>
       </div>
 
-      {/* 활성화된 필터 뱃지 영역 */}
-      {(selectedLecture || tagsParam) && (
-        <div className="mb-4 flex flex-wrap items-center gap-2 sm:mb-6">
+      {/* 활성화된 필터 뱃지 영역 - 2026 트렌드: 시각적 피드백 강화 */}
+      {(selectedLecture || tagsParams.length > 0) && (
+        <div className="mb-6 flex flex-wrap items-center gap-2.5 sm:mb-8">
+          <span className="text-sm font-medium text-gray-500">필터:</span>
           {selectedLecture && (
             <Badge
               variant="secondary"
-              className="h-7 gap-1.5 rounded-full bg-gradient-to-r from-orange-50 to-amber-50 px-3 text-orange-700 ring-1 ring-orange-200"
+              className="h-8 gap-2 rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 px-3.5 text-orange-700 shadow-sm ring-1 ring-orange-200/60"
             >
-              <span className="max-w-[150px] truncate text-[13px]">강의: {selectedLecture.name}</span>
+              <span className="max-w-[180px] truncate text-sm font-medium">{selectedLecture.name}</span>
               <button
                 onClick={handleClearLectureFilter}
-                className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full transition-colors hover:bg-orange-200/50"
+                className="flex h-5 w-5 items-center justify-center rounded-lg transition-colors hover:bg-orange-200/60"
               >
-                <FiX className="h-3 w-3" />
+                <FiX className="h-3.5 w-3.5" />
               </button>
             </Badge>
           )}
-          {tagsParam && (
+          {tagsParams.map(tag => (
             <Badge
+              key={tag}
               variant="secondary"
-              className="h-7 gap-1.5 rounded-full bg-blue-50 px-3 text-blue-700 ring-1 ring-blue-200"
+              className="h-8 gap-2 rounded-xl bg-blue-50 px-3.5 text-blue-700 shadow-sm ring-1 ring-blue-200/60"
             >
-              <FiTag className="h-3 w-3" />
-              <span className="max-w-[150px] truncate text-[13px]">{tagsParam}</span>
+              <FiTag className="h-3.5 w-3.5" />
+              <span className="max-w-[180px] truncate text-sm font-medium">{tag}</span>
               <button
-                onClick={handleClearTagFilter}
-                className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full transition-colors hover:bg-blue-200/50"
+                onClick={() => handleRemoveTag(tag)}
+                className="flex h-5 w-5 items-center justify-center rounded-lg transition-colors hover:bg-blue-200/60"
               >
-                <FiX className="h-3 w-3" />
+                <FiX className="h-3.5 w-3.5" />
               </button>
             </Badge>
+          ))}
+          {tagsParams.length > 1 && (
+            <button
+              onClick={handleClearTagFilter}
+              className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-700"
+            >
+              전체 해제
+            </button>
           )}
         </div>
       )}
@@ -273,11 +326,11 @@ function CommunityContent() {
       <div className="flex flex-col gap-6">
         {/* 게시글 목록 */}
         <main className="min-w-0 flex-1">
-          {/* 목록 헤더 */}
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 sm:text-lg">
+          {/* 목록 헤더 - 2026 트렌드: Calm UI */}
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="flex items-center gap-3 text-lg font-bold text-gray-900 sm:text-xl">
               전체 글
-              <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-gray-100 px-2 text-xs font-semibold text-gray-600">
+              <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-lg bg-gradient-to-r from-gray-100 to-gray-50 px-2.5 text-sm font-semibold tabular-nums text-gray-600">
                 {data?.page?.totalElements ?? 0}
               </span>
             </h2>
@@ -352,13 +405,14 @@ function CommunityContent() {
         </main>
       </div>
 
-      {/* 모바일 플로팅 글쓰기 버튼 */}
+      {/* 모바일 플로팅 글쓰기 버튼 - 2026 트렌드: Liquid Glass + Motion */}
       <button
         onClick={handleWriteClick}
-        className="fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-300/50 transition-all active:scale-90 sm:hidden"
+        className="group fixed right-5 bottom-5 z-50 flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-xl shadow-orange-400/40 transition-all duration-300 active:scale-90 sm:hidden"
         aria-label="글쓰기"
       >
-        <FiEdit3 className="h-6 w-6" />
+        <span className="absolute inset-0 rounded-[20px] bg-gradient-to-br from-white/20 to-transparent opacity-0 transition-opacity duration-300 group-active:opacity-100" />
+        <FiEdit3 className="h-7 w-7 transition-transform duration-300 group-active:rotate-12" />
       </button>
 
       {/* 강의 검색 모달 */}

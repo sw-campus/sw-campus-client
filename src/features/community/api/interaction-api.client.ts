@@ -41,3 +41,18 @@ export async function getMyBookmarks(): Promise<BookmarkWithPost[]> {
   const { data } = await api.get<BookmarkWithPost[]>('/bookmarks')
   return data
 }
+
+// 좋아요 누른 사용자 정보
+export interface Liker {
+  id: number
+  nickname: string
+}
+
+/**
+ * 게시글 좋아요 목록 조회 API
+ * GET /api/v1/posts/:postId/likers
+ */
+export async function getPostLikers(postId: number): Promise<Liker[]> {
+  const { data } = await api.get<Liker[]>(`/posts/${postId}/likers`)
+  return data
+}
