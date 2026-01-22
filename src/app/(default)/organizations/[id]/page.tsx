@@ -40,6 +40,9 @@ export async function generateMetadata({ params }: OrganizationDetailPageProps):
   return {
     title: orgName,
     description: orgDescription,
+    alternates: {
+      canonical: `${env.NEXT_PUBLIC_BASE_URL}/organizations/${id}`,
+    },
     openGraph: {
       title: `${orgName} | 소프트웨어캠퍼스`,
       description: orgDescription,
