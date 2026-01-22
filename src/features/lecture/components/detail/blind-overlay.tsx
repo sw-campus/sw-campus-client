@@ -26,14 +26,14 @@ export function BlindOverlay({ totalCount, visibleCount }: BlindOverlayProps) {
         <p className="text-foreground mb-1 text-sm font-semibold">{hiddenCount}개의 리뷰가 더 있습니다</p>
         <p className="text-muted-foreground mb-4 text-xs">
           {isLoggedIn
-            ? '리뷰를 작성하거나 설문조사를 완료하면 모든 리뷰를 볼 수 있어요'
+            ? '리뷰를 작성하거나 설문조사를 100% 완료하면 모든 리뷰를 볼 수 있어요'
             : '로그인하면 더 많은 리뷰를 확인할 수 있어요'}
         </p>
 
         {isLoggedIn ? (
           <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
             <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
-              <Link href="/survey">설문조사 완료하기</Link>
+              <Link href="/mypage/personal">설문조사 완료하기</Link>
             </Button>
             <span className="text-muted-foreground text-xs">또는</span>
             <p className="text-muted-foreground text-xs">위에서 후기를 작성해 주세요</p>
