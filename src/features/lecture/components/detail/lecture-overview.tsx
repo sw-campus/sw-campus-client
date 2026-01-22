@@ -20,7 +20,15 @@ interface Props {
   isAiSummary: boolean
 }
 
-export default function LectureOverview({ lecture, org, displaySummary, isLoading, isOrgLoading, isAiLoading, isAiSummary }: Props) {
+export default function LectureOverview({
+  lecture,
+  org,
+  displaySummary,
+  isLoading,
+  isOrgLoading,
+  isAiLoading,
+  isAiSummary,
+}: Props) {
   return (
     <div className="space-y-12">
       {/* 프로그램 요약 */}
@@ -191,7 +199,10 @@ export default function LectureOverview({ lecture, org, displaySummary, isLoadin
               <div className="flex flex-col gap-3 sm:hidden">
                 {applicationSteps.length > 0 ? (
                   applicationSteps.map((step, idx) => (
-                    <div key={idx} className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm ring-1 ring-black/5">
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm ring-1 ring-black/5"
+                    >
                       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-500">
                         {idx + 1}
                       </div>

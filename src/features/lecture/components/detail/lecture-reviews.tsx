@@ -8,13 +8,13 @@ import { useRouter } from 'next/navigation'
 import { FaUser } from 'react-icons/fa'
 import { toast } from 'sonner'
 
-import { useAuthStore } from '@/store/auth-store'
-
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { checkReviewEligibility, createReview, getLectureReviews } from '@/features/lecture/api/review-api.client'
+import { CATEGORY_LABELS, type Review, type ReviewCategory } from '@/features/lecture/api/review-api.types'
+import { useAuthStore } from '@/store/auth-store'
 
-import { checkReviewEligibility, createReview, getLectureReviews } from '../../api/review-api.client'
-import { CATEGORY_LABELS, type Review, type ReviewCategory } from '../../api/review-api.types'
+import { BlindOverlay } from './blind-overlay'
 import { CertificateVerifyModal } from './certificate-verify-modal'
 import { formatDate, Section, StarRating } from './detail-shared'
 import { ReviewCompleteModal } from './review-complete-modal'
@@ -120,9 +120,9 @@ export default function LectureReviews({ lectureId }: Props) {
   })
   const [overallComment, setOverallComment] = useState('')
 
-  // 리뷰 목록 조회
+  // 리뷰 목록 조회 (블라인드 필터링 적용)
   const {
-    data: reviews,
+    data: reviewData,
     isLoading,
     isError,
   } = useQuery({
@@ -130,6 +130,10 @@ export default function LectureReviews({ lectureId }: Props) {
     queryFn: () => getLectureReviews(lectureId),
     staleTime: 1000 * 60,
   })
+
+  const reviews = reviewData?.reviews ?? []
+  const totalCount = reviewData?.totalCount ?? 0
+  const isUnblinded = reviewData?.isUnblinded ?? false
 
   // 후기 작성 버튼 클릭
   const handleWriteClick = async () => {
@@ -273,6 +277,10 @@ export default function LectureReviews({ lectureId }: Props) {
         {reviews.map(review => (
           <ReviewCard key={review.reviewId} review={review} />
         ))}
+        {/* 블라인드 상태면 오버레이 표시 */}
+        {!isUnblinded && totalCount > reviews.length && (
+          <BlindOverlay totalCount={totalCount} visibleCount={reviews.length} />
+        )}
       </div>
     )
   }

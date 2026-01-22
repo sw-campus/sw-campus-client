@@ -1,7 +1,7 @@
 'use client'
 
-import Modal from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
+import Modal from '@/components/ui/modal'
 
 interface ReviewCompleteModalProps {
   isOpen: boolean
@@ -19,7 +19,7 @@ export function ReviewCompleteModal({ isOpen, onClose }: ReviewCompleteModalProp
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              className="h-full w-full text-success"
+              className="text-success h-full w-full"
             >
               <path d="M20 6L9 17l-5-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
