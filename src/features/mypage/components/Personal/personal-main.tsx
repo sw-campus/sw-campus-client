@@ -161,7 +161,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
 
   // 리뷰 승인 여부 확인 헬퍼 함수
   const isReviewApproved = (lecture: CompletedLecture): boolean => {
-    return lecture.reviewStatus === APPROVAL_STATUS.APPROVED
+    return !canEditByStatus(lecture.reviewStatus)
   }
 
   const _formatDate = (iso?: string) => {
