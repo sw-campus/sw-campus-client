@@ -13,7 +13,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import {
-  APPROVAL_STATUS,
   getApprovalStatusLabel,
   getApprovalStatusColor,
   canEditByStatus,
@@ -60,7 +59,7 @@ export function ReviewManagementSection() {
   }
 
   const isReadOnly = (lecture: CompletedLecture): boolean => {
-    return lecture.reviewStatus === APPROVAL_STATUS.APPROVED
+    return !canEditByStatus(lecture.reviewStatus)
   }
 
   const handleFileSelect = (file: File) => {
