@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FiEye, FiHeart, FiMessageCircle, FiTrendingUp, FiMapPin, FiFileText } from 'react-icons/fi'
+import { FiEye, FiHeart, FiMessageCircle, FiTrendingUp, FiMapPin } from 'react-icons/fi'
 
 import { UserAvatar } from '@/components/ui/user-avatar'
 import { formatRelativeTime } from '@/lib/format-relative-time'
@@ -46,26 +46,6 @@ export function PostListRow({ post }: PostListRowProps) {
 
         {/* 호버 시 좌측 액센트 라인 */}
         <div className="absolute top-5 bottom-5 left-0 w-1 rounded-r-full bg-gradient-to-b from-orange-400 to-amber-400 opacity-0 transition-all duration-300 group-hover:opacity-100" />
-
-        {/* 썸네일 영역 - 왼쪽에 배치 */}
-        <div className="shrink-0">
-          <div className="relative h-20 w-20 overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 ring-1 ring-gray-200/30 sm:h-24 sm:w-36">
-            {post.thumbnailUrl ? (
-              <Image
-                src={post.thumbnailUrl}
-                alt={post.title}
-                fill
-                sizes="(max-width: 639px) 80px, 144px"
-                quality={85}
-                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <FiFileText className="h-8 w-8 text-gray-300 sm:h-10 sm:w-10" />
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* 컨텐츠 영역 */}
         <div className="flex min-w-0 flex-1 flex-col justify-between">
@@ -157,6 +137,20 @@ export function PostListRow({ post }: PostListRowProps) {
             </div>
           </div>
         </div>
+
+        {/* 썸네일 영역 (오른쪽) - 있을 때만 표시 */}
+        {post.thumbnailUrl && (
+          <div className="relative hidden h-20 w-28 shrink-0 overflow-hidden rounded-xl sm:block sm:h-24 sm:w-36">
+            <Image
+              src={post.thumbnailUrl}
+              alt={post.title}
+              fill
+              sizes="(max-width: 640px) 112px, 144px"
+              quality={85}
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            />
+          </div>
+        )}
       </div>
     </div>
   )
