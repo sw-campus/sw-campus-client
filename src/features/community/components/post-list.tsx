@@ -96,7 +96,7 @@ export function PostList({ posts, isLoading = false, viewType }: PostListProps) 
     )
   }
 
-  // 빈 목록 - 2026 트렌드: 친근하고 모던한 빈 상태
+  // 빈 목록
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/30 to-white py-24">

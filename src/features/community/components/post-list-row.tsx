@@ -21,10 +21,7 @@ interface PostListRowProps {
 const POPULAR_THRESHOLD = 10
 
 /**
- * 게시글 줄형 아이템 컴포넌트 - 2026 트렌드 적용
- * - Calm UI: 여유로운 여백과 정보 계층 구조
- * - 세련된 호버 효과
- * - 부드러운 애니메이션
+ * 게시글 줄형 아이템 컴포넌트
  */
 export function PostListRow({ post }: PostListRowProps) {
   const router = useRouter()

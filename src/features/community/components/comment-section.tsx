@@ -24,10 +24,7 @@ export interface ReplyFormProps {
 }
 
 /**
- * 댓글 섹션 컴포넌트 - 2026 트렌드 적용
- * - Calm UI: 여유로운 여백과 부드러운 전환
- * - 향상된 스레드 시각화
- * - 모던한 입력 폼
+ * 댓글 섹션 컴포넌트
  */
 export function CommentSection({ postId }: CommentSectionProps) {
   const { isLoggedIn } = useAuthStore()
@@ -115,7 +112,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
 
   return (
     <section className="mt-12 border-t border-gray-100 pt-10">
-      {/* 헤더 - 2026 트렌드: 더 bold한 타이포그래피 */}
+      {/* 헤더 */}
       <div className="mb-8 flex items-center gap-4">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-100 to-amber-100 shadow-sm">
           <FiMessageCircle className="h-5 w-5 text-orange-600" />

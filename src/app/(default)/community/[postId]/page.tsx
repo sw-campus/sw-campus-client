@@ -201,7 +201,7 @@ export default function PostDetailPage() {
   return (
     <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 sm:px-6 sm:py-8 md:px-8">
       <div className="mx-auto w-full lg:max-w-3xl">
-      {/* 뒤로가기 - 2026 트렌드: 부드러운 전환 */}
+      {/* 뒤로가기 */}
       <Link
         href="/community"
         className="mb-5 ml-4 inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 active:scale-95 sm:mb-8 sm:ml-0"
@@ -210,7 +210,7 @@ export default function PostDetailPage() {
         <span>목록으로</span>
       </Link>
 
-      {/* 게시글 카드 - 2026 트렌드: Liquid Glass + Calm UI */}
+      {/* 게시글 카드 */}
       <article className="overflow-hidden border-y border-gray-200/40 bg-white shadow-sm sm:rounded-3xl sm:border sm:shadow-lg sm:shadow-gray-100/50">
         {/* 헤더 */}
         <header className="p-5 pb-0 sm:p-8 sm:pb-0">
@@ -260,7 +260,7 @@ export default function PostDetailPage() {
             </div>
           )}
 
-          {/* 제목 - 2026 트렌드: Bold 타이포그래피 */}
+          {/* 제목 */}
           <h1 className="mb-6 text-2xl leading-tight font-extrabold tracking-tight text-gray-900 sm:mb-8 sm:text-3xl lg:text-4xl">
             {post.title}
           </h1>
@@ -314,7 +314,7 @@ export default function PostDetailPage() {
           </div>
         </header>
 
-        {/* 구분선 - 2026 트렌드: 더 여유로운 여백 */}
+        {/* 구분선 */}
         <div className="mx-5 my-6 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent sm:mx-8 sm:my-8" />
 
         {/* 본문 */}
@@ -359,7 +359,7 @@ export default function PostDetailPage() {
           )}
         </div>
 
-        {/* 액션 버튼 - 2026 트렌드: 더 큰 버튼, 명확한 피드백 */}
+        {/* 액션 버튼 */}
         {isLoggedIn && (
           <div className="mt-8 border-t border-gray-100 p-5 sm:mt-10 sm:p-6">
             {/* 좋아요, 북마크 - 항상 표시 */}
