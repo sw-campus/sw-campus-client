@@ -93,3 +93,4 @@ src/app/
 | `06-eslint-rules.md` | ESLint 규칙 |
 | `07-performance-optimization.md` | 성능 최적화 |
 | `08-security.md` | 보안 규칙 |
+| `09-naming-conventions.md` | 네이밍 컨벤션 |

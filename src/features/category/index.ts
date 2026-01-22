@@ -5,5 +5,5 @@ export * from './types/category.type'
 export * from './api/category.api'
 
 // Hooks
-export * from './hooks/useCategoryTree'
-export * from './hooks/useCurriculumsByCategoryId'
+export * from './hooks/use-category-tree'
+export * from './hooks/use-curriculums-by-category-id'

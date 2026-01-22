@@ -9,6 +9,16 @@
 
 ---
 
+## ⚠️ 리뷰 코멘트 작성 원칙
+
+- **문제가 있는 코드에만 코멘트합니다.**
+- 잘 작성된 코드에 칭찬/긍정적 코멘트를 작성하지 마세요.
+- "좋습니다", "잘했습니다", "훌륭합니다" 등의 표현을 사용하지 마세요.
+- 개선이 필요한 부분에만 집중하세요.
+- 문제가 없으면 코멘트를 작성하지 마세요.
+
+---
+
 ## 프로젝트 개요
 
 - **프로젝트**: sw-campus-client (교육 플랫폼 프론트엔드)
@@ -249,13 +259,25 @@ try {
 
 ## 파일 네이밍 컨벤션
 
+### 파일명 (kebab-case)
+
 | 유형 | 패턴 | 예시 |
 |------|------|------|
-| 컴포넌트 | PascalCase | `CourseCard.tsx` |
-| 훅 | camelCase + use prefix | `useCourseQuery.ts` |
-| 타입 | `{domain}.type.ts` | `course.type.ts` |
-| API | `{domain}Api.ts` | `courseApi.ts` |
-| 스토어 | `{domain}.store.ts` | `cart.store.ts` |
+| 컴포넌트 | kebab-case.tsx | `course-card.tsx` |
+| 훅 | use-{name}.ts | `use-course-query.ts` |
+| API | {domain}-api.ts | `course-api.ts` |
+| 타입 | {domain}.type.ts | `course.type.ts` |
+| 스토어 | {domain}.store.ts | `cart.store.ts` |
+
+### 코드 내 네이밍
+
+| 유형 | 패턴 | 예시 |
+|------|------|------|
+| 컴포넌트 export | PascalCase | `CourseCard` |
+| 변수 | camelCase | `userName` |
+| 상수 | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
+| 함수 | camelCase + 동사 | `fetchUserData()` |
+| 타입/인터페이스 | PascalCase | `User`, `LectureResponse` |
 
 ---
 

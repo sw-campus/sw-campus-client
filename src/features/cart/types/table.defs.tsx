@@ -11,8 +11,8 @@ import {
   formatPcType,
   formatRecruitType,
   formatText,
-} from '@/features/cart/utils/cartCompareFormatters'
-import type { LectureDetail } from '@/features/lecture/api/lectureApi.types'
+} from '@/features/cart/utils/cart-compare-formatters'
+import type { LectureDetail } from '@/features/lecture/api/lecture-api.types'
 import { cn } from '@/lib/utils'
 
 export type Detail = LectureDetail | null | undefined
@@ -25,7 +25,7 @@ export type RowDef = {
 }
 
 export function valueOrUnselected(detail: Detail, value: ReactNode) {
-  return detail ? value : '미선택'
+  return detail ? value : '-'
 }
 
 export function dividerCell() {

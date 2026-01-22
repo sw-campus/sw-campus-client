@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 
-import VerifyClient from '@/app/(auth)/auth/verify/VerifyClient'
+import VerifyClient from '@/app/(auth)/auth/verify/verify-client'
 
 export default function VerifyPage() {
   return (
