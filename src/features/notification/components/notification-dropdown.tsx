@@ -69,7 +69,7 @@ function NotificationItem({
   onMarkAsRead: (id: number) => void
 }) {
   const router = useRouter()
-  const Icon = getNotificationIcon(notification.type)
+  const icon = getNotificationIcon(notification.type)
 
   const handleClick = () => {
     if (!notification.read) {
@@ -118,7 +118,7 @@ function NotificationItem({
             : 'bg-muted text-muted-foreground'
         )}
       >
-        <Icon className="size-4" />
+        {icon({ className: 'size-4' })}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
