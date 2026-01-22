@@ -11,13 +11,37 @@ import './globals.css'
 
 const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://softwarecampus.co.kr'
+
 export const metadata: Metadata = {
-  title: '소프트웨어캠퍼스',
-  description: '소프트웨어캠퍼스',
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: '소프트웨어캠퍼스',
+    template: '%s | 소프트웨어캠퍼스',
+  },
+  description: '국비지원 IT 부트캠프 비교 플랫폼 - 강의 비교, 수강 후기, 취업 정보를 한눈에',
+  keywords: ['부트캠프', '국비지원', 'IT교육', '개발자', '코딩', '프로그래밍', '취업'],
+  authors: [{ name: '소프트웨어캠퍼스' }],
+  creator: '소프트웨어캠퍼스',
   icons: {
     icon: '/icons/icon.png',
     shortcut: '/icons/favicon.ico',
     apple: '/icons/apple-icon.png',
+  },
+  openGraph: {
+    type: 'website',
+    siteName: '소프트웨어캠퍼스',
+    locale: 'ko_KR',
+    url: BASE_URL,
+    title: '소프트웨어캠퍼스',
+    description: '국비지원 IT 부트캠프 비교 플랫폼 - 강의 비교, 수강 후기, 취업 정보를 한눈에',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: BASE_URL,
   },
 }
 

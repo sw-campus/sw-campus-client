@@ -13,7 +13,6 @@ import { LogoutDialog } from '@/components/layout/header/logout-dialog'
 import { useLogout } from '@/features/auth/hooks/use-logout'
 import { useCartLecturesQuery } from '@/features/cart/hooks/use-cart-lectures-query'
 import type { CategoryTreeNode } from '@/features/category'
-import { NotificationDropdown } from '@/features/notification'
 import { ensureSessionActive } from '@/lib/axios'
 import { useAuthStore } from '@/store/auth-store'
 
@@ -166,8 +165,6 @@ export default function Header({
             >
               <FiLogOut />
             </HeaderIconAction>
-
-            <NotificationDropdown />
 
             <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href={mypageHref}>
               <FiUser />
