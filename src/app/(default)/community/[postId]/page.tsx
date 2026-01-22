@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { ClickableTag } from '@/features/community/components/clickable-tag'
 import { CommentSection } from '@/features/community/components/comment-section'
+import { LikerListModal } from '@/features/community/components/liker-list-modal'
 import { PostNavigation } from '@/features/community/components/post-navigation'
 import { UserProfileLink } from '@/features/community/components/user-profile-link'
 import { useDeletePost } from '@/features/community/hooks/use-delete-post'
@@ -55,6 +56,7 @@ export default function PostDetailPage() {
   const { mutate: togglePin, isPending: isPinning } = useTogglePin(postId)
   const [isCopied, setIsCopied] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isLikerModalOpen, setIsLikerModalOpen] = useState(false)
 
   const imagesNotInBody = useMemo(() => {
     if (!post) return []
@@ -71,6 +73,7 @@ export default function PostDetailPage() {
 
     return post.images.filter(url => !bodyImageUrls.has(url))
   }, [post])
+
 
   const handleDelete = () => {
     deletePost(postId, {
@@ -201,26 +204,26 @@ export default function PostDetailPage() {
       {/* 뒤로가기 */}
       <Link
         href="/community"
-        className="mb-4 ml-4 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900 active:scale-95 sm:mb-6 sm:ml-0"
+        className="mb-5 ml-4 inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 active:scale-95 sm:mb-8 sm:ml-0"
       >
         <FiArrowLeft className="h-4 w-4" />
-        <span>목록</span>
+        <span>목록으로</span>
       </Link>
 
       {/* 게시글 카드 */}
-      <article className="overflow-hidden border-y border-gray-200/60 bg-white shadow-sm sm:rounded-3xl sm:border">
+      <article className="overflow-hidden border-y border-gray-200/40 bg-white shadow-sm sm:rounded-3xl sm:border sm:shadow-lg sm:shadow-gray-100/50">
         {/* 헤더 */}
-        <header className="p-4 pb-0 sm:p-8 sm:pb-0">
+        <header className="p-5 pb-0 sm:p-8 sm:pb-0">
           {/* 배지 영역 */}
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
               {post.pinned && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 px-2.5 py-1 text-xs font-semibold text-orange-700">
-                  <FiMapPin className="h-3 w-3" />
+                <span className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-orange-100 to-amber-100 px-3 py-1.5 text-sm font-bold text-orange-700 shadow-sm">
+                  <FiMapPin className="h-4 w-4" />
                   공지
                 </span>
               )}
-              <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+              <span className="rounded-xl bg-gray-100/80 px-3 py-1.5 text-sm font-medium text-gray-600">
                 {post.categoryName}
               </span>
             </div>
@@ -228,21 +231,21 @@ export default function PostDetailPage() {
             {/* 공유 버튼 */}
             <button
               onClick={handleShare}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all active:scale-95 ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200 active:scale-95 ${
                 isCopied
                   ? 'bg-success/10 text-success'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100/80 text-gray-600 hover:bg-gray-200/80'
               }`}
             >
               {isCopied ? (
                 <>
-                  <FiCheck className="h-3.5 w-3.5" />
-                  복사됨
+                  <FiCheck className="h-4 w-4" />
+                  복사됨!
                 </>
               ) : (
                 <>
-                  <FiShare2 className="h-3.5 w-3.5" />
-                  공유
+                  <FiShare2 className="h-4 w-4" />
+                  공유하기
                 </>
               )}
             </button>
@@ -250,7 +253,7 @@ export default function PostDetailPage() {
 
           {/* 태그 */}
           {post.tags.length > 0 && (
-            <div className="mb-4 flex flex-wrap gap-1.5">
+            <div className="mb-5 flex flex-wrap gap-2">
               {post.tags.map(tag => (
                 <ClickableTag key={tag} tag={tag} variant="chip" />
               ))}
@@ -258,28 +261,28 @@ export default function PostDetailPage() {
           )}
 
           {/* 제목 */}
-          <h1 className="mb-5 text-xl leading-snug font-bold tracking-tight text-gray-900 sm:mb-6 sm:text-2xl lg:text-3xl">
+          <h1 className="mb-6 text-2xl leading-tight font-extrabold tracking-tight text-gray-900 sm:mb-8 sm:text-3xl lg:text-4xl">
             {post.title}
           </h1>
 
           {/* 작성자 정보 + 통계 */}
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             {/* 작성자 */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <UserProfileLink
                 userId={post.authorId}
-                className="transition-transform hover:scale-105"
+                className="transition-transform duration-200 hover:scale-105"
               >
-                <UserAvatar nickname={post.authorNickname ?? '익명'} size="md" avatarClassName="ring-2 ring-white" />
+                <UserAvatar nickname={post.authorNickname ?? '익명'} size="lg" avatarClassName="ring-2 ring-white shadow-md" />
               </UserProfileLink>
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-1">
                 <UserProfileLink
                   userId={post.authorId}
-                  className="font-semibold text-gray-900 transition-colors hover:text-orange-600"
+                  className="text-lg font-bold text-gray-900 transition-colors hover:text-orange-600"
                 >
                   {post.authorNickname ?? '익명'}
                 </UserProfileLink>
-                <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
                   <span title={formattedDate}>{relativeTime}</span>
                   <span className="hidden text-gray-300 sm:inline">·</span>
                   <span className="hidden text-gray-400 sm:inline">{formattedDate}</span>
@@ -287,29 +290,35 @@ export default function PostDetailPage() {
               </div>
             </div>
 
-            {/* 통계 */}
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              <span className="flex items-center gap-1.5" title="조회수">
-                <FiEye className="h-4 w-4" />
-                <span className="tabular-nums">{post.viewCount}</span>
+            {/* 통계 - 카드 스타일 */}
+            <div className="flex items-center gap-3 rounded-2xl bg-gray-50/80 px-4 py-2.5 text-sm">
+              <span className="flex items-center gap-1.5 text-gray-600" title="조회수">
+                <FiEye className="h-4 w-4 text-gray-400" />
+                <span className="font-semibold tabular-nums">{post.viewCount}</span>
               </span>
-              <span className="flex items-center gap-1.5" title="좋아요">
-                <FiHeart className="h-4 w-4" />
-                <span className="tabular-nums">{post.likeCount}</span>
-              </span>
-              <span className="flex items-center gap-1.5" title="댓글">
-                <FiMessageCircle className="h-4 w-4" />
-                <span className="tabular-nums">{post.commentCount}</span>
+              <div className="h-4 w-px bg-gray-200" />
+              <button
+                onClick={() => setIsLikerModalOpen(true)}
+                className="flex items-center gap-1.5 text-gray-600 transition-colors hover:text-rose-500"
+                title="좋아요 목록 보기"
+              >
+                <FiHeart className="h-4 w-4 text-gray-400" />
+                <span className="font-semibold tabular-nums">{post.likeCount}</span>
+              </button>
+              <div className="h-4 w-px bg-gray-200" />
+              <span className="flex items-center gap-1.5 text-gray-600" title="댓글">
+                <FiMessageCircle className="h-4 w-4 text-gray-400" />
+                <span className="font-semibold tabular-nums">{post.commentCount}</span>
               </span>
             </div>
           </div>
         </header>
 
         {/* 구분선 */}
-        <div className="mx-4 my-4 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent sm:mx-8 sm:my-6" />
+        <div className="mx-5 my-6 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent sm:mx-8 sm:my-8" />
 
         {/* 본문 */}
-        <div className="px-4 sm:px-8">
+        <div className="px-5 sm:px-8">
           {isLoggedIn ? (
             <>
               <div
@@ -352,33 +361,47 @@ export default function PostDetailPage() {
 
         {/* 액션 버튼 */}
         {isLoggedIn && (
-          <div className="mt-6 border-t border-gray-100 p-4 sm:mt-8 sm:p-6">
+          <div className="mt-8 border-t border-gray-100 p-5 sm:mt-10 sm:p-6">
             {/* 좋아요, 북마크 - 항상 표시 */}
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => toggleLike()}
-                disabled={isLiking}
-                className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-all active:scale-95 sm:flex-none sm:px-4 ${
-                  post.isLiked
-                    ? 'border-rose-200 bg-rose-50 text-rose-600'
-                    : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <FiHeart className={`h-4 w-4 ${post.isLiked ? 'fill-rose-500' : ''}`} />
-                <span>좋아요</span>
-                {post.likeCount > 0 && <span className="tabular-nums">{post.likeCount}</span>}
-              </button>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-1 sm:flex-none">
+                <button
+                  onClick={() => toggleLike()}
+                  disabled={isLiking}
+                  className={`flex h-11 flex-1 items-center justify-center gap-2.5 rounded-xl border text-sm font-bold transition-all duration-200 active:scale-95 sm:px-5 ${
+                    post.isLiked
+                      ? 'border-rose-200 bg-gradient-to-r from-rose-50 to-pink-50 text-rose-600 shadow-sm'
+                      : 'border-gray-200 text-gray-600 hover:border-rose-200 hover:bg-rose-50/50 hover:text-rose-500'
+                  } ${post.likeCount > 0 ? 'rounded-r-none border-r-0' : ''}`}
+                >
+                  <FiHeart className={`h-5 w-5 ${post.isLiked ? 'fill-rose-500' : ''}`} />
+                  <span>좋아요</span>
+                </button>
+                {post.likeCount > 0 && (
+                  <button
+                    onClick={() => setIsLikerModalOpen(true)}
+                    className={`flex h-11 items-center justify-center rounded-xl rounded-l-none border px-4 text-sm font-bold tabular-nums transition-all duration-200 hover:bg-gray-50 active:scale-95 ${
+                      post.isLiked
+                        ? 'border-rose-200 bg-gradient-to-r from-rose-50 to-pink-50 text-rose-600 hover:from-rose-100 hover:to-pink-100'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                    title="좋아요 목록 보기"
+                  >
+                    {post.likeCount}
+                  </button>
+                )}
+              </div>
 
               <button
                 onClick={() => toggleBookmark()}
                 disabled={isBookmarking}
-                className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-all active:scale-95 sm:flex-none sm:px-4 ${
+                className={`flex h-11 flex-1 items-center justify-center gap-2.5 rounded-xl border text-sm font-bold transition-all duration-200 active:scale-95 sm:flex-none sm:px-5 ${
                   post.isBookmarked
-                    ? 'border-warning/30 bg-warning/10 text-warning'
-                    : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                    ? 'border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-600 shadow-sm'
+                    : 'border-gray-200 text-gray-600 hover:border-amber-200 hover:bg-amber-50/50 hover:text-amber-500'
                 }`}
               >
-                <FiBookmark className={`h-4 w-4 ${post.isBookmarked ? 'fill-warning' : ''}`} />
+                <FiBookmark className={`h-5 w-5 ${post.isBookmarked ? 'fill-amber-500' : ''}`} />
                 <span>북마크</span>
               </button>
 
@@ -387,22 +410,22 @@ export default function PostDetailPage() {
                 <button
                   onClick={() => togglePin()}
                   disabled={isPinning}
-                  className={`flex h-10 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium transition-all active:scale-95 ${
+                  className={`flex h-11 items-center justify-center gap-2.5 rounded-xl border px-5 text-sm font-bold transition-all duration-200 active:scale-95 ${
                     post.pinned
-                      ? 'border-orange-200 bg-orange-50 text-orange-600'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                      ? 'border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 text-orange-600 shadow-sm'
+                      : 'border-gray-200 text-gray-600 hover:border-orange-200 hover:bg-orange-50/50 hover:text-orange-500'
                   }`}
                 >
-                  <FiMapPin className={`h-4 w-4 ${post.pinned ? 'fill-orange-600' : ''}`} />
+                  <FiMapPin className={`h-5 w-5 ${post.pinned ? 'fill-orange-600' : ''}`} />
                   <span className="hidden sm:inline">{post.pinned ? '고정 해제' : '공지 고정'}</span>
                 </button>
               )}
 
               {/* 수정/삭제 - 작성자 또는 관리자 */}
               {(post.isAuthor || userType === 'ADMIN') && (
-                <div className="flex gap-2 sm:ml-auto">
+                <div className="flex gap-2.5 sm:ml-auto">
                   <Link href={`/community/${post.id}/edit`}>
-                    <button className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-gray-200 px-3 text-sm font-medium text-gray-600 transition-all hover:border-gray-300 hover:bg-gray-50 active:scale-95 sm:px-4">
+                    <button className="flex h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 text-sm font-bold text-gray-600 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 active:scale-95 sm:px-5">
                       <FiEdit2 className="h-4 w-4" />
                       <span className="hidden sm:inline">수정</span>
                     </button>
@@ -412,7 +435,7 @@ export default function PostDetailPage() {
                     <AlertDialogTrigger asChild>
                       <button
                         disabled={isDeleting}
-                        className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-gray-200 px-3 text-sm font-medium text-rose-500 transition-all hover:border-rose-200 hover:bg-rose-50 active:scale-95 sm:px-4"
+                        className="flex h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 text-sm font-bold text-rose-500 transition-all duration-200 hover:border-rose-200 hover:bg-rose-50 active:scale-95 sm:px-5"
                       >
                         <FiTrash2 className="h-4 w-4" />
                         <span className="hidden sm:inline">삭제</span>
@@ -445,7 +468,7 @@ export default function PostDetailPage() {
 
         {/* 댓글 섹션 - 로그인한 사용자만 */}
         {isLoggedIn && (
-          <div className="px-4 pb-4 sm:px-8 sm:pb-8">
+          <div className="px-5 pb-6 sm:px-8 sm:pb-10">
             <CommentSection postId={postId} />
           </div>
         )}
@@ -456,6 +479,13 @@ export default function PostDetailPage() {
         <PostNavigation postId={postId} />
       </div>
       </div>
+
+      {/* 좋아요 목록 모달 */}
+      <LikerListModal
+        postId={postId}
+        open={isLikerModalOpen}
+        onOpenChange={setIsLikerModalOpen}
+      />
     </main>
   )
 }

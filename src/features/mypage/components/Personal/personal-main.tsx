@@ -231,20 +231,9 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
 
       const password = passwordInput.trim()
 
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[mypage.verify-password] request', {
-          hasPassword: password.length > 0,
-          passwordLength: password.length,
-        })
-      }
-
       const { data } = await api.post<unknown>('/mypage/verify-password', {
         password,
       })
-
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[mypage.verify-password] response', data)
-      }
 
       const verified =
         typeof data === 'boolean'
@@ -258,10 +247,6 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                 : typeof (data as { result?: unknown })?.result === 'boolean'
                   ? Boolean((data as { result?: unknown }).result)
                   : false
-
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('[mypage.verify-password] parsed', { verified })
-      }
 
       if (!verified) {
         setPasswordVerifyError('비밀번호가 일치하지 않습니다.')
