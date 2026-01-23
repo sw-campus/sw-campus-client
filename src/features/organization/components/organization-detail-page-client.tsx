@@ -1,21 +1,19 @@
 'use client'
 
-import type { OrganizationDetail as OrganizationDetailType } from '../types/organization.type'
 import { useOrganizationDetailQuery, useOrganizationLecturesQuery } from '../hooks/use-organizations'
 import { OrganizationDetail } from './organization-detail'
 
 interface OrganizationDetailPageClientProps {
   organizationId: number
-  initialData?: OrganizationDetailType
 }
 
 /**
  * 기관 상세 페이지 클라이언트 컴포넌트
  * API 연동을 통해 실제 데이터 표시
  */
-export function OrganizationDetailPageClient({ organizationId, initialData }: OrganizationDetailPageClientProps) {
+export function OrganizationDetailPageClient({ organizationId }: OrganizationDetailPageClientProps) {
   // 기관 상세 정보 조회
-  const { data: organization, isLoading: isOrgLoading } = useOrganizationDetailQuery(organizationId, initialData)
+  const { data: organization, isLoading: isOrgLoading } = useOrganizationDetailQuery(organizationId)
 
   // 기관별 강의 목록 조회
   const {

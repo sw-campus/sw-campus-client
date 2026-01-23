@@ -13,10 +13,8 @@ import { postKeys } from './use-posts'
  * 게시글 상세 조회 훅
  * - hydration 완료 후 게시글을 조회하여 인증 토큰이 포함되도록 함
  * - 로그인 상태가 변경되면 자동으로 다시 조회 (isLiked 등 사용자별 상태 갱신)
- * @param postId - 게시글 ID
- * @param initialData - 서버에서 미리 가져온 데이터 (SSR)
  */
-export function usePostDetail(postId: number, initialData?: PostDetail) {
+export function usePostDetail(postId: number) {
   const queryClient = useQueryClient()
   const hasHydrated = useAuthStore(state => state.hasHydrated)
   const isLoggedIn = useAuthStore(state => state.isLoggedIn)
@@ -35,6 +33,5 @@ export function usePostDetail(postId: number, initialData?: PostDetail) {
     // 비로그인 사용자는 인증 없이 요청 (게시글 헤더 표시를 위해)
     queryFn: () => isLoggedIn ? getPost(postId) : getPostPublic(postId),
     enabled: !!postId && hasHydrated,
-    initialData,
   })
 }
