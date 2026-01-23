@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { togglePostLike, toggleBookmark, getPostLikers } from '../api/interaction-api.client'
+import { togglePostLike, toggleBookmark } from '../api/interaction-api.client'
 import { togglePin } from '../api/post-api.client'
 import type { PostDetail } from '../api/post-api.types'
 import { postKeys } from './use-posts'
@@ -134,16 +134,5 @@ export function useTogglePin(postId: number) {
       queryClient.invalidateQueries({ queryKey })
       queryClient.invalidateQueries({ queryKey: postKeys.lists() })
     },
-  })
-}
-
-/**
- * 게시글 좋아요 목록 조회 Query Hook
- */
-export function useLikers(postId: number, enabled: boolean = true) {
-  return useQuery({
-    queryKey: [...postKeys.detail(postId), 'likers'],
-    queryFn: () => getPostLikers(postId),
-    enabled,
   })
 }
