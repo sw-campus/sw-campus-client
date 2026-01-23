@@ -24,8 +24,13 @@ export function useRemoveFromCart() {
 
   const ensureLoggedIn = () => {
     if (isLoggedIn) return true
-    toast.error('로그인이 필요합니다.')
-    router.push('/login')
+    toast.info('로그인이 필요합니다', {
+      description: '장바구니를 사용하려면 먼저 로그인해주세요.',
+      action: {
+        label: '로그인',
+        onClick: () => router.push('/login'),
+      },
+    })
     return false
   }
 
