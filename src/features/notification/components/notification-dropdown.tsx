@@ -25,17 +25,6 @@ import {
 } from '../hooks/use-notifications-query'
 import { useSSE } from '../hooks/use-sse'
 
-function getNotificationIcon(type: NotificationType) {
-  switch (type) {
-    case 'COMMENT':
-      return FiMessageSquare
-    case 'REPLY':
-      return FiCornerDownRight
-    default:
-      return FiMessageSquare
-  }
-}
-
 function getNotificationMessage(type: NotificationType, senderNickname: string): string {
   switch (type) {
     case 'COMMENT':
@@ -55,18 +44,15 @@ function NotificationItem({
   onMarkAsRead: (id: number) => void
 }) {
   const router = useRouter()
-  const icon = getNotificationIcon(notification.type)
 
   const handleClick = () => {
     if (!notification.read) {
       onMarkAsRead(notification.id)
     }
-    // postId가 있으면 해당 댓글로, 없으면 게시글로 이동
     if (notification.postId) {
       const targetUrl = `/community/${notification.postId}#comment-${notification.targetId}`
       const currentPath = window.location.pathname
 
-      // 이미 같은 게시글 페이지에 있으면 직접 스크롤 (해시 변경 없이)
       if (currentPath === `/community/${notification.postId}`) {
         setTimeout(() => {
           const element = document.getElementById(`comment-${notification.targetId}`)
@@ -104,7 +90,11 @@ function NotificationItem({
             : 'bg-muted text-muted-foreground'
         )}
       >
-        {icon({ className: 'size-4' })}
+        {notification.type === 'REPLY' ? (
+          <FiCornerDownRight className="size-4" />
+        ) : (
+          <FiMessageSquare className="size-4" />
+        )}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
@@ -131,7 +121,6 @@ function NotificationItem({
 const NOTIFICATIONS_PER_PAGE = 10
 
 export function NotificationDropdown() {
-  // SSE 연결
   useSSE()
 
   const [displayCount, setDisplayCount] = useState(NOTIFICATIONS_PER_PAGE)

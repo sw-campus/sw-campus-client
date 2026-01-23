@@ -34,6 +34,7 @@ import {
 import type { PostDetail } from '@/features/community/api/post-api.types'
 import { ClickableTag } from '@/features/community/components/clickable-tag'
 import { CommentSection } from '@/features/community/components/comment-section'
+import { LikerListModal } from '@/features/community/components/liker-list-modal'
 import { PostNavigation } from '@/features/community/components/post-navigation'
 import { UserProfileLink } from '@/features/community/components/user-profile-link'
 import { useDeletePost } from '@/features/community/hooks/use-delete-post'
@@ -59,6 +60,7 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
   const { mutate: togglePin, isPending: isPinning } = useTogglePin(postId)
   const [isCopied, setIsCopied] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isLikerModalOpen, setIsLikerModalOpen] = useState(false)
 
   // React Compiler가 자동 최적화하므로 useMemo 대신 IIFE 사용
   const imagesNotInBody = (() => {
@@ -298,10 +300,14 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
                 <FiEye className="h-4 w-4" />
                 <span className="tabular-nums">{post.viewCount}</span>
               </span>
-              <span className="flex items-center gap-1.5" title="좋아요">
+              <button
+                onClick={() => setIsLikerModalOpen(true)}
+                className="flex items-center gap-1.5 rounded-md px-1 py-0.5 transition-colors hover:bg-rose-50 hover:text-rose-500"
+                title="좋아요 목록 보기"
+              >
                 <FiHeart className="h-4 w-4" />
                 <span className="tabular-nums">{post.likeCount}</span>
-              </span>
+              </button>
               <span className="flex items-center gap-1.5" title="댓글">
                 <FiMessageCircle className="h-4 w-4" />
                 <span className="tabular-nums">{post.commentCount}</span>
@@ -360,19 +366,31 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
           <div className="mt-6 border-t border-gray-100 p-4 sm:mt-8 sm:p-6">
             {/* 좋아요, 북마크 - 항상 표시 */}
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => toggleLike()}
-                disabled={isLiking}
-                className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-all active:scale-95 sm:flex-none sm:px-4 ${
-                  post.isLiked
-                    ? 'border-rose-200 bg-rose-50 text-rose-600'
-                    : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <FiHeart className={`h-4 w-4 ${post.isLiked ? 'fill-rose-500' : ''}`} />
-                <span>좋아요</span>
-                {post.likeCount > 0 && <span className="tabular-nums">{post.likeCount}</span>}
-              </button>
+              <div className="flex flex-1 sm:flex-none">
+                <button
+                  onClick={() => toggleLike()}
+                  disabled={isLiking}
+                  className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-l-xl border text-sm font-medium transition-all active:scale-95 sm:px-4 ${
+                    post.isLiked
+                      ? 'border-rose-200 bg-rose-50 text-rose-600'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <FiHeart className={`h-4 w-4 ${post.isLiked ? 'fill-rose-500' : ''}`} />
+                  <span>좋아요</span>
+                </button>
+                <button
+                  onClick={() => setIsLikerModalOpen(true)}
+                  className={`flex h-10 items-center justify-center gap-1 rounded-r-xl border border-l-0 px-3 text-sm font-medium tabular-nums transition-all active:scale-95 ${
+                    post.isLiked
+                      ? 'border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                  title="좋아요 목록 보기"
+                >
+                  {post.likeCount}
+                </button>
+              </div>
 
               <button
                 onClick={() => toggleBookmark()}
@@ -461,6 +479,13 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
         <PostNavigation postId={postId} />
       </div>
       </div>
+
+      {/* 좋아요 목록 모달 */}
+      <LikerListModal
+        postId={postId}
+        open={isLikerModalOpen}
+        onOpenChange={setIsLikerModalOpen}
+      />
     </main>
   )
 }

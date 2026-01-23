@@ -54,36 +54,34 @@ export function PostList({ posts, isLoading = false, viewType }: PostListProps) 
             ))}
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2 sm:space-y-3">
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="flex gap-4 rounded-2xl border border-gray-200/60 bg-white p-5 sm:gap-5"
+                className="flex gap-3 rounded-xl border border-gray-200/60 bg-white p-3 sm:gap-4 sm:rounded-2xl sm:p-4"
               >
-                {/* 썸네일 스켈레톤 */}
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 sm:h-[88px] sm:w-32">
-                  <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-                </div>
                 {/* 컨텐츠 스켈레톤 */}
-                <div className="flex flex-1 flex-col justify-between py-0.5">
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <div className="h-5 w-16 rounded-md bg-gray-100" />
-                      <div className="h-5 w-12 rounded-md bg-gray-100" />
-                    </div>
-                    <div className="h-5 w-4/5 rounded-lg bg-gray-100" />
+                <div className="flex flex-1 flex-col gap-1.5 sm:gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="h-4 w-12 rounded bg-gray-100 sm:h-5 sm:w-16" />
+                    <div className="h-4 w-10 rounded bg-gray-100 sm:h-5 sm:w-12" />
                   </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-16 rounded bg-gray-100" />
-                      <div className="h-1 w-1 rounded-full bg-gray-200" />
-                      <div className="h-3 w-12 rounded bg-gray-100" />
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="h-3 w-8 rounded bg-gray-100" />
-                      <div className="h-3 w-8 rounded bg-gray-100" />
-                      <div className="h-3 w-8 rounded bg-gray-100" />
-                    </div>
+                  <div className="h-4 w-full rounded bg-gray-100 sm:h-5" />
+                  <div className="h-4 w-3/4 rounded bg-gray-100 sm:hidden" />
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-3 w-12 rounded bg-gray-100" />
+                    <div className="h-3 w-10 rounded bg-gray-100" />
+                  </div>
+                </div>
+                {/* 오른쪽 영역 스켈레톤 */}
+                <div className="flex shrink-0 flex-col items-end gap-1.5">
+                  <div className="relative h-14 w-14 overflow-hidden rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 sm:h-16 sm:w-20">
+                    <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="h-3 w-6 rounded bg-gray-100" />
+                    <div className="h-3 w-6 rounded bg-gray-100" />
+                    <div className="h-3 w-6 rounded bg-gray-100" />
                   </div>
                 </div>
               </div>
@@ -124,7 +122,7 @@ export function PostList({ posts, isLoading = false, viewType }: PostListProps) 
           ))}
         </div>
       ) : (
-        <div className="w-full space-y-4">
+        <div className="w-full space-y-2 sm:space-y-3">
           {/* 고정 게시글 */}
           {pinnedPosts.length > 0 && (
             <>
@@ -132,7 +130,7 @@ export function PostList({ posts, isLoading = false, viewType }: PostListProps) 
                 <PostListRow key={post.id} post={post} />
               ))}
               {regularPosts.length > 0 && (
-                <div className="relative my-6">
+                <div className="relative my-3 sm:my-4">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-dashed border-gray-200" />
                   </div>

@@ -185,4 +185,25 @@ html {
   .animate-shimmer {
     animation: shimmer 1.5s infinite;
   }
+
+  /* 댓글 하이라이트 애니메이션 */
+  @keyframes highlight-pulse {
+    0% {
+      background-color: transparent;
+      box-shadow: none;
+    }
+    15% {
+      background-color: oklch(0.95 0.05 70);
+      box-shadow: 0 0 0 4px oklch(0.9 0.1 70 / 0.3), 0 4px 20px oklch(0.8 0.15 70 / 0.2);
+    }
+    100% {
+      background-color: transparent;
+      box-shadow: none;
+    }
+  }
+
+  .animate-highlight {
+    animation: highlight-pulse 2.5s ease-out;
+    border-radius: 1rem;
+  }
 }
