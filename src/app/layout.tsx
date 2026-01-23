@@ -14,6 +14,10 @@ const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://softwarecampus.co.kr'
 
+// 검색엔진 인증 코드 (환경변수로 관리)
+const GOOGLE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+const NAVER_VERIFICATION = process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION
+
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
@@ -44,6 +48,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: BASE_URL,
+  },
+  verification: {
+    google: GOOGLE_VERIFICATION,
+    other: NAVER_VERIFICATION ? { 'naver-site-verification': NAVER_VERIFICATION } : undefined,
   },
 }
 
