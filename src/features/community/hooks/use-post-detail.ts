@@ -20,11 +20,14 @@ export function usePostDetail(postId: number, initialData?: PostDetail) {
   const queryClient = useQueryClient()
   const hasHydrated = useAuthStore(state => state.hasHydrated)
   const isLoggedIn = useAuthStore(state => state.isLoggedIn)
-  const prevIsLoggedIn = React.useRef(isLoggedIn)
+  const prevIsLoggedIn = React.useRef<boolean | null>(null)
 
-  // 로그인 상태 변경 시 게시글 다시 조회
+  // hydration 완료 후 또는 로그인 상태 변경 시 게시글 다시 조회
   React.useEffect(() => {
-    if (hasHydrated && prevIsLoggedIn.current !== isLoggedIn) {
+    if (!hasHydrated) return
+
+    // 첫 hydration 완료 시 또는 로그인 상태 변경 시 리페치
+    if (prevIsLoggedIn.current === null || prevIsLoggedIn.current !== isLoggedIn) {
       prevIsLoggedIn.current = isLoggedIn
       queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) })
     }
