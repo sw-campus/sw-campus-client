@@ -69,11 +69,13 @@ export function PostCard({ post }: PostCardProps) {
               {post.categoryName}
             </span>
             {/* 부트캠프 수강일기 주차 정보 */}
-            {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.length > 0 && post.tags[0].match(/^\d+월 \d+주차$/) && (
-              <span className="rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-medium text-gray-700 shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-xs">
-                {post.tags[0]}
-              </span>
-            )}
+            {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME &&
+              post.tags.length > 0 &&
+              post.tags[0].match(/^\d+월 \d+주차$/) && (
+                <span className="rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-medium text-gray-700 shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-xs">
+                  {post.tags[0]}
+                </span>
+              )}
           </div>
         </div>
 
@@ -84,7 +86,8 @@ export function PostCard({ post }: PostCardProps) {
           </h3>
 
           {/* 태그 영역 (주차 정보 태그는 카테고리 옆에 표시하므로 제외) */}
-          {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.filter(tag => !tag.match(/^\d+월 \d+주차$/)).length > 0 ? (
+          {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME &&
+          post.tags.filter(tag => !tag.match(/^\d+월 \d+주차$/)).length > 0 ? (
             <div className="mt-2 flex h-5 gap-1.5 overflow-hidden sm:mt-3 sm:h-6">
               {post.tags
                 .filter(tag => !tag.match(/^\d+월 \d+주차$/))
@@ -95,7 +98,7 @@ export function PostCard({ post }: PostCardProps) {
             </div>
           ) : (
             <div className="mt-2 h-5 sm:mt-3 sm:h-6" />
-          )
+          )}
 
           {/* 구분선 */}
           <div className="my-2.5 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent sm:my-3" />
