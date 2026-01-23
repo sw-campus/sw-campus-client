@@ -235,10 +235,22 @@ export async function ensureSessionActive(): Promise<boolean> {
 
 // 요청 인터셉터
 api.interceptors.request.use(
-  config => {
+  async config => {
     // If an access token exists in the client store, attach it.
     try {
-      const token = useAuthStore.getState().accessToken
+      const state = useAuthStore.getState()
+      let token = state.accessToken
+
+      // accessToken이 없지만 로그인 상태인 경우 refresh 시도
+      // (페이지 새로고침 후 토큰이 메모리에서 사라진 경우)
+      if (!token && state.isLoggedIn && !isRefreshing) {
+        // refresh/login/logout 요청이 아닌 경우에만 refresh 시도
+        const url = config.url ?? ''
+        if (!/auth\/(refresh|logout|login)/i.test(url)) {
+          token = await refreshAccessToken()
+        }
+      }
+
       if (token) {
         const headers = AxiosHeaders.from(config.headers ?? {})
         headers.set('Authorization', `Bearer ${token}`)
