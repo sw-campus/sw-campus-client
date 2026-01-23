@@ -81,86 +81,71 @@ export function SearchBar({
   return (
     <div className="flex flex-col gap-2">
       <div className="relative">
-        {/* 포커스 시 글로우 효과 */}
-        <div
-          className={cn(
-            'pointer-events-none absolute -inset-0.5 rounded-xl bg-gradient-to-r from-orange-400 to-amber-400 opacity-0 blur transition-opacity duration-300',
-            isFocused && 'opacity-20'
-          )}
+      {/* 포커스 시 글로우 효과 */}
+      <div
+        className={cn(
+          'pointer-events-none absolute -inset-0.5 rounded-xl bg-gradient-to-r from-orange-400 to-amber-400 opacity-0 blur transition-opacity duration-300',
+          isFocused && 'opacity-20'
+        )}
+      />
+
+      <div
+        className={cn(
+          'relative flex items-center overflow-hidden rounded-xl border bg-white/80 backdrop-blur-sm transition-all duration-200',
+          isFocused
+            ? 'border-orange-300 shadow-lg shadow-orange-100/50'
+            : 'border-gray-200/80 hover:border-gray-300'
+        )}
+      >
+        {/* 검색 아이콘 */}
+        <div className="pointer-events-none flex items-center pl-4">
+          <FiSearch
+            className={cn(
+              'h-4 w-4 transition-colors duration-200',
+              isFocused ? 'text-orange-500' : 'text-gray-400'
+            )}
+          />
+        </div>
+
+        {/* 입력 필드 */}
+        <input
+          type="text"
+          value={inputValue}
+          onChange={e => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder={onTagsChange ? '검색어 또는 #태그 입력' : placeholder}
+          className="h-11 w-full flex-1 bg-transparent px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
         />
 
-        <div
-          className={cn(
-            'relative flex items-center overflow-hidden rounded-xl border bg-white/80 backdrop-blur-sm transition-all duration-200',
-            isFocused
-              ? 'border-orange-300 shadow-lg shadow-orange-100/50'
-              : 'border-gray-200/80 hover:border-gray-300'
-          )}
-        >
-          {/* 검색 아이콘 */}
-          <div className="pointer-events-none flex items-center pl-4">
-            <FiSearch
-              className={cn(
-                'h-4 w-4 transition-colors duration-200',
-                isFocused ? 'text-orange-500' : 'text-gray-400'
-              )}
-            />
-          </div>
-
-          {/* 입력 필드 */}
-          <input
-            type="text"
-            value={inputValue}
-            onChange={e => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder={onTagsChange ? '검색어 또는 #태그 입력' : placeholder}
-            className="h-11 w-full flex-1 bg-transparent px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
-          />
-
-          {/* 클리어 버튼 */}
-          {inputValue && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="mr-2 flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 active:scale-90"
-            >
-              <FiX className="h-3.5 w-3.5" />
-            </button>
-          )}
-        </div>
+        {/* 클리어 버튼 */}
+        {inputValue && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="mr-2 flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 active:scale-90"
+          >
+            <FiX className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
-
-      {/* 태그 뱃지 목록 */}
+    </div>
+      {/* 태그 배지 표시 */}
       {tags.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
+          <FiTag className="h-3.5 w-3.5 text-gray-400" />
           {tags.map(tag => (
             <Badge
               key={tag}
               variant="secondary"
-              className="h-7 gap-1.5 rounded-full bg-blue-50 px-3 text-blue-700 ring-1 ring-blue-200"
+              className="cursor-pointer gap-1 bg-orange-100 text-orange-700 hover:bg-orange-200"
+              onClick={() => handleRemoveTag(tag)}
             >
-              <FiTag className="h-3 w-3" />
-              <span className="max-w-[120px] truncate text-[13px]">{tag}</span>
-              <button
-                type="button"
-                onClick={() => handleRemoveTag(tag)}
-                className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full transition-colors hover:bg-blue-200/50"
-              >
-                <FiX className="h-3 w-3" />
-              </button>
+              #{tag}
+              <FiX className="h-3 w-3" />
             </Badge>
           ))}
-          {tags.length > 1 && (
-            <button
-              type="button"
-              onClick={() => onTagsChange?.([])}
-              className="text-xs font-medium text-gray-500 transition-colors hover:text-gray-700"
-            >
-              전체 해제
-            </button>
-          )}
         </div>
       )}
     </div>

@@ -36,8 +36,8 @@ export function ClickableTag({
   }
 
   const baseStyles = variant === 'chip'
-    ? 'inline-flex cursor-pointer items-center gap-1 rounded-full bg-gradient-to-r from-gray-50 to-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200/60 transition-all duration-200 hover:from-orange-50 hover:to-amber-50 hover:text-orange-600 hover:ring-orange-200/60 hover:shadow-sm active:scale-95'
-    : 'cursor-pointer text-xs font-medium text-gray-500 transition-all duration-200 hover:text-orange-600'
+    ? 'inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full bg-gradient-to-r from-gray-50 to-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200/60 transition-all duration-200 hover:from-orange-50 hover:to-amber-50 hover:text-orange-600 hover:ring-orange-200/60 hover:shadow-sm active:scale-95'
+    : 'shrink-0 cursor-pointer text-xs font-medium text-gray-500 transition-all duration-200 hover:text-orange-600'
 
   return (
     <span

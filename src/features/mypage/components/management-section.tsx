@@ -13,7 +13,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import {
-  APPROVAL_STATUS,
   getApprovalStatusLabel,
   getApprovalStatusColor,
   canEditByStatus,
@@ -59,8 +58,9 @@ export function ReviewManagementSection() {
     return getApprovalStatusColor(lecture.reviewStatus)
   }
 
+  // 리뷰 읽기 전용 여부 (APPROVED만 읽기 전용, REJECTED/PENDING은 수정 가능)
   const isReadOnly = (lecture: CompletedLecture): boolean => {
-    return lecture.reviewStatus === APPROVAL_STATUS.APPROVED || lecture.reviewStatus === APPROVAL_STATUS.REJECTED
+    return !canEditByStatus(lecture.reviewStatus)
   }
 
   const handleFileSelect = (file: File) => {

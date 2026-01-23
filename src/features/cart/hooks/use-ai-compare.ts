@@ -114,7 +114,9 @@ export function useAiCompare({ leftId, rightId, leftDetail, rightDetail, isLogge
     }
 
     if (!isLoggedIn) {
-      toast.error('로그인이 필요한 기능입니다')
+      toast.info('로그인이 필요합니다', {
+        description: 'AI 비교 기능을 사용하려면 먼저 로그인해주세요.',
+      })
       return
     }
 
