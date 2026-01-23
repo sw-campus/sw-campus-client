@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 
 import { JsonLd, createArticleJsonLd } from '@/components/seo/json-ld'
 import { mapApiPostDetailToPostDetail } from '@/features/community/api/post-api.client'
@@ -13,10 +14,11 @@ interface PostDetailPageProps {
   }>
 }
 
-async function getPost(postId: string) {
+async function getPost(postId: string, cookieHeader?: string) {
   try {
     const res = await fetch(`${env.NEXT_PUBLIC_API_URL}/posts/${postId}`, {
       next: { revalidate: 60 },
+      headers: cookieHeader ? { Cookie: cookieHeader } : undefined,
     })
     if (!res.ok) return null
     return res.json() as Promise<ApiPostDetailResponse>
@@ -27,7 +29,9 @@ async function getPost(postId: string) {
 
 export async function generateMetadata({ params }: PostDetailPageProps): Promise<Metadata> {
   const { postId } = await params
-  const post = await getPost(postId)
+  const cookieStore = await cookies()
+  const cookieHeader = cookieStore.toString()
+  const post = await getPost(postId, cookieHeader)
 
   if (!post) {
     return {
@@ -61,7 +65,9 @@ export async function generateMetadata({ params }: PostDetailPageProps): Promise
 
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
   const { postId } = await params
-  const post = await getPost(postId)
+  const cookieStore = await cookies()
+  const cookieHeader = cookieStore.toString()
+  const post = await getPost(postId, cookieHeader)
 
   // 서버에서 가져온 데이터를 클라이언트 형식으로 변환
   const initialData = post ? mapApiPostDetailToPostDetail(post) : undefined
