@@ -3,8 +3,8 @@
 import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
 
-import Modal from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
+import Modal from '@/components/ui/modal'
 
 interface CertificateVerifyModalProps {
   isOpen: boolean
