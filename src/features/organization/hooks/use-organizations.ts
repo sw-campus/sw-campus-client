@@ -17,18 +17,13 @@ export function useOrganizationsQuery(keyword?: string) {
 /**
  * 기관 상세 조회 Query Hook
  * @param organizationId - 기관 ID
- * @param initialData - 서버에서 미리 가져온 데이터 (SSR)
  */
-export function useOrganizationDetailQuery(
-  organizationId: number,
-  initialData?: Awaited<ReturnType<typeof fetchOrganizationDetail>>
-) {
+export function useOrganizationDetailQuery(organizationId: number) {
   return useQuery({
     queryKey: ['organization', organizationId],
     queryFn: () => fetchOrganizationDetail(organizationId),
     staleTime: 1000 * 60 * 5, // 5분간 fresh 유지
     enabled: !!organizationId,
-    initialData,
   })
 }
 

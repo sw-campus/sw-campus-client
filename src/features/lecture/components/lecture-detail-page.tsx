@@ -17,15 +17,13 @@ import LectureTabNav from './detail/lecture-tab-nav'
 
 interface Props {
   lectureId: string
-  initialData?: Awaited<ReturnType<typeof getLectureDetail>>
 }
 
-export default function LectureDetailPage({ lectureId, initialData }: Props) {
+export default function LectureDetailPage({ lectureId }: Props) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['lectureDetail', lectureId],
     queryFn: () => getLectureDetail(lectureId),
     staleTime: 1000 * 60,
-    initialData,
   })
 
   const lecture = data
@@ -36,7 +34,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
       {
         queryKey: ['organization', data?.orgId],
         queryFn: async () => {
-          if (!data?.orgId) return undefined
+          if (!data?.orgId) return null
           return fetchOrganizationDetail(data.orgId)
         },
         enabled: !!data?.orgId,
