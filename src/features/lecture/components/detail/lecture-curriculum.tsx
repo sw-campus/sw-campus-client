@@ -82,7 +82,7 @@ function SpecialCurriculumItem({ item, index }: SpecialCurriculumItemProps) {
   return (
     <div className="rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm">
       <div className="flex items-center gap-3">
-        <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+        <span className="bg-primary/10 text-primary flex size-6 items-center justify-center rounded-full text-xs font-semibold">
           {index + 1}
         </span>
         <span className="text-sm font-medium text-gray-900">{item.title}</span>

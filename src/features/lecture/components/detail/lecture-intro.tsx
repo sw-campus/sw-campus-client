@@ -21,7 +21,7 @@ const SERVICE_LABELS: Record<keyof LectureDetail['services'], string> = {
 // 체크 아이콘 컴포넌트
 function CheckIcon({ checked }: { checked: boolean }) {
   return checked ? (
-    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-success/15 text-success">
+    <span className="bg-success/15 text-success flex h-6 w-6 items-center justify-center rounded-full">
       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
       </svg>
@@ -165,7 +165,7 @@ export default function LectureIntro({ lecture }: Props) {
             )}
             {lecture.project.mentor && (
               <InfoRow label="멘토 지원">
-                <span className="flex items-center gap-1.5 font-medium text-success">
+                <span className="text-success flex items-center gap-1.5 font-medium">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>

@@ -67,3 +67,21 @@ export interface ReviewPageResponse {
     totalPages: number
   }
 }
+
+/**
+ * 리뷰 목록 응답 (블라인드 정보 포함)
+ */
+export interface ReviewListResponse {
+  reviews: Review[]
+  totalCount: number
+  isUnblinded: boolean
+}
+
+/**
+ * 리뷰 블라인드 상태 응답
+ */
+export interface ReviewBlindStatus {
+  isUnblinded: boolean
+  hasApprovedReview: boolean
+  hasSurveyCompleted: boolean
+}
