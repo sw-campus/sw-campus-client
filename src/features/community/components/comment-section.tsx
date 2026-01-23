@@ -133,23 +133,23 @@ export function CommentSection({ postId }: CommentSectionProps) {
       {/* 새 댓글 입력 폼 (답글 작성 중이 아닐 때만 표시) */}
       {isLoggedIn ? (
         !replyTo && (
-          <form onSubmit={handleSubmit} className="mb-10">
+          <form onSubmit={handleSubmit} className="mb-8 sm:mb-10">
             <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-sm transition-all duration-300 focus-within:border-orange-300/80 focus-within:shadow-lg focus-within:shadow-orange-100/40">
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="따뜻한 댓글은 작성자에게 큰 힘이 됩니다..."
-                className="min-h-[100px] w-full resize-none border-0 bg-transparent p-5 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 sm:min-h-[120px]"
-                rows={4}
+                className="min-h-[80px] w-full resize-none border-0 bg-transparent p-4 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 sm:min-h-[120px] sm:p-5"
+                rows={3}
               />
-              <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50/50 px-4 py-3">
+              <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50/50 px-3 py-2.5 sm:px-4 sm:py-3">
                 <p className="hidden text-xs text-gray-400 sm:block">
                   Ctrl + Enter로 등록
                 </p>
                 <Button
                   type="submit"
                   disabled={isCreating || !body.trim()}
-                  className="h-10 gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 font-bold shadow-md shadow-orange-200/50 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-orange-200/60 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                  className="h-11 w-full gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 font-bold shadow-md shadow-orange-200/50 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-orange-200/60 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 sm:h-10 sm:w-auto"
                 >
                   <FiSend className="h-4 w-4" />
                   {isCreating ? '등록 중...' : '댓글 등록'}

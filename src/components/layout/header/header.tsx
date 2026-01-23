@@ -138,6 +138,7 @@ export default function Header({
               <Link
                 key={uniqueKey}
                 href={href}
+                prefetch={false}
                 onMouseEnter={onOtherNavEnter}
                 onFocus={onOtherNavEnter}
               >

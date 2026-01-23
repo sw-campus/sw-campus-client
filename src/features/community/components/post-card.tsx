@@ -57,7 +57,7 @@ export function PostCard({ post }: PostCardProps) {
             </div>
           )}
           {/* 배지 오버레이 */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+          <div className="absolute top-3 left-3 flex gap-1.5">
             {post.pinned && (
               <span className="inline-flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-xs font-bold text-orange-600 shadow-sm backdrop-blur-sm">
                 <FiMapPin className="h-3 w-3" />
@@ -76,12 +76,12 @@ export function PostCard({ post }: PostCardProps) {
         {/* 컨텐츠 영역 (아래) */}
         <div className="relative flex min-w-0 flex-1 flex-col p-4">
           {/* 카테고리 + 주차 정보 */}
-          <div className="mb-2 flex flex-wrap items-center gap-1.5">
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+          <div className="mb-2 flex items-center gap-1.5 overflow-hidden">
+            <span className="shrink-0 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
               {post.categoryName}
             </span>
             {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.length > 0 && post.tags[0].match(/^\d+월 \d+주차$/) && (
-              <span className="rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
+              <span className="shrink-0 rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
                 {post.tags[0]}
               </span>
             )}
@@ -92,8 +92,8 @@ export function PostCard({ post }: PostCardProps) {
             {post.title}
           </h3>
 
-          {/* 태그 영역 - 일관된 카드 높이 유지를 위해 항상 렌더링 */}
-          <div className="mt-2 flex h-6 gap-1.5 overflow-hidden">
+          {/* 태그 영역 - 모바일에서 숨김 */}
+          <div className="mt-2 hidden h-6 flex-nowrap gap-1.5 overflow-hidden sm:flex">
             {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME &&
               post.tags
                 .filter(tag => !tag.match(/^\d+월 \d+주차$/))

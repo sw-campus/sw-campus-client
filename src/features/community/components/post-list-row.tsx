@@ -46,57 +46,56 @@ export function PostListRow({ post }: PostListRowProps) {
 
         {/* 컨텐츠 영역 */}
         <div className="flex min-w-0 flex-1 flex-col justify-between">
-          {/* 상단: 배지 + 제목 */}
-          <div className="space-y-2">
-            {/* 배지 영역 */}
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              {post.pinned && (
-                <span className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-orange-100 to-amber-100 px-2.5 py-1 text-xs font-bold text-orange-600">
-                  <FiMapPin className="h-3 w-3" />
-                  공지
-                </span>
-              )}
-              <span className="rounded-lg bg-gray-100/80 px-2.5 py-1 text-xs font-medium text-gray-600">
-                {post.categoryName}
+          {/* 상단: 메타 정보 (카테고리 + 주차) - 한 줄로 */}
+          <div className="mb-1.5 flex items-center gap-1.5 text-xs text-gray-500">
+            {post.pinned && (
+              <span className="inline-flex shrink-0 items-center gap-1 font-bold text-orange-600">
+                <FiMapPin className="h-3 w-3" />
+                공지
               </span>
-              {/* 부트캠프 성장일기 주차 정보 */}
-              {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.length > 0 && post.tags[0].match(/^\d+월 \d+주차$/) && (
-                <span className="rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600">
-                  {post.tags[0]}
-                </span>
-              )}
-              {isPopular && !post.pinned && (
-                <span className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-rose-50 to-pink-50 px-2.5 py-1 text-xs font-semibold text-rose-600">
+            )}
+            {post.pinned && <span className="text-gray-300">·</span>}
+            <span className="shrink-0 font-medium text-gray-600">{post.categoryName}</span>
+            {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.length > 0 && post.tags[0].match(/^\d+월 \d+주차$/) && (
+              <>
+                <span className="text-gray-300">·</span>
+                <span className="shrink-0 font-medium text-blue-600">{post.tags[0]}</span>
+              </>
+            )}
+            {isPopular && !post.pinned && (
+              <>
+                <span className="text-gray-300">·</span>
+                <span className="inline-flex shrink-0 items-center gap-0.5 font-semibold text-rose-500">
                   <FiTrendingUp className="h-3 w-3" />
                   인기
                 </span>
-              )}
-            </div>
-
-            {/* 제목 */}
-            <h3 className="line-clamp-1 text-base font-bold text-gray-900 transition-colors duration-200 group-hover:text-orange-600 sm:text-lg">
-              <Link href={`/community/${post.id}`} onClick={e => e.stopPropagation()}>
-                {post.title}
-              </Link>
-            </h3>
-
-            {/* 부트캠프 성장일기 태그 (주차 정보 태그는 카테고리 옆에 표시하므로 제외) */}
-            {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.filter(tag => !tag.match(/^\d+월 \d+주차$/)).length > 0 && (
-              <div className="flex gap-2 overflow-hidden">
-                {post.tags
-                  .filter(tag => !tag.match(/^\d+월 \d+주차$/))
-                  .slice(0, 3)
-                  .map(tag => (
-                    <ClickableTag key={tag} tag={tag} maxLength={10} />
-                  ))}
-              </div>
+              </>
             )}
           </div>
 
-          {/* 하단: 작성자 정보 + 통계 (썸네일 없을 때) */}
-          <div className="mt-3 flex items-center justify-between">
-            {/* 작성자 정보 */}
-            <div className="flex items-center gap-2 text-sm">
+          {/* 제목 */}
+          <h3 className="line-clamp-2 text-[15px] font-bold leading-snug text-gray-900 transition-colors duration-200 group-hover:text-orange-600 sm:line-clamp-1 sm:text-lg">
+            <Link href={`/community/${post.id}`} onClick={e => e.stopPropagation()}>
+              {post.title}
+            </Link>
+          </h3>
+
+          {/* 부트캠프 성장일기 태그 - 데스크탑에서만 표시 */}
+          {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.filter(tag => !tag.match(/^\d+월 \d+주차$/)).length > 0 && (
+            <div className="mt-2 hidden flex-nowrap gap-2 overflow-hidden sm:flex">
+              {post.tags
+                .filter(tag => !tag.match(/^\d+월 \d+주차$/))
+                .slice(0, 3)
+                .map(tag => (
+                  <ClickableTag key={tag} tag={tag} maxLength={10} />
+                ))}
+            </div>
+          )}
+
+          {/* 하단: 작성자 + 통계 - 한 줄로 컴팩트하게 */}
+          <div className="mt-2 flex items-center justify-between text-xs sm:mt-3 sm:text-sm">
+            {/* 작성자 정보 + 시간 */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <UserProfileLink
                 userId={post.authorId}
                 onClick={e => e.stopPropagation()}
@@ -107,61 +106,46 @@ export function PostListRow({ post }: PostListRowProps) {
               <UserProfileLink
                 userId={post.authorId}
                 onClick={e => e.stopPropagation()}
-                className="font-medium text-gray-700 transition-colors hover:text-orange-600"
+                className="max-w-[80px] truncate font-medium text-gray-700 transition-colors hover:text-orange-600 sm:max-w-none"
               >
                 {post.authorNickname}
               </UserProfileLink>
-              <span className="h-1 w-1 rounded-full bg-gray-300" />
-              <span className="text-gray-500" title={post.createdAt.toLocaleString('ko-KR')}>
+              <span className="text-gray-300">·</span>
+              <span className="shrink-0 text-gray-500" title={post.createdAt.toLocaleString('ko-KR')}>
                 {relativeTime}
               </span>
             </div>
 
-            {/* 통계 - 썸네일 없을 때 또는 모바일에서 표시 */}
-            <div className={`flex items-center gap-3 text-sm text-gray-500 sm:gap-4 ${post.thumbnailUrl ? 'sm:hidden' : ''}`}>
+            {/* 통계 - 항상 표시 */}
+            <div className="flex items-center gap-2.5 text-gray-500 sm:gap-4">
               <span className="flex items-center gap-1 transition-colors group-hover:text-gray-700">
-                <FiEye className="h-4 w-4" />
+                <FiEye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="tabular-nums">{post.viewCount}</span>
               </span>
               <span className={`flex items-center gap-1 transition-colors ${isPopular ? 'text-rose-500' : 'group-hover:text-rose-500'}`}>
-                <FiHeart className={`h-4 w-4 ${isPopular ? 'fill-rose-500' : ''}`} />
+                <FiHeart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isPopular ? 'fill-rose-500' : ''}`} />
                 <span className="tabular-nums">{post.likeCount}</span>
               </span>
               <span className="flex items-center gap-1 transition-colors group-hover:text-blue-500">
-                <FiMessageCircle className="h-4 w-4" />
+                <FiMessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="tabular-nums">{post.commentCount}</span>
               </span>
             </div>
           </div>
         </div>
 
-        {/* 썸네일 영역 (오른쪽) - 있을 때만 표시 */}
+        {/* 썸네일 영역 (오른쪽) - 데스크탑에서만 표시 */}
         {post.thumbnailUrl && (
-          <div className="hidden shrink-0 flex-col items-end gap-2 sm:flex">
-            <div className="relative h-20 w-28 overflow-hidden rounded-xl sm:h-24 sm:w-36">
+          <div className="hidden shrink-0 sm:block">
+            <div className="relative h-20 w-28 overflow-hidden rounded-xl sm:h-[72px] sm:w-[100px]">
               <Image
                 src={post.thumbnailUrl}
                 alt={post.title}
                 fill
-                sizes="(max-width: 640px) 112px, 144px"
+                sizes="100px"
                 quality={85}
                 className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               />
-            </div>
-            {/* 통계 - 썸네일 아래에 표시 */}
-            <div className="flex items-center gap-3 text-sm text-gray-500">
-              <span className="flex items-center gap-1 transition-colors group-hover:text-gray-700">
-                <FiEye className="h-3.5 w-3.5" />
-                <span className="tabular-nums">{post.viewCount}</span>
-              </span>
-              <span className={`flex items-center gap-1 transition-colors ${isPopular ? 'text-rose-500' : 'group-hover:text-rose-500'}`}>
-                <FiHeart className={`h-3.5 w-3.5 ${isPopular ? 'fill-rose-500' : ''}`} />
-                <span className="tabular-nums">{post.likeCount}</span>
-              </span>
-              <span className="flex items-center gap-1 transition-colors group-hover:text-blue-500">
-                <FiMessageCircle className="h-3.5 w-3.5" />
-                <span className="tabular-nums">{post.commentCount}</span>
-              </span>
             </div>
           </div>
         )}

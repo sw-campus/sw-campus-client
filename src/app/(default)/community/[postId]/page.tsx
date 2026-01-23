@@ -201,14 +201,16 @@ export default function PostDetailPage() {
   return (
     <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 sm:px-6 sm:py-8 md:px-8">
       <div className="mx-auto w-full lg:max-w-3xl">
-      {/* 뒤로가기 */}
-      <Link
-        href="/community"
-        className="mb-5 ml-4 inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 active:scale-95 sm:mb-8 sm:ml-0"
-      >
-        <FiArrowLeft className="h-4 w-4" />
-        <span>목록으로</span>
-      </Link>
+      {/* 뒤로가기 - 모바일에서 스티키 */}
+      <div className="sticky top-0 z-10 -mx-4 mb-4 bg-white/80 px-4 py-3 backdrop-blur-md sm:static sm:mx-0 sm:mb-8 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
+        <Link
+          href="/community"
+          className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 active:scale-95"
+        >
+          <FiArrowLeft className="h-5 w-5" />
+          <span>목록으로</span>
+        </Link>
+      </div>
 
       {/* 게시글 카드 */}
       <article className="overflow-hidden border-y border-gray-200/40 bg-white shadow-sm sm:rounded-3xl sm:border sm:shadow-lg sm:shadow-gray-100/50">
