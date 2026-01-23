@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { FiHeart, FiMessageCircle, FiMapPin, FiFileText } from 'react-icons/fi'
+import { FiHeart, FiMessageCircle, FiMapPin, FiFileText, FiTrendingUp } from 'react-icons/fi'
 
 import { formatRelativeTime } from '@/lib/format-relative-time'
 
@@ -14,6 +14,9 @@ interface PostCardProps {
   post: Post
 }
 
+// 인기글 기준
+const POPULAR_THRESHOLD = 10
+
 /**
  * 게시글 카드 컴포넌트 (모던 글래스모피즘 스타일)
  * - 모바일에서 컴팩트한 크기
@@ -23,6 +26,7 @@ interface PostCardProps {
 export function PostCard({ post }: PostCardProps) {
   const router = useRouter()
   const relativeTime = formatRelativeTime(post.createdAt)
+  const isPopular = post.likeCount >= POPULAR_THRESHOLD
 
   return (
     <div
@@ -65,15 +69,23 @@ export function PostCard({ post }: PostCardProps) {
                 공지
               </span>
             )}
+            {isPopular && !post.pinned && (
+              <span className="inline-flex items-center gap-0.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm sm:gap-1 sm:px-2.5 sm:py-1 sm:text-xs">
+                <FiTrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                인기
+              </span>
+            )}
             <span className="rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2 py-0.5 text-[10px] font-medium text-white shadow-sm sm:px-2.5 sm:py-1 sm:text-xs">
               {post.categoryName}
             </span>
             {/* 부트캠프 수강일기 주차 정보 */}
-            {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.length > 0 && post.tags[0].match(/^\d+월 \d+주차$/) && (
-              <span className="rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-medium text-gray-700 shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-xs">
-                {post.tags[0]}
-              </span>
-            )}
+            {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME &&
+              post.tags.length > 0 &&
+              post.tags[0].match(/^\d+월 \d+주차$/) && (
+                <span className="rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-medium text-gray-700 shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-xs">
+                  {post.tags[0]}
+                </span>
+              )}
           </div>
         </div>
 
@@ -84,7 +96,8 @@ export function PostCard({ post }: PostCardProps) {
           </h3>
 
           {/* 태그 영역 (주차 정보 태그는 카테고리 옆에 표시하므로 제외) */}
-          {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME && post.tags.filter(tag => !tag.match(/^\d+월 \d+주차$/)).length > 0 ? (
+          {post.categoryName === BOOTCAMP_DIARY_CATEGORY_NAME &&
+          post.tags.filter(tag => !tag.match(/^\d+월 \d+주차$/)).length > 0 ? (
             <div className="mt-2 flex h-5 gap-1.5 overflow-hidden sm:mt-3 sm:h-6">
               {post.tags
                 .filter(tag => !tag.match(/^\d+월 \d+주차$/))

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { TiptapEditor } from '@/components/ui/editor/tiptap-editor'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { getLectureSearch } from '@/features/lecture/api/lecture.api'
 
 import type { BoardCategory } from '../api/board-category-api.types'
 import type { CreatePostRequest, PostDetail } from '../api/post-api.types'
@@ -139,6 +140,40 @@ export function PostForm({
       if (parsedBody) {
         setDiaryForm(parsedBody)
       }
+    }
+  }, [initialData, isBootcampDiaryCategory])
+
+  // 수정 모드에서 부트캠프 성장일기 강의 정보 복원
+  useEffect(() => {
+    if (initialData && isBootcampDiaryCategory && initialData.tags && initialData.tags.length >= 2) {
+      // 태그 구조: [주차정보, 강의명, 훈련기관명, ...]
+      const lectureName = initialData.tags[1]
+      const orgName = initialData.tags[2] || ''
+
+      // 강의명으로 검색하여 복원
+      const restoreLecture = async () => {
+        try {
+          const queryString = `text=${encodeURIComponent(lectureName)}`
+          const result = await getLectureSearch(queryString)
+
+          if (result.content && result.content.length > 0) {
+            // 강의명과 훈련기관명이 모두 일치하는 강의를 찾음
+            const matchedLecture = result.content.find(
+              lecture => lecture.lectureName === lectureName && lecture.orgName === orgName
+            ) || result.content[0]
+
+            setSelectedLecture({
+              id: matchedLecture.lectureId,
+              name: matchedLecture.lectureName,
+              orgName: matchedLecture.orgName || '정보 없음',
+            })
+          }
+        } catch (error) {
+          console.error('강의 정보 복원 실패:', error)
+        }
+      }
+
+      restoreLecture()
     }
   }, [initialData, isBootcampDiaryCategory])
 

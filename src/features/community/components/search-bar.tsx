@@ -2,23 +2,34 @@
 
 import { useState, useEffect } from 'react'
 
-import { FiSearch, FiX } from 'react-icons/fi'
+import { FiSearch, FiX, FiTag } from 'react-icons/fi'
 
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 interface SearchBarProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
+  /** 태그 배열 (URL에서 가져온 값) */
+  tags?: string[]
+  /** 태그 변경 콜백 - keywordOnly는 태그 추출 후 남은 키워드 */
+  onTagsChange?: (tags: string[], keywordOnly?: string) => void
 }
 
 /**
  * 검색 입력 컴포넌트
  * - 디바운싱 적용 (300ms)
+ * - #태그 형식으로 태그 추가 지원
  * - 모던한 글래스모피즘 스타일
- * - 포커스 애니메이션
  */
-export function SearchBar({ value, onChange, placeholder = '검색어를 입력하세요' }: SearchBarProps) {
+export function SearchBar({
+  value,
+  onChange,
+  placeholder = '검색어를 입력하세요',
+  tags = [],
+  onTagsChange,
+}: SearchBarProps) {
   const [inputValue, setInputValue] = useState(value)
   const [isFocused, setIsFocused] = useState(false)
 
@@ -43,12 +54,33 @@ export function SearchBar({ value, onChange, placeholder = '검색어를 입력�
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      onChange(inputValue)
+      // #태그 파싱
+      const tagMatches = inputValue.match(/#[\w가-힣]+/g)
+      if (tagMatches && tagMatches.length > 0 && onTagsChange) {
+        const newTags = tagMatches.map(t => t.slice(1)) // # 제거
+        const uniqueTags = [...new Set([...tags, ...newTags])] // 중복 제거
+
+        // 태그 부분 제거하고 나머지 키워드만 남김
+        const keywordOnly = inputValue.replace(/#[\w가-힣]+/g, '').trim()
+        setInputValue(keywordOnly)
+
+        // 태그와 키워드를 함께 전달 (한 번의 URL 업데이트로 처리)
+        onTagsChange(uniqueTags, keywordOnly)
+      } else {
+        onChange(inputValue)
+      }
+    }
+  }
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    if (onTagsChange) {
+      onTagsChange(tags.filter(tag => tag !== tagToRemove))
     }
   }
 
   return (
-    <div className="relative">
+    <div className="flex flex-col gap-2">
+      <div className="relative">
       {/* 포커스 시 글로우 효과 */}
       <div
         className={cn(
@@ -83,7 +115,7 @@ export function SearchBar({ value, onChange, placeholder = '검색어를 입력�
           onKeyDown={handleKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          placeholder={placeholder}
+          placeholder={onTagsChange ? '검색어 또는 #태그 입력' : placeholder}
           className="h-11 w-full flex-1 bg-transparent px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
         />
 
@@ -98,6 +130,24 @@ export function SearchBar({ value, onChange, placeholder = '검색어를 입력�
           </button>
         )}
       </div>
+    </div>
+      {/* 태그 배지 표시 */}
+      {tags.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <FiTag className="h-3.5 w-3.5 text-gray-400" />
+          {tags.map(tag => (
+            <Badge
+              key={tag}
+              variant="secondary"
+              className="cursor-pointer gap-1 bg-orange-100 text-orange-700 hover:bg-orange-200"
+              onClick={() => handleRemoveTag(tag)}
+            >
+              #{tag}
+              <FiX className="h-3 w-3" />
+            </Badge>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

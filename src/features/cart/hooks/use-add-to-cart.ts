@@ -41,8 +41,13 @@ export function useAddToCart() {
 
   const addToCart = (item: AddToCartItem) => {
     if (!isLoggedIn) {
-      toast.error('로그인이 필요합니다.')
-      router.push('/login')
+      toast.info('로그인이 필요합니다', {
+        description: '장바구니에 담으려면 먼저 로그인해주세요.',
+        action: {
+          label: '로그인',
+          onClick: () => router.push('/login'),
+        },
+      })
       return
     }
     mutation.mutate(String(item.lectureId))

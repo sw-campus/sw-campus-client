@@ -5,8 +5,8 @@ export type NotificationType = 'COMMENT' | 'REPLY'
 export interface Notification {
   id: number
   type: NotificationType
-  targetId: number  // 댓글 ID
-  postId: number    // 게시글 ID
+  targetId: number // 댓글 ID
+  postId: number // 게시글 ID
   senderId: number
   senderNickname: string
   read: boolean
