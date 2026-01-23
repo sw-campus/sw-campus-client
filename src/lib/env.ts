@@ -15,4 +15,11 @@ export const env = {
   isLocal,
 
   NEXT_PUBLIC_API_URL: required(process.env.NEXT_PUBLIC_API_URL, 'NEXT_PUBLIC_API_URL'),
+  NEXT_PUBLIC_BASE_URL: isProd
+    ? required(process.env.NEXT_PUBLIC_BASE_URL, 'NEXT_PUBLIC_BASE_URL')
+    : (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
+
+  // 검색엔진 인증 (선택)
+  NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  NEXT_PUBLIC_NAVER_SITE_VERIFICATION: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION,
 }
