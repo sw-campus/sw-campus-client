@@ -89,13 +89,13 @@ export default function OAuthCallbackClient() {
 
         // 리다이렉트: 최초 로그인 > returnUrl > 관리자면 /admin > 홈
         if (isFirstLogin) {
-          // 최초 로그인: 설문 페이지로 이동
+          // 최초 로그인: 환영 페이지로 이동
           try {
             sessionStorage.setItem(SURVEY_FIRST_LOGIN_KEY, 'true')
           } catch {
             // ignore storage errors
           }
-          router.replace('/mypage/survey')
+          router.replace('/welcome')
         } else if (returnUrl && returnUrl.startsWith('/')) {
           router.replace(returnUrl)
         } else if (userType === 'ADMIN') {

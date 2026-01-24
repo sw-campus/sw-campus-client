@@ -247,14 +247,14 @@ export function useSignupForm() {
 
       toast.success('회원가입이 완료되었습니다.')
 
-      // 최초 로그인이면 설문 페이지로, 아니면 홈으로
+      // 최초 로그인이면 환영 페이지로, 아니면 홈으로
       if (response.isFirstLogin) {
         try {
           sessionStorage.setItem(SURVEY_FIRST_LOGIN_KEY, 'true')
         } catch {
           // ignore storage errors
         }
-        router.push('/mypage/survey')
+        router.push('/welcome')
       } else {
         router.push('/')
       }
