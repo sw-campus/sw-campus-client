@@ -30,7 +30,7 @@ export const step1Schema = z.object({
         title: z
           .string()
           .min(1, '제목은 필수입니다.')
-          .max(20, '제목은 20자 이내로 입력해 주세요.')
+          .max(50, '제목은 50자 이내로 입력해 주세요.')
           .refine(val => val.trim().length > 0, '제목은 공백만 입력할 수 없습니다.'),
         sortOrder: z.number().int().positive('순서는 1 이상이어야 합니다.'),
       }),
