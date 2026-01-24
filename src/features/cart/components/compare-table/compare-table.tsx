@@ -94,7 +94,7 @@ function renderSpecialCurriculumList(items: { title: string }[]) {
                 </span>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="max-w-[200px] break-words">{item.title}</p>
+                <p className="max-w-52 break-words">{item.title}</p>
               </TooltipContent>
             </Tooltip>
           )
