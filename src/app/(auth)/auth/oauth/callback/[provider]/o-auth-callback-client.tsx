@@ -6,7 +6,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { oauthLogin } from '@/features/auth/auth-api'
-import { OAUTH_RETURN_URL_KEY } from '@/features/auth/constants'
+import { OAUTH_RETURN_URL_KEY, SURVEY_FIRST_LOGIN_KEY } from '@/features/auth/constants'
 import { getProfile } from '@/features/mypage/api/survey.api'
 import { parseUserType, parseUserName, parseNickname, type LoginResponse } from '@/lib/parse-login-response'
 import { useAuthStore } from '@/store/auth-store'
@@ -75,6 +75,9 @@ export default function OAuthCallbackClient() {
 
         toast.success('로그인되었습니다.')
 
+        // 최초 로그인 여부 확인
+        const isFirstLogin = (data as { isFirstLogin?: boolean })?.isFirstLogin ?? false
+
         // returnUrl 확인 (sessionStorage에서)
         let returnUrl: string | null = null
         try {
@@ -84,8 +87,16 @@ export default function OAuthCallbackClient() {
           // ignore storage errors
         }
 
-        // 리다이렉트: returnUrl > 관리자면 /admin > 홈
-        if (returnUrl && returnUrl.startsWith('/')) {
+        // 리다이렉트: 최초 로그인 > returnUrl > 관리자면 /admin > 홈
+        if (isFirstLogin) {
+          // 최초 로그인: 설문 페이지로 이동
+          try {
+            sessionStorage.setItem(SURVEY_FIRST_LOGIN_KEY, 'true')
+          } catch {
+            // ignore storage errors
+          }
+          router.replace('/mypage/survey')
+        } else if (returnUrl && returnUrl.startsWith('/')) {
           router.replace(returnUrl)
         } else if (userType === 'ADMIN') {
           router.replace('/admin')
@@ -107,7 +118,7 @@ export default function OAuthCallbackClient() {
     <div className="flex min-h-[50vh] items-center justify-center">
       <div className="text-center">
         <p className="text-lg font-medium">소셜 로그인 처리 중…</p>
-        <p className="mt-2 text-sm text-gray-500">잠시만 기다려 주세요.</p>
+        <p className="mt-2 text-sm text-muted-foreground">잠시만 기다려 주세요.</p>
       </div>
     </div>
   )
