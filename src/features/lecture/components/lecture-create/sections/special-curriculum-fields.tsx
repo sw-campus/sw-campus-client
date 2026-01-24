@@ -9,7 +9,7 @@ import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/
 import { Input } from '@/components/ui/input'
 import type { LectureFormValues } from '@/features/lecture/validation/lecture-form-schema'
 
-const TITLE_MAX_LENGTH = 20
+const TITLE_MAX_LENGTH = 50
 
 const MAX_SPECIAL_CURRICULUMS = 5
 
