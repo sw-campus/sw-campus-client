@@ -14,6 +14,8 @@ import {
   signupSchema,
   SignupInput,
 } from '@/features/auth/auth-api'
+import { SURVEY_FIRST_LOGIN_KEY } from '@/features/auth/constants'
+import { useAuthStore } from '@/store/auth-store'
 import { useSignupStore } from '@/store/signup-store'
 
 export function useSignupForm() {
@@ -232,10 +234,30 @@ export function useSignupForm() {
     }
 
     try {
-      await signup(result.data)
+      const response = await signup(result.data)
       reset()
+
+      // 자동 로그인: 상태 설정
+      const { login: setLogin, setUserType, setNickname: setStoreNickname } = useAuthStore.getState()
+      setLogin(response.name ?? name)
+      setUserType('PERSONAL')
+      if (response.nickname) {
+        setStoreNickname(response.nickname)
+      }
+
       toast.success('회원가입이 완료되었습니다.')
-      router.push('/login')
+
+      // 최초 로그인이면 환영 페이지로, 아니면 홈으로
+      if (response.isFirstLogin) {
+        try {
+          sessionStorage.setItem(SURVEY_FIRST_LOGIN_KEY, 'true')
+        } catch {
+          // ignore storage errors
+        }
+        router.push('/welcome')
+      } else {
+        router.push('/')
+      }
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error) ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.')
     }
