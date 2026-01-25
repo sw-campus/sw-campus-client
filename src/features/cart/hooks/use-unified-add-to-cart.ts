@@ -10,6 +10,21 @@ import { getLectureDetail } from '@/features/lecture/api/lecture-api'
 import { useAuthStore } from '@/store/auth-store'
 import { useGuestCartStore } from '@/store/guest-cart.store'
 
+type AddGuestItemResult = ReturnType<ReturnType<typeof useGuestCartStore.getState>['addItem']>
+
+/**
+ * Guest cart 추가 실패 시 토스트 메시지 표시
+ */
+function showAddFailureToast(result: AddGuestItemResult): void {
+  if (result.success) return
+
+  if (result.reason === 'duplicate') {
+    toast.info('이미 AI 심층 비교 목록에 있는 강의입니다')
+  } else if (result.reason === 'limit') {
+    toast.warning('AI 심층 비교는 최대 10개까지 담을 수 있습니다')
+  }
+}
+
 /**
  * 통합 Add to Cart 훅 - 로그인 여부에 따라 서버/로컬 cart에 자동 추가
  *
@@ -71,14 +86,7 @@ export function useUnifiedAddToCart() {
         }
 
         const result = addGuestItem(cartItem)
-
-        if (!result.success) {
-          if (result.reason === 'duplicate') {
-            toast.info('이미 AI 심층 비교 목록에 있는 강의입니다')
-          } else if (result.reason === 'limit') {
-            toast.warning('AI 심층 비교는 최대 10개까지 담을 수 있습니다')
-          }
-        }
+        showAddFailureToast(result)
       } catch {
         // 상세 정보 조회 실패 시 기본 정보만으로 추가
         const cartItem: CartItem = {
@@ -87,14 +95,7 @@ export function useUnifiedAddToCart() {
         }
 
         const result = addGuestItem(cartItem)
-
-        if (!result.success) {
-          if (result.reason === 'duplicate') {
-            toast.info('이미 AI 심층 비교 목록에 있는 강의입니다')
-          } else if (result.reason === 'limit') {
-            toast.warning('AI 심층 비교는 최대 10개까지 담을 수 있습니다')
-          }
-        }
+        showAddFailureToast(result)
       }
     }
   }
