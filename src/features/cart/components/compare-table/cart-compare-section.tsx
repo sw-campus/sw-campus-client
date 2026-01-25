@@ -2,18 +2,8 @@
 
 import { useState } from 'react'
 
-import { useRouter } from 'next/navigation'
-
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { AiAuthModal, type AiAuthModalType } from '@/features/cart/components/ai-auth-modal'
 import { AiFinalRecommendation } from '@/features/cart/components/ai-final-recommendation'
 import { AiFloatingButton } from '@/features/cart/components/ai-floating-button'
 import { CartItemSidebar } from '@/features/cart/components/compare-table/cart-item-sidebar'
@@ -29,10 +19,9 @@ const LABEL_COL_GRID_CLASS = 'grid-cols-2 md:grid-cols-[13.75rem_minmax(0,1fr)_1
 const LABEL_COL_TABLE_CLASS = 'w-[5.5rem] md:w-[13.75rem]'
 
 export default function CartCompareSection() {
-  const router = useRouter()
   const [isLeftOver, setIsLeftOver] = useState(false)
   const [isRightOver, setIsRightOver] = useState(false)
-  const [isSurveyDialogOpen, setIsSurveyDialogOpen] = useState(false)
+  const [authModalType, setAuthModalType] = useState<AiAuthModalType>(null)
 
   const isLoggedIn = useAuthStore(state => state.isLoggedIn)
 
@@ -70,21 +59,27 @@ export default function CartCompareSection() {
     isLoggedIn,
   })
 
-  // AI 분석이 가능한지 여부
-  const canAnalyze = Boolean(leftDetail && rightDetail && isLoggedIn)
+  // AI 분석이 가능한지 여부 (두 강의 선택 시 버튼 활성화)
+  // 로그인/설문 체크는 클릭 시 모달로 처리
+  const canAnalyze = Boolean(leftDetail && rightDetail)
 
-  // AI 분석 실행 핸들러 (캐싱 적용)
+  // AI 분석 실행 핸들러
   const handleAiAnalyze = async () => {
+    // 비로그인 시 로그인 모달 표시
+    if (!isLoggedIn) {
+      setAuthModalType('login')
+      return
+    }
+
     const result = await runAiAnalyze()
-    // 설문조사 필요 시 다이얼로그 오픈
+    // 설문조사 필요 시 설문 모달 표시
     if (result && 'needsSurvey' in result && result.needsSurvey) {
-      setIsSurveyDialogOpen(true)
+      setAuthModalType('survey')
     }
   }
 
   // 비활성 이유 메시지
   const getDisabledReason = () => {
-    if (!isLoggedIn) return '로그인이 필요합니다'
     if (!leftDetail || !rightDetail) return '두 강의를 모두 선택해주세요'
     return ''
   }
@@ -228,24 +223,8 @@ export default function CartCompareSection() {
         className="bottom-36 md:bottom-10"
       />
 
-      <Dialog open={isSurveyDialogOpen} onOpenChange={setIsSurveyDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>설문조사가 필요합니다</DialogTitle>
-            <DialogDescription>
-              AI 비교 분석을 위해서는 설문조사 결과가 필요합니다.
-              <br />
-              마이페이지에서 설문조사를 진행하시겠습니까?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsSurveyDialogOpen(false)}>
-              취소
-            </Button>
-            <Button onClick={() => router.push('/mypage/survey')}>확인</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* AI 인증/설문 안내 모달 */}
+      <AiAuthModal type={authModalType} onClose={() => setAuthModalType(null)} />
     </div>
   )
 }
