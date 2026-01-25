@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-import { useCartLecturesWithDetailQuery } from '@/features/cart/hooks/use-cart-lectures-with-detail-query'
+import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import type { CartItem } from '@/features/cart/types/cart.type'
 import { useLectureDetailQuery } from '@/features/lecture'
 import type { LectureDetail } from '@/features/lecture/api/lecture-api.types'
@@ -41,11 +41,8 @@ type Resolved = {
   dropLecture: (side: Side, lectureId: string) => void
 }
 
-const EMPTY_CART_ITEMS: CartItem[] = []
-
 export function useCartComparePageModel(): Resolved {
-  const cartQuery = useCartLecturesWithDetailQuery()
-  const items = cartQuery.data ?? EMPTY_CART_ITEMS
+  const { items, isLoading: cartIsLoading, isError: cartIsError } = useUnifiedCart()
 
   const { leftId, rightId, setLeftId, setRightId } = useCartCompareStore()
 
@@ -111,8 +108,8 @@ export function useCartComparePageModel(): Resolved {
 
   return {
     items,
-    isLoading: cartQuery.isLoading,
-    isError: cartQuery.isError,
+    isLoading: cartIsLoading,
+    isError: cartIsError,
 
     leftId,
     rightId,

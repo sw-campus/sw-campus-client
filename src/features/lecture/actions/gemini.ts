@@ -1,10 +1,28 @@
 'use server'
 
+import { cookies } from 'next/headers'
+
 import { GoogleGenerativeAI, SchemaType, type Schema } from '@google/generative-ai'
 
 import type { LectureDetail } from '@/features/lecture/api/lecture-api.types'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
+
+/**
+ * 서버 측 인증 체크
+ * - 인증 쿠키 존재 여부 확인
+ * - 비인증 시 에러 throw
+ */
+async function checkAuthentication(): Promise<void> {
+  const cookieStore = await cookies()
+  // accessToken 또는 refreshToken 쿠키 존재 여부 확인
+  const hasAccessToken = cookieStore.has('accessToken')
+  const hasRefreshToken = cookieStore.has('refreshToken')
+
+  if (!hasAccessToken && !hasRefreshToken) {
+    throw new Error('인증이 필요합니다. 로그인 후 다시 시도해주세요.')
+  }
+}
 
 export async function generateGeminiSummary(lectureData: LectureDetail) {
   if (!process.env.GEMINI_API_KEY) {
@@ -220,6 +238,9 @@ export async function compareCoursesWithAI(
   rightLecture: LectureDetail,
   userSurvey: AiSurveyInput,
 ): Promise<ComparisonResult> {
+  // 서버 측 인증 체크
+  await checkAuthentication()
+
   if (!process.env.GEMINI_API_KEY) {
     console.warn('GEMINI_API_KEY is missing')
     throw new Error('API 키가 설정되지 않아 AI 분석을 수행할 수 없습니다.')

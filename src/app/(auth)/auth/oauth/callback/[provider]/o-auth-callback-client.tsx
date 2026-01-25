@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { oauthLogin } from '@/features/auth/auth-api'
 import { OAUTH_RETURN_URL_KEY, SURVEY_FIRST_LOGIN_KEY } from '@/features/auth/constants'
+import { useMigrateGuestCart } from '@/features/cart/hooks/use-migrate-guest-cart'
 import { getProfile } from '@/features/mypage/api/survey.api'
 import { parseUserType, parseUserName, parseNickname, type LoginResponse } from '@/lib/parse-login-response'
 import { useAuthStore } from '@/store/auth-store'
@@ -17,6 +18,7 @@ export default function OAuthCallbackClient() {
   const params = useParams<{ provider: string }>()
 
   const { login: setLogin, setUserType, setNickname } = useAuthStore()
+  const { migrateGuestCart } = useMigrateGuestCart()
 
   useEffect(() => {
     const run = async () => {
@@ -71,6 +73,13 @@ export default function OAuthCallbackClient() {
           }
         } catch {
           // ignore nickname fetch errors
+        }
+
+        // Guest cart 마이그레이션 (로그인 성공 후)
+        try {
+          await migrateGuestCart()
+        } catch {
+          // ignore migration errors
         }
 
         toast.success('로그인되었습니다.')

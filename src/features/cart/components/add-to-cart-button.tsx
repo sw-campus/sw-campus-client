@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { useAddToCart } from '@/features/cart/hooks/use-add-to-cart'
+import { useUnifiedAddToCart } from '@/features/cart/hooks/use-unified-add-to-cart'
 import type { AddToCartItem } from '@/features/cart/types/cart.type'
 
 type ButtonProps = React.ComponentProps<typeof Button>
@@ -12,7 +12,7 @@ interface AddToCartButtonProps extends Omit<ButtonProps, 'onClick'> {
 }
 
 export function AddToCartButton({ item, children, onClick, ...props }: AddToCartButtonProps) {
-  const { addToCart } = useAddToCart()
+  const { addToCart } = useUnifiedAddToCart()
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
