@@ -1,0 +1,6 @@
+export { MainBanner } from './main-banner'
+export { AiCompareSection } from './ai-compare-section'
+export { BannerCarousel } from './banner-carousel'
+export { BootcampListSection } from './bootcamp-list-section'
+export { PartnerSection } from './partner-section'
+export { EventSection } from './event-section'
