@@ -77,29 +77,6 @@ function SearchContentInner() {
     return parent?.children ?? []
   })()
 
-  type CategoryPath = { l1: number; l2?: number; l3?: number }
-  const categoryPathMap = (() => {
-    const map = new Map<number, CategoryPath>()
-    if (!categoryTree) return map
-
-    for (const l1 of categoryTree) {
-      map.set(l1.categoryId, { l1: l1.categoryId })
-
-      if (l1.children) {
-        for (const l2 of l1.children) {
-          map.set(l2.categoryId, { l1: l1.categoryId, l2: l2.categoryId })
-
-          if (l2.children) {
-            for (const l3 of l2.children) {
-              map.set(l3.categoryId, { l1: l1.categoryId, l2: l2.categoryId, l3: l3.categoryId })
-            }
-          }
-        }
-      }
-    }
-    return map
-  })()
-
   // URL 파라미터 변경 시 카테고리 상태 동기화
   useEffect(() => {
     if (!categoryTree || categoryTree.length === 0) return
@@ -112,6 +89,23 @@ function SearchContentInner() {
       return
     }
 
+    // categoryPathMap을 useEffect 내부에서 생성 (무한 루프 방지)
+    type CategoryPath = { l1: number; l2?: number; l3?: number }
+    const pathMap = new Map<number, CategoryPath>()
+    for (const l1 of categoryTree) {
+      pathMap.set(l1.categoryId, { l1: l1.categoryId })
+      if (l1.children) {
+        for (const l2 of l1.children) {
+          pathMap.set(l2.categoryId, { l1: l1.categoryId, l2: l2.categoryId })
+          if (l2.children) {
+            for (const l3 of l2.children) {
+              pathMap.set(l3.categoryId, { l1: l1.categoryId, l2: l2.categoryId, l3: l3.categoryId })
+            }
+          }
+        }
+      }
+    }
+
     let foundL1: number | null = null
     let foundL2: number | null = null
     const foundL3s: string[] = []
@@ -120,7 +114,7 @@ function SearchContentInner() {
       const id = Number(idStr)
       if (!id) return
 
-      const path = categoryPathMap.get(id)
+      const path = pathMap.get(id)
       if (path) {
         if (path.l1 && path.l1 !== foundL1) {
           foundL1 = path.l1
@@ -133,13 +127,10 @@ function SearchContentInner() {
       }
     })
 
-    if (foundL1 !== level1Id) setLevel1Id(foundL1)
-    if (foundL2 !== level2Id) setLevel2Id(foundL2)
-
-    const isL3Same = foundL3s.length === level3Ids.length && foundL3s.every(id => level3Ids.includes(id))
-    if (!isL3Same) setLevel3Ids(foundL3s)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- URL 변경 시에만 동기화 (level1Id 등은 의도적으로 제외)
-  }, [searchParams, categoryTree, categoryPathMap])
+    setLevel1Id(foundL1)
+    setLevel2Id(foundL2)
+    setLevel3Ids(foundL3s)
+  }, [searchParams, categoryTree])
 
   const toggleFilter = (group: FilterGroupKey, label: string) => {
     setActiveFilters(prev => {
