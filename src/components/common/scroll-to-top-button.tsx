@@ -29,7 +29,7 @@ export function ScrollToTopButton() {
   if (!isMounted) return null
 
   return createPortal(
-    <div className="pointer-events-none fixed inset-x-0 bottom-36 z-50 mx-auto w-full max-w-7xl px-4 md:bottom-10">
+    <div className="pointer-events-none fixed inset-x-0 bottom-24 z-50 mx-auto w-full max-w-7xl px-4 md:bottom-10">
       <AnimatePresence>
         {isVisible && (
           <motion.button

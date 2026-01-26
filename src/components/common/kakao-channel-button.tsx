@@ -41,7 +41,7 @@ export default function KakaoChannelButton() {
         onLoad={handleKakaoLoad}
         strategy="afterInteractive"
       />
-      <div id="kakao-chat-channel-button" className="fixed right-4 bottom-20 z-50 md:right-32 md:bottom-12" />
+      <div id="kakao-chat-channel-button" className="fixed right-4 bottom-6 z-50 md:right-32 md:bottom-12" />
     </>
   )
 }
