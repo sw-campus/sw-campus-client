@@ -18,7 +18,7 @@ export interface DetailScore {
 export interface Review {
   reviewId: number
   lectureId: number
-  memberId: number
+  memberId: number | null  // 탈퇴한 회원의 경우 null
   nickname: string
   comment: string
   score: number

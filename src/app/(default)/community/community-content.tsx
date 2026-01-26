@@ -3,7 +3,7 @@
 import { Suspense, useState } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { FiEdit3, FiFilter, FiX, FiList, FiGrid, FiChevronLeft, FiChevronRight, FiUser } from 'react-icons/fi'
+import { FiEdit3, FiFilter, FiX, FiChevronLeft, FiChevronRight, FiUser, FiMoreHorizontal } from 'react-icons/fi'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
@@ -128,46 +128,37 @@ function CommunityContentInner() {
     setPage(0)
   }
 
-  // ViewType 상태 관리 (로컬 스토리지 연동) - lazy initialization으로 초기값 설정
-  const [viewType, setViewType] = useState<'list' | 'card'>(() => {
-    if (typeof window === 'undefined') return 'list'
-    const saved = localStorage.getItem('community-post-view-type') as 'list' | 'card' | null
-    return saved === 'card' || saved === 'list' ? saved : 'list'
-  })
-
-  const handleViewChange = (type: 'list' | 'card') => {
-    setViewType(type)
-    localStorage.setItem('community-post-view-type', type)
-  }
-
   const pageInfo = data?.page
   const totalPages = pageInfo?.totalPages ?? 1
 
   return (
     <div className="custom-container mx-auto w-full max-w-7xl">
       {/* 1. 상단 헤더 영역 */}
-      <div className="mb-8 sm:mb-10">
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 px-3 py-1">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-start justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1 space-y-2 sm:space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 px-2.5 py-1 sm:px-3">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange-500" />
-              <span className="text-xs font-semibold text-orange-700">커뮤니티</span>
+              <span className="text-[11px] font-semibold text-orange-700 sm:text-xs">커뮤니티</span>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
-              부트캠프 <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">수강일기</span>
+            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
+              부트캠프{' '}
+              <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
+                수강일기
+              </span>
             </h1>
-            <p className="max-w-lg text-base text-gray-500 sm:text-lg">
+            <p className="max-w-md text-sm text-gray-500 sm:text-base">
               매주 배운 내용과 성장 과정을 기록하고, 동료들과 함께 성장하세요
             </p>
           </div>
 
           {/* 데스크탑 버튼 영역 */}
-          <div className="hidden items-center gap-3 sm:flex">
+          <div className="hidden shrink-0 items-center gap-2.5 sm:flex">
             {currentMember && (
               <Button
                 variant="outline"
                 onClick={() => router.push(`/community/user/${currentMember.userId}`)}
-                className="h-11 gap-2 rounded-2xl border-gray-200 bg-white px-5 text-sm font-semibold text-gray-700 transition-all duration-300 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
+                className="h-10 gap-2 rounded-xl border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 transition-all duration-200 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
               >
                 <FiUser className="h-4 w-4" />
                 내 프로필
@@ -175,7 +166,7 @@ function CommunityContentInner() {
             )}
             <Button
               onClick={handleWriteClick}
-              className="group relative h-11 gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 px-6 text-sm font-bold shadow-lg shadow-orange-200/60 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-orange-300/60"
+              className="group relative h-10 gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 text-sm font-bold shadow-lg shadow-orange-200/50 transition-all duration-200 hover:shadow-xl hover:shadow-orange-200/60 active:scale-[0.98]"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <FiEdit3 className="h-4 w-4" />
@@ -183,11 +174,11 @@ function CommunityContentInner() {
             </Button>
           </div>
 
-          {/* 모바일 프로필 버튼 */}
+          {/* 모바일 프로필 버튼 - 44px 최소 터치 영역 */}
           {currentMember && (
             <button
               onClick={() => router.push(`/community/user/${currentMember.userId}`)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 sm:hidden"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 sm:hidden"
               aria-label="내 프로필"
             >
               <FiUser className="h-5 w-5" />
@@ -197,10 +188,10 @@ function CommunityContentInner() {
       </div>
 
       {/* 2. 툴바 영역 */}
-      <div className="mb-6 overflow-hidden rounded-3xl border border-gray-200/40 bg-white/80 p-4 shadow-sm backdrop-blur-xl sm:mb-8 sm:p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="mb-5 overflow-hidden rounded-2xl border border-gray-100 bg-white/90 p-3 shadow-sm ring-1 ring-gray-900/[0.04] backdrop-blur-xl sm:mb-6 sm:rounded-3xl sm:p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           {/* 검색창 - #태그 지원 */}
-          <div className="w-full sm:max-w-md">
+          <div className="w-full sm:max-w-sm lg:max-w-md">
             <SearchBar
               value={keywordParam}
               onChange={handleSearch}
@@ -210,22 +201,23 @@ function CommunityContentInner() {
           </div>
 
           {/* 필터 및 컨트롤 */}
-          <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-hide sm:pb-0">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide sm:gap-2.5">
             {/* 강의 필터 */}
             <Button
               variant="outline"
               size="sm"
               onClick={() => setIsLectureModalOpen(true)}
-              className={`h-10 shrink-0 gap-2 rounded-xl border px-4 text-sm font-medium transition-all duration-200 active:scale-95 ${
+              className={`h-9 shrink-0 gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition-all duration-200 active:scale-95 sm:h-10 sm:gap-2 sm:rounded-xl sm:px-4 sm:text-sm ${
                 selectedLecture
-                  ? 'border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 shadow-sm shadow-orange-100/50'
+                  ? 'border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 shadow-sm'
                   : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
-              <FiFilter className="h-4 w-4" />
-              <span>강의 필터</span>
+              <FiFilter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">강의</span>
+              <span>필터</span>
               {selectedLecture && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white shadow-sm">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-bold text-white sm:h-5 sm:w-5 sm:text-[10px]">
                   1
                 </span>
               )}
@@ -239,104 +231,77 @@ function CommunityContentInner() {
                 setPage(0)
               }}
             >
-              <SelectTrigger className="h-10 w-[120px] shrink-0 rounded-xl border-gray-200 bg-white text-sm font-medium">
+              <SelectTrigger className="h-9 w-[100px] shrink-0 rounded-lg border-gray-200 bg-white text-[13px] font-medium sm:h-10 sm:w-[110px] sm:rounded-xl sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
                 {POST_SORT_OPTIONS.map(option => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem key={option.value} value={option.value} className="text-sm">
                     {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            {/* 구분선 */}
-            <div className="h-6 w-px shrink-0 bg-gray-200/80" />
-
-            {/* 뷰 타입 전환 */}
-            <div className="flex shrink-0 items-center gap-1 rounded-xl bg-gray-100/80 p-1">
-              <button
-                onClick={() => handleViewChange('list')}
-                className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 active:scale-90 ${
-                  viewType === 'list'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-400 hover:text-gray-600'
-                }`}
-                aria-label="리스트형 보기"
-              >
-                <FiList className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => handleViewChange('card')}
-                className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 active:scale-90 ${
-                  viewType === 'card'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-400 hover:text-gray-600'
-                }`}
-                aria-label="카드형 보기"
-              >
-                <FiGrid className="h-4 w-4" />
-              </button>
-            </div>
           </div>
         </div>
       </div>
 
       {/* 활성화된 강의 필터 뱃지 */}
       {selectedLecture && (
-        <div className="mb-6 flex flex-wrap items-center gap-2.5 sm:mb-8">
-          <span className="text-sm font-medium text-gray-500">강의 필터:</span>
+        <div className="mb-5 flex flex-wrap items-center gap-2 sm:mb-6 sm:gap-2.5">
+          <span className="text-xs font-medium text-gray-500 sm:text-sm">강의 필터:</span>
           <Badge
             variant="secondary"
-            className="h-8 gap-2 rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 px-3.5 text-orange-700 shadow-sm ring-1 ring-orange-200/60"
+            className="h-7 gap-1.5 rounded-lg bg-gradient-to-r from-orange-50 to-amber-50 px-2.5 text-orange-700 shadow-sm ring-1 ring-orange-200/60 sm:h-8 sm:gap-2 sm:rounded-xl sm:px-3.5"
           >
-            <span className="max-w-[180px] truncate text-sm font-medium">{selectedLecture.name}</span>
+            <span className="max-w-[140px] truncate text-xs font-medium sm:max-w-[180px] sm:text-sm">{selectedLecture.name}</span>
             <button
               onClick={handleClearLectureFilter}
-              className="flex h-5 w-5 items-center justify-center rounded-lg transition-colors hover:bg-orange-200/60"
+              className="flex h-4 w-4 items-center justify-center rounded transition-colors hover:bg-orange-200/60 sm:h-5 sm:w-5 sm:rounded-lg"
             >
-              <FiX className="h-3.5 w-3.5" />
+              <FiX className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </button>
           </Badge>
         </div>
       )}
 
       {/* 메인 컨텐츠 영역 */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-5 sm:gap-6">
         {/* 게시글 목록 */}
         <main className="min-w-0 flex-1">
           {/* 목록 헤더 */}
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="flex items-center gap-3 text-lg font-bold text-gray-900 sm:text-xl">
+          <div className="mb-4 flex items-center justify-between sm:mb-5">
+            <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 sm:gap-3 sm:text-lg">
               전체 글
-              <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-lg bg-gradient-to-r from-gray-100 to-gray-50 px-2.5 text-sm font-semibold tabular-nums text-gray-600">
+              <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-md bg-gray-100 px-2 text-xs font-semibold tabular-nums text-gray-600 sm:h-7 sm:min-w-7 sm:rounded-lg sm:px-2.5 sm:text-sm">
                 {data?.page?.totalElements ?? 0}
               </span>
             </h2>
           </div>
 
-          <PostList posts={data?.posts ?? []} isLoading={isLoading} viewType={viewType} />
+          <PostList posts={data?.posts ?? []} isLoading={isLoading} />
 
           {/* 페이지네이션 */}
           {totalPages > 1 && (
-            <div className="mt-8 flex flex-col items-center gap-4">
-              {/* 페이지네이션 버튼 */}
-              <div className="flex items-center gap-1">
-                {/* 이전 */}
+            <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:gap-4">
+              {/* 페이지네이션 컨테이너 - 44px 최소 터치 영역 */}
+              <div className="flex items-center gap-1 rounded-2xl bg-gray-50/80 p-1 sm:rounded-2xl sm:p-1.5">
+                {/* 이전 버튼 */}
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all hover:bg-gray-50 active:scale-95 disabled:opacity-40 disabled:hover:bg-white sm:h-9 sm:w-9"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10"
                   aria-label="이전 페이지"
                 >
-                  <FiChevronLeft className="h-5 w-5 sm:h-4 sm:w-4" />
+                  <FiChevronLeft className="h-5 w-5" />
                 </button>
 
                 {/* 페이지 번호 */}
-                <div className="flex items-center gap-1 px-1">
+                <div className="flex items-center">
                   {(() => {
                     const maxVisible = 5
+                    const mobileMaxVisible = 3
                     let start = Math.max(0, page - Math.floor(maxVisible / 2))
                     const end = Math.min(totalPages - 1, start + maxVisible - 1)
                     if (end - start + 1 < maxVisible) {
@@ -346,39 +311,87 @@ function CommunityContentInner() {
                     for (let i = start; i <= end; i++) {
                       pages.push(i)
                     }
-                    return pages.map(pageNum => (
-                      <button
-                        key={pageNum}
-                        onClick={() => setPage(pageNum)}
-                        className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-medium transition-all active:scale-95 sm:h-9 sm:w-9 ${
-                          pageNum === page
-                            ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/50'
-                            : 'text-gray-600 hover:bg-gray-100'
-                        }`}
-                      >
-                        {pageNum + 1}
-                      </button>
-                    ))
+
+                    // 첫 페이지 + ... 표시
+                    const showStartEllipsis = start > 1
+                    const showEndEllipsis = end < totalPages - 2
+
+                    return (
+                      <>
+                        {/* 첫 페이지 (시작이 0이 아닌 경우) */}
+                        {start > 0 && (
+                          <>
+                            <button
+                              onClick={() => setPage(0)}
+                              className="hidden h-10 w-10 items-center justify-center rounded-xl text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex"
+                            >
+                              1
+                            </button>
+                            {showStartEllipsis && (
+                              <span className="hidden items-center justify-center px-1 text-gray-400 sm:flex">
+                                <FiMoreHorizontal className="h-4 w-4" />
+                              </span>
+                            )}
+                          </>
+                        )}
+
+                        {/* 페이지 번호들 - 44px 최소 터치 영역 */}
+                        {pages.map(pageNum => {
+                          // 모바일에서는 현재 페이지 주변 3개만 표시
+                          const isMobileVisible = Math.abs(pageNum - page) <= Math.floor(mobileMaxVisible / 2)
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setPage(pageNum)}
+                              className={`h-11 w-11 items-center justify-center rounded-xl text-sm font-medium transition-all active:scale-95 sm:h-10 sm:w-10 ${
+                                pageNum === page
+                                  ? 'flex bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/40'
+                                  : `text-gray-600 hover:bg-white hover:shadow-sm ${isMobileVisible ? 'flex' : 'hidden sm:flex'}`
+                              }`}
+                            >
+                              {pageNum + 1}
+                            </button>
+                          )
+                        })}
+
+                        {/* 마지막 페이지 (끝이 totalPages-1이 아닌 경우) */}
+                        {end < totalPages - 1 && (
+                          <>
+                            {showEndEllipsis && (
+                              <span className="hidden items-center justify-center px-1 text-gray-400 sm:flex">
+                                <FiMoreHorizontal className="h-4 w-4" />
+                              </span>
+                            )}
+                            <button
+                              onClick={() => setPage(totalPages - 1)}
+                              className="hidden h-10 w-10 items-center justify-center rounded-xl text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex"
+                            >
+                              {totalPages}
+                            </button>
+                          </>
+                        )}
+                      </>
+                    )
                   })()}
                 </div>
 
-                {/* 다음 */}
+                {/* 다음 버튼 */}
                 <button
                   onClick={() => setPage(p => p + 1)}
                   disabled={page >= totalPages - 1}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all hover:bg-gray-50 active:scale-95 disabled:opacity-40 disabled:hover:bg-white sm:h-9 sm:w-9"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10"
                   aria-label="다음 페이지"
                 >
-                  <FiChevronRight className="h-5 w-5 sm:h-4 sm:w-4" />
+                  <FiChevronRight className="h-5 w-5" />
                 </button>
               </div>
 
-              {/* 페이지 정보 - 모바일에서 표시 */}
-              <p className="text-sm text-gray-500">
-                <span className="font-medium text-gray-700">{page + 1}</span>
-                <span className="mx-1">/</span>
+              {/* 페이지 정보 */}
+              <p className="text-xs text-gray-500 sm:text-sm">
+                <span className="font-semibold text-gray-700">{page + 1}</span>
+                <span className="mx-1 text-gray-400">/</span>
                 <span>{totalPages}</span>
-                <span className="ml-1">페이지</span>
+                <span className="ml-1 text-gray-400">페이지</span>
               </p>
             </div>
           )}
@@ -388,11 +401,11 @@ function CommunityContentInner() {
       {/* 모바일 플로팅 글쓰기 버튼 */}
       <button
         onClick={handleWriteClick}
-        className="group fixed right-5 bottom-5 z-50 flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-xl shadow-orange-400/40 transition-all duration-300 active:scale-90 sm:hidden"
+        className="group fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-xl shadow-orange-400/30 ring-4 ring-orange-100/50 transition-all duration-200 active:scale-90 sm:hidden"
         aria-label="글쓰기"
       >
-        <span className="absolute inset-0 rounded-[20px] bg-gradient-to-br from-white/20 to-transparent opacity-0 transition-opacity duration-300 group-active:opacity-100" />
-        <FiEdit3 className="h-7 w-7 transition-transform duration-300 group-active:rotate-12" />
+        <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent opacity-0 transition-opacity duration-200 group-active:opacity-100" />
+        <FiEdit3 className="h-6 w-6 transition-transform duration-200 group-active:rotate-12" />
       </button>
 
       {/* 강의 검색 모달 */}

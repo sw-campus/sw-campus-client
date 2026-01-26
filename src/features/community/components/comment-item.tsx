@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { FiCornerDownRight, FiEdit2, FiHeart, FiMessageCircle, FiMoreVertical, FiSend, FiTrash2, FiX } from 'react-icons/fi'
+import { FiCornerDownRight, FiEdit2, FiHeart, FiLoader, FiMessageCircle, FiMoreVertical, FiSend, FiTrash2, FiX } from 'react-icons/fi'
 
 import { UserAvatar } from '@/components/ui/user-avatar'
 
@@ -185,7 +185,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {/* 좋아요 */}
             <button
               onClick={handleLike}
@@ -202,7 +202,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             {isLoggedIn && (comment.isAuthor || userType === 'ADMIN') && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                  <button className="flex h-11 w-11 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 sm:h-8 sm:w-8">
                     <FiMoreVertical className="h-4 w-4" />
                   </button>
                 </DropdownMenuTrigger>
@@ -249,8 +249,9 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
                 size="sm"
                 onClick={handleUpdate}
                 disabled={isUpdating || !editBody.trim()}
-                className="rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 shadow-sm"
+                className="gap-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 shadow-sm"
               >
+                {isUpdating && <FiLoader className="h-3.5 w-3.5 animate-spin" />}
                 {isUpdating ? '수정 중...' : '수정'}
               </Button>
             </div>
@@ -293,9 +294,10 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
               <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDelete}
-                className="rounded-xl bg-rose-500 hover:bg-rose-600"
+                className="gap-1.5 rounded-xl bg-rose-500 hover:bg-rose-600"
                 disabled={isDeleting}
               >
+                {isDeleting && <FiLoader className="h-3.5 w-3.5 animate-spin" />}
                 {isDeleting ? '삭제 중...' : '삭제'}
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -305,15 +307,21 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
       {/* 인라인 답글 입력 폼 */}
       {isReplyFormVisible && replyFormProps && (
         <form onSubmit={replyFormProps.onSubmit} className="mt-2 ml-2 border-l-2 border-orange-200 pl-2 sm:ml-6 sm:pl-4">
+          {/* 접근성을 위한 시각적으로 숨겨진 라벨 */}
+          <label htmlFor={`reply-input-${comment.id}`} className="sr-only">
+            {comment.authorNickname}님에게 답글 작성
+          </label>
           <div className="flex items-center gap-2 rounded-lg border border-orange-200 bg-orange-50/50 p-1.5 focus-within:border-orange-300">
             <FiCornerDownRight className="h-3 w-3 shrink-0 text-orange-400" />
             <input
+              id={`reply-input-${comment.id}`}
               ref={replyTextareaRef as React.RefObject<HTMLInputElement>}
               type="text"
               value={replyFormProps.body}
               onChange={(e) => replyFormProps.setBody(e.target.value)}
               placeholder={`@${comment.authorNickname} 답글...`}
               className="min-w-0 flex-1 border-0 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
+              aria-label={`${comment.authorNickname}님에게 답글`}
             />
             <button
               type="button"
