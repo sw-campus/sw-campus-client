@@ -39,7 +39,7 @@ type MyProfileResponse = {
 // 모달 스크린샷처럼: 라운드, 얇은 보더, 포커스 앰버 컬러
 
 const INPUT_CLASS =
-  'h-10 sm:h-11 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
+  'h-10 md:h-11 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
 
 // AddressInput(daum.Postcode)이 동작하려면 postcode 스크립트가 필요합니다.
 const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
@@ -289,7 +289,7 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
     <div className="mx-auto w-full max-w-2xl">
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-4 sm:px-8 sm:py-6">
+        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-4 md:px-8 md:py-6">
           <h2 className="text-xl font-semibold text-gray-900">개인 정보 수정</h2>
 
           <button
@@ -303,7 +303,7 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
         </div>
 
         {/* Body */}
-        <div className="px-4 py-4 sm:px-8 sm:py-6">{formContent}</div>
+        <div className="px-4 py-4 md:px-8 md:py-6">{formContent}</div>
       </div>
     </div>
   )

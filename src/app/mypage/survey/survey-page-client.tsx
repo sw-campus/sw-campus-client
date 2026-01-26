@@ -65,7 +65,7 @@ export function SurveyPageClient() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-[800px]">
+      <DialogContent className="md:max-w-[calc(100%-2rem)] md:max-w-[800px]">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>{STEP_TITLES[currentStep]}</DialogTitle>
         </DialogHeader>

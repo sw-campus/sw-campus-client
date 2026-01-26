@@ -39,9 +39,9 @@ export function LectureCreateQualificationFields({ selectTriggerClassName }: Pro
       <FieldDescription>필요 시 추가해 주세요.</FieldDescription>
       <FieldContent>
         <div className="space-y-3">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center">
             <Select value={selectedType} onValueChange={v => setSelectedType(v as QualType)}>
-              <SelectTrigger className={`w-full sm:w-[180px] ${selectTriggerClassName}`}>
+              <SelectTrigger className={`w-full md:w-[180px] ${selectTriggerClassName}`}>
                 <SelectValue placeholder="유형 선택" />
               </SelectTrigger>
               <SelectContent>
@@ -96,7 +96,7 @@ export function LectureCreateQualificationFields({ selectTriggerClassName }: Pro
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                     <Controller
                       control={control}
                       name={`quals.${idx}.type`}
@@ -115,7 +115,7 @@ export function LectureCreateQualificationFields({ selectTriggerClassName }: Pro
                       )}
                     />
 
-                    <div className="sm:col-span-2">
+                    <div className="md:col-span-2">
                       <Controller
                         control={control}
                         name={`quals.${idx}.text`}

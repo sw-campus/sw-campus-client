@@ -60,13 +60,13 @@ export function AdminDashboard() {
   return (
     <div className="flex flex-1 flex-col gap-6">
       {/* Header with Global Period Selector */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="text-foreground text-2xl font-bold">대시보드</h1>
         <PeriodToggle period={period} onPeriodChange={setPeriod} />
       </div>
 
       {/* Section 1: 핵심 지표 - 4열 그리드 */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {statCards.map(stat => (
           <StatCard
             key={stat.title}
@@ -82,7 +82,7 @@ export function AdminDashboard() {
       <VisitorLineChart report={analyticsReport} isLoading={isAnalyticsLoading} period={period} />
 
       {/* Section 3: 참여도 & 분포 - 4열 그리드 */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:grid-cols-4">
         {/* 참여도 카드 */}
         <EngagementCard
           period={period}
@@ -103,7 +103,7 @@ export function AdminDashboard() {
       <ClickRankingSection period={period} />
 
       {/* Section 5: 인기 검색어 + 이벤트 통계 */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <PopularSearchTermsCard period={period} />
         <EventStatsSection period={period} />
       </div>

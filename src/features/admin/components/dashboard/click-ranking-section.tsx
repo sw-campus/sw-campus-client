@@ -98,7 +98,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* 배너 클릭 Top 5 */}
         <Card className="bg-card flex h-full flex-col">
           <CardHeader className="flex flex-row items-center justify-between">

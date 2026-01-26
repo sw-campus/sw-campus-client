@@ -76,7 +76,7 @@ export function OrganizationApprovalPage() {
     <div className="flex flex-1 flex-col gap-6">
       <h1 className="text-foreground text-2xl font-bold">기관 승인 관리</h1>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {stats.map(stat => (
           <ColorfulStatCard
             key={stat.title}

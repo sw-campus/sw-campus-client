@@ -36,7 +36,7 @@ export function DesktopHeader({
   onOtherNavEnter,
 }: DesktopHeaderProps) {
   return (
-    <header className="sticky top-0 z-50 mx-auto mt-6 hidden w-full max-w-7xl items-center justify-between rounded-full border border-gray-200 bg-white/60 px-10 py-4 shadow-lg backdrop-blur-xl md:flex">
+    <header className="absolute left-1/2 top-6 z-50 hidden w-full max-w-7xl -translate-x-1/2 items-center justify-between rounded-full border border-gray-200 bg-white/60 px-10 py-4 shadow-lg backdrop-blur-xl md:flex">
       {/* 좌측: 로고 */}
       <div className="flex flex-1 items-center gap-8">
         <Link href={userType === 'ADMIN' ? '/admin' : '/'} className="flex items-center gap-3">
@@ -56,7 +56,7 @@ export function DesktopHeader({
       </div>
 
       {/* 중앙: 네비게이션 (lg 이상) */}
-      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 font-semibold text-gray-800 lg:flex">
+      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 font-semibold text-gray-800 md:flex">
         {categories
           .filter(c => !c.type || c.type === 'LECTURE')
           .map(category => {

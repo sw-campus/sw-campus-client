@@ -54,8 +54,8 @@ export default function LargeBanner() {
   // 로딩 중이거나 데이터 없으면 빈 상태 표시
   if (isLoading) {
     return (
-      <div className="bg-muted mx-auto mt-4 flex h-[140px] w-full max-w-7xl items-center justify-center overflow-hidden rounded-2xl sm:mt-6 sm:h-[180px] sm:rounded-3xl md:h-[310px]">
-        <div className="text-muted-foreground text-sm sm:text-base">배너 로딩 중...</div>
+      <div className="bg-muted flex aspect-[1280/210] items-center justify-center overflow-hidden rounded-2xl">
+        <div className="text-muted-foreground text-sm md:text-base">배너 로딩 중...</div>
       </div>
     )
   }
@@ -75,7 +75,7 @@ export default function LargeBanner() {
   }
 
   return (
-    <div className="mx-auto mt-4 w-full max-w-7xl overflow-hidden rounded-2xl border border-gray-200 shadow-lg sm:mt-6 sm:rounded-3xl">
+    <div className="overflow-hidden rounded-2xl">
       <Swiper
         modules={[Pagination, Autoplay]}
         slidesPerView={1}
@@ -93,7 +93,7 @@ export default function LargeBanner() {
 
           const content = (
             <div
-              className="relative h-[140px] w-full overflow-hidden sm:h-[180px] md:h-[310px]"
+              className="relative aspect-[1280/210] w-full overflow-hidden"
               style={{ backgroundColor: banner.backgroundColor || '#f3f4f6' }}
             >
               {banner.imageUrl ? (

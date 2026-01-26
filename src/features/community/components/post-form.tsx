@@ -351,9 +351,9 @@ export function PostForm({
 
   return (
     <>
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5 sm:space-y-6">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5 md:space-y-6">
         {/* 카테고리 선택 - Step 1 */}
-        <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
+        <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md md:p-5">
           {/* 단계 표시 */}
           <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
             <span>STEP 1</span>
@@ -364,7 +364,7 @@ export function PostForm({
             </div>
             카테고리 선택 <span className="text-orange-500">*</span>
           </label>
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">{renderCategorySelects()}</div>
+          <div className="flex flex-col gap-2 md:flex-row md:flex-wrap">{renderCategorySelects()}</div>
           <input
             type="hidden"
             {...register('boardCategoryId', {
@@ -379,7 +379,7 @@ export function PostForm({
 
         {/* 부트캠프 성장일기 - 강의 선택 */}
         {isBootcampDiaryCategory && (
-          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
+          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md md:p-5">
             {/* 단계 표시 */}
             <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
               <span>STEP 1-2</span>
@@ -397,7 +397,7 @@ export function PostForm({
 
         {/* 제목 */}
         {isBootcampDiaryCategory ? (
-          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
+          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md md:p-5">
             {/* 단계 표시 */}
             <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
               <span>STEP 2</span>
@@ -418,7 +418,7 @@ export function PostForm({
             </div>
           </div>
         ) : (
-          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
+          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md md:p-5">
             {/* 단계 표시 */}
             <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
               <span>STEP 2</span>
@@ -445,7 +445,7 @@ export function PostForm({
 
         {/* 본문 */}
         {isBootcampDiaryCategory ? (
-          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
+          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md md:p-5">
             {/* 단계 표시 */}
             <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
               <span>STEP 3</span>
@@ -455,7 +455,7 @@ export function PostForm({
             </div>
           </div>
         ) : (
-          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
+          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md md:p-5">
             {/* 단계 표시 */}
             <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
               <span>STEP 3</span>
@@ -488,7 +488,7 @@ export function PostForm({
         )}
 
         {/* 태그 - Optional */}
-        <div className="relative rounded-2xl border-2 border-dashed border-gray-200/80 bg-gradient-to-br from-gray-50/30 to-white p-4 shadow-sm transition-all hover:border-gray-300/80 hover:bg-white hover:shadow-md sm:p-5">
+        <div className="relative rounded-2xl border-2 border-dashed border-gray-200/80 bg-gradient-to-br from-gray-50/30 to-white p-4 shadow-sm transition-all hover:border-gray-300/80 hover:bg-white hover:shadow-md md:p-5">
           {/* 선택 표시 */}
           <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-xs font-medium text-gray-500 shadow-sm">
             <span>선택사항</span>
@@ -531,7 +531,7 @@ export function PostForm({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="h-12 w-full rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-base font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-300/50 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-none disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none sm:h-11 sm:w-auto sm:px-10 sm:text-sm"
+            className="h-12 w-full rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-base font-semibold shadow-md shadow-orange-200/50 transition-all hover:shadow-lg hover:shadow-orange-300/50 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-none disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none md:h-11 md:w-auto md:px-10 md:text-sm"
           >
             {isSubmitting ? '처리 중...' : submitLabel}
           </Button>

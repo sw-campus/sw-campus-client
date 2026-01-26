@@ -134,26 +134,26 @@ function CommunityContentInner() {
   return (
     <div className="custom-container mx-auto w-full max-w-7xl">
       {/* 1. 상단 헤더 영역 */}
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-start justify-between gap-3 sm:gap-4">
-          <div className="min-w-0 flex-1 space-y-2 sm:space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 px-2.5 py-1 sm:px-3">
+      <div className="mb-6 md:mb-8">
+        <div className="flex items-start justify-between gap-3 md:gap-4">
+          <div className="min-w-0 flex-1 space-y-2 md:space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 px-2.5 py-1 md:px-3">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange-500" />
-              <span className="text-[11px] font-semibold text-orange-700 sm:text-xs">커뮤니티</span>
+              <span className="text-[11px] font-semibold text-orange-700 md:text-xs">커뮤니티</span>
             </div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
+            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 md:text-3xl md:text-4xl">
               부트캠프{' '}
               <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
                 수강일기
               </span>
             </h1>
-            <p className="max-w-md text-sm text-gray-500 sm:text-base">
+            <p className="max-w-md text-sm text-gray-500 md:text-base">
               매주 배운 내용과 성장 과정을 기록하고, 동료들과 함께 성장하세요
             </p>
           </div>
 
           {/* 데스크탑 버튼 영역 */}
-          <div className="hidden shrink-0 items-center gap-2.5 sm:flex">
+          <div className="hidden shrink-0 items-center gap-2.5 md:flex">
             {currentMember && (
               <Button
                 variant="outline"
@@ -178,7 +178,7 @@ function CommunityContentInner() {
           {currentMember && (
             <button
               onClick={() => router.push(`/community/user/${currentMember.userId}`)}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 sm:hidden"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 md:hidden"
               aria-label="내 프로필"
             >
               <FiUser className="h-5 w-5" />
@@ -188,10 +188,10 @@ function CommunityContentInner() {
       </div>
 
       {/* 2. 툴바 영역 */}
-      <div className="mb-5 overflow-hidden rounded-2xl border border-gray-100 bg-white/90 p-3 shadow-sm ring-1 ring-gray-900/[0.04] backdrop-blur-xl sm:mb-6 sm:rounded-3xl sm:p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <div className="mb-5 overflow-hidden rounded-2xl border border-gray-100 bg-white/90 p-3 shadow-sm ring-1 ring-gray-900/[0.04] backdrop-blur-xl md:mb-6 md:rounded-3xl md:p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
           {/* 검색창 - #태그 지원 */}
-          <div className="w-full sm:max-w-sm lg:max-w-md">
+          <div className="w-full md:max-w-sm md:max-w-md">
             <SearchBar
               value={keywordParam}
               onChange={handleSearch}
@@ -201,23 +201,23 @@ function CommunityContentInner() {
           </div>
 
           {/* 필터 및 컨트롤 */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide sm:gap-2.5">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide md:gap-2.5">
             {/* 강의 필터 */}
             <Button
               variant="outline"
               size="sm"
               onClick={() => setIsLectureModalOpen(true)}
-              className={`h-9 shrink-0 gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition-all duration-200 active:scale-95 sm:h-10 sm:gap-2 sm:rounded-xl sm:px-4 sm:text-sm ${
+              className={`h-9 shrink-0 gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition-all duration-200 active:scale-95 md:h-10 md:gap-2 md:rounded-xl md:px-4 md:text-sm ${
                 selectedLecture
                   ? 'border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 shadow-sm'
                   : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
-              <FiFilter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <FiFilter className="h-3.5 w-3.5 md:h-4 md:w-4" />
               <span className="hidden xs:inline">강의</span>
               <span>필터</span>
               {selectedLecture && (
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-bold text-white sm:h-5 sm:w-5 sm:text-[10px]">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-bold text-white md:h-5 md:w-5 md:text-[10px]">
                   1
                 </span>
               )}
@@ -231,7 +231,7 @@ function CommunityContentInner() {
                 setPage(0)
               }}
             >
-              <SelectTrigger className="h-9 w-[100px] shrink-0 rounded-lg border-gray-200 bg-white text-[13px] font-medium sm:h-10 sm:w-[110px] sm:rounded-xl sm:text-sm">
+              <SelectTrigger className="h-9 w-[100px] shrink-0 rounded-lg border-gray-200 bg-white text-[13px] font-medium md:h-10 md:w-[110px] md:rounded-xl md:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -249,32 +249,32 @@ function CommunityContentInner() {
 
       {/* 활성화된 강의 필터 뱃지 */}
       {selectedLecture && (
-        <div className="mb-5 flex flex-wrap items-center gap-2 sm:mb-6 sm:gap-2.5">
-          <span className="text-xs font-medium text-gray-500 sm:text-sm">강의 필터:</span>
+        <div className="mb-5 flex flex-wrap items-center gap-2 md:mb-6 md:gap-2.5">
+          <span className="text-xs font-medium text-gray-500 md:text-sm">강의 필터:</span>
           <Badge
             variant="secondary"
-            className="h-7 gap-1.5 rounded-lg bg-gradient-to-r from-orange-50 to-amber-50 px-2.5 text-orange-700 shadow-sm ring-1 ring-orange-200/60 sm:h-8 sm:gap-2 sm:rounded-xl sm:px-3.5"
+            className="h-7 gap-1.5 rounded-lg bg-gradient-to-r from-orange-50 to-amber-50 px-2.5 text-orange-700 shadow-sm ring-1 ring-orange-200/60 md:h-8 md:gap-2 md:rounded-xl md:px-3.5"
           >
-            <span className="max-w-[140px] truncate text-xs font-medium sm:max-w-[180px] sm:text-sm">{selectedLecture.name}</span>
+            <span className="max-w-[140px] truncate text-xs font-medium md:max-w-[180px] md:text-sm">{selectedLecture.name}</span>
             <button
               onClick={handleClearLectureFilter}
-              className="flex h-4 w-4 items-center justify-center rounded transition-colors hover:bg-orange-200/60 sm:h-5 sm:w-5 sm:rounded-lg"
+              className="flex h-4 w-4 items-center justify-center rounded transition-colors hover:bg-orange-200/60 md:h-5 md:w-5 md:rounded-lg"
             >
-              <FiX className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              <FiX className="h-3 w-3 md:h-3.5 md:w-3.5" />
             </button>
           </Badge>
         </div>
       )}
 
       {/* 메인 컨텐츠 영역 */}
-      <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-col gap-5 md:gap-6">
         {/* 게시글 목록 */}
         <main className="min-w-0 flex-1">
           {/* 목록 헤더 */}
-          <div className="mb-4 flex items-center justify-between sm:mb-5">
-            <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 sm:gap-3 sm:text-lg">
+          <div className="mb-4 flex items-center justify-between md:mb-5">
+            <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 md:gap-3 md:text-lg">
               전체 글
-              <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-md bg-gray-100 px-2 text-xs font-semibold tabular-nums text-gray-600 sm:h-7 sm:min-w-7 sm:rounded-lg sm:px-2.5 sm:text-sm">
+              <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-md bg-gray-100 px-2 text-xs font-semibold tabular-nums text-gray-600 md:h-7 md:min-w-7 md:rounded-lg md:px-2.5 md:text-sm">
                 {data?.page?.totalElements ?? 0}
               </span>
             </h2>
@@ -284,14 +284,14 @@ function CommunityContentInner() {
 
           {/* 페이지네이션 */}
           {totalPages > 1 && (
-            <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:gap-4">
+            <div className="mt-6 flex flex-col items-center gap-3 md:mt-8 md:gap-4">
               {/* 페이지네이션 컨테이너 - 44px 최소 터치 영역 */}
-              <div className="flex items-center gap-1 rounded-2xl bg-gray-50/80 p-1 sm:rounded-2xl sm:p-1.5">
+              <div className="flex items-center gap-1 rounded-2xl bg-gray-50/80 p-1 md:rounded-2xl md:p-1.5">
                 {/* 이전 버튼 */}
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 md:h-10 md:w-10"
                   aria-label="이전 페이지"
                 >
                   <FiChevronLeft className="h-5 w-5" />
@@ -323,12 +323,12 @@ function CommunityContentInner() {
                           <>
                             <button
                               onClick={() => setPage(0)}
-                              className="hidden h-10 w-10 items-center justify-center rounded-xl text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex"
+                              className="hidden h-10 w-10 items-center justify-center rounded-xl text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 md:flex"
                             >
                               1
                             </button>
                             {showStartEllipsis && (
-                              <span className="hidden items-center justify-center px-1 text-gray-400 sm:flex">
+                              <span className="hidden items-center justify-center px-1 text-gray-400 md:flex">
                                 <FiMoreHorizontal className="h-4 w-4" />
                               </span>
                             )}
@@ -343,10 +343,10 @@ function CommunityContentInner() {
                             <button
                               key={pageNum}
                               onClick={() => setPage(pageNum)}
-                              className={`h-11 w-11 items-center justify-center rounded-xl text-sm font-medium transition-all active:scale-95 sm:h-10 sm:w-10 ${
+                              className={`h-11 w-11 items-center justify-center rounded-xl text-sm font-medium transition-all active:scale-95 md:h-10 md:w-10 ${
                                 pageNum === page
                                   ? 'flex bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/40'
-                                  : `text-gray-600 hover:bg-white hover:shadow-sm ${isMobileVisible ? 'flex' : 'hidden sm:flex'}`
+                                  : `text-gray-600 hover:bg-white hover:shadow-sm ${isMobileVisible ? 'flex' : 'hidden md:flex'}`
                               }`}
                             >
                               {pageNum + 1}
@@ -358,13 +358,13 @@ function CommunityContentInner() {
                         {end < totalPages - 1 && (
                           <>
                             {showEndEllipsis && (
-                              <span className="hidden items-center justify-center px-1 text-gray-400 sm:flex">
+                              <span className="hidden items-center justify-center px-1 text-gray-400 md:flex">
                                 <FiMoreHorizontal className="h-4 w-4" />
                               </span>
                             )}
                             <button
                               onClick={() => setPage(totalPages - 1)}
-                              className="hidden h-10 w-10 items-center justify-center rounded-xl text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex"
+                              className="hidden h-10 w-10 items-center justify-center rounded-xl text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 md:flex"
                             >
                               {totalPages}
                             </button>
@@ -379,7 +379,7 @@ function CommunityContentInner() {
                 <button
                   onClick={() => setPage(p => p + 1)}
                   disabled={page >= totalPages - 1}
-                  className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 md:h-10 md:w-10"
                   aria-label="다음 페이지"
                 >
                   <FiChevronRight className="h-5 w-5" />
@@ -387,7 +387,7 @@ function CommunityContentInner() {
               </div>
 
               {/* 페이지 정보 */}
-              <p className="text-xs text-gray-500 sm:text-sm">
+              <p className="text-xs text-gray-500 md:text-sm">
                 <span className="font-semibold text-gray-700">{page + 1}</span>
                 <span className="mx-1 text-gray-400">/</span>
                 <span>{totalPages}</span>
@@ -401,7 +401,7 @@ function CommunityContentInner() {
       {/* 모바일 플로팅 글쓰기 버튼 */}
       <button
         onClick={handleWriteClick}
-        className="group fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-xl shadow-orange-400/30 ring-4 ring-orange-100/50 transition-all duration-200 active:scale-90 sm:hidden"
+        className="group fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-xl shadow-orange-400/30 ring-4 ring-orange-100/50 transition-all duration-200 active:scale-90 md:hidden"
         aria-label="글쓰기"
       >
         <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent opacity-0 transition-opacity duration-200 group-active:opacity-100" />

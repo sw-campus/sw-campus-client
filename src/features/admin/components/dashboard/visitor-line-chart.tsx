@@ -57,7 +57,7 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
 
   return (
     <Card className="bg-card">
-      <CardHeader className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-between">
+      <CardHeader className="flex flex-col gap-3 pb-2 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-wrap items-center gap-3">
           <CardTitle className="text-foreground whitespace-nowrap">{periodLabel} 방문자수</CardTitle>
         </div>

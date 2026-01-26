@@ -250,7 +250,7 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
           name="desiredJobs"
           control={control}
           render={({ field }) => (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
               {desiredJobOptions.map((job) => (
                 <label
                   key={job}

@@ -36,17 +36,17 @@ export default function LectureCurriculum({ curriculum, specialCurriculums }: Pr
               return (
                 <div
                   key={`${item.name}-${item.level}-${idx}`}
-                  className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm hover:bg-gray-50/50 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5 sm:py-4"
+                  className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm hover:bg-gray-50/50 md:flex-row md:items-center md:justify-between md:gap-4 md:px-5 md:py-4"
                 >
-                  <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="flex items-center gap-3 md:gap-4">
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-500">
                       {idx + 1}
                     </span>
-                    <span className="text-sm font-medium text-gray-900 sm:text-base">{item.name}</span>
+                    <span className="text-sm font-medium text-gray-900 md:text-base">{item.name}</span>
                   </div>
                   <Badge
                     variant="outline"
-                    className={`shrink-0 self-start border ${badgeColor} rounded-md px-2 py-0.5 text-xs font-medium sm:self-auto sm:px-2.5 sm:py-1`}
+                    className={`shrink-0 self-start border ${badgeColor} rounded-md px-2 py-0.5 text-xs font-medium md:self-auto md:px-2.5 md:py-1`}
                   >
                     {levelText}
                   </Badge>

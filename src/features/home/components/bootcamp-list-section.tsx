@@ -33,17 +33,16 @@ export function BootcampListSection() {
     subcategories.find((c) => c.categoryId === resolvedCategoryId)?.categoryName ?? ''
 
   return (
-    <section className="flex flex-col gap-6 bg-brand-gold-light px-4 py-[30px] md:custom-container">
+    <section className="bg-brand-gold-light">
+      <div className="flex flex-col gap-6 px-4 py-[30px] md:mx-auto md:w-full md:max-w-[1448px] md:gap-10 md:px-6 md:py-[100px]">
       {/* 섹션 헤더 */}
-      <div className="flex flex-col gap-4">
-        <h2 className="text-center text-xl font-bold md:text-left md:text-2xl">
-          수강생 후기 <span className="text-brand-gold">BEST</span> 부트캠프들을
-          <br />
-          한눈에 살펴보세요.
+      <div className="flex flex-col gap-6 md:gap-8">
+        <h2 className="text-center text-xl font-bold md:text-[32px]">
+          수강생 후기 <span className="text-brand-gold">BEST</span> 부트캠프들을 한눈에 살펴보세요.
         </h2>
 
         {/* 카테고리 탭 */}
-        <div className="scrollbar-hide -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
+        <div className="scrollbar-hide -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:justify-center md:px-0">
           {subcategories.map((category) => (
             <button
               key={category.categoryId}
@@ -51,7 +50,7 @@ export function BootcampListSection() {
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 resolvedCategoryId === category.categoryId
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  : 'border border-border bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
               {category.categoryName}
@@ -66,7 +65,7 @@ export function BootcampListSection() {
           <div className="size-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
         </div>
       ) : lecturesData && lecturesData.length > 0 ? (
-        <div className="flex flex-col gap-3 md:grid md:grid-cols-2 md:gap-4">
+        <div className="flex flex-col gap-3 md:flex-row md:justify-center md:gap-6">
           {lecturesData.slice(0, 4).map((lecture) => (
             <BootcampListItem key={lecture.lectureId} lecture={lecture} />
           ))}
@@ -81,7 +80,7 @@ export function BootcampListSection() {
       )}
 
       {/* 더보기 버튼 */}
-      <Button variant="outline" className="mx-auto h-auto min-w-[280px] gap-2 rounded-full py-3" asChild>
+      <Button variant="outline" className="mx-auto h-auto min-w-[320px] gap-2 rounded-full px-8 py-4 text-base" asChild>
         <Link
           href={
             resolvedCategoryId
@@ -90,9 +89,10 @@ export function BootcampListSection() {
           }
         >
           <span className="font-bold text-brand-gold">{selectedCategoryName || '전체'}</span> 프로그램 더보기
-          <ArrowRight className="size-4" />
+          <ArrowRight className="size-5" />
         </Link>
       </Button>
+      </div>
     </section>
   )
 }
@@ -110,39 +110,84 @@ function BootcampListItem({ lecture }: BootcampListItemProps) {
   const reviewCount = lecture.reviewCount ?? 0
   const hasReviews = score > 0
 
+  // 날짜 포맷
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return ''
+    return dateStr.includes('T') ? dateStr.split('T')[0] : dateStr.slice(0, 10)
+  }
+  const dateRange =
+    lecture.startAt && lecture.endAt
+      ? `${formatDate(lecture.startAt)} ~ ${formatDate(lecture.endAt)}`
+      : ''
+
+  // 내배카 필요 여부
+  const recruitTypeMap: Record<string, string> = {
+    CARD_REQUIRED: '내배카 필요 O',
+    GENERAL: '내배카 필요 X',
+    KDT: 'KDT(우수형)',
+  }
+  const recruitLabel = lecture.recruitType ? recruitTypeMap[lecture.recruitType] || lecture.recruitType : null
+
+  // 온/오프라인
+  const locMap: Record<string, string> = {
+    ONLINE: '온라인',
+    OFFLINE: '오프라인',
+    MIXED: '온오프혼합',
+  }
+  const locLabel = lecture.lectureLoc ? locMap[lecture.lectureLoc] || lecture.lectureLoc : null
+
   return (
     <Link
       href={`/lectures/${lecture.lectureId}`}
-      className="flex flex-col gap-3 rounded-xl border border-border bg-card px-5 py-4 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
+      className="flex w-full flex-col gap-6 rounded-xl bg-white p-6 shadow-[4px_4px_20px_rgba(194,147,32,0.25)] transition-all hover:shadow-[4px_4px_24px_rgba(194,147,32,0.35)] md:w-[332px]"
     >
-      {/* 상단: 카테고리 | 별점 + 리뷰수 + 모집중 */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">{lecture.categoryName || '부트캠프'}</span>
-        <div className="flex items-center gap-2">
+      {/* 콘텐츠 영역 */}
+      <div className="flex flex-col gap-3">
+        {/* 상단: 카테고리 | 별점 + 리뷰수 + 모집중 */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-[#555555]">{lecture.categoryName || '부트캠프'}</span>
           <div className="flex items-center gap-1">
             <Star
-              className={`size-4 ${hasReviews ? 'fill-primary text-primary' : 'fill-muted-foreground/40 text-muted-foreground/40'}`}
+              className={`size-[18px] ${hasReviews ? 'fill-brand-gold text-brand-gold' : 'fill-muted-foreground/40 text-muted-foreground/40'}`}
             />
-            <span className="text-sm font-medium">{score.toFixed(1)}</span>
-            <span className="text-xs text-muted-foreground">({reviewCount})</span>
+            <span className="text-base">{score.toFixed(1)}</span>
+            <span className="text-xs text-[#555555]">({reviewCount})</span>
+            {lecture.status === 'RECRUITING' && (
+              <span className="ml-1 flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                <span className="size-1.5 rounded-full bg-emerald-500" />
+                모집중
+              </span>
+            )}
           </div>
-          {lecture.status === 'RECRUITING' ? (
-            <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
-              모집중
-            </span>
-          ) : lecture.status === 'FINISHED' ? (
-            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-              마감
-            </span>
-          ) : null}
         </div>
-      </div>
 
-      {/* 중간: 강의명 + 기관명 */}
-      <div className="flex flex-col gap-1">
-        <h3 className="line-clamp-2 break-keep text-base font-semibold">{lecture.lectureName}</h3>
-        <span className="text-sm text-muted-foreground">{lecture.orgName}</span>
+        {/* 강의명 */}
+        <h3 className="line-clamp-3 h-[100px] break-keep text-2xl font-bold">{lecture.lectureName}</h3>
+
+        {/* 기관명 */}
+        <span className="text-base text-[#555555]">{lecture.orgName}</span>
+
+        {/* 날짜 */}
+        <span className="text-xs text-[#888888]">{dateRange || '-'}</span>
+
+        {/* 태그 */}
+        <div className="flex flex-wrap gap-1.5">
+          {recruitLabel && (
+            <span className="rounded-full bg-amber-400/20 px-2.5 py-1 text-xs font-medium text-amber-700">
+              #{recruitLabel}
+            </span>
+          )}
+          {locLabel && (
+            <span className="rounded-full bg-amber-400/20 px-2.5 py-1 text-xs font-medium text-amber-700">
+              #{locLabel}
+            </span>
+          )}
+          {lecture.totalDays && (
+            <span className="rounded-full bg-amber-400/20 px-2.5 py-1 text-xs font-medium text-amber-700">
+              #{lecture.totalDays}일 과정
+            </span>
+          )}
+        </div>
       </div>
 
       {/* 하단: 버튼 */}
@@ -151,7 +196,7 @@ function BootcampListItem({ lecture }: BootcampListItemProps) {
           <Button
             variant="outline"
             size="sm"
-            className="h-9 flex-1 border-transparent bg-neutral-800 text-brand-gold hover:bg-neutral-800 hover:text-brand-gold"
+            className="h-12 flex-1 rounded-lg border-transparent bg-neutral-800 text-base text-brand-gold hover:bg-neutral-800 hover:text-brand-gold"
             onClick={(e) => {
               e.preventDefault()
               removeFromCart(lecture.lectureId)
@@ -165,7 +210,7 @@ function BootcampListItem({ lecture }: BootcampListItemProps) {
             item={{ lectureId: lecture.lectureId }}
             variant="outline"
             size="sm"
-            className="h-9 flex-1 border-transparent bg-brand-gold-light text-[#020202] hover:bg-brand-gold-light"
+            className="h-12 flex-1 rounded-lg border-transparent bg-brand-gold-light text-base text-[#020202] hover:bg-brand-gold-light"
           >
             관심등록
           </AddToCartButton>
@@ -173,7 +218,7 @@ function BootcampListItem({ lecture }: BootcampListItemProps) {
         <AddToCartButton
           item={{ lectureId: lecture.lectureId }}
           size="sm"
-          className="h-9 flex-1 bg-brand-gold text-neutral-700 hover:bg-brand-gold"
+          className="h-12 flex-1 rounded-lg bg-brand-gold text-base text-neutral-700 hover:bg-brand-gold"
           onClick={() => router.push('/cart/compare')}
         >
           비교하기

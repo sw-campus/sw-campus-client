@@ -62,10 +62,8 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
   if (isLoading) {
     return (
       <div className="custom-container">
-        <div className="custom-card">
-          <div className="flex items-center justify-center py-20">
-            <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
-          </div>
+        <div className="flex items-center justify-center py-20">
+          <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
         </div>
       </div>
     )
@@ -75,10 +73,8 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
   if (isError || !lecture) {
     return (
       <div className="custom-container">
-        <div className="custom-card">
-          <div className="text-muted-foreground py-20 text-center">
-            <p className="text-lg">강의 정보를 찾을 수 없습니다.</p>
-          </div>
+        <div className="text-muted-foreground py-20 text-center">
+          <p className="text-lg">강의 정보를 찾을 수 없습니다.</p>
         </div>
       </div>
     )
@@ -86,8 +82,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
 
   return (
     <div className="custom-container">
-      <div className="custom-card">
-        <div className="mx-auto w-full max-w-6xl px-4 py-6 lg:px-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6">
           {/* 상단 대표 이미지 영역 */}
           <div className="w-full overflow-hidden rounded-3xl bg-white/60 ring-1 ring-white/30 backdrop-blur-xl">
             <div className="relative aspect-16/6 w-full bg-white/30">
@@ -106,9 +101,9 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-12">
             {/* LEFT */}
-            <section className="lg:col-span-8">
+            <section className="md:col-span-8">
               {/* 타이틀 영역 */}
               <Card className="mb-4 rounded-2xl bg-white/70 ring-1 ring-white/30 backdrop-blur-xl">
                 <CardContent className="p-4">
@@ -164,13 +159,12 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
             </section>
 
             {/* RIGHT (sticky) */}
-            <aside className="lg:col-span-4">
+            <aside className="md:col-span-4">
               <LectureSidebar lecture={lecture} />
             </aside>
           </div>
-          {/* 모바일 하단 고정바 공간 확보 */}
-          <div className="h-20 lg:hidden" />
-        </div>
+        {/* 모바일 하단 고정바 공간 확보 */}
+        <div className="h-20 md:hidden" />
       </div>
     </div>
   )

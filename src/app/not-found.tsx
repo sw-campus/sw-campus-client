@@ -18,14 +18,14 @@ export default function NotFound() {
         <p className="mt-2 text-gray-300">요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.</p>
 
         {/* Action Buttons */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button asChild size="lg" className="w-full sm:w-auto">
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 md:flex-row">
+          <Button asChild size="lg" className="w-full md:w-auto">
             <Link href="/">홈으로 돌아가기</Link>
           </Button>
           <Button
             variant="outline"
             size="lg"
-            className="w-full border-white/20 text-white hover:bg-white/10 sm:w-auto"
+            className="w-full border-white/20 text-white hover:bg-white/10 md:w-auto"
             onClick={() => window.history.back()}
           >
             이전 페이지로

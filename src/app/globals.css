@@ -163,10 +163,7 @@ html {
     opacity: 1;
   }
   .custom-container {
-    @apply relative flex flex-1 flex-col gap-4 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 md:px-8;
-  }
-  .custom-card {
-    @apply mx-auto w-full max-w-7xl overflow-x-auto rounded-2xl border border-gray-200 bg-white/70 p-4 shadow-lg backdrop-blur-xl sm:rounded-3xl sm:p-6 md:p-8;
+    @apply relative flex flex-1 flex-col gap-4 overflow-x-hidden px-4 py-6;
   }
 
   /* 부트캠프 성장일기 템플릿 스타일 */

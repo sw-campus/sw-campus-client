@@ -102,7 +102,7 @@ export default function CartCompareSection() {
   }
 
   return (
-    <div className="mx-auto grid w-full gap-4 py-4 pb-40 md:py-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+    <div className="mx-auto grid w-full gap-4 py-4 pb-40 md:py-6 md:grid-cols-[280px_minmax(0,1fr)]">
       <CartItemSidebar
         items={items}
         isLoading={isLoading}

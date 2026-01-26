@@ -129,8 +129,8 @@ export function ReviewManagementSection() {
                   <TableRow>
                     <TableHead className="w-12 text-center">#</TableHead>
                     <TableHead>강의명</TableHead>
-                    <TableHead className="hidden w-20 sm:table-cell">수료증</TableHead>
-                    <TableHead className="hidden w-20 sm:table-cell">후기</TableHead>
+                    <TableHead className="hidden w-20 md:table-cell">수료증</TableHead>
+                    <TableHead className="hidden w-20 md:table-cell">후기</TableHead>
                     <TableHead className="w-20 text-center">관리</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -141,7 +141,7 @@ export function ReviewManagementSection() {
                       <TableCell className="text-foreground max-w-[200px] truncate font-medium" title={l.lectureName}>
                         {l.lectureName}
                         {/* Mobile info */}
-                        <div className="mt-1 flex items-center gap-2 sm:hidden">
+                        <div className="mt-1 flex items-center gap-2 md:hidden">
                           <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
                             {getApprovalStatusLabel(l.certificateStatus)}
                           </Badge>
@@ -154,13 +154,13 @@ export function ReviewManagementSection() {
                         </div>
                       </TableCell>
                       {/* 수료증 상태 */}
-                      <TableCell className="hidden sm:table-cell">
+                      <TableCell className="hidden md:table-cell">
                         <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
                           {getApprovalStatusLabel(l.certificateStatus)}
                         </Badge>
                       </TableCell>
                       {/* 후기 상태 */}
-                      <TableCell className="hidden sm:table-cell">
+                      <TableCell className="hidden md:table-cell">
                         <Badge
                           variant="secondary"
                           className={`text-xs ${getStatusBadgeClass(l)}`}

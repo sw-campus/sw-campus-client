@@ -18,7 +18,7 @@ export default function AdminInfoModal() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-175">
+      <DialogContent className="md:max-w-[calc(100%-2rem)] md:max-w-175">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>관리자 정보 수정</DialogTitle>
         </DialogHeader>

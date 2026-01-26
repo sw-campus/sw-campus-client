@@ -243,7 +243,7 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
   return (
     <section>
       {/* Header with title and sort */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-foreground text-xl font-bold">수강생 분들의 솔직한 후기예요.</h2>
           <p className="text-muted-foreground mt-1 text-sm">총 {totalElements}개의 후기</p>
@@ -263,7 +263,7 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
       </div>
 
       {/* Review Cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:grid-cols-3">
         {reviews.map(review => (
           <OrganizationReviewCard key={review.reviewId} review={review} />
         ))}

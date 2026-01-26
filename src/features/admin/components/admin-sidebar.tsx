@@ -26,7 +26,7 @@ export function AdminSidebar() {
   return (
     <>
       {/* Mobile: Horizontal Scrollable Tabs */}
-      <div className="-mx-4 mb-4 overflow-x-auto px-4 scrollbar-hide lg:hidden">
+      <div className="-mx-4 mb-4 overflow-x-auto px-4 scrollbar-hide md:hidden">
         <nav className="flex gap-2 whitespace-nowrap">
           {menuItems.map(item => (
             <Link
@@ -46,7 +46,7 @@ export function AdminSidebar() {
       </div>
 
       {/* Desktop: Vertical Sidebar */}
-      <aside className="border-border bg-card hidden w-56 shrink-0 flex-col rounded-lg border lg:flex xl:w-64">
+      <aside className="border-border bg-card hidden w-56 shrink-0 flex-col rounded-lg border md:flex xl:w-64">
         <div className="border-border border-b p-4 xl:p-6">
           <h1 className="text-foreground text-base font-bold xl:text-lg">관리자 페이지</h1>
         </div>

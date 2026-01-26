@@ -205,7 +205,7 @@ export function LectureDetailModal({
           </div>
         )}
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="gap-2 md:gap-0">
           {onEdit && (
             <Button variant="outline" onClick={handleEdit}>
               수정

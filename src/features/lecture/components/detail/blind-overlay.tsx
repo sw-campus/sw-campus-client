@@ -31,15 +31,15 @@ export function BlindOverlay({ totalCount, visibleCount }: BlindOverlayProps) {
         </p>
 
         {isLoggedIn ? (
-          <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
-            <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+          <div className="flex flex-col items-center gap-2 md:flex-row md:justify-center">
+            <Button asChild size="sm" variant="outline" className="w-full md:w-auto">
               <Link href="/mypage/personal">설문조사 완료하기</Link>
             </Button>
             <span className="text-muted-foreground text-xs">또는</span>
             <p className="text-muted-foreground text-xs">위에서 후기를 작성해 주세요</p>
           </div>
         ) : (
-          <Button asChild size="sm" className="w-full sm:w-auto">
+          <Button asChild size="sm" className="w-full md:w-auto">
             <Link href="/login">로그인하고 리뷰 더 보기</Link>
           </Button>
         )}

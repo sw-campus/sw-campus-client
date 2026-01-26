@@ -86,8 +86,8 @@ export function InfoBox({ children }: { children: ReactNode }) {
 
 export function InfoRow({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-6">
-      <span className="text-sm font-medium text-gray-600 sm:w-24 sm:shrink-0 sm:text-xs sm:text-gray-800">{label}</span>
+    <div className="flex flex-col gap-1 md:flex-row md:items-start md:gap-6">
+      <span className="text-sm font-medium text-gray-600 md:w-24 md:shrink-0 md:text-xs md:text-gray-800">{label}</span>
       <span className="text-sm font-semibold text-gray-900">{children}</span>
     </div>
   )

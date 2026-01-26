@@ -356,7 +356,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
             {surveyLoading && <p className="text-sm text-gray-500">불러오는 중...</p>}
             {surveyError && !surveyLoading && <p className="text-sm text-red-600">{surveyError}</p>}
             {!surveyLoading && !surveyError && (
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-3">
                 <article className="rounded-xl border border-gray-100 bg-white px-5 py-4 shadow-sm ring-1 ring-black/5">
                   <p className="text-xs text-gray-500 uppercase">등록된 설문</p>
                   <p className="text-2xl font-semibold text-gray-900">{(surveyExists ? 1 : 0).toLocaleString()}개</p>
@@ -425,21 +425,21 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
               <Table className="table-fixed">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="hidden w-16 sm:table-cell">No.</TableHead>
+                    <TableHead className="hidden w-16 md:table-cell">No.</TableHead>
                     <TableHead>강의명</TableHead>
-                    <TableHead className="hidden w-24 sm:table-cell">수료증</TableHead>
-                    <TableHead className="hidden w-24 sm:table-cell">후기</TableHead>
-                    <TableHead className="hidden w-20 text-center sm:table-cell">관리</TableHead>
+                    <TableHead className="hidden w-24 md:table-cell">수료증</TableHead>
+                    <TableHead className="hidden w-24 md:table-cell">후기</TableHead>
+                    <TableHead className="hidden w-20 text-center md:table-cell">관리</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {lectures!.map((l, index) => (
                     <TableRow key={l.certificateId} className="hover:bg-muted/50 transition-colors">
-                      <TableCell className="text-muted-foreground hidden sm:table-cell">{index + 1}</TableCell>
+                      <TableCell className="text-muted-foreground hidden md:table-cell">{index + 1}</TableCell>
                       <TableCell className="text-foreground truncate font-medium" title={l.lectureName}>
                         {l.lectureName}
                         {/* 모바일 추가 정보 및 액션 */}
-                        <div className="mt-1 flex items-center justify-between sm:hidden">
+                        <div className="mt-1 flex items-center justify-between md:hidden">
                           <div className="flex items-center gap-2">
                             <Badge className={`rounded-full border ${getCertStatusColor(l.certificateStatus)}`} variant="outline">
                               {getApprovalStatusLabel(l.certificateStatus)}
@@ -504,13 +504,13 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                         </div>
                       </TableCell>
                       {/* 수료증 상태 */}
-                      <TableCell className="hidden sm:table-cell">
+                      <TableCell className="hidden md:table-cell">
                         <Badge className={`rounded-full border ${getCertStatusColor(l.certificateStatus)}`} variant="outline">
                           {getApprovalStatusLabel(l.certificateStatus)}
                         </Badge>
                       </TableCell>
                       {/* 후기 상태 */}
-                      <TableCell className="hidden sm:table-cell">
+                      <TableCell className="hidden md:table-cell">
                         {l.canWriteReview ? (
                           <Badge className="rounded-full border-gray-200 bg-white text-gray-700" variant="outline">
                             작성 가능
@@ -522,7 +522,7 @@ export default function PersonalMain({ activeSection, openInfoModal, onOpenProdu
                         )}
                       </TableCell>
                       {/* 관리: 수료증 + 후기 버튼 */}
-                      <TableCell className="hidden text-center sm:table-cell">
+                      <TableCell className="hidden text-center md:table-cell">
                         <div className="flex justify-center gap-1">
                           {/* 수료증 버튼 */}
                           <Tooltip>

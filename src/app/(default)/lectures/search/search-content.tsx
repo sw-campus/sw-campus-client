@@ -265,9 +265,9 @@ function SearchContentInner() {
 
   return (
     <div className="custom-container">
-      <div className="custom-card flex flex-col gap-4 lg:flex-row lg:gap-6">
+      <div className="flex flex-col gap-4 md:flex-row md:gap-6">
         {/* 모바일: 필터 토글 버튼 */}
-        <div className="flex items-center justify-between lg:hidden">
+        <div className="flex items-center justify-between md:hidden">
           <span className="text-sm text-gray-600">
             총 <strong className="text-primary">{pageInfo.totalElements}</strong>개의 강의
           </span>
@@ -283,7 +283,7 @@ function SearchContentInner() {
         </div>
 
         {/* 사이드바 - 모바일에서는 토글, 데스크탑에서는 항상 표시 */}
-        <div className={`${isFilterOpen ? 'block' : 'hidden'} lg:block`}>
+        <div className={`${isFilterOpen ? 'block' : 'hidden'} md:block`}>
           <LectureSearchSidebar
             level1Id={level1Id}
             level2Id={level2Id}
@@ -308,7 +308,7 @@ function SearchContentInner() {
         {/* 오른쪽: 검색 + 결과 + 강의 목록 */}
         <div className="flex min-w-0 flex-1 flex-col gap-4">
           {/* 검색창 + 정렬 */}
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
             <div className="flex flex-1 items-center gap-2">
               <Input
                 className="flex-1"
@@ -327,7 +327,7 @@ function SearchContentInner() {
               </Button>
             </div>
             <Select value={selectedSort} onValueChange={value => setSelectedSort(value)}>
-              <SelectTrigger className={`${filterSelectTriggerClass} w-full sm:w-[180px]`}>
+              <SelectTrigger className={`${filterSelectTriggerClass} w-full md:w-[180px]`}>
                 <SelectValue placeholder="정렬" />
               </SelectTrigger>
               <SelectContent>
@@ -341,7 +341,7 @@ function SearchContentInner() {
           </div>
 
           {/* 결과 수 - 데스크탑만 */}
-          <div className="hidden text-sm text-gray-600 lg:block">
+          <div className="hidden text-sm text-gray-600 md:block">
             총 <strong className="text-primary">{pageInfo.totalElements}</strong>개의 강의가 검색되었습니다.
           </div>
 

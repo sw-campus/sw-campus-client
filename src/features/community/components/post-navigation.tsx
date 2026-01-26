@@ -19,7 +19,7 @@ export function PostNavigation({ postId }: PostNavigationProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+      <div className="flex flex-col gap-3 md:flex-row md:gap-4">
         <div className="h-16 flex-1 rounded-2xl bg-gray-100" />
         <div className="h-16 flex-1 rounded-2xl bg-gray-100" />
       </div>
@@ -31,12 +31,12 @@ export function PostNavigation({ postId }: PostNavigationProps) {
   }
 
   return (
-    <nav className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-4">
+    <nav className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-4">
       {/* 이전 게시글 */}
       {data.previous ? (
         <Link
           href={`/community/${data.previous.id}`}
-          className="group flex flex-1 items-center gap-3 rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all active:scale-[0.98] hover:border-orange-200 hover:shadow-md sm:active:scale-100"
+          className="group flex flex-1 items-center gap-3 rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all active:scale-[0.98] hover:border-orange-200 hover:shadow-md md:active:scale-100"
         >
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 transition-colors group-hover:bg-orange-100">
             <FiChevronLeft className="h-5 w-5 text-gray-400 transition-all group-hover:-translate-x-0.5 group-hover:text-orange-500" />
@@ -49,14 +49,14 @@ export function PostNavigation({ postId }: PostNavigationProps) {
           </div>
         </Link>
       ) : (
-        <div className="hidden flex-1 sm:block" />
+        <div className="hidden flex-1 md:block" />
       )}
 
       {/* 다음 게시글 */}
       {data.next ? (
         <Link
           href={`/community/${data.next.id}`}
-          className="group flex flex-1 items-center justify-end gap-3 rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all active:scale-[0.98] hover:border-orange-200 hover:shadow-md sm:active:scale-100"
+          className="group flex flex-1 items-center justify-end gap-3 rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all active:scale-[0.98] hover:border-orange-200 hover:shadow-md md:active:scale-100"
         >
           <div className="min-w-0 text-right">
             <span className="text-xs font-medium text-gray-400">다음 글</span>
@@ -69,7 +69,7 @@ export function PostNavigation({ postId }: PostNavigationProps) {
           </div>
         </Link>
       ) : (
-        <div className="hidden flex-1 sm:block" />
+        <div className="hidden flex-1 md:block" />
       )}
     </nav>
   )

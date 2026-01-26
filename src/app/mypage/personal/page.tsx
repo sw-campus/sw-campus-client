@@ -9,9 +9,7 @@ export default function MyPage() {
   if (userType === 'PERSONAL') {
     return (
       <div className="custom-container">
-        <div className="custom-card">
-          <MyPageDashboard />
-        </div>
+        <MyPageDashboard />
       </div>
     )
   }

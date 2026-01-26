@@ -70,20 +70,20 @@ export function BannerTable({ banners, isLoading, isToggling, onViewDetail, onTo
 
   return (
     <Card className="bg-card">
-      <CardHeader className="pb-3 sm:pb-6">
-        <CardTitle className="text-foreground text-base sm:text-lg">배너 목록</CardTitle>
+      <CardHeader className="pb-3 md:pb-6">
+        <CardTitle className="text-foreground text-base md:text-lg">배너 목록</CardTitle>
       </CardHeader>
-      <CardContent className="px-3 pb-3 sm:px-6 sm:pb-6">
-        <div className="-mx-3 overflow-x-auto sm:mx-0">
+      <CardContent className="px-3 pb-3 md:px-6 md:pb-6">
+        <div className="-mx-3 overflow-x-auto md:mx-0">
           <Table className="min-w-[550px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[40px] text-xs sm:w-[60px] sm:text-sm">NO</TableHead>
-                <TableHead className="w-[60px] text-xs sm:w-[100px] sm:text-sm">타입</TableHead>
-                <TableHead className="min-w-[100px] text-xs sm:text-sm">강의명</TableHead>
-                <TableHead className="w-[120px] text-xs sm:w-[200px] sm:text-sm">기간</TableHead>
-                <TableHead className="w-[70px] text-center text-xs sm:w-[110px] sm:text-sm">기간상태</TableHead>
-                <TableHead className="w-[60px] text-center text-xs sm:w-[90px] sm:text-sm">활성화</TableHead>
+                <TableHead className="w-[40px] text-xs md:w-[60px] md:text-sm">NO</TableHead>
+                <TableHead className="w-[60px] text-xs md:w-[100px] md:text-sm">타입</TableHead>
+                <TableHead className="min-w-[100px] text-xs md:text-sm">강의명</TableHead>
+                <TableHead className="w-[120px] text-xs md:w-[200px] md:text-sm">기간</TableHead>
+                <TableHead className="w-[70px] text-center text-xs md:w-[110px] md:text-sm">기간상태</TableHead>
+                <TableHead className="w-[60px] text-center text-xs md:w-[90px] md:text-sm">활성화</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -95,14 +95,14 @@ export function BannerTable({ banners, isLoading, isToggling, onViewDetail, onTo
                     onClick={() => onViewDetail(banner)}
                     className="hover:bg-muted/50 cursor-pointer transition-colors"
                   >
-                    <TableCell className="text-muted-foreground text-xs sm:text-sm">{index + 1}</TableCell>
+                    <TableCell className="text-muted-foreground text-xs md:text-sm">{index + 1}</TableCell>
                     <TableCell>
                       <TypeBadge type={banner.type} />
                     </TableCell>
-                    <TableCell className="text-foreground max-w-[100px] truncate text-xs font-medium sm:max-w-none sm:text-sm" title={banner.lectureName}>
+                    <TableCell className="text-foreground max-w-[100px] truncate text-xs font-medium md:max-w-none md:text-sm" title={banner.lectureName}>
                       {banner.lectureName}
                     </TableCell>
-                    <TableCell className="text-muted-foreground truncate text-xs sm:text-sm">
+                    <TableCell className="text-muted-foreground truncate text-xs md:text-sm">
                       {formatDate(banner.startDate)} ~ {formatDate(banner.endDate)}
                     </TableCell>
                     <TableCell className="text-center">

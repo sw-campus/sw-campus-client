@@ -31,7 +31,7 @@ export default function PersonalAside({
   return (
     <>
       {/* 모바일/태블릿 상단 탭형 네비게이션 */}
-      <nav className="mb-4 lg:hidden">
+      <nav className="mb-4 md:hidden">
         <div className="grid grid-cols-3 gap-2">
           <button
             onClick={onClickPersonInfo}
@@ -70,7 +70,7 @@ export default function PersonalAside({
       </nav>
 
       {/* 데스크톱 사이드바 (lg 이상) */}
-      <aside className="hidden rounded-3xl border border-white/10 bg-white/90 p-5 text-neutral-900 shadow-lg shadow-black/10 lg:block lg:w-56 lg:self-start">
+      <aside className="hidden rounded-3xl border border-white/10 bg-white/90 p-5 text-neutral-900 shadow-lg shadow-black/10 md:block md:w-56 md:self-start">
         <h2 className="mb-5 text-2xl font-semibold">마이페이지</h2>
         <nav className="space-y-2 text-base leading-relaxed">
           <button

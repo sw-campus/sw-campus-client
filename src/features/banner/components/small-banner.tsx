@@ -5,9 +5,9 @@ import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
-import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
-import { Autoplay } from 'swiper/modules'
+import 'swiper/css/navigation'
+import { Autoplay, Navigation } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { trackBannerClick } from '@/lib/analytics'
@@ -30,20 +30,19 @@ function isExternalLink(url: string): boolean {
 }
 
 export default function SmallBanner() {
-  const swiperRef = useRef<SwiperType | null>(null)
+  const prevRef = useRef<HTMLButtonElement>(null)
+  const nextRef = useRef<HTMLButtonElement>(null)
   const { data: banners, isLoading } = useBannersByTypeQuery('SMALL')
 
   if (isLoading) {
     return (
-      <div className="relative mx-auto mt-4 w-full overflow-visible rounded-3xl">
-        <div className="flex gap-4 overflow-visible">
-          {[0, 1, 2].map(i => (
-            <div
-              key={i}
-              className="bg-muted h-[200px] w-[calc(33.33%-11px)] shrink-0 animate-pulse rounded-2xl border border-gray-200"
-            />
-          ))}
-        </div>
+      <div className="relative flex w-full gap-2 overflow-visible">
+        {[0, 1, 2].map(i => (
+          <div
+            key={i}
+            className="bg-muted aspect-[420/150] w-[calc(33.33%-11px)] shrink-0 animate-pulse rounded-lg border border-gray-200 md:rounded-2xl"
+          />
+        ))}
       </div>
     )
   }
@@ -63,24 +62,26 @@ export default function SmallBanner() {
   }
 
   return (
-    <div className="relative mx-auto mt-4 w-full rounded-3xl">
+    <div className="relative w-full">
       <Swiper
-        onBeforeInit={swiper => {
-          swiperRef.current = swiper
-        }}
-        modules={[Autoplay]}
-        loop={true}
+        modules={[Autoplay, Navigation]}
+        rewind={true}
         autoplay={{
           delay: 5000,
           disableOnInteraction: false,
         }}
-        spaceBetween={16}
-        slidesPerView={3}
-        breakpoints={{
-          0: { slidesPerView: 1 },
-          768: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
+        navigation={{
+          prevEl: prevRef.current,
+          nextEl: nextRef.current,
         }}
+        onBeforeInit={(swiper) => {
+          if (swiper.params.navigation && typeof swiper.params.navigation !== 'boolean') {
+            swiper.params.navigation.prevEl = prevRef.current
+            swiper.params.navigation.nextEl = nextRef.current
+          }
+        }}
+        spaceBetween={8}
+        slidesPerView={2.5}
       >
         {banners.map(banner => {
           const href = getBannerLink(banner)
@@ -88,7 +89,7 @@ export default function SmallBanner() {
 
           const content = (
             <div
-              className="relative h-[200px] w-full overflow-hidden rounded-2xl border border-gray-200 shadow"
+              className="relative aspect-[420/150] w-full overflow-hidden rounded-lg border border-gray-200 shadow md:rounded-2xl"
               style={{ backgroundColor: banner.backgroundColor || '#ffffff' }}
             >
               {banner.imageUrl ? (
@@ -131,14 +132,14 @@ export default function SmallBanner() {
 
       {/* 커스텀 네비게이션 버튼 */}
       <button
-        onClick={() => swiperRef.current?.slidePrev()}
+        ref={prevRef}
         className="absolute top-1/2 left-0 z-10 -translate-x-4 -translate-y-1/2 rounded-full bg-white/80 p-2.5 shadow-lg transition-all hover:scale-110 hover:text-orange-400 active:scale-95"
         aria-label="이전 슬라이드"
       >
         <FiChevronLeft className="h-5 w-5" />
       </button>
       <button
-        onClick={() => swiperRef.current?.slideNext()}
+        ref={nextRef}
         className="absolute top-1/2 right-0 z-10 translate-x-4 -translate-y-1/2 rounded-full bg-white/80 p-2.5 shadow-lg transition-all hover:scale-110 hover:text-orange-400 active:scale-95"
         aria-label="다음 슬라이드"
       >

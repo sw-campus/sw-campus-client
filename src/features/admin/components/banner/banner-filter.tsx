@@ -57,7 +57,7 @@ export function BannerFilter({
   }
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       {/* 좌측: 필터들 */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Period Status Filter Tabs */}
@@ -98,7 +98,7 @@ export function BannerFilter({
       </div>
 
       {/* 우측: 검색 */}
-      <div className="relative w-full sm:w-64">
+      <div className="relative w-full md:w-64">
         <LuSearch className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           type="text"

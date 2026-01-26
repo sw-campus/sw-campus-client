@@ -28,11 +28,11 @@ export function PostCard({ post, onClick }: PostCardProps) {
           onClick()
         }
       }}
-      className="group relative box-border h-[120px] max-h-[120px] min-h-[120px] w-full cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-orange-200 hover:shadow-lg hover:shadow-orange-100/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 active:scale-[0.98] sm:h-[136px] sm:max-h-[136px] sm:min-h-[136px]"
+      className="group relative box-border h-[120px] max-h-[120px] min-h-[120px] w-full cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-orange-200 hover:shadow-lg hover:shadow-orange-100/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 active:scale-[0.98] md:h-[136px] md:max-h-[136px] md:min-h-[136px]"
     >
       <div className="absolute inset-0 flex gap-4 p-4">
         {/* 썸네일 */}
-        <div className="relative h-[88px] w-[88px] flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 sm:h-[104px] sm:w-[104px]">
+        <div className="relative h-[88px] w-[88px] flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 md:h-[104px] md:w-[104px]">
           {post.thumbnailUrl ? (
             <Image
               src={post.thumbnailUrl}
@@ -58,8 +58,8 @@ export function PostCard({ post, onClick }: PostCardProps) {
               {formatRelativeTime(post.createdAt)}
             </span>
           </div>
-          <div className="h-[44px] flex-shrink-0 overflow-hidden sm:h-[52px]">
-            <h3 className="line-clamp-2 text-base font-semibold leading-[22px] text-gray-900 transition-colors group-hover:text-orange-600 sm:text-lg sm:leading-[26px]">
+          <div className="h-[44px] flex-shrink-0 overflow-hidden md:h-[52px]">
+            <h3 className="line-clamp-2 text-base font-semibold leading-[22px] text-gray-900 transition-colors group-hover:text-orange-600 md:text-lg md:leading-[26px]">
               {post.title}
             </h3>
           </div>

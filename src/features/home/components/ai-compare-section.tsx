@@ -53,10 +53,10 @@ export function AiCompareSection() {
 
   if (isLoading) {
     return (
-      <section className="md:custom-container flex flex-col items-center gap-4 px-4 pt-[30px] pb-4">
-        <h2 className="text-foreground text-center text-xl font-bold md:text-2xl">
+      <section className="flex flex-col items-center gap-4 px-4 pt-[30px] pb-4 md:mx-auto md:w-full md:max-w-[1448px] md:gap-6 md:px-6 md:pt-[100px] md:pb-[50px]">
+        <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
           <span className="text-brand-gold">AI 비교분석</span> 기능으로
-          <br />
+          <br className="md:hidden" />{' '}
           최적의 강의를 한눈에 비교해보세요.
         </h2>
         <div className="flex h-40 w-full items-center justify-center">
@@ -68,10 +68,10 @@ export function AiCompareSection() {
 
   if (items.length === 0) {
     return (
-      <section className="md:custom-container flex flex-col items-center gap-4 px-4 pt-[30px] pb-4">
-        <h2 className="text-foreground text-center text-xl font-bold md:text-2xl">
+      <section className="flex flex-col items-center gap-4 px-4 pt-[30px] pb-4 md:mx-auto md:w-full md:max-w-[1448px] md:gap-6 md:px-6 md:pt-[100px] md:pb-[50px]">
+        <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
           <span className="text-brand-gold">AI 비교분석</span> 기능으로
-          <br />
+          <br className="md:hidden" />{' '}
           최적의 강의를 한눈에 비교해보세요.
         </h2>
         <Card className="w-full shadow-lg">
@@ -88,9 +88,9 @@ export function AiCompareSection() {
   }
 
   return (
-    <section className="md:custom-container flex flex-col items-center gap-4 px-4 pt-[30px] pb-4">
+    <section className="flex flex-col items-center gap-4 px-4 pt-[30px] pb-4 md:mx-auto md:w-full md:max-w-[1448px] md:gap-6 md:px-6 md:pt-[100px] md:pb-[50px]">
       {/* 섹션 타이틀 */}
-      <h2 className="text-foreground text-center text-xl font-bold md:text-2xl">
+      <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
         <span className="text-brand-gold">AI 비교분석</span> 기능으로
         <br />
         최적의 강의를 한눈에 비교해보세요.

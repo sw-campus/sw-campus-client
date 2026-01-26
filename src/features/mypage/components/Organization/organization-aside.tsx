@@ -28,7 +28,7 @@ export default function OrganizationAside({
   return (
     <>
       {/* Mobile/Tablet Top Tabs */}
-      <div className="w-full lg:hidden">
+      <div className="w-full md:hidden">
         <nav className="flex w-full items-center gap-2 overflow-x-auto">
           <button
             onClick={onClickOrgInfo}
@@ -57,7 +57,7 @@ export default function OrganizationAside({
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden w-56 self-start rounded-3xl border border-white/10 bg-white/90 p-5 text-neutral-900 shadow-lg shadow-black/10 lg:block">
+      <aside className="hidden w-56 self-start rounded-3xl border border-white/10 bg-white/90 p-5 text-neutral-900 shadow-lg shadow-black/10 md:block">
         <h2 className="mb-5 text-2xl font-semibold">마이페이지</h2>
 
         <nav className="space-y-2 text-sm leading-relaxed">

@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 
+import { LogOut, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { FiChevronDown, FiChevronRight, FiX } from 'react-icons/fi'
-import { LogOut, User } from 'lucide-react'
 
 import type { MobileNavTabs } from '@/features/navigation/components/navigation-menu.model'
 import type { MobileNavGroup, NavLinkItem } from '@/features/navigation/types/navigation-menu.types'
@@ -38,7 +38,7 @@ function SubAccordionItem({
     return (
       <Link
         href={item.href}
-        className={`block py-1.5 rounded ${isActive ? 'bg-gray-100 text-gray-700' : 'text-gray-600'}`}
+        className={`block rounded py-1.5 ${isActive ? 'bg-gray-100 text-gray-700' : 'text-gray-600'}`}
         onClick={onClose}
       >
         {item.title}
@@ -49,17 +49,14 @@ function SubAccordionItem({
   return (
     <div>
       <button
-        className={`flex w-full items-center justify-between py-1.5 rounded ${isOpen || isActive ? 'bg-gray-100 text-gray-700' : 'text-gray-600'}`}
+        className={`flex w-full items-center justify-between rounded py-1.5 ${isOpen || isActive ? 'bg-gray-100 text-gray-700' : 'text-gray-600'}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         <span>{item.title}</span>
-        <FiChevronRight
-          className={`transition-transform ${isOpen ? 'rotate-90' : ''}`}
-          size={16}
-        />
+        <FiChevronRight className={`transition-transform ${isOpen ? 'rotate-90' : ''}`} size={16} />
       </button>
       {isOpen && (
-        <div className="ml-2 flex flex-col gap-1 border-l border-gray-200 pl-3 pb-1">
+        <div className="ml-2 flex flex-col gap-1 border-l border-gray-200 pb-1 pl-3">
           {item.items.map(subItem => (
             <Link
               key={subItem.title}
@@ -91,9 +88,8 @@ function AccordionMenu({
   const hasChildren = group.items && group.items.length > 0
   const isActive = group.href ? pathname.startsWith(group.href.split('?')[0]) : false
   // 하위 항목 중 하나라도 현재 경로와 일치하면 활성화
-  const hasActiveChild = hasChildren && group.items.some(child =>
-    child.href ? pathname.startsWith(child.href.split('?')[0]) : false
-  )
+  const hasActiveChild =
+    hasChildren && group.items.some(child => (child.href ? pathname.startsWith(child.href.split('?')[0]) : false))
 
   if (!hasChildren) {
     return (
@@ -114,13 +110,10 @@ function AccordionMenu({
         onClick={onToggle}
       >
         <span>{group.title}</span>
-        <FiChevronDown
-          className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          size={20}
-        />
+        <FiChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} size={20} />
       </button>
       {isOpen && (
-        <div className="ml-2 flex flex-col gap-1 border-l border-gray-200 pl-4 pb-2">
+        <div className="ml-2 flex flex-col gap-1 border-l border-gray-200 pb-2 pl-4">
           {group.items.map(child => (
             <SubAccordionItem key={child.title} item={child} onClose={onClose} />
           ))}
@@ -152,7 +145,7 @@ export function NavigationMenuMobileOverlay({
   ]
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm lg:hidden" onClick={onClose}>
+    <div className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm md:hidden" onClick={onClose}>
       <div
         className="absolute top-0 left-0 flex h-full w-[85%] max-w-sm flex-col bg-white shadow-xl"
         onClick={e => e.stopPropagation()}
@@ -160,7 +153,7 @@ export function NavigationMenuMobileOverlay({
         {/* 헤더 */}
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <span className="text-lg font-bold text-gray-900">메뉴</span>
-          <button onClick={onClose} className="rounded-full p-1 ">
+          <button onClick={onClose} className="rounded-full p-1">
             <FiX size={24} />
           </button>
         </div>
@@ -186,7 +179,7 @@ export function NavigationMenuMobileOverlay({
             <div className="flex items-center justify-center gap-6">
               <Link
                 href={mypageHref || '/mypage'}
-                className="flex items-center gap-1 text-sm text-gray-500 "
+                className="flex items-center gap-1 text-sm text-gray-500"
                 onClick={onClose}
               >
                 <User size={16} />
@@ -196,18 +189,14 @@ export function NavigationMenuMobileOverlay({
               <button
                 onClick={onLogout}
                 disabled={isLoggingOut}
-                className="flex items-center gap-1 text-sm text-gray-500  disabled:opacity-50"
+                className="flex items-center gap-1 text-sm text-gray-500 disabled:opacity-50"
               >
                 <LogOut size={16} />
                 로그아웃
               </button>
             </div>
           ) : (
-            <Link
-              href="/login"
-              className="block text-center text-sm text-gray-500 "
-              onClick={onClose}
-            >
+            <Link href="/login" className="block text-center text-sm text-gray-500" onClick={onClose}>
               로그인
             </Link>
           )}

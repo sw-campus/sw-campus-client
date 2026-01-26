@@ -93,7 +93,7 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
   return (
     <>
       {/* 데스크톱: 접이식 */}
-      <Card className="hidden lg:block">
+      <Card className="hidden md:block">
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -139,7 +139,7 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
       </Card>
 
       {/* 모바일: 접이식 */}
-      <Card className="lg:hidden">
+      <Card className="md:hidden">
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
