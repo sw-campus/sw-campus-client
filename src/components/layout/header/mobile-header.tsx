@@ -28,15 +28,15 @@ export function MobileHeader({
       {/* 좌측: 햄버거 + 로고 */}
       <div className="flex items-center gap-3">
         <button type="button" className="text-header-text" onClick={onOpenNav} aria-label="메뉴 열기">
-          <Menu size={20} />
+          <Menu size={28} />
         </button>
         <Link href={userType === 'ADMIN' ? '/admin' : '/'}>
           <Image
             src="/images/logo.png"
             alt="SOFTWARE CAMPUS 로고"
-            width={28}
-            height={28}
-            className="size-7 object-contain brightness-0 invert"
+            width={32}
+            height={32}
+            className="size-8 object-contain brightness-0 invert"
             priority
           />
         </Link>
@@ -53,19 +53,21 @@ export function MobileHeader({
               <span className="text-xs">님</span>
             </div>
             <Link href={mypageHref} aria-label="마이페이지">
-              <User size={20} />
+              <User size={28} />
             </Link>
             {userType !== 'ADMIN' && userType !== 'ORGANIZATION' && (
               <Link href="/cart/compare" aria-label="AI 심층 비교">
-                <Bot size={20} />
+                <Bot size={28} />
               </Link>
             )}
           </>
         ) : (
           <>
-            <span className="text-xs font-bold">로그인을 해주세요.</span>
+            <Link href="/login" className="text-xs font-bold">
+              로그인을 해주세요.
+            </Link>
             <Link href="/cart/compare" aria-label="AI 심층 비교">
-              <Bot size={20} />
+              <Bot size={28} />
             </Link>
           </>
         )}
