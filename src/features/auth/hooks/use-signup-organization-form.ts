@@ -13,6 +13,7 @@ import {
   signupOrganization,
   signupSchema,
 } from '@/features/auth/auth-api'
+import { useAuthStore } from '@/store/auth-store'
 import { useSignupStore } from '@/store/signup-store'
 
 export function useSignupOrganizationForm() {
@@ -253,13 +254,21 @@ export function useSignupOrganizationForm() {
         return
       }
 
-      await signupOrganization(parsed.data)
+      const response = await signupOrganization(parsed.data)
 
       // 폼 상태 초기화
       reset()
 
-      toast.success('회원가입이 완료되었습니다. 로그인해 주세요.')
-      router.push('/login')
+      // 자동 로그인: 상태 설정
+      const { login: setLogin, setUserType, setNickname: setStoreNickname } = useAuthStore.getState()
+      setLogin(response.name ?? name)
+      setUserType('ORGANIZATION')
+      if (response.nickname) {
+        setStoreNickname(response.nickname)
+      }
+
+      toast.success('회원가입이 완료되었습니다. 관리자 승인 후 서비스 이용이 가능합니다.')
+      router.push('/')
     } catch (error: unknown) {
       console.error('Organization signup error:', error)
       toast.error(extractErrorMessage(error) ?? '회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.')

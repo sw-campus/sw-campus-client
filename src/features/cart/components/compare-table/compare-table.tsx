@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from 'react'
 
 import { Badge } from '@/components/ui/badge'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { AiCommentRow } from '@/features/cart/components/ai-comment-row'
 import {
@@ -70,17 +71,41 @@ function getSortedSpecialCurriculums(detail: LectureDetail | null | undefined) {
   return [...items].sort((a, b) => a.sortOrder - b.sortOrder)
 }
 
+const DISPLAY_MAX_LENGTH = 20
+
 // 특화 커리큘럼 전체 목록 렌더링 (하나의 셀에 모두 표시)
 function renderSpecialCurriculumList(items: { title: string }[]) {
   if (items.length === 0) return '-'
 
   return (
     <div className="space-y-1 text-center">
-      {items.map((item, idx) => (
-        <span key={idx} className="block text-xs text-foreground md:text-base">
-          {item.title}
-        </span>
-      ))}
+      {items.map((item, idx) => {
+        const isOverLimit = item.title.length > DISPLAY_MAX_LENGTH
+        const displayTitle = isOverLimit
+          ? `${item.title.slice(0, DISPLAY_MAX_LENGTH)}...`
+          : item.title
+
+        if (isOverLimit) {
+          return (
+            <Tooltip key={idx}>
+              <TooltipTrigger asChild>
+                <span className="block cursor-default text-xs text-foreground md:text-base">
+                  {displayTitle}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-52 break-words">{item.title}</p>
+              </TooltipContent>
+            </Tooltip>
+          )
+        }
+
+        return (
+          <span key={idx} className="block text-xs text-foreground md:text-base">
+            {displayTitle}
+          </span>
+        )
+      })}
     </div>
   )
 }

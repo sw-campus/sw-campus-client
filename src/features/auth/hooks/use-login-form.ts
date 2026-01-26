@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { login as loginApi } from '@/features/auth/auth-api'
+import { useMigrateGuestCart } from '@/features/cart/hooks/use-migrate-guest-cart'
 import { getProfile } from '@/features/mypage/api/survey.api'
 import { parseUserType, parseUserName, parseNickname, type LoginResponse } from '@/lib/parse-login-response'
 import { useAuthStore } from '@/store/auth-store'
@@ -14,6 +15,7 @@ export function useLoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { login: setLogin, setUserType: setAuthUserType, setNickname } = useAuthStore()
+  const { migrateGuestCart } = useMigrateGuestCart()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -49,6 +51,13 @@ export function useLoginForm() {
         }
       } catch {
         // ignore nickname fetch errors
+      }
+
+      // Guest cart 마이그레이션 (로그인 성공 후)
+      try {
+        await migrateGuestCart()
+      } catch {
+        // ignore migration errors
       }
 
       // returnUrl이 있으면 해당 페이지로, 없으면 관리자는 /admin, 그 외에는 홈으로 리다이렉트

@@ -5,21 +5,17 @@ import { X } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
-import { useCartLecturesWithDetailQuery } from '@/features/cart/hooks/use-cart-lectures-with-detail-query'
-import { useRemoveFromCart } from '@/features/cart/hooks/use-remove-from-cart'
-import { useAuthStore } from '@/store/auth-store'
+import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
+import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 
 export default function FloatingCart() {
   const router = useRouter()
 
-  const isLoggedIn = useAuthStore(state => state.isLoggedIn)
+  const { items, hasHydrated } = useUnifiedCart()
+  const { mutate: remove } = useUnifiedRemoveFromCart()
 
-  const { data } = useCartLecturesWithDetailQuery()
-  const items = data ?? []
-
-  const { mutate: remove } = useRemoveFromCart()
-
-  if (!isLoggedIn) return null
+  // hydration 완료 전에는 렌더링하지 않음 (flash 방지)
+  if (!hasHydrated) return null
 
   return (
     <AnimatePresence>
