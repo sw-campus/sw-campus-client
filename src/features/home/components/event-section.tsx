@@ -8,7 +8,7 @@ const events = [
 
 export function EventSection() {
   return (
-    <section className="flex flex-col gap-6 px-4 py-[30px] md:mx-auto md:w-full md:max-w-[1448px] md:gap-10 md:px-6 md:py-[50px]">
+    <section className="container-responsive flex flex-col gap-6 py-[30px] md:gap-10 md:py-[50px]">
       {/* 섹션 헤더 */}
       <h2 className="text-center text-xl font-bold md:text-[32px]">
         소프트웨어 캠퍼스에서{' '}

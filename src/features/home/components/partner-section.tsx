@@ -15,7 +15,7 @@ export function PartnerSection() {
 
   if (isLoading) {
     return (
-      <section className="flex flex-col gap-6 px-4 py-[30px] md:mx-auto md:w-full md:max-w-[1448px] md:gap-10 md:px-6 md:py-[50px]">
+      <section className="container-responsive flex flex-col gap-6 py-[30px] md:gap-10 md:py-[50px]">
         <div className="flex flex-col gap-2 text-center">
           <h2 className="text-xl font-bold md:text-[32px]">
             협력 중인 <span className="text-brand-gold">훈련 기관</span>을 확인 해보세요.
@@ -30,7 +30,7 @@ export function PartnerSection() {
   }
 
   return (
-    <section className="flex flex-col gap-6 px-4 py-[30px] md:mx-auto md:w-full md:max-w-[1448px] md:gap-10 md:px-6 md:py-[50px]">
+    <section className="container-responsive flex flex-col gap-6 py-[30px] md:gap-10 md:py-[50px]">
       {/* 섹션 헤더 */}
       <div className="flex flex-col gap-3 text-center md:gap-4">
         <h2 className="text-xl font-bold md:text-[32px]">
@@ -59,27 +59,27 @@ export function PartnerSection() {
           <div className="hidden flex-col items-center gap-6 md:flex">
             <div className="flex justify-center gap-6">
               {/* 1열 - 아래로 밀림 */}
-              <div className="flex flex-col gap-6 pt-12">
+              <div className="flex flex-col gap-6 pt-16">
                 <PartnerCard partner={displayPartners[0]} />
                 <PartnerCard partner={displayPartners[1]} />
               </div>
               {/* 2열 - 위로 밀림 */}
-              <div className="flex flex-col gap-6 pb-12">
+              <div className="flex flex-col gap-6 pb-16">
                 <PartnerCard partner={displayPartners[2]} />
                 <PartnerCard partner={displayPartners[3]} />
               </div>
               {/* 3열 - 아래로 밀림 */}
-              <div className="flex flex-col gap-6 pt-12">
+              <div className="flex flex-col gap-6 pt-16">
                 <PartnerCard partner={displayPartners[4]} />
                 <PartnerCard partner={displayPartners[5]} />
               </div>
               {/* 4열 - 위로 밀림 */}
-              <div className="flex flex-col gap-6 pb-12">
+              <div className="flex flex-col gap-6 pb-16">
                 <PartnerCard partner={displayPartners[6]} />
                 <PartnerCard partner={displayPartners[7]} />
               </div>
               {/* 5열 - 아래로 밀림 */}
-              <div className="flex flex-col gap-6 pt-12">
+              <div className="flex flex-col gap-6 pt-16">
                 <PartnerCard partner={displayPartners[8]} />
                 {displayPartners[9] && <PartnerCard partner={displayPartners[9]} />}
               </div>
@@ -113,9 +113,9 @@ interface PartnerCardProps {
 function PartnerCard({ partner }: PartnerCardProps) {
   return (
     <Link href={`/organizations/${partner.id}`}>
-      <div className="bg-brand-gold-light flex h-[140px] w-full flex-col items-center justify-center gap-4 rounded-xl p-4 shadow-[4px_4px_15px_rgba(161,161,170,0.25)] transition-shadow hover:shadow-md md:h-[190px] md:w-[260px] md:gap-4 md:p-4">
+      <div className="bg-brand-gold-light flex h-[130px] w-full flex-col items-center justify-center gap-3 rounded-xl p-4 shadow-[4px_4px_15px_rgba(161,161,170,0.25)] transition-shadow hover:shadow-md md:h-[180px] md:w-[240px] md:gap-4 md:p-4">
         {/* 로고 - 흰색 원형 배경 */}
-        <div className="flex size-16 items-center justify-center overflow-hidden rounded-full bg-white shadow-[4px_4px_10px_rgba(161,161,170,0.25)] md:size-[100px] md:p-2.5">
+        <div className="flex size-12 items-center justify-center overflow-hidden rounded-full bg-white shadow-[4px_4px_10px_rgba(161,161,170,0.25)] md:size-[65px] md:p-1.5">
           {partner.logoUrl ? (
             <Image src={partner.logoUrl} alt={partner.name} width={80} height={80} className="object-contain" />
           ) : (
@@ -124,7 +124,7 @@ function PartnerCard({ partner }: PartnerCardProps) {
         </div>
 
         {/* 기관명 */}
-        <p className="line-clamp-2 w-full text-center text-sm font-medium break-keep md:text-base">{partner.name}</p>
+        <p className="line-clamp-2 w-full text-center text-xs font-medium break-keep md:text-sm">{partner.name}</p>
       </div>
     </Link>
   )

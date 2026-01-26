@@ -53,7 +53,7 @@ export function AiCompareSection() {
 
   if (isLoading) {
     return (
-      <section className="flex flex-col items-center gap-4 px-4 pt-[30px] pb-4 md:mx-auto md:w-full md:max-w-[1448px] md:gap-6 md:px-6 md:pt-[100px] md:pb-[50px]">
+      <section className="container-responsive flex flex-col items-center gap-4 pt-[30px] pb-4 md:gap-6 md:pt-[100px] md:pb-[50px]">
         <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
           <span className="text-brand-gold">AI 비교분석</span> 기능으로
           <br className="md:hidden" />{' '}
@@ -68,7 +68,7 @@ export function AiCompareSection() {
 
   if (items.length === 0) {
     return (
-      <section className="flex flex-col items-center gap-4 px-4 pt-[30px] pb-4 md:mx-auto md:w-full md:max-w-[1448px] md:gap-6 md:px-6 md:pt-[100px] md:pb-[50px]">
+      <section className="container-responsive flex flex-col items-center gap-4 pt-[30px] pb-4 md:gap-6 md:pt-[100px] md:pb-[50px]">
         <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
           <span className="text-brand-gold">AI 비교분석</span> 기능으로
           <br className="md:hidden" />{' '}
@@ -88,7 +88,7 @@ export function AiCompareSection() {
   }
 
   return (
-    <section className="flex flex-col items-center gap-4 px-4 pt-[30px] pb-4 md:mx-auto md:w-full md:max-w-[1448px] md:gap-6 md:px-6 md:pt-[100px] md:pb-[50px]">
+    <section className="container-responsive flex flex-col items-center gap-4 pt-[30px] pb-4 md:gap-6 md:pt-[100px] md:pb-[50px]">
       {/* 섹션 타이틀 */}
       <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
         <span className="text-brand-gold">AI 비교분석</span> 기능으로

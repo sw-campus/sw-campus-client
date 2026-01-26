@@ -162,8 +162,23 @@ html {
     background-color: var(--accent) !important;
     opacity: 1;
   }
+
+  /* ========================================
+   * 공통 컨테이너 시스템
+   * - 반응형 여백: 화면 크기에 따라 자동 조정
+   * - clamp(최소값, 선호값, 최대값)
+   * ======================================== */
+
+  /* 페이지/섹션 공통 컨테이너 - 반응형 좌우 여백 */
+  .container-responsive {
+    @apply mx-auto w-full max-w-[1448px];
+    padding-inline: clamp(1.5rem, 8vw, 6rem);
+  }
+
+  /* 기존 custom-container 확장 */
   .custom-container {
-    @apply relative flex flex-1 flex-col gap-4 overflow-x-hidden px-4 py-6;
+    @apply relative flex flex-1 flex-col gap-4 overflow-x-hidden py-6;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
   }
 
   /* 부트캠프 성장일기 템플릿 스타일 */

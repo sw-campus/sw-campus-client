@@ -34,7 +34,7 @@ export function BootcampListSection() {
 
   return (
     <section className="bg-brand-gold-light">
-      <div className="flex flex-col gap-6 px-4 py-[30px] md:mx-auto md:w-full md:max-w-[1448px] md:gap-10 md:px-6 md:py-[100px]">
+      <div className="container-responsive flex flex-col gap-6 py-[30px] md:gap-10 md:py-[100px]">
       {/* 섹션 헤더 */}
       <div className="flex flex-col gap-6 md:gap-8">
         <h2 className="text-center text-xl font-bold md:text-[32px]">
@@ -171,19 +171,19 @@ function BootcampListItem({ lecture }: BootcampListItemProps) {
         <span className="text-xs text-[#888888]">{dateRange || '-'}</span>
 
         {/* 태그 */}
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex gap-1.5 overflow-hidden">
           {recruitLabel && (
-            <span className="rounded-full bg-amber-400/20 px-2.5 py-1 text-xs font-medium text-amber-700">
+            <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[11px] font-medium text-amber-700">
               #{recruitLabel}
             </span>
           )}
           {locLabel && (
-            <span className="rounded-full bg-amber-400/20 px-2.5 py-1 text-xs font-medium text-amber-700">
+            <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[11px] font-medium text-amber-700">
               #{locLabel}
             </span>
           )}
           {lecture.totalDays && (
-            <span className="rounded-full bg-amber-400/20 px-2.5 py-1 text-xs font-medium text-amber-700">
+            <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[11px] font-medium text-amber-700">
               #{lecture.totalDays}일 과정
             </span>
           )}

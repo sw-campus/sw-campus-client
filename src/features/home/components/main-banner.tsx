@@ -18,11 +18,11 @@ export function MainBanner() {
           }}
         />
         {/* 텍스트 컨텐츠 */}
-        <div className="relative z-10 mx-auto flex w-full max-w-[1448px] flex-col justify-center gap-6 px-6">
-          <p className="text-[28px] font-normal text-[#CACACA]">
+        <div className="container-responsive relative z-10 flex flex-col justify-center gap-4">
+          <p className="text-[22px] font-normal text-[#CACACA]">
             부트캠프, 하나하나 클릭해서 비교해보시나요?
           </p>
-          <h1 className="text-[60px] font-bold text-white">
+          <h1 className="text-[48px] font-bold text-white">
             AI로 3초만에 스펙 비교하세요.
           </h1>
         </div>
