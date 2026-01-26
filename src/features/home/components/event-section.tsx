@@ -1,8 +1,9 @@
 import Image from 'next/image'
+import Link from 'next/link'
 
 const events = [
-  { id: 1, imageUrl: '/images/events/6c14531cb87052cd8a8a2e2e11697c086d5fcd85.png' },
-  { id: 2, imageUrl: '/images/events/f82d9596cf7d0efaa83d9b97becfcf70ea0fc421.png' },
+  { id: 1, imageUrl: '/images/events/6c14531cb87052cd8a8a2e2e11697c086d5fcd85.png', link: '' },
+  { id: 2, imageUrl: '/images/events/f82d9596cf7d0efaa83d9b97becfcf70ea0fc421.png', link: '' },
 ]
 
 export function EventSection() {
@@ -18,7 +19,7 @@ export function EventSection() {
       {/* 이벤트 목록 - 세로 배치 */}
       <div className="flex flex-col gap-4">
         {events.map((event) => (
-          <div key={event.id} className="relative w-full overflow-hidden rounded-xl">
+          <Link key={event.id} href={event.link} className="relative w-full overflow-hidden rounded-xl">
             <Image
               src={event.imageUrl}
               alt={`이벤트 ${event.id}`}
@@ -26,7 +27,7 @@ export function EventSection() {
               height={400}
               className="h-auto w-full"
             />
-          </div>
+          </Link>
         ))}
       </div>
     </section>
