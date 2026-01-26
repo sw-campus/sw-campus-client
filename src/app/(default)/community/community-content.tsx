@@ -174,14 +174,14 @@ function CommunityContentInner() {
             </Button>
           </div>
 
-          {/* 모바일 프로필 버튼 */}
+          {/* 모바일 프로필 버튼 - 44px 최소 터치 영역 */}
           {currentMember && (
             <button
               onClick={() => router.push(`/community/user/${currentMember.userId}`)}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 sm:hidden"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 sm:hidden"
               aria-label="내 프로필"
             >
-              <FiUser className="h-4.5 w-4.5" />
+              <FiUser className="h-5 w-5" />
             </button>
           )}
         </div>
@@ -285,16 +285,16 @@ function CommunityContentInner() {
           {/* 페이지네이션 */}
           {totalPages > 1 && (
             <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:gap-4">
-              {/* 페이지네이션 컨테이너 */}
-              <div className="flex items-center gap-1 rounded-xl bg-gray-50/80 p-1 sm:rounded-2xl sm:p-1.5">
+              {/* 페이지네이션 컨테이너 - 44px 최소 터치 영역 */}
+              <div className="flex items-center gap-1 rounded-2xl bg-gray-50/80 p-1 sm:rounded-2xl sm:p-1.5">
                 {/* 이전 버튼 */}
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10 sm:rounded-xl"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10"
                   aria-label="이전 페이지"
                 >
-                  <FiChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <FiChevronLeft className="h-5 w-5" />
                 </button>
 
                 {/* 페이지 번호 */}
@@ -323,7 +323,7 @@ function CommunityContentInner() {
                           <>
                             <button
                               onClick={() => setPage(0)}
-                              className="hidden h-9 w-9 items-center justify-center rounded-lg text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex sm:h-10 sm:w-10 sm:rounded-xl"
+                              className="hidden h-10 w-10 items-center justify-center rounded-xl text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex"
                             >
                               1
                             </button>
@@ -335,15 +335,15 @@ function CommunityContentInner() {
                           </>
                         )}
 
-                        {/* 페이지 번호들 */}
-                        {pages.map((pageNum, idx) => {
+                        {/* 페이지 번호들 - 44px 최소 터치 영역 */}
+                        {pages.map(pageNum => {
                           // 모바일에서는 현재 페이지 주변 3개만 표시
                           const isMobileVisible = Math.abs(pageNum - page) <= Math.floor(mobileMaxVisible / 2)
                           return (
                             <button
                               key={pageNum}
                               onClick={() => setPage(pageNum)}
-                              className={`h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-all active:scale-95 sm:h-10 sm:w-10 sm:rounded-xl ${
+                              className={`h-11 w-11 items-center justify-center rounded-xl text-sm font-medium transition-all active:scale-95 sm:h-10 sm:w-10 ${
                                 pageNum === page
                                   ? 'flex bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/40'
                                   : `text-gray-600 hover:bg-white hover:shadow-sm ${isMobileVisible ? 'flex' : 'hidden sm:flex'}`
@@ -364,7 +364,7 @@ function CommunityContentInner() {
                             )}
                             <button
                               onClick={() => setPage(totalPages - 1)}
-                              className="hidden h-9 w-9 items-center justify-center rounded-lg text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex sm:h-10 sm:w-10 sm:rounded-xl"
+                              className="hidden h-10 w-10 items-center justify-center rounded-xl text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex"
                             >
                               {totalPages}
                             </button>
@@ -379,10 +379,10 @@ function CommunityContentInner() {
                 <button
                   onClick={() => setPage(p => p + 1)}
                   disabled={page >= totalPages - 1}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10 sm:rounded-xl"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10"
                   aria-label="다음 페이지"
                 >
-                  <FiChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <FiChevronRight className="h-5 w-5" />
                 </button>
               </div>
 

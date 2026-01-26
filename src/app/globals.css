@@ -104,6 +104,7 @@
 
 html {
   scrollbar-gutter: stable;
+  scroll-behavior: smooth;
 }
 
 @layer base {
@@ -191,19 +192,32 @@ html {
     0% {
       background-color: transparent;
       box-shadow: none;
+      transform: scale(1);
     }
-    15% {
-      background-color: oklch(0.95 0.05 70);
-      box-shadow: 0 0 0 4px oklch(0.9 0.1 70 / 0.3), 0 4px 20px oklch(0.8 0.15 70 / 0.2);
+    10% {
+      background-color: oklch(0.95 0.08 70);
+      box-shadow: 0 0 0 4px oklch(0.9 0.12 70 / 0.4), 0 4px 24px oklch(0.8 0.15 70 / 0.25);
+      transform: scale(1.005);
+    }
+    30% {
+      background-color: oklch(0.97 0.04 70);
+      box-shadow: 0 0 0 2px oklch(0.9 0.08 70 / 0.2), 0 2px 12px oklch(0.8 0.1 70 / 0.15);
+      transform: scale(1);
     }
     100% {
       background-color: transparent;
       box-shadow: none;
+      transform: scale(1);
     }
   }
 
   .animate-highlight {
     animation: highlight-pulse 2.5s ease-out;
     border-radius: 1rem;
+  }
+
+  /* 스켈레톤 staggered pulse */
+  .animate-pulse {
+    animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FiMessageCircle, FiSend, FiSmile } from 'react-icons/fi'
+import { FiLoader, FiMessageCircle, FiSend, FiSmile } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/auth-store'
@@ -135,12 +135,18 @@ export function CommentSection({ postId }: CommentSectionProps) {
         !replyTo && (
           <form onSubmit={handleSubmit} className="mb-10">
             <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-sm transition-all duration-300 focus-within:border-orange-300/80 focus-within:shadow-lg focus-within:shadow-orange-100/40">
+              {/* 접근성을 위한 시각적으로 숨겨진 라벨 */}
+              <label htmlFor="comment-input" className="sr-only">
+                댓글 작성
+              </label>
               <textarea
+                id="comment-input"
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="따뜻한 댓글은 작성자에게 큰 힘이 됩니다..."
-                className="min-h-[100px] w-full resize-none border-0 bg-transparent p-5 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 sm:min-h-[120px]"
+                className="min-h-[100px] w-full resize-none border-0 bg-transparent p-5 text-sm leading-relaxed text-gray-900 placeholder:text-gray-500 placeholder:font-medium focus:outline-none focus:ring-0 sm:min-h-[120px]"
                 rows={4}
+                aria-label="댓글 내용"
               />
               <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50/50 px-4 py-3">
                 <p className="hidden text-xs text-gray-400 sm:block">
@@ -151,7 +157,11 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   disabled={isCreating || !body.trim()}
                   className="h-10 gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 font-bold shadow-md shadow-orange-200/50 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-orange-200/60 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
                 >
-                  <FiSend className="h-4 w-4" />
+                  {isCreating ? (
+                    <FiLoader className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FiSend className="h-4 w-4" />
+                  )}
                   {isCreating ? '등록 중...' : '댓글 등록'}
                 </Button>
               </div>
