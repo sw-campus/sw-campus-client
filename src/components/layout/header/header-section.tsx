@@ -2,18 +2,36 @@
 
 import { useState } from 'react'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import Header, { NavCategoryItem } from '@/components/layout/header/header'
+import { useLogout } from '@/features/auth/hooks/use-logout'
 import { useCategoryTree } from '@/features/category'
 import { type BoardCategory } from '@/features/community'
 import { useBoardCategories } from '@/features/community/hooks'
 import { Navigation } from '@/features/navigation'
+import { useAuthStore } from '@/store/auth-store'
 import { useDesktopNavigationStore } from '@/store/navigation.store'
 
 export default function HeaderSection() {
   const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const { isLoggedIn, nickname, userType } = useAuthStore()
+  const { logout, isPending: isLoggingOut } = useLogout()
+
+  const mypageHref =
+    userType === 'ADMIN' ? '/mypage/admin' : userType === 'ORGANIZATION' ? '/mypage/organization' : '/mypage/personal'
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      setOpen(false)
+      router.push('/')
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   const { data: categoryTree } = useCategoryTree()
   const { data: boardCategories } = useBoardCategories()
@@ -71,6 +89,11 @@ export default function HeaderSection() {
         onDesktopEnter={undefined}
         onDesktopLeave={handleDesktopLeave}
         categories={mergedCategories}
+        isLoggedIn={isLoggedIn}
+        nickname={nickname}
+        mypageHref={mypageHref}
+        onLogout={handleLogout}
+        isLoggingOut={isLoggingOut}
       />
     </>
   )

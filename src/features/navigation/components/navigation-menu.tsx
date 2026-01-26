@@ -17,12 +17,22 @@ export default function Navigation({
   onDesktopEnter,
   onDesktopLeave,
   categories,
+  isLoggedIn,
+  nickname,
+  mypageHref,
+  onLogout,
+  isLoggingOut,
 }: {
   open: boolean
   onClose: () => void
   onDesktopEnter?: () => void
   onDesktopLeave?: () => void
   categories?: NavCategoryItem[]
+  isLoggedIn?: boolean
+  nickname?: string | null
+  mypageHref?: string
+  onLogout?: () => void
+  isLoggingOut?: boolean
 }) {
   const CLOSE_DELAY_MS = 180
 
@@ -75,7 +85,16 @@ export default function Navigation({
 
   return (
     <>
-      <NavigationMenuMobileOverlay open={open} onClose={onClose} items={mobileNavData} />
+      <NavigationMenuMobileOverlay
+        open={open}
+        onClose={onClose}
+        items={mobileNavData}
+        isLoggedIn={isLoggedIn}
+        nickname={nickname}
+        mypageHref={mypageHref}
+        onLogout={onLogout}
+        isLoggingOut={isLoggingOut}
+      />
       <NavigationMenuDesktop
         showDesktop={showDesktop}
         items={activeCategoryChildren}
