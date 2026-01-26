@@ -15,9 +15,7 @@ export const metadata: Metadata = {
 export default function OrganizationsPage() {
   return (
     <div className="custom-container">
-      <div className="custom-card">
-        <OrganizationList />
-      </div>
+      <OrganizationList />
     </div>
   )
 }

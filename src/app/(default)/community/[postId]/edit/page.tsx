@@ -29,7 +29,7 @@ export default function EditPostPage() {
       <main className="custom-container mx-auto max-w-6xl">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-32 rounded bg-gray-200" />
-          <div className="custom-card">
+          <div>
             <div className="h-96 w-full rounded bg-gray-200" />
           </div>
         </div>
@@ -56,7 +56,7 @@ export default function EditPostPage() {
       <main className="custom-container mx-auto max-w-6xl">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-32 rounded bg-gray-200" />
-          <div className="custom-card">
+          <div>
             <div className="h-96 w-full rounded bg-gray-200" />
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function EditPostPage() {
       </Link>
 
       {/* 폼 카드 */}
-      <div className="custom-card">
+      <div>
         <h1 className="mb-6 text-2xl font-bold text-gray-900">게시글 수정</h1>
 
         {categories.length > 0 ? (

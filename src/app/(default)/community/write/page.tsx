@@ -23,7 +23,7 @@ export default function WritePostPage() {
       <main className="custom-container mx-auto w-full max-w-7xl md:!px-10">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-32 rounded bg-gray-200" />
-          <div className="custom-card">
+          <div>
             <div className="h-96 w-full rounded bg-gray-200" />
           </div>
         </div>
@@ -61,7 +61,7 @@ export default function WritePostPage() {
       </Link>
 
       {/* 폼 카드 */}
-      <div className="custom-card">
+      <div>
         <h1 className="mb-6 text-2xl font-bold text-gray-900">게시글 작성</h1>
 
         {isCategoriesLoading ? (

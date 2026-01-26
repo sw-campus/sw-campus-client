@@ -76,9 +76,7 @@ export default async function OrganizationDetailPage({ params }: OrganizationDet
     <>
       {orgJsonLd && <JsonLd data={orgJsonLd} />}
       <div className="custom-container">
-        <div className="custom-card">
-          <OrganizationDetailPageClient organizationId={orgId} initialData={organization ?? undefined} />
-        </div>
+        <OrganizationDetailPageClient organizationId={orgId} initialData={organization ?? undefined} />
       </div>
     </>
   )

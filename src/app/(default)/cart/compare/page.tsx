@@ -3,9 +3,7 @@ import CartCompareSection from '@/features/cart/components/compare-table/cart-co
 export default function Page() {
   return (
     <div className="custom-container">
-      <div className="custom-card">
-        <CartCompareSection />
-      </div>
+      <CartCompareSection />
     </div>
   )
 }
