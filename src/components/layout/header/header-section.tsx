@@ -55,7 +55,7 @@ export default function HeaderSection() {
   }
 
   return (
-    <div className="relative">
+    <>
       <Header
         categories={mergedCategories}
         onOpenNav={() => setOpen(true)}
@@ -72,6 +72,6 @@ export default function HeaderSection() {
         onDesktopLeave={handleDesktopLeave}
         categories={mergedCategories}
       />
-    </div>
+    </>
   )
 }
