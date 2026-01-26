@@ -3,16 +3,21 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 
 export default function FloatingCart() {
   const router = useRouter()
+  const pathname = usePathname()
 
   const { items, hasHydrated } = useUnifiedCart()
   const { mutate: remove } = useUnifiedRemoveFromCart()
+
+  // 커뮤니티 페이지에서는 표시하지 않음
+  const isCommunityPage = pathname.startsWith('/community')
+  if (isCommunityPage) return null
 
   // hydration 완료 전에는 렌더링하지 않음 (flash 방지)
   if (!hasHydrated) return null
