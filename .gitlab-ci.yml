@@ -30,15 +30,13 @@ lint:
 build-dev:
   stage: build
   image: docker:24
-  services:
-    - docker:24-dind
+  # Self-hosted Runner uses Docker socket binding (no DinD needed)
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "develop" && $CI_PIPELINE_SOURCE == "web"
       when: manual
   variables:
     TAG: "RHSA-$CI_COMMIT_SHA"
-    DOCKER_HOST: tcp://docker:2375
   script:
     - |
       echo "Building DEV image with tag $TAG"
@@ -102,8 +100,7 @@ update-manifest-dev:
 build-release:
   stage: build
   image: docker:24
-  services:
-    - docker:24-dind
+  # Self-hosted Runner uses Docker socket binding (no DinD needed)
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /\[skip ci\]/
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "web"
