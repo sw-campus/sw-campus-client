@@ -29,7 +29,7 @@ lint:
 # Build Dev (develop 브랜치 전용)
 build-dev:
   stage: build
-  image: docker:24
+  image: docker:27
   # Self-hosted Runner uses Docker socket binding (no DinD needed)
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -99,7 +99,7 @@ update-manifest-dev:
 # Build Release (main 브랜치 전용)
 build-release:
   stage: build
-  image: docker:24
+  image: docker:27
   # Self-hosted Runner uses Docker socket binding (no DinD needed)
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /\[skip ci\]/
