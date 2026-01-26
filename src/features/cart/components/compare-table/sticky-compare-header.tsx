@@ -30,10 +30,10 @@ interface StickyCompareHeaderProps {
 function MobileMiniCard({ title, lectureId }: { title: string; lectureId?: string | null }) {
   const hasSelection = Boolean(title)
   return (
-    <div className="flex flex-1 flex-col gap-3 overflow-hidden rounded-[12px] bg-white p-3 shadow-[4px_4px_20px_0px_rgba(161,161,170,0.25)]">
+    <div className="flex flex-1 flex-col gap-3 overflow-hidden rounded-[12px] bg-card p-3 shadow-card">
       <p
         className={cn(
-          'truncate text-center text-sm font-bold text-[#020202]',
+          'truncate text-center text-sm font-bold text-foreground',
           !hasSelection && 'text-muted-foreground',
         )}
       >
@@ -42,12 +42,12 @@ function MobileMiniCard({ title, lectureId }: { title: string; lectureId?: strin
       {hasSelection && lectureId ? (
         <Link
           href={`/lectures/${lectureId}`}
-          className="flex h-8 w-full items-center justify-center rounded-[8px] bg-[#f9f9f9] text-xs text-[#020202] hover:bg-[#f0f0f0]"
+          className="flex h-8 w-full items-center justify-center rounded-[8px] bg-muted text-xs text-foreground hover:bg-muted/80"
         >
           자세히 보기
         </Link>
       ) : (
-        <div className="flex h-8 w-full items-center justify-center rounded-[8px] bg-[#f9f9f9] text-xs text-muted-foreground">
+        <div className="flex h-8 w-full items-center justify-center rounded-[8px] bg-muted text-xs text-muted-foreground">
           자세히 보기
         </div>
       )}
@@ -87,16 +87,14 @@ function StickyAiButton({
       whileHover={canAnalyze ? { scale: 1.01 } : undefined}
       whileTap={canAnalyze ? { scale: 0.99 } : undefined}
       className={cn(
-        'relative flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-[#feb706] transition-all',
+        'relative flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-brand-gold transition-all',
         'h-[65px] text-sm md:h-[95px] md:text-xl',
-        // Enabled state - yellow gradient (Figma 스타일)
-        canAnalyze && !isLoading && 'bg-gradient-to-r from-[#fffdf6] via-[#ffe8b0] to-[#ffd454]',
+        // Enabled state - yellow (desktop AiAnalyzeButton과 동일)
+        canAnalyze && !isLoading && 'bg-yellow-400 text-gray-900 hover:bg-yellow-500 active:bg-yellow-600',
         // Loading state
-        isLoading && 'bg-[#ffe8b0]',
+        isLoading && 'bg-yellow-300 text-gray-900',
         // Disabled state
-        !canAnalyze && !isLoading && 'cursor-not-allowed border-gray-300 bg-gray-200 text-gray-400',
-        // Text colors
-        (canAnalyze || isLoading) && 'text-[#020202]',
+        !canAnalyze && !isLoading && 'cursor-not-allowed border-border bg-gray-200 text-gray-400',
         className,
       )}
     >
@@ -123,10 +121,10 @@ function StickyAiButton({
 function DesktopMiniCard({ title, lectureId }: { title: string; lectureId?: string | null }) {
   const hasSelection = Boolean(title)
   return (
-    <div className="flex flex-1 flex-col gap-3 overflow-hidden rounded-[12px] bg-white p-6 shadow-[4px_4px_20px_0px_rgba(161,161,170,0.25)]">
+    <div className="flex flex-1 flex-col gap-3 overflow-hidden rounded-[12px] bg-card p-6 shadow-card">
       <p
         className={cn(
-          'truncate text-center text-xl font-bold text-[#020202]',
+          'truncate text-center text-xl font-bold text-foreground',
           !hasSelection && 'text-muted-foreground',
         )}
       >
@@ -135,12 +133,12 @@ function DesktopMiniCard({ title, lectureId }: { title: string; lectureId?: stri
       {hasSelection && lectureId ? (
         <Link
           href={`/lectures/${lectureId}`}
-          className="flex h-12 w-full items-center justify-center rounded-[8px] bg-[#f9f9f9] text-base text-[#020202] hover:bg-[#f0f0f0]"
+          className="flex h-12 w-full items-center justify-center rounded-[8px] bg-muted text-base text-foreground hover:bg-muted/80"
         >
           자세히 보기
         </Link>
       ) : (
-        <div className="flex h-12 w-full items-center justify-center rounded-[8px] bg-[#f9f9f9] text-base text-muted-foreground">
+        <div className="flex h-12 w-full items-center justify-center rounded-[8px] bg-muted text-base text-muted-foreground">
           자세히 보기
         </div>
       )}
@@ -238,8 +236,8 @@ export function StickyCompareHeader({
         <MobileMiniCard title={leftTitle} lectureId={leftId} />
         <MobileMiniCard title={rightTitle} lectureId={rightId} />
         {/* VS 뱃지 - 중앙 (45px) */}
-        <div className="absolute left-1/2 top-1/2 flex size-[45px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#020202]">
-          <span className="text-base font-bold text-[#feb706]">VS</span>
+        <div className="absolute left-1/2 top-1/2 flex size-[45px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-footer-bg">
+          <span className="text-base font-bold text-brand-gold">VS</span>
         </div>
       </div>
       {/* AI 버튼 */}
@@ -260,8 +258,8 @@ export function StickyCompareHeader({
         <DesktopMiniCard title={leftTitle} lectureId={leftId} />
         <DesktopMiniCard title={rightTitle} lectureId={rightId} />
         {/* VS 뱃지 - 중앙 (80px) */}
-        <div className="absolute left-1/2 top-1/2 flex size-[80px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#020202]">
-          <span className="text-2xl font-bold text-[#feb706]">VS</span>
+        <div className="absolute left-1/2 top-1/2 flex size-[80px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-footer-bg">
+          <span className="text-2xl font-bold text-brand-gold">VS</span>
         </div>
       </div>
       {/* AI 버튼 */}
@@ -282,7 +280,7 @@ export function StickyCompareHeader({
       <>
         {/* 모바일 Sticky 헤더 */}
         <div
-          className="fixed top-0 z-[var(--z-fixed)] bg-[#fafafa] shadow-lg md:hidden"
+          className="fixed top-0 z-[var(--z-fixed)] bg-muted shadow-lg md:hidden"
           style={{
             left: 0,
             right: 0,

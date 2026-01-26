@@ -21,26 +21,22 @@ export function AiAnalyzeButton({
   isLoading,
   hasResult,
   onAnalyze,
-  onClear,
+  onClear: _onClear,
   disabledReason = '두 강의를 모두 선택해주세요',
   className,
 }: AiAnalyzeButtonProps) {
+  // 분석 완료 시 버튼 숨김 (Figma 디자인)
+  if (hasResult) return null
+
   const handleClick = () => {
     if (isLoading) return
-
-    if (hasResult && onClear) {
-      onClear()
-      return
-    }
-
-    if (isEnabled && !hasResult) {
+    if (isEnabled) {
       onAnalyze()
     }
   }
 
   const getButtonText = () => {
     if (isLoading) return 'AI가 분석하고 있어요...'
-    if (hasResult) return '분석 완료! 다시 분석하려면 클릭하세요'
     if (!isEnabled) return disabledReason
     return 'AI에게 물어보고, 최적의 답을 발견하세요'
   }
@@ -49,19 +45,19 @@ export function AiAnalyzeButton({
     <motion.button
       type="button"
       onClick={handleClick}
-      disabled={(!isEnabled && !hasResult) || isLoading}
-      whileHover={isEnabled || hasResult ? { scale: 1.01 } : undefined}
-      whileTap={isEnabled || hasResult ? { scale: 0.99 } : undefined}
+      disabled={!isEnabled || isLoading}
+      whileHover={isEnabled ? { scale: 1.01 } : undefined}
+      whileTap={isEnabled ? { scale: 0.99 } : undefined}
       className={cn(
         'relative flex h-[65px] w-full items-center justify-center gap-2 rounded-xl transition-all md:h-[59px] md:gap-3 md:max-w-[348px]',
-        // Enabled/Success state - yellow
-        (isEnabled || hasResult) && !isLoading && 'bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600',
+        // Enabled state - yellow
+        isEnabled && !isLoading && 'bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600',
         // Loading state
         isLoading && 'bg-yellow-300',
         // Disabled state
-        !isEnabled && !hasResult && !isLoading && 'cursor-not-allowed bg-gray-200 text-gray-400',
+        !isEnabled && !isLoading && 'cursor-not-allowed bg-gray-200 text-gray-400',
         // Text colors
-        (isEnabled || hasResult || isLoading) && 'text-gray-900',
+        (isEnabled || isLoading) && 'text-gray-900',
         className,
       )}
     >
@@ -76,13 +72,6 @@ export function AiAnalyzeButton({
 
       {/* Text */}
       <span className="text-sm font-semibold md:text-base">{getButtonText()}</span>
-
-      {/* Success indicator */}
-      {hasResult && !isLoading && (
-        <span className="absolute right-4 flex size-6 items-center justify-center rounded-full bg-green-500 text-xs text-white">
-          ✓
-        </span>
-      )}
     </motion.button>
   )
 }

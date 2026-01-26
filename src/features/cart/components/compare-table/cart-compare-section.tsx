@@ -3,7 +3,6 @@
 import { useRef, useState } from 'react'
 
 import { AiAuthModal, type AiAuthModalType } from '@/features/cart/components/ai-auth-modal'
-import { AiFinalRecommendation } from '@/features/cart/components/ai-final-recommendation'
 import { AiAnalyzeButton } from '@/features/cart/components/compare-table/ai-analyze-button'
 import { AiAnalysisSummary } from '@/features/cart/components/compare-table/ai-analysis-summary'
 import { CartItemSidebar } from '@/features/cart/components/compare-table/cart-item-sidebar'
@@ -247,19 +246,6 @@ export default function CartCompareSection() {
               aiResult={aiResult}
             />
 
-            {/* AI 최종 추천 - 데스크톱에서만 표시 (모바일은 AiAnalysisSummary에서 처리) */}
-            {aiResult && (
-              <div className="hidden md:block">
-                <AiFinalRecommendation
-                  recommendation={aiResult.finalRecommendation}
-                  leftTitle={left?.title ?? 'A과정'}
-                  rightTitle={right?.title ?? 'B과정'}
-                  leftId={leftId}
-                  rightId={rightId}
-                  recommendationLevel={aiResult.recommendationLevel}
-                />
-              </div>
-            )}
           </div>
         </div>
       </div>

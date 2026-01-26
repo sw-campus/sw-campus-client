@@ -78,7 +78,7 @@ export function LectureSummaryCard({
           {/* 제목 - 중앙 정렬, 한 줄 truncate */}
           <div
             className={cn(
-              'truncate text-center text-sm font-bold text-[#020202] md:text-xl',
+              'truncate text-center text-sm font-bold text-foreground md:text-xl',
               !hasSelection && 'text-muted-foreground',
             )}
           >
@@ -91,7 +91,7 @@ export function LectureSummaryCard({
               asChild
               size="sm"
               variant="outline"
-              className="h-8 w-full rounded-[8px] border-0 bg-[#f9f9f9] text-xs text-[#020202] hover:bg-[#f0f0f0] md:h-12 md:text-base"
+              className="h-8 w-full rounded-[8px] border-0 bg-muted text-xs text-foreground hover:bg-muted/80 md:h-12 md:text-base"
             >
               <Link href={`/lectures/${lectureId}`}>자세히 보기</Link>
             </Button>
@@ -100,7 +100,7 @@ export function LectureSummaryCard({
               disabled
               size="sm"
               variant="outline"
-              className="h-8 w-full rounded-[8px] border-0 bg-[#f9f9f9] text-xs text-[#020202] md:h-12 md:text-base"
+              className="h-8 w-full rounded-[8px] border-0 bg-muted text-xs text-foreground md:h-12 md:text-base"
             >
               자세히 보기
             </Button>

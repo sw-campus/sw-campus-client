@@ -139,8 +139,8 @@ export function CompareTable({
 
   // 섹션 헤더 렌더링 (통합: 모바일 + 데스크톱)
   const sectionHeader = (title: string, key: string) => (
-    <div key={`${key}-header`} className="flex items-center justify-center bg-[#fffcf4] p-3 md:p-4">
-      <span className="text-xs font-semibold text-[#020202] md:text-sm">{title}</span>
+    <div key={`${key}-header`} className="flex items-center justify-center bg-brand-gold-light p-3 md:p-4">
+      <span className="text-xs font-semibold text-foreground md:text-sm">{title}</span>
     </div>
   )
 
@@ -152,17 +152,17 @@ export function CompareTable({
     rightValue: React.ReactNode,
   ) => (
     <div key={key} className="bg-white px-4 py-2 md:px-6 md:py-3">
-      <div className="flex w-full flex-col shadow-[2px_2px_10px_0px_rgba(161,161,170,0.25)]">
+      <div className="flex w-full flex-col shadow-sm">
         {/* 라벨 헤더 */}
-        <div className="flex h-8 items-center justify-center rounded-t-[8px] bg-[#f9f9f9] px-3 md:h-10 md:px-4">
-          <span className="text-xs font-semibold text-[#020202] md:text-sm">{label}</span>
+        <div className="flex h-8 items-center justify-center rounded-t-[8px] bg-muted px-3 md:h-10 md:px-4">
+          <span className="text-xs font-semibold text-foreground md:text-sm">{label}</span>
         </div>
         {/* 값 영역 */}
         <div className="flex overflow-hidden rounded-b-[8px]">
-          <div className="min-w-0 flex-1 break-words border-r border-[#eee] bg-white p-3 text-center text-[10px] text-[#020202] md:p-4 md:text-sm">
+          <div className="min-w-0 flex-1 break-words border-r border-border bg-white p-3 text-center text-[10px] text-foreground md:p-4 md:text-sm">
             {leftValue}
           </div>
-          <div className="min-w-0 flex-1 break-words bg-white p-3 text-center text-[10px] text-[#020202] md:p-4 md:text-sm">
+          <div className="min-w-0 flex-1 break-words bg-white p-3 text-center text-[10px] text-foreground md:p-4 md:text-sm">
             {rightValue}
           </div>
         </div>
