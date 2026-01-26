@@ -4,7 +4,7 @@ export interface Comment {
   id: number
   postId: number
   parentId: number | null
-  authorId: number
+  authorId: number | null  // 탈퇴한 회원의 경우 null
   authorNickname: string
   body: string
   imageUrl: string | null
@@ -21,7 +21,7 @@ export interface ApiCommentResponse {
   id: number
   postId: number
   parentId: number | null
-  authorId: number
+  authorId: number | null  // 탈퇴한 회원의 경우 null
   authorNickname: string
   body: string
   imageUrl: string | null

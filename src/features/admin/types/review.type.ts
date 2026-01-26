@@ -34,7 +34,7 @@ export interface ReviewSummary {
   reviewId: number
   lectureId: number
   lectureName: string
-  memberId: number
+  memberId: number | null  // 탈퇴한 회원의 경우 null
   userName: string
   nickname: string
   score: number
@@ -58,7 +58,7 @@ export interface ReviewDetail {
   reviewId: number
   lectureId: number
   lectureName: string
-  memberId: number
+  memberId: number | null  // 탈퇴한 회원의 경우 null
   userName: string
   nickname: string
   comment: string

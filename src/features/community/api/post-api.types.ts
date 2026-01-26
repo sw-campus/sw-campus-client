@@ -5,7 +5,7 @@
 export interface ApiPostResponse {
   id: number
   title: string
-  authorId: number
+  authorId: number | null  // 탈퇴한 회원의 경우 null
   authorNickname: string
   categoryId: number
   categoryName: string
@@ -23,7 +23,7 @@ export interface ApiPostDetailResponse {
   id: number
   title: string
   body: string
-  authorId: number
+  authorId: number | null  // 탈퇴한 회원의 경우 null
   authorNickname: string
   categoryId: number
   categoryName: string
@@ -94,7 +94,7 @@ export function mapApiPostToPost(apiPost: ApiPostResponse): Post {
 export interface Post {
   id: number
   title: string
-  authorId: number
+  authorId: number | null  // 탈퇴한 회원의 경우 null
   authorNickname: string
   categoryId: number
   categoryName: string
@@ -112,7 +112,7 @@ export interface PostDetail {
   id: number
   title: string
   body: string
-  authorId: number
+  authorId: number | null  // 탈퇴한 회원의 경우 null
   authorNickname: string
   categoryId: number
   categoryName: string
