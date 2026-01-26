@@ -3,7 +3,7 @@
 import { Suspense, useState } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { FiEdit3, FiFilter, FiX, FiList, FiGrid, FiChevronLeft, FiChevronRight, FiUser, FiMoreHorizontal } from 'react-icons/fi'
+import { FiEdit3, FiFilter, FiX, FiChevronLeft, FiChevronRight, FiUser, FiMoreHorizontal } from 'react-icons/fi'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
@@ -128,18 +128,6 @@ function CommunityContentInner() {
     setPage(0)
   }
 
-  // ViewType 상태 관리 (로컬 스토리지 연동) - lazy initialization으로 초기값 설정
-  const [viewType, setViewType] = useState<'list' | 'card'>(() => {
-    if (typeof window === 'undefined') return 'list'
-    const saved = localStorage.getItem('community-post-view-type') as 'list' | 'card' | null
-    return saved === 'card' || saved === 'list' ? saved : 'list'
-  })
-
-  const handleViewChange = (type: 'list' | 'card') => {
-    setViewType(type)
-    localStorage.setItem('community-post-view-type', type)
-  }
-
   const pageInfo = data?.page
   const totalPages = pageInfo?.totalPages ?? 1
 
@@ -186,14 +174,14 @@ function CommunityContentInner() {
             </Button>
           </div>
 
-          {/* 모바일 프로필 버튼 */}
+          {/* 모바일 프로필 버튼 - 44px 최소 터치 영역 */}
           {currentMember && (
             <button
               onClick={() => router.push(`/community/user/${currentMember.userId}`)}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 sm:hidden"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 sm:hidden"
               aria-label="내 프로필"
             >
-              <FiUser className="h-4.5 w-4.5" />
+              <FiUser className="h-5 w-5" />
             </button>
           )}
         </div>
@@ -255,34 +243,6 @@ function CommunityContentInner() {
               </SelectContent>
             </Select>
 
-            {/* 구분선 */}
-            <div className="h-5 w-px shrink-0 bg-gray-200 sm:h-6" />
-
-            {/* 뷰 타입 전환 */}
-            <div className="flex shrink-0 items-center gap-0.5 rounded-lg bg-gray-100/80 p-0.5 sm:gap-1 sm:rounded-xl sm:p-1">
-              <button
-                onClick={() => handleViewChange('list')}
-                className={`flex h-7 w-7 items-center justify-center rounded-md transition-all duration-200 active:scale-90 sm:h-8 sm:w-8 sm:rounded-lg ${
-                  viewType === 'list'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-400 hover:text-gray-600'
-                }`}
-                aria-label="리스트형 보기"
-              >
-                <FiList className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </button>
-              <button
-                onClick={() => handleViewChange('card')}
-                className={`flex h-7 w-7 items-center justify-center rounded-md transition-all duration-200 active:scale-90 sm:h-8 sm:w-8 sm:rounded-lg ${
-                  viewType === 'card'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-400 hover:text-gray-600'
-                }`}
-                aria-label="카드형 보기"
-              >
-                <FiGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -320,21 +280,21 @@ function CommunityContentInner() {
             </h2>
           </div>
 
-          <PostList posts={data?.posts ?? []} isLoading={isLoading} viewType={viewType} />
+          <PostList posts={data?.posts ?? []} isLoading={isLoading} />
 
           {/* 페이지네이션 */}
           {totalPages > 1 && (
             <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:gap-4">
-              {/* 페이지네이션 컨테이너 */}
-              <div className="flex items-center gap-1 rounded-xl bg-gray-50/80 p-1 sm:rounded-2xl sm:p-1.5">
+              {/* 페이지네이션 컨테이너 - 44px 최소 터치 영역 */}
+              <div className="flex items-center gap-1 rounded-2xl bg-gray-50/80 p-1 sm:rounded-2xl sm:p-1.5">
                 {/* 이전 버튼 */}
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10 sm:rounded-xl"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10"
                   aria-label="이전 페이지"
                 >
-                  <FiChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <FiChevronLeft className="h-5 w-5" />
                 </button>
 
                 {/* 페이지 번호 */}
@@ -363,7 +323,7 @@ function CommunityContentInner() {
                           <>
                             <button
                               onClick={() => setPage(0)}
-                              className="hidden h-9 w-9 items-center justify-center rounded-lg text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex sm:h-10 sm:w-10 sm:rounded-xl"
+                              className="hidden h-10 w-10 items-center justify-center rounded-xl text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex"
                             >
                               1
                             </button>
@@ -375,15 +335,15 @@ function CommunityContentInner() {
                           </>
                         )}
 
-                        {/* 페이지 번호들 */}
-                        {pages.map((pageNum, idx) => {
+                        {/* 페이지 번호들 - 44px 최소 터치 영역 */}
+                        {pages.map(pageNum => {
                           // 모바일에서는 현재 페이지 주변 3개만 표시
                           const isMobileVisible = Math.abs(pageNum - page) <= Math.floor(mobileMaxVisible / 2)
                           return (
                             <button
                               key={pageNum}
                               onClick={() => setPage(pageNum)}
-                              className={`h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-all active:scale-95 sm:h-10 sm:w-10 sm:rounded-xl ${
+                              className={`h-11 w-11 items-center justify-center rounded-xl text-sm font-medium transition-all active:scale-95 sm:h-10 sm:w-10 ${
                                 pageNum === page
                                   ? 'flex bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/40'
                                   : `text-gray-600 hover:bg-white hover:shadow-sm ${isMobileVisible ? 'flex' : 'hidden sm:flex'}`
@@ -404,7 +364,7 @@ function CommunityContentInner() {
                             )}
                             <button
                               onClick={() => setPage(totalPages - 1)}
-                              className="hidden h-9 w-9 items-center justify-center rounded-lg text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex sm:h-10 sm:w-10 sm:rounded-xl"
+                              className="hidden h-10 w-10 items-center justify-center rounded-xl text-sm font-medium text-gray-600 transition-all hover:bg-white hover:shadow-sm active:scale-95 sm:flex"
                             >
                               {totalPages}
                             </button>
@@ -419,10 +379,10 @@ function CommunityContentInner() {
                 <button
                   onClick={() => setPage(p => p + 1)}
                   disabled={page >= totalPages - 1}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10 sm:rounded-xl"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-500 transition-all hover:bg-white hover:text-gray-700 hover:shadow-sm active:scale-95 disabled:pointer-events-none disabled:opacity-40 sm:h-10 sm:w-10"
                   aria-label="다음 페이지"
                 >
-                  <FiChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <FiChevronRight className="h-5 w-5" />
                 </button>
               </div>
 

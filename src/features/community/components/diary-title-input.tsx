@@ -84,14 +84,6 @@ export function DiaryTitleInput({
           </div>
         </div>
 
-        {/* 미리보기 */}
-        <div className="bg-muted/50 rounded-lg border px-4 py-3 text-sm">
-          <span className="text-muted-foreground mr-2 font-medium">제목 미리보기:</span>
-          <span className="text-foreground font-bold">{summary || '(한 줄 소감)'}</span>
-          <span className="text-muted-foreground ml-3 text-xs">
-            ({month}월 {week}주차 정보는 게시글 목록에 표시됩니다)
-          </span>
-        </div>
       </div>
     </div>
   )

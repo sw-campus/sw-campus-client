@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useEffect } from 'react'
+import { Suspense, useState } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -63,6 +63,9 @@ function SearchContentInner() {
   // 모바일에서 필터 사이드바 토글
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
+  // URL 파라미터 변경 추적을 위한 상태
+  const [prevCategoryParams, setPrevCategoryParams] = useState<string>('')
+
   const level1Categories = categoryTree ?? []
 
   const level2Categories = (() => {
@@ -77,69 +80,59 @@ function SearchContentInner() {
     return parent?.children ?? []
   })()
 
-  type CategoryPath = { l1: number; l2?: number; l3?: number }
-  const categoryPathMap = (() => {
-    const map = new Map<number, CategoryPath>()
-    if (!categoryTree) return map
-
-    for (const l1 of categoryTree) {
-      map.set(l1.categoryId, { l1: l1.categoryId })
-
-      if (l1.children) {
-        for (const l2 of l1.children) {
-          map.set(l2.categoryId, { l1: l1.categoryId, l2: l2.categoryId })
-
-          if (l2.children) {
-            for (const l3 of l2.children) {
-              map.set(l3.categoryId, { l1: l1.categoryId, l2: l2.categoryId, l3: l3.categoryId })
-            }
-          }
-        }
-      }
-    }
-    return map
-  })()
-
-  // URL 파라미터 변경 시 카테고리 상태 동기화
-  useEffect(() => {
-    if (!categoryTree || categoryTree.length === 0) return
+  // URL 파라미터 변경 시 카테고리 상태 동기화 (렌더링 중 조건부 업데이트)
+  const currentCategoryParams = searchParams.getAll('categoryIds').join(',')
+  if (categoryTree && categoryTree.length > 0 && currentCategoryParams !== prevCategoryParams) {
+    setPrevCategoryParams(currentCategoryParams)
 
     const categoryIdsParam = searchParams.getAll('categoryIds')
     if (categoryIdsParam.length === 0) {
       setLevel1Id(null)
       setLevel2Id(null)
       setLevel3Ids([])
-      return
-    }
-
-    let foundL1: number | null = null
-    let foundL2: number | null = null
-    const foundL3s: string[] = []
-
-    categoryIdsParam.forEach(idStr => {
-      const id = Number(idStr)
-      if (!id) return
-
-      const path = categoryPathMap.get(id)
-      if (path) {
-        if (path.l1 && path.l1 !== foundL1) {
-          foundL1 = path.l1
-          foundL2 = null
+    } else {
+      type CategoryPath = { l1: number; l2?: number; l3?: number }
+      const pathMap = new Map<number, CategoryPath>()
+      for (const l1 of categoryTree) {
+        pathMap.set(l1.categoryId, { l1: l1.categoryId })
+        if (l1.children) {
+          for (const l2 of l1.children) {
+            pathMap.set(l2.categoryId, { l1: l1.categoryId, l2: l2.categoryId })
+            if (l2.children) {
+              for (const l3 of l2.children) {
+                pathMap.set(l3.categoryId, { l1: l1.categoryId, l2: l2.categoryId, l3: l3.categoryId })
+              }
+            }
+          }
         }
-        if (path.l2 && path.l1 === foundL1) {
-          foundL2 = path.l2
-        }
-        if (path.l3) foundL3s.push(String(path.l3))
       }
-    })
 
-    if (foundL1 !== level1Id) setLevel1Id(foundL1)
-    if (foundL2 !== level2Id) setLevel2Id(foundL2)
+      let foundL1: number | null = null
+      let foundL2: number | null = null
+      const foundL3s: string[] = []
 
-    const isL3Same = foundL3s.length === level3Ids.length && foundL3s.every(id => level3Ids.includes(id))
-    if (!isL3Same) setLevel3Ids(foundL3s)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- URL 변경 시에만 동기화 (level1Id 등은 의도적으로 제외)
-  }, [searchParams, categoryTree, categoryPathMap])
+      categoryIdsParam.forEach(idStr => {
+        const id = Number(idStr)
+        if (!id) return
+
+        const path = pathMap.get(id)
+        if (path) {
+          if (path.l1 && path.l1 !== foundL1) {
+            foundL1 = path.l1
+            foundL2 = null
+          }
+          if (path.l2 && path.l1 === foundL1) {
+            foundL2 = path.l2
+          }
+          if (path.l3) foundL3s.push(String(path.l3))
+        }
+      })
+
+      setLevel1Id(foundL1)
+      setLevel2Id(foundL2)
+      setLevel3Ids(foundL3s)
+    }
+  }
 
   const toggleFilter = (group: FilterGroupKey, label: string) => {
     setActiveFilters(prev => {

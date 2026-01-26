@@ -36,10 +36,10 @@ export function PostListRow({ post }: PostListRowProps) {
   return (
     <article
       onClick={() => router.push(`/community/${post.id}`)}
-      className={`group relative flex w-full cursor-pointer overflow-hidden rounded-xl border transition-all duration-200 active:scale-[0.995] sm:rounded-2xl ${
+      className={`group relative flex w-full cursor-pointer overflow-hidden rounded-xl border transition-all duration-200 active:scale-[0.98] active:shadow-inner sm:rounded-2xl ${
         post.pinned
-          ? 'border-orange-200/80 bg-gradient-to-r from-orange-50/90 via-amber-50/50 to-white'
-          : 'border-gray-100 bg-white hover:border-orange-200/60 hover:shadow-lg hover:shadow-orange-50/50'
+          ? 'border-orange-200/80 bg-gradient-to-r from-orange-50/90 via-amber-50/50 to-white active:from-orange-100/90'
+          : 'border-gray-100 bg-white hover:border-orange-200/60 hover:shadow-lg hover:shadow-orange-50/50 active:bg-gray-50/80'
       }`}
     >
       {/* 좌측 악센트 바 */}

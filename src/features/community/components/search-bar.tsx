@@ -91,10 +91,10 @@ export function SearchBar({
 
       <div
         className={cn(
-          'relative flex items-center overflow-hidden rounded-xl border bg-white/80 backdrop-blur-sm transition-all duration-200',
+          'group relative flex items-center overflow-hidden rounded-xl border bg-white/80 backdrop-blur-sm transition-all duration-200',
           isFocused
             ? 'border-orange-300 shadow-lg shadow-orange-100/50'
-            : 'border-gray-200/80 hover:border-gray-300'
+            : 'border-gray-200/80 hover:border-orange-200 hover:bg-white hover:shadow-md hover:shadow-orange-50/30'
         )}
       >
         {/* 검색 아이콘 */}
@@ -102,7 +102,7 @@ export function SearchBar({
           <FiSearch
             className={cn(
               'h-4 w-4 transition-colors duration-200',
-              isFocused ? 'text-orange-500' : 'text-gray-400'
+              isFocused ? 'text-orange-500' : 'text-gray-400 group-hover:text-orange-400'
             )}
           />
         </div>

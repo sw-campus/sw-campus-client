@@ -324,7 +324,7 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
           {isLoggedIn ? (
             <>
               <div
-                className="prose prose-gray max-w-none prose-img:rounded-xl"
+                className="prose prose-gray max-w-none prose-p:leading-relaxed prose-headings:font-bold prose-headings:tracking-tight prose-a:text-orange-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md prose-blockquote:border-l-orange-400 prose-blockquote:bg-orange-50/50 prose-blockquote:py-1 prose-blockquote:not-italic prose-code:rounded prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-normal prose-code:before:content-none prose-code:after:content-none"
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.body) }}
               />
 
@@ -365,45 +365,48 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
         {isLoggedIn && (
           <div className="mt-6 border-t border-gray-100 p-4 sm:mt-8 sm:p-6">
             {/* 좋아요, 북마크 - 항상 표시 */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex flex-1 sm:flex-none">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+              {/* 좋아요 + 북마크 그룹 */}
+              <div className="flex gap-2">
+                <div className="flex">
+                  <button
+                    onClick={() => toggleLike()}
+                    disabled={isLiking}
+                    className={`flex h-10 items-center justify-center gap-2 rounded-l-xl border text-sm font-medium transition-all active:scale-95 px-3 sm:px-4 ${
+                      post.isLiked
+                        ? 'border-rose-200 bg-rose-50 text-rose-600'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <FiHeart className={`h-4 w-4 ${post.isLiked ? 'fill-rose-500' : ''}`} />
+                    <span className="hidden sm:inline">좋아요</span>
+                  </button>
+                  <button
+                    onClick={() => setIsLikerModalOpen(true)}
+                    className={`flex h-10 items-center justify-center gap-1 rounded-r-xl border border-l-0 px-2.5 text-sm font-medium tabular-nums transition-all active:scale-95 sm:px-3 ${
+                      post.isLiked
+                        ? 'border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                    title="좋아요 목록 보기"
+                  >
+                    {post.likeCount}
+                  </button>
+                </div>
+
                 <button
-                  onClick={() => toggleLike()}
-                  disabled={isLiking}
-                  className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-l-xl border text-sm font-medium transition-all active:scale-95 sm:px-4 ${
-                    post.isLiked
-                      ? 'border-rose-200 bg-rose-50 text-rose-600'
+                  onClick={() => toggleBookmark()}
+                  disabled={isBookmarking}
+                  className={`flex h-10 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-all active:scale-95 px-3 sm:px-4 ${
+                    post.isBookmarked
+                      ? 'border-warning/30 bg-warning/10 text-warning'
                       : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <FiHeart className={`h-4 w-4 ${post.isLiked ? 'fill-rose-500' : ''}`} />
-                  <span>좋아요</span>
-                </button>
-                <button
-                  onClick={() => setIsLikerModalOpen(true)}
-                  className={`flex h-10 items-center justify-center gap-1 rounded-r-xl border border-l-0 px-3 text-sm font-medium tabular-nums transition-all active:scale-95 ${
-                    post.isLiked
-                      ? 'border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-                  title="좋아요 목록 보기"
-                >
-                  {post.likeCount}
+                  <FiBookmark className={`h-4 w-4 ${post.isBookmarked ? 'fill-warning' : ''}`} />
+                  <span className="hidden sm:inline">북마크</span>
                 </button>
               </div>
-
-              <button
-                onClick={() => toggleBookmark()}
-                disabled={isBookmarking}
-                className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-all active:scale-95 sm:flex-none sm:px-4 ${
-                  post.isBookmarked
-                    ? 'border-warning/30 bg-warning/10 text-warning'
-                    : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <FiBookmark className={`h-4 w-4 ${post.isBookmarked ? 'fill-warning' : ''}`} />
-                <span>북마크</span>
-              </button>
 
               {/* 관리자: 공지 고정/해제 */}
               {userType === 'ADMIN' && (
