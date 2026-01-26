@@ -15,6 +15,10 @@ export default function FloatingCart() {
   const { items, hasHydrated } = useUnifiedCart()
   const { mutate: remove } = useUnifiedRemoveFromCart()
 
+  // 커뮤니티 페이지에서는 표시하지 않음
+  const isCommunityPage = pathname.startsWith('/community')
+  if (isCommunityPage) return null
+
   // hydration 완료 전에는 렌더링하지 않음 (flash 방지)
   if (!hasHydrated) return null
 

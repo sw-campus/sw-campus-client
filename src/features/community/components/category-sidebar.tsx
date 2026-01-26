@@ -190,7 +190,10 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
   return (
     <>
       {/* 모바일: 드릴다운 방식 탭 */}
-      <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 lg:hidden">
+      <div className="relative lg:hidden">
+        {/* 오른쪽 스크롤 힌트 그라데이션 */}
+        <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-8 bg-gradient-to-l from-white via-white/80 to-transparent" />
+        <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 pr-8">
         <div className="flex gap-2 pb-3">
           {/* 상위로 가기 버튼 */}
           {/* currentCategory가 있으면 (자식 카테고리를 보여주는 상태) 해당 카테고리명으로 표시 */}
@@ -242,6 +245,7 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
               {cat.name}
             </button>
           ))}
+        </div>
         </div>
       </div>
 

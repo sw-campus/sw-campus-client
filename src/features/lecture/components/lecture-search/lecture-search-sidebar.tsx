@@ -99,14 +99,18 @@ export function LectureSearchSidebar({
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-2">
             <FilterGroup label="대분류">
-              <Select value={level1Id?.toString() ?? ''} onValueChange={v => onLevel1Change(v ? Number(v) : null)}>
+              <Select
+                value={level1Id?.toString() ?? 'all'}
+                onValueChange={v => onLevel1Change(v === 'all' ? null : Number(v))}
+              >
                 <SelectTrigger className={filterSelectTriggerClass}>
                   <SelectValue placeholder="전체" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
+                    <SelectItem value="all">전체</SelectItem>
                     {level1Categories.map(cat => (
-                      <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
+                      <SelectItem key={cat.categoryId} value={String(cat.categoryId)}>
                         {cat.categoryName}
                       </SelectItem>
                     ))}
@@ -117,8 +121,8 @@ export function LectureSearchSidebar({
 
             <FilterGroup label="중분류">
               <Select
-                value={level2Id?.toString() ?? ''}
-                onValueChange={v => onLevel2Change(v ? Number(v) : null)}
+                value={level2Id?.toString() ?? 'all'}
+                onValueChange={v => onLevel2Change(v === 'all' ? null : Number(v))}
                 disabled={!level1Id || level2Categories.length === 0}
               >
                 <SelectTrigger className={filterSelectTriggerClass}>
@@ -126,6 +130,7 @@ export function LectureSearchSidebar({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
+                    <SelectItem value="all">전체</SelectItem>
                     {level2Categories.map(cat => (
                       <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
                         {cat.categoryName}

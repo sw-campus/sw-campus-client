@@ -2,9 +2,14 @@
 
 import { motion, useReducedMotion, type Variants } from 'framer-motion'
 
-import LargeBanner from '@/features/banner/components/large-banner'
-import MidBanner from '@/features/banner/components/mid-banner'
-import LectureSection from '@/features/lecture/components/lecture-section'
+import {
+  AiCompareSection,
+  BannerCarousel,
+  BootcampListSection,
+  EventSection,
+  MainBanner,
+  PartnerSection,
+} from '@/features/home/components'
 
 const container: Variants = {
   hidden: {},
@@ -33,15 +38,30 @@ export default function HomeContent() {
       variants={container}
       initial={reduceMotion ? false : 'hidden'}
       animate={reduceMotion ? undefined : 'show'}
+      className="flex flex-col"
     >
       <motion.div variants={fadeUp}>
-        <LargeBanner />
+        <MainBanner />
       </motion.div>
+
       <motion.div variants={fadeUp}>
-        <MidBanner />
+        <AiCompareSection />
       </motion.div>
+
       <motion.div variants={fadeUp}>
-        <LectureSection />
+        <BannerCarousel />
+      </motion.div>
+
+      <motion.div variants={fadeUp}>
+        <BootcampListSection />
+      </motion.div>
+
+      <motion.div variants={fadeUp}>
+        <PartnerSection />
+      </motion.div>
+
+      <motion.div variants={fadeUp}>
+        <EventSection />
       </motion.div>
     </motion.div>
   )

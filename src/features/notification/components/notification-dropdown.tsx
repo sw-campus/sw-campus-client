@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FiBell, FiCheckCircle, FiMessageSquare, FiCornerDownRight, FiInbox, FiChevronDown } from 'react-icons/fi'
+import { FiBell, FiCheckCircle, FiMessageSquare, FiCornerDownRight, FiInbox, FiChevronDown, FiTrash2 } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -22,6 +22,7 @@ import {
   useNotificationsQuery,
   useMarkAsReadMutation,
   useMarkAllAsReadMutation,
+  useDeleteNotificationMutation,
 } from '../hooks/use-notifications-query'
 import { useSSE } from '../hooks/use-sse'
 
@@ -39,9 +40,11 @@ function getNotificationMessage(type: NotificationType, senderNickname: string):
 function NotificationItem({
   notification,
   onMarkAsRead,
+  onDelete,
 }: {
   notification: Notification
   onMarkAsRead: (id: number) => void
+  onDelete: (id: number) => void
 }) {
   const router = useRouter()
 
@@ -72,10 +75,15 @@ function NotificationItem({
     }
   }
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onDelete(notification.id)
+  }
+
   return (
     <DropdownMenuItem
       className={cn(
-        'flex cursor-pointer items-start gap-3 rounded-lg p-3 transition-colors',
+        'group flex cursor-pointer items-start gap-3 rounded-lg p-3 transition-colors',
         !notification.read
           ? 'bg-primary/5 hover:bg-primary/10'
           : 'hover:bg-muted/50'
@@ -106,9 +114,19 @@ function NotificationItem({
           >
             {getNotificationMessage(notification.type, notification.senderNickname)}
           </p>
-          {!notification.read && (
-            <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" />
-          )}
+          <div className="flex shrink-0 items-center gap-1">
+            {!notification.read && (
+              <span className="mt-1.5 size-2 rounded-full bg-primary" />
+            )}
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+              aria-label="알림 삭제"
+            >
+              <FiTrash2 className="size-3.5" />
+            </button>
+          </div>
         </div>
         <span className="mt-1 block text-xs text-muted-foreground">
           {formatRelativeTime(new Date(notification.createdAt))}
@@ -127,6 +145,7 @@ export function NotificationDropdown() {
   const { data, isLoading } = useNotificationsQuery()
   const { mutate: markAsRead } = useMarkAsReadMutation()
   const { mutate: markAllAsRead } = useMarkAllAsReadMutation()
+  const { mutate: deleteNotification } = useDeleteNotificationMutation()
 
   const notifications = data?.notifications ?? []
   const unreadCount = data?.unreadCount ?? 0
@@ -212,6 +231,7 @@ export function NotificationDropdown() {
                 <NotificationItem
                   notification={notification}
                   onMarkAsRead={(id) => markAsRead(id)}
+                  onDelete={(id) => deleteNotification(id)}
                 />
                 {index < displayedNotifications.length - 1 && (
                   <DropdownMenuSeparator className="mx-3 my-1" />
