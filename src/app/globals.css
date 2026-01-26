@@ -26,6 +26,7 @@
   --color-footer-bg: var(--footer-bg);
   --color-footer-text: var(--footer-text);
   --color-footer-muted: var(--footer-muted);
+  --color-header-text: var(--header-text);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -81,6 +82,7 @@
   --footer-bg: oklch(0.15 0 0); /* #020202 */
   --footer-text: oklch(0.82 0 0); /* #C8C8C8 */
   --footer-muted: oklch(0.45 0 0); /* #606060 */
+  --header-text: oklch(1 0 0 / 0.8); /* white 80% */
 
   /* === 그림자 === */
   --shadow-card: 4px 4px 20px oklch(0.71 0 0 / 0.25);

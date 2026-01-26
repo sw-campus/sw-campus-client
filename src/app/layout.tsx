@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next'
 
 import Script from 'next/script'
 
-import DynamicBackground from '@/components/common/dynamic-background'
 import KakaoChannelButton from '@/components/common/kakao-channel-button'
 import QueryClientProviderWrapper from '@/components/providers/query-client-provider'
 import { JsonLd, createWebsiteJsonLd } from '@/components/seo/json-ld'
@@ -87,7 +86,6 @@ export default function RootLayout({
       )}
       <body className="relative flex min-h-screen flex-col">
         <JsonLd data={createWebsiteJsonLd(BASE_URL)} />
-        <DynamicBackground />
         <QueryClientProviderWrapper>
           {children}
           <Toaster richColors closeButton position="bottom-center" />
