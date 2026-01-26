@@ -379,37 +379,53 @@ export function PostForm({
 
         {/* 부트캠프 성장일기 - 강의 선택 */}
         {isBootcampDiaryCategory && (
-          <LectureSelector
-            selectedLecture={selectedLecture}
-            onOpenModal={() => setIsLectureModalOpen(true)}
-            onRemove={() => setSelectedLecture(null)}
-            error={lectureError}
-          />
+          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
+            {/* 단계 표시 */}
+            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
+              <span>STEP 1-2</span>
+            </div>
+            <div className="mt-1">
+              <LectureSelector
+                selectedLecture={selectedLecture}
+                onOpenModal={() => setIsLectureModalOpen(true)}
+                onRemove={() => setSelectedLecture(null)}
+                error={lectureError}
+              />
+            </div>
+          </div>
         )}
 
         {/* 제목 */}
         {isBootcampDiaryCategory ? (
-          <DiaryTitleInput
-            month={diaryMonth}
-            week={diaryWeek}
-            summary={diarySummary}
-            onMonthChange={setDiaryMonth}
-            onWeekChange={setDiaryWeek}
-            onSummaryChange={value => {
-              setDiarySummary(value)
-              if (diarySummaryError) setDiarySummaryError(null)
-            }}
-            error={diarySummaryError}
-          />
-        ) : (
-          <div className="relative rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
             {/* 단계 표시 */}
-            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
+            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
+              <span>STEP 2</span>
+            </div>
+            <div className="mt-1">
+              <DiaryTitleInput
+                month={diaryMonth}
+                week={diaryWeek}
+                summary={diarySummary}
+                onMonthChange={setDiaryMonth}
+                onWeekChange={setDiaryWeek}
+                onSummaryChange={value => {
+                  setDiarySummary(value)
+                  if (diarySummaryError) setDiarySummaryError(null)
+                }}
+                error={diarySummaryError}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
+            {/* 단계 표시 */}
+            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
               <span>STEP 2</span>
             </div>
             <label htmlFor="title" className="mb-3 mt-1 flex items-center gap-2 text-sm font-semibold text-gray-800">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 shadow-sm">
-                <FiType className="h-3.5 w-3.5 text-blue-600" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-orange-100 to-amber-100 shadow-sm">
+                <FiType className="h-3.5 w-3.5 text-orange-600" />
               </div>
               제목 <span className="text-orange-500">*</span>
             </label>
@@ -429,16 +445,24 @@ export function PostForm({
 
         {/* 본문 */}
         {isBootcampDiaryCategory ? (
-          <DiaryTemplateForm formData={diaryForm} errors={diaryErrors} onChange={handleDiaryChange} />
-        ) : (
-          <div className="relative rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
             {/* 단계 표시 */}
-            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
+            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
+              <span>STEP 3</span>
+            </div>
+            <div className="mt-1">
+              <DiaryTemplateForm formData={diaryForm} errors={diaryErrors} onChange={handleDiaryChange} />
+            </div>
+          </div>
+        ) : (
+          <div className="relative rounded-2xl border-2 border-orange-200/80 bg-gradient-to-br from-orange-50/50 to-white p-4 shadow-sm transition-all hover:border-orange-300/80 hover:shadow-md sm:p-5">
+            {/* 단계 표시 */}
+            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
               <span>STEP 3</span>
             </div>
             <label htmlFor="body" className="mb-3 mt-1 flex items-center gap-2 text-sm font-semibold text-gray-800">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-success/15 shadow-sm">
-                <FiFileText className="h-3.5 w-3.5 text-success" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-orange-100 to-amber-100 shadow-sm">
+                <FiFileText className="h-3.5 w-3.5 text-orange-600" />
               </div>
               내용 <span className="text-orange-500">*</span>
             </label>
@@ -464,14 +488,14 @@ export function PostForm({
         )}
 
         {/* 태그 - Optional */}
-        <div className="relative rounded-2xl border border-dashed border-gray-200/80 bg-gray-50/30 p-4 shadow-sm transition-all hover:border-gray-300 hover:bg-white hover:shadow-md sm:p-5">
+        <div className="relative rounded-2xl border-2 border-dashed border-gray-200/80 bg-gradient-to-br from-gray-50/30 to-white p-4 shadow-sm transition-all hover:border-gray-300/80 hover:bg-white hover:shadow-md sm:p-5">
           {/* 선택 표시 */}
-          <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full border border-purple-200 bg-white px-2.5 py-0.5 text-xs font-medium text-purple-600 shadow-sm">
+          <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-xs font-medium text-gray-500 shadow-sm">
             <span>선택사항</span>
           </div>
           <label htmlFor="tags" className="mb-3 mt-1 flex items-center gap-2 text-sm font-semibold text-gray-800">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-purple-100 to-violet-100 shadow-sm">
-              <FiTag className="h-3.5 w-3.5 text-purple-600" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 shadow-sm">
+              <FiTag className="h-3.5 w-3.5 text-gray-500" />
             </div>
             <span>태그</span>
             <span className="text-xs font-normal text-gray-500">(쉼표로 구분)</span>
