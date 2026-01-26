@@ -139,7 +139,7 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
       </Card>
 
       {/* 모바일: 접이식 */}
-      <Card className="lg:hidden">
+      <Card className="overflow-hidden lg:hidden">
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -175,7 +175,7 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
             >
               <div className="border-t px-4 pb-4 pt-2">
                 <div className="text-xs text-gray-400 mb-2">동일한 카테고리의 항목끼리 비교할 수 있습니다.</div>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
+                <div className="space-y-2 max-h-60 overflow-y-auto overflow-x-hidden">
                   {cartItemList(true)}
                 </div>
               </div>

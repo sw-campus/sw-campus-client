@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 
-import { TableCell, TableRow } from '@/components/ui/table'
 import {
   formatBoolean,
   formatCourseTime,
@@ -13,7 +12,6 @@ import {
   formatText,
 } from '@/features/cart/utils/cart-compare-formatters'
 import type { LectureDetail } from '@/features/lecture/api/lecture-api.types'
-import { cn } from '@/lib/utils'
 
 export type Detail = LectureDetail | null | undefined
 
@@ -21,104 +19,10 @@ export type RowDef = {
   key: string
   label: string
   value: (detail: Detail) => ReactNode
-  valueAlign?: 'left' | 'center'
 }
 
 export function valueOrUnselected(detail: Detail, value: ReactNode) {
   return detail ? value : '-'
-}
-
-export function dividerCell() {
-  return (
-    <TableCell className="w-px px-0">
-      <div className="bg-border h-full w-px" />
-    </TableCell>
-  )
-}
-
-export function dataRow({
-  rowKey,
-  label,
-  leftValue,
-  rightValue,
-  labelColClassName,
-  valueAlign = 'center',
-  isLeftSelected,
-  isRightSelected,
-}: {
-  rowKey: string
-  label: string
-  leftValue: ReactNode
-  rightValue: ReactNode
-  labelColClassName: string
-  valueAlign?: 'left' | 'center'
-  isLeftSelected: boolean
-  isRightSelected: boolean
-}) {
-  return (
-    <TableRow key={rowKey}>
-      <TableCell
-        className={cn(
-          'sticky left-0 z-20 bg-background border-r px-2 py-2 align-top text-xs font-semibold whitespace-normal md:px-6 md:py-4 md:text-base',
-          labelColClassName,
-        )}
-      >
-        {label}
-      </TableCell>
-      <TableCell
-        className={cn(
-          'px-2 py-2 align-top text-xs whitespace-normal md:px-6 md:py-4 md:text-base',
-          valueAlign === 'center' ? 'text-center' : 'text-left',
-          !isLeftSelected && 'text-muted-foreground',
-        )}
-      >
-        {leftValue}
-      </TableCell>
-      {dividerCell()}
-      <TableCell
-        className={cn(
-          'px-2 py-2 align-top text-xs whitespace-normal md:px-6 md:py-4 md:text-base',
-          valueAlign === 'center' ? 'text-center' : 'text-left',
-          !isRightSelected && 'text-muted-foreground',
-        )}
-      >
-        {rightValue}
-      </TableCell>
-    </TableRow>
-  )
-}
-
-export function renderRow({
-  rowKey,
-  row,
-  leftDetail,
-  rightDetail,
-  labelColClassName,
-  isLeftSelected,
-  isRightSelected,
-}: {
-  rowKey: string
-  row: RowDef
-  leftDetail: Detail
-  rightDetail: Detail
-  labelColClassName: string
-  isLeftSelected: boolean
-  isRightSelected: boolean
-}) {
-  return dataRow({
-    rowKey,
-    label: row.label,
-    leftValue: valueOrUnselected(leftDetail, row.value(leftDetail)),
-    rightValue: valueOrUnselected(rightDetail, row.value(rightDetail)),
-    labelColClassName,
-    valueAlign: row.valueAlign,
-    isLeftSelected,
-    isRightSelected,
-  })
-}
-
-function centerRows(rows: RowDef[]): RowDef[] {
-  return rows.map(row => ({ ...row, valueAlign: 'center' }))
 }
 
 export function hasStep(detail: Detail, stepType: string) {
@@ -189,7 +93,7 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
         key: 'location',
         label: '교육장소',
         value: d => (
-          <div className="line-clamp-2 text-[11px] md:line-clamp-none md:text-base">
+          <div className="line-clamp-2 text-[11px] md:line-clamp-none md:text-sm">
             {formatLectureLoc(d?.lectureLoc)}
             {d?.location ? ` (${d.location})` : ''}
           </div>
@@ -201,43 +105,43 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
   {
     key: 'cost',
     title: '수강료 및 지원',
-    rows: centerRows([
+    rows: [
       { key: 'recruitType', label: '내배카', value: d => formatRecruitType(d?.recruitType) },
       { key: 'tuition', label: '자기부담금', value: d => formatMoney(d?.support?.tuition) },
       { key: 'stipend', label: '정부 지원금', value: d => formatText(d?.support?.stipend) },
       { key: 'extraSupport', label: '훈련수당 (월)', value: d => formatText(d?.support?.extraSupport) },
-    ]),
+    ],
   },
   {
     key: 'benefits',
     title: '추가 제공 항목',
-    rows: centerRows([
+    rows: [
       {
         key: 'benefits',
         label: '추가 혜택',
         value: d => (
-          <div className="line-clamp-3 text-[11px] md:line-clamp-none md:text-base">{formatList(d?.benefits)}</div>
+          <div className="line-clamp-3 text-[11px] md:line-clamp-none md:text-sm">{formatList(d?.benefits)}</div>
         ),
       },
-    ]),
+    ],
   },
   {
     key: 'goal',
     title: '훈련목표',
-    rows: centerRows([
+    rows: [
       {
         key: 'goal',
         label: '목표',
         value: d => (
-          <div className="line-clamp-3 text-[11px] md:line-clamp-none md:text-base">{formatText(d?.goal)}</div>
+          <div className="line-clamp-3 text-[11px] md:line-clamp-none md:text-sm">{formatText(d?.goal)}</div>
         ),
       },
-    ]),
+    ],
   },
   {
     key: 'quals',
     title: '지원자격',
-    rows: centerRows([
+    rows: [
       {
         key: 'required',
         label: '필수',
@@ -248,21 +152,21 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
         label: '우대',
         value: d => formatList(d?.quals?.filter(q => q.type === 'PREFERRED').map(q => q.text)),
       },
-    ]),
+    ],
   },
   {
     key: 'equipment',
     title: '훈련시설 및 장비',
-    rows: centerRows([
+    rows: [
       { key: 'pc', label: '장비', value: d => formatPcType(d?.equipment?.pc) },
       { key: 'books', label: '교재지원 유무', value: d => formatBoolean(d?.services?.books) },
       { key: 'merit', label: '훈련시설 장점', value: d => d?.equipment?.merit ?? '-' },
-    ]),
+    ],
   },
   {
     key: 'project',
     title: '프로젝트',
-    rows: centerRows([
+    rows: [
       {
         key: 'num',
         label: '횟수',
@@ -276,12 +180,12 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
       { key: 'team', label: '팀 구성 방식', value: d => d?.project?.team ?? '-' },
       { key: 'tool', label: '사용하는 협업툴', value: d => d?.project?.tool ?? '-' },
       { key: 'mentor', label: '멘토링/코드리뷰', value: d => formatBoolean(d?.project?.mentor) },
-    ]),
+    ],
   },
   {
     key: 'job',
     title: '취업 지원 서비스',
-    rows: centerRows([
+    rows: [
       { key: 'resume', label: '이력서/자소서 첨삭', value: d => formatBoolean(d?.services?.resume) },
       { key: 'mock', label: '모의 면접', value: d => formatBoolean(d?.services?.mockInterview) },
       { key: 'help', label: '취업 지원', value: d => formatBoolean(d?.services?.employmentHelp) },
@@ -290,6 +194,6 @@ export const COMPARE_SECTIONS: Array<{ key: string; title: string; rows: RowDef[
         label: '수료 후 사후관리',
         value: d => formatBoolean(d?.services?.afterCompletion),
       },
-    ]),
+    ],
   },
 ]

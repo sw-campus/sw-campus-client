@@ -22,6 +22,9 @@ export default function FloatingCart() {
   // hydration 완료 전에는 렌더링하지 않음 (flash 방지)
   if (!hasHydrated) return null
 
+  // 비교 페이지에서는 FloatingCart 숨김 (CartItemSidebar가 동일 기능 제공)
+  if (pathname === '/cart/compare') return null
+
   return (
     <AnimatePresence>
       {items.length > 0 && (

@@ -15,12 +15,16 @@ export function LectureSummaryCard({
   title,
   thumbnailUrl,
   lectureId,
+  orgName: _orgName,
+  price: _price,
   onClear,
 }: {
   side: Side
   title: string
   thumbnailUrl?: string | null
   lectureId?: string | null
+  orgName?: string | null
+  price?: number | null
   onClear: () => void
 }) {
   const reduceMotion = useReducedMotion()
@@ -34,7 +38,7 @@ export function LectureSummaryCard({
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, filter: 'blur(2px)' }}
         transition={reduceMotion ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
-        className="relative flex flex-col items-center gap-1.5 px-2 py-3 text-center md:gap-3 md:px-6 md:py-8"
+        className="relative overflow-hidden rounded-[12px] bg-white p-3 shadow-[4px_4px_20px_0px_rgba(161,161,170,0.25)] md:p-6"
       >
         {/* 닫기 버튼 */}
         {hasSelection ? (
@@ -45,47 +49,63 @@ export function LectureSummaryCard({
             initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
             animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 0.12, ease: 'easeOut' }}
-            className="bg-background text-muted-foreground hover:text-foreground absolute top-0.5 right-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border md:top-3 md:right-3 md:h-9 md:w-9"
+            className="bg-background text-muted-foreground hover:text-foreground absolute top-1.5 right-1.5 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full border md:top-2 md:right-2 md:h-7 md:w-7"
           >
-            <FiX className="h-3.5 w-3.5 md:h-5 md:w-5" />
+            <FiX className="h-3 w-3 md:h-4 md:w-4" />
           </motion.button>
         ) : null}
 
-        {/* 이미지 */}
-        <div className="bg-muted/30 relative h-12 w-12 overflow-hidden rounded-full md:h-24 md:w-24">
-          {thumbnailUrl ? (
-            <Image
-              src={thumbnailUrl}
-              alt=""
-              fill
-              sizes="96px"
-              className="object-cover"
-              unoptimized={thumbnailUrl.startsWith('http')}
-            />
-          ) : null}
-        </div>
+        {/* 세로 레이아웃 - 모바일/데스크톱 통일 (Figma 스타일) */}
+        <div className="flex flex-col gap-3">
+          {/* 직사각형 썸네일 - 모바일: h-[86px], 데스크톱: h-[181px] */}
+          <div className="bg-muted/30 relative h-[86px] w-full shrink-0 overflow-hidden rounded-[8px] md:h-[181px]">
+            {thumbnailUrl ? (
+              <Image
+                src={thumbnailUrl}
+                alt=""
+                fill
+                sizes="(max-width: 768px) 132px, 511px"
+                className="object-cover"
+                unoptimized={thumbnailUrl.startsWith('http')}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <span className="text-muted-foreground text-sm md:text-lg">{side === 'left' ? 'A' : 'B'}</span>
+              </div>
+            )}
+          </div>
 
-        <div className="space-y-1">
+          {/* 제목 - 중앙 정렬, 한 줄 truncate */}
           <div
             className={cn(
-              '[display:-webkit-box] overflow-hidden text-sm leading-snug font-bold break-keep [-webkit-box-orient:vertical] [-webkit-line-clamp:2] md:text-xl',
+              'truncate text-center text-sm font-bold text-foreground md:text-xl',
               !hasSelection && 'text-muted-foreground',
             )}
           >
             {hasSelection ? title : '미선택'}
           </div>
-          {!hasSelection && <div className="text-muted-foreground text-xs opacity-60 md:text-sm">강의를 선택해 주세요</div>}
-        </div>
 
-        {hasSelection ? (
-          <Button asChild size="sm" className="mt-1 h-8 w-full text-xs md:mt-2 md:h-10 md:w-40 md:text-sm">
-            <Link href={`/lectures/${lectureId}`}>자세히 보기</Link>
-          </Button>
-        ) : (
-          <Button disabled size="sm" className="mt-1 h-8 w-full text-xs md:mt-2 md:h-10 md:w-40 md:text-sm">
-            자세히 보기
-          </Button>
-        )}
+          {/* 자세히 보기 버튼 - 전체 너비 */}
+          {hasSelection ? (
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="h-8 w-full rounded-[8px] border-0 bg-muted text-xs text-foreground hover:bg-muted/80 md:h-12 md:text-base"
+            >
+              <Link href={`/lectures/${lectureId}`}>자세히 보기</Link>
+            </Button>
+          ) : (
+            <Button
+              disabled
+              size="sm"
+              variant="outline"
+              className="h-8 w-full rounded-[8px] border-0 bg-muted text-xs text-foreground md:h-12 md:text-base"
+            >
+              자세히 보기
+            </Button>
+          )}
+        </div>
       </motion.div>
     </AnimatePresence>
   )
