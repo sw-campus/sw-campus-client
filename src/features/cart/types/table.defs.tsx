@@ -55,11 +55,12 @@ export function dataRow({
   isLeftSelected: boolean
   isRightSelected: boolean
 }) {
+  // 데스크톱 전용 (모바일은 compare-table.tsx에서 div로 렌더링)
   return (
     <TableRow key={rowKey}>
       <TableCell
         className={cn(
-          'sticky left-0 z-20 bg-background border-r px-2 py-2 align-top text-xs font-semibold whitespace-normal md:px-6 md:py-4 md:text-base',
+          'sticky left-0 z-20 bg-background border-r px-6 py-4 align-top text-base font-semibold whitespace-normal text-left',
           labelColClassName,
         )}
       >
@@ -67,7 +68,7 @@ export function dataRow({
       </TableCell>
       <TableCell
         className={cn(
-          'px-2 py-2 align-top text-xs whitespace-normal md:px-6 md:py-4 md:text-base',
+          'px-6 py-4 align-top text-base whitespace-normal',
           valueAlign === 'center' ? 'text-center' : 'text-left',
           !isLeftSelected && 'text-muted-foreground',
         )}
@@ -77,7 +78,7 @@ export function dataRow({
       {dividerCell()}
       <TableCell
         className={cn(
-          'px-2 py-2 align-top text-xs whitespace-normal md:px-6 md:py-4 md:text-base',
+          'px-6 py-4 align-top text-base whitespace-normal',
           valueAlign === 'center' ? 'text-center' : 'text-left',
           !isRightSelected && 'text-muted-foreground',
         )}

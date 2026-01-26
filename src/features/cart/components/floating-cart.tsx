@@ -3,19 +3,23 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 
 export default function FloatingCart() {
   const router = useRouter()
+  const pathname = usePathname()
 
   const { items, hasHydrated } = useUnifiedCart()
   const { mutate: remove } = useUnifiedRemoveFromCart()
 
   // hydration 완료 전에는 렌더링하지 않음 (flash 방지)
   if (!hasHydrated) return null
+
+  // 비교 페이지에서는 FloatingCart 숨김 (CartItemSidebar가 동일 기능 제공)
+  if (pathname === '/cart/compare') return null
 
   return (
     <AnimatePresence>

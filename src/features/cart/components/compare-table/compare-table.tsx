@@ -2,10 +2,13 @@
 
 import { useRef, useState, useEffect } from 'react'
 
+import { PiRobotDuotone } from 'react-icons/pi'
+
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { AiCommentRow } from '@/features/cart/components/ai-comment-row'
+import { SectionLabelTag } from '@/features/cart/components/compare-table/section-label-tag'
 import {
   COMPARE_SECTIONS,
   dataRow,
@@ -18,11 +21,14 @@ import {
 import type { ComparisonResult } from '@/features/lecture/actions/gemini'
 import type { LectureDetail } from '@/features/lecture/api/lecture-api.types'
 
+// 데스크톱 전용 섹션 헤더 (모바일은 div로 렌더링)
 function sectionRow(label: string, rowKey: string) {
   return (
     <TableRow key={rowKey}>
-      <TableCell colSpan={4} className="bg-accent/10 text-accent-foreground px-2 py-2 text-xs font-semibold md:px-6 md:py-3 md:text-sm">
-        {label}
+      <TableCell colSpan={4} className="bg-muted/5 px-6 py-3">
+        <div className="flex justify-start">
+          <SectionLabelTag>{label}</SectionLabelTag>
+        </div>
       </TableCell>
     </TableRow>
   )
@@ -173,11 +179,148 @@ export function CompareTable({
     return () => el.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // 모바일용 섹션 헤더 렌더링 (Figma: bg-[#fffcf4], p-[12px], text-[12px])
+  const mobileSectionHeader = (title: string, key: string) => (
+    <div key={`${key}-mobile-header`} className="flex items-center justify-center bg-[#fffcf4] p-3">
+      <span className="text-xs font-semibold text-[#020202]">{title}</span>
+    </div>
+  )
+
+  // 모바일용 데이터 행 렌더링 (Figma 스타일 정확히 적용)
+  const mobileDataRow = (
+    key: string,
+    label: string,
+    leftValue: React.ReactNode,
+    rightValue: React.ReactNode,
+  ) => (
+    <div key={`${key}-mobile`} className="bg-white px-4 py-2">
+      <div className="flex w-full flex-col shadow-[2px_2px_10px_0px_rgba(161,161,170,0.25)]">
+        {/* 라벨 헤더: h-[32px], bg-[#f9f9f9], px-[12px], rounded-t-[8px], text-[12px] */}
+        <div className="flex h-8 items-center justify-center rounded-t-[8px] bg-[#f9f9f9] px-3">
+          <span className="text-xs font-semibold text-[#020202]">{label}</span>
+        </div>
+        {/* 값 영역: rounded-b-[8px], p-[12px], text-[10px], border-[#eee] */}
+        <div className="flex overflow-hidden rounded-b-[8px]">
+          <div className="min-w-0 flex-1 break-words border-r border-[#eee] bg-white p-3 text-center text-[10px] text-[#020202]">
+            {leftValue}
+          </div>
+          <div className="min-w-0 flex-1 break-words bg-white p-3 text-center text-[10px] text-[#020202]">
+            {rightValue}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  // 모바일용 AI 코멘트 렌더링
+  const mobileAiComment = (
+    sectionKey: string,
+    sectionTitle: string,
+  ) => {
+    if (!hasSectionData(sectionKey)) return null
+    const aiComment = getAiComment(sectionKey)
+    if (!aiComment) return null
+
+    const getAdvantageLabel = () => {
+      if (aiComment.advantage === 'equal') return '비슷함'
+      if (aiComment.advantage === 'left') return `${leftTitle ?? '왼쪽 강의'} 유리`
+      return `${rightTitle ?? '오른쪽 강의'} 유리`
+    }
+
+    const getAdvantageStyle = () => {
+      if (aiComment.advantage === 'equal') return 'bg-gray-200 text-gray-700'
+      if (aiComment.advantage === 'left') return 'bg-blue-100 text-blue-800'
+      return 'bg-emerald-100 text-emerald-800'
+    }
+
+    return (
+      <div key={`${sectionKey}-mobile-ai`} className="border-y border-yellow-200 bg-yellow-50/80 px-4 py-3">
+        <div className="flex items-start gap-3">
+          {/* AI 아이콘 */}
+          <div className="shrink-0">
+            <div className="flex size-7 items-center justify-center rounded-full bg-yellow-400">
+              <PiRobotDuotone className="size-4 text-yellow-900" />
+            </div>
+          </div>
+          {/* 코멘트 내용 */}
+          <div className="min-w-0 flex-1">
+            <div className="mb-1.5 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-yellow-900">{sectionTitle} 분석</span>
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${getAdvantageStyle()}`}>
+                {getAdvantageLabel()}
+              </span>
+            </div>
+            <p className="break-words text-sm font-medium leading-relaxed text-gray-800">
+              {aiComment.comment}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="relative">
-      {/* 모바일 스크롤 힐트 */}
+      {/* ========== 모바일: div 기반 레이아웃 (Figma 스타일) ========== */}
+      <div className="flex w-full flex-col overflow-hidden rounded-[12px] bg-white shadow-[4px_4px_20px_0px_rgba(161,161,170,0.25)] md:hidden">
+        {COMPARE_SECTIONS.flatMap(section => [
+          mobileSectionHeader(section.title, section.key),
+          ...section.rows.map(row =>
+            mobileDataRow(
+              `${section.key}-${row.key}`,
+              row.label,
+              valueOrUnselected(leftDetail, row.value(leftDetail)),
+              valueOrUnselected(rightDetail, row.value(rightDetail)),
+            ),
+          ),
+          // 섹션별 AI 코멘트 추가
+          mobileAiComment(section.key, section.title),
+        ])}
+
+        {/* 선발절차 */}
+        {mobileSectionHeader('선발절차', 'steps')}
+        {stepTypes.length === 0
+          ? mobileDataRow('steps-empty', '절차', '-', '-')
+          : stepTypes.map(stepType =>
+              mobileDataRow(
+                `steps-${stepType}`,
+                stepType,
+                valueOrUnselected(leftDetail, hasStep(leftDetail, stepType) ? 'O' : 'X'),
+                valueOrUnselected(rightDetail, hasStep(rightDetail, stepType) ? 'O' : 'X'),
+              ),
+            )}
+        {/* 선발절차 AI 코멘트 */}
+        {mobileAiComment('steps', '선발절차')}
+
+        {/* 메인 커리큘럼 */}
+        {mobileSectionHeader('메인 커리큘럼', 'curriculum')}
+        {curriculumNames.length === 0
+          ? mobileDataRow('curriculum-empty', '커리큘럼', '-', '-')
+          : curriculumNames.map(name =>
+              mobileDataRow(
+                `curriculum-${name}`,
+                name,
+                valueOrUnselected(leftDetail, renderCurriculumLevel(curriculumLevel(leftDetail, name))),
+                valueOrUnselected(rightDetail, renderCurriculumLevel(curriculumLevel(rightDetail, name))),
+              ),
+            )}
+
+        {/* 특화 커리큘럼 */}
+        {mobileSectionHeader('특화 커리큘럼', 'special-curriculum')}
+        {mobileDataRow(
+          'special-curriculum-content',
+          '내용',
+          valueOrUnselected(leftDetail, renderSpecialCurriculumList(leftSpecialCurriculums)),
+          valueOrUnselected(rightDetail, renderSpecialCurriculumList(rightSpecialCurriculums)),
+        )}
+        {/* 커리큘럼 AI 코멘트 (메인 + 특화 통합) */}
+        {mobileAiComment('curriculum', '커리큘럼')}
+      </div>
+
+      {/* ========== 데스크톱: Table 기반 레이아웃 ========== */}
+      {/* 데스크톱 스크롤 힐트 */}
       {showScrollHint && (
-        <div className="pointer-events-none absolute right-0 top-0 z-10 flex h-full items-center md:hidden">
+        <div className="pointer-events-none absolute right-0 top-0 z-10 hidden h-full items-center md:flex">
           <div className="flex h-full w-8 items-center justify-center bg-gradient-to-l from-white/90 to-transparent">
             <span className="animate-pulse text-xs text-gray-400">←</span>
           </div>
@@ -185,14 +328,14 @@ export function CompareTable({
       )}
       <div
         ref={scrollRef}
-        className="scrollbar-hide overflow-x-auto rounded-md border border-border"
+        className="scrollbar-hide hidden overflow-x-auto rounded-md border border-border md:block"
       >
-        <Table className="table-fixed break-keep min-w-[500px] md:min-w-0">
+        <Table className="table-fixed break-keep">
         <colgroup>
           <col className={labelColClassName} />
-          <col className="min-w-[140px]" />
+          <col />
           <col className="w-px" />
-          <col className="min-w-[140px]" />
+          <col />
         </colgroup>
         <TableBody className="[&_tr:nth-child(even)]:bg-muted/30 [&_td]:leading-relaxed [&_tr:nth-child(odd)]:bg-white">
           {COMPARE_SECTIONS.flatMap(section => [

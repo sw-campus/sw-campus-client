@@ -376,7 +376,7 @@ function CommunityContentInner() {
                         )}
 
                         {/* 페이지 번호들 */}
-                        {pages.map((pageNum, idx) => {
+                        {pages.map((pageNum, _idx) => {
                           // 모바일에서는 현재 페이지 주변 3개만 표시
                           const isMobileVisible = Math.abs(pageNum - page) <= Math.floor(mobileMaxVisible / 2)
                           return (
