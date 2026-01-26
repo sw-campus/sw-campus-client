@@ -244,7 +244,6 @@ export default function CartCompareSection() {
               rightTitle={right?.title}
               leftDetail={leftDetailResolved}
               rightDetail={rightDetailResolved}
-              labelColClassName="w-[5.5rem] md:w-[11rem]"
               aiResult={aiResult}
             />
 

@@ -11,8 +11,6 @@ import { PiRobotDuotone } from 'react-icons/pi'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { cn } from '@/lib/utils'
 
-import { MiniLectureCard } from './mini-lecture-card'
-
 interface StickyCompareHeaderProps {
   leftTitle: string
   leftThumbnail: string | null
@@ -57,24 +55,26 @@ function MobileMiniCard({ title, lectureId }: { title: string; lectureId?: strin
   )
 }
 
-// 모바일용 AI 버튼 - AiAnalyzeButton과 동일한 스타일
-function MobileAiButton({
+// 공용 AI 버튼 - 모바일/데스크톱 공유 (Figma 스타일)
+function StickyAiButton({
   canAnalyze,
-  isAiLoading,
-  hasAiResult,
-  onAiAnalyze,
+  isLoading,
+  hasResult,
+  onAnalyze,
+  className,
 }: {
   canAnalyze: boolean
-  isAiLoading: boolean
-  hasAiResult: boolean
-  onAiAnalyze: () => void
+  isLoading: boolean
+  hasResult: boolean
+  onAnalyze: () => void
+  className?: string
 }) {
-  if (hasAiResult) return null
+  if (hasResult) return null
 
-  const isDisabled = !canAnalyze || isAiLoading
+  const isDisabled = !canAnalyze || isLoading
 
   const getButtonText = () => {
-    if (isAiLoading) return 'AI가 분석하고 있어요...'
+    if (isLoading) return 'AI가 분석하고 있어요...'
     if (!canAnalyze) return '두 강의를 선택해주세요'
     return 'AI에게 물어보고, 최적의 답을 발견하세요'
   }
@@ -82,97 +82,68 @@ function MobileAiButton({
   return (
     <motion.button
       type="button"
-      onClick={onAiAnalyze}
+      onClick={onAnalyze}
       disabled={isDisabled}
       whileHover={canAnalyze ? { scale: 1.01 } : undefined}
       whileTap={canAnalyze ? { scale: 0.99 } : undefined}
       className={cn(
-        'relative flex h-[65px] w-full items-center justify-center gap-2 rounded-xl transition-all',
-        // Enabled state - yellow
-        canAnalyze && !isAiLoading && 'bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600',
+        'relative flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-[#feb706] transition-all',
+        'h-[65px] text-sm md:h-[95px] md:text-xl',
+        // Enabled state - yellow gradient (Figma 스타일)
+        canAnalyze && !isLoading && 'bg-gradient-to-r from-[#fffdf6] via-[#ffe8b0] to-[#ffd454]',
         // Loading state
-        isAiLoading && 'bg-yellow-300',
+        isLoading && 'bg-[#ffe8b0]',
         // Disabled state
-        !canAnalyze && !isAiLoading && 'cursor-not-allowed bg-gray-200 text-gray-400',
+        !canAnalyze && !isLoading && 'cursor-not-allowed border-gray-300 bg-gray-200 text-gray-400',
         // Text colors
-        (canAnalyze || isAiLoading) && 'text-gray-900',
+        (canAnalyze || isLoading) && 'text-[#020202]',
+        className,
       )}
     >
-      {/* Icon */}
-      {isAiLoading ? (
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}>
+      {/* Icon - 모바일만 표시 */}
+      {isLoading ? (
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+          className="md:hidden"
+        >
           <FiLoader className="size-5" />
         </motion.div>
       ) : (
-        <PiRobotDuotone className="size-6" />
+        <PiRobotDuotone className="size-6 md:hidden" />
       )}
 
       {/* Text */}
-      <span className="text-sm font-semibold">{getButtonText()}</span>
+      <span className="font-semibold">{getButtonText()}</span>
     </motion.button>
   )
 }
 
-// 데스크톱용 AI 버튼 - 외부 컴포넌트로 분리
-function DesktopStickyAiButton({
-  canAnalyze,
-  isLoading,
-  hasResult,
-  onAnalyze,
-}: {
-  canAnalyze: boolean
-  isLoading: boolean
-  hasResult: boolean
-  onAnalyze: () => void
-}) {
-  if (hasResult) return null
-
-  const isDisabled = !canAnalyze || isLoading
-
+// 데스크톱용 미니 카드 (Figma 스타일: 제목 + 자세히 보기 버튼)
+function DesktopMiniCard({ title, lectureId }: { title: string; lectureId?: string | null }) {
+  const hasSelection = Boolean(title)
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="relative">
-        {canAnalyze && !isLoading && (
-          <>
-            <motion.div
-              className="absolute inset-0 rounded-full bg-purple-500/30"
-              animate={{ scale: [1, 1.4, 1.8], opacity: [0.6, 0.3, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
-            />
-            <motion.div
-              className="absolute inset-0 rounded-full bg-purple-500/20"
-              animate={{ scale: [1, 1.6, 2.2], opacity: [0.4, 0.2, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeOut', delay: 0.5 }}
-            />
-          </>
+    <div className="flex flex-1 flex-col gap-3 overflow-hidden rounded-[12px] bg-white p-6 shadow-[4px_4px_20px_0px_rgba(161,161,170,0.25)]">
+      <p
+        className={cn(
+          'truncate text-center text-xl font-bold text-[#020202]',
+          !hasSelection && 'text-muted-foreground',
         )}
-        <motion.button
-          type="button"
-          onClick={onAnalyze}
-          disabled={isDisabled}
-          whileHover={!isDisabled ? { scale: 1.05 } : undefined}
-          whileTap={!isDisabled ? { scale: 0.95 } : undefined}
-          className={cn(
-            'relative z-10 flex size-20 items-center justify-center rounded-full',
-            'bg-gradient-to-br from-purple-500 to-pink-600',
-            'border-2 border-white/30 shadow-xl',
-            'transition-all duration-300',
-            canAnalyze && !isLoading && 'shadow-[0_0_30px_rgba(168,85,247,0.5)]',
-            isDisabled && 'cursor-not-allowed opacity-50',
-          )}
-        >
-          {isLoading ? (
-            <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}>
-              <FiLoader className="size-7 text-white" />
-            </motion.div>
-          ) : (
-            <span className="text-xl font-bold text-white">AI</span>
-          )}
-        </motion.button>
-      </div>
-      <p className="text-sm font-medium text-gray-700">
-        {isLoading ? 'AI가 분석 중입니다...' : 'AI에게 물어보고, 최적의 답을 발견하세요.'}
+      >
+        {hasSelection ? title : '미선택'}
       </p>
+      {hasSelection && lectureId ? (
+        <Link
+          href={`/lectures/${lectureId}`}
+          className="flex h-12 w-full items-center justify-center rounded-[8px] bg-[#f9f9f9] text-base text-[#020202] hover:bg-[#f0f0f0]"
+        >
+          자세히 보기
+        </Link>
+      ) : (
+        <div className="flex h-12 w-full items-center justify-center rounded-[8px] bg-[#f9f9f9] text-base text-muted-foreground">
+          자세히 보기
+        </div>
+      )}
     </div>
   )
 }
@@ -180,15 +151,15 @@ function DesktopStickyAiButton({
 /**
  * 비교 테이블 Sticky 헤더
  *
- * ## 모바일 vs 데스크톱
- * - 모바일: Figma 스타일 (카드 + VS 뱃지 + 전체 너비 AI 버튼)
- * - 데스크톱: 기존 스타일 (썸네일 + 제목 + 원형 AI 버튼)
+ * 모바일/데스크톱 통일된 Figma 스타일:
+ * - VS 뱃지: 검정 배경 + 노란 텍스트
+ * - AI 버튼: 노란 배경 + 로봇 아이콘
  */
 export function StickyCompareHeader({
   leftTitle,
-  leftThumbnail,
+  leftThumbnail: _leftThumbnail,
   rightTitle,
-  rightThumbnail,
+  rightThumbnail: _rightThumbnail,
   leftId,
   rightId,
   canAnalyze,
@@ -266,32 +237,40 @@ export function StickyCompareHeader({
       <div className="relative flex items-center gap-4">
         <MobileMiniCard title={leftTitle} lectureId={leftId} />
         <MobileMiniCard title={rightTitle} lectureId={rightId} />
-        {/* VS 뱃지 - 중앙 */}
+        {/* VS 뱃지 - 중앙 (45px) */}
         <div className="absolute left-1/2 top-1/2 flex size-[45px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#020202]">
           <span className="text-base font-bold text-[#feb706]">VS</span>
         </div>
       </div>
       {/* AI 버튼 */}
-      <MobileAiButton
-        canAnalyze={canAnalyze}
-        isAiLoading={isAiLoading}
-        hasAiResult={hasAiResult}
-        onAiAnalyze={onAiAnalyze}
-      />
-    </div>
-  )
-
-  // 데스크톱 Sticky 헤더 콘텐츠 (기존 스타일)
-  const desktopHeaderContent = (
-    <div className="flex items-center justify-between gap-8 px-8 py-4">
-      <MiniLectureCard title={leftTitle} thumbnailUrl={leftThumbnail} side="left" />
-      <DesktopStickyAiButton
+      <StickyAiButton
         canAnalyze={canAnalyze}
         isLoading={isAiLoading}
         hasResult={hasAiResult}
         onAnalyze={onAiAnalyze}
       />
-      <MiniLectureCard title={rightTitle} thumbnailUrl={rightThumbnail} side="right" />
+    </div>
+  )
+
+  // 데스크톱 Sticky 헤더 콘텐츠 (Figma 스타일)
+  const desktopHeaderContent = (
+    <div className="flex flex-col gap-6 p-6">
+      {/* 카드 영역 */}
+      <div className="relative flex items-center gap-6">
+        <DesktopMiniCard title={leftTitle} lectureId={leftId} />
+        <DesktopMiniCard title={rightTitle} lectureId={rightId} />
+        {/* VS 뱃지 - 중앙 (80px) */}
+        <div className="absolute left-1/2 top-1/2 flex size-[80px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#020202]">
+          <span className="text-2xl font-bold text-[#feb706]">VS</span>
+        </div>
+      </div>
+      {/* AI 버튼 */}
+      <StickyAiButton
+        canAnalyze={canAnalyze}
+        isLoading={isAiLoading}
+        hasResult={hasAiResult}
+        onAnalyze={onAiAnalyze}
+      />
     </div>
   )
 
