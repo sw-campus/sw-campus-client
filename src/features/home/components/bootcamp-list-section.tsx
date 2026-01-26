@@ -81,7 +81,7 @@ export function BootcampListSection() {
       )}
 
       {/* 더보기 버튼 */}
-      <Button variant="outline" className="w-full gap-2" asChild>
+      <Button variant="outline" className="mx-auto h-auto min-w-[280px] gap-2 rounded-full py-3" asChild>
         <Link
           href={
             resolvedCategoryId
@@ -113,7 +113,7 @@ function BootcampListItem({ lecture }: BootcampListItemProps) {
   return (
     <Link
       href={`/lectures/${lecture.lectureId}`}
-      className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
+      className="flex flex-col gap-3 rounded-xl border border-border bg-card px-5 py-4 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
     >
       {/* 상단: 카테고리 | 별점 + 리뷰수 + 모집중 */}
       <div className="flex items-center justify-between">
@@ -141,7 +141,7 @@ function BootcampListItem({ lecture }: BootcampListItemProps) {
 
       {/* 중간: 강의명 + 기관명 */}
       <div className="flex flex-col gap-1">
-        <h3 className="truncate text-base font-semibold">{lecture.lectureName}</h3>
+        <h3 className="line-clamp-2 break-keep text-base font-semibold">{lecture.lectureName}</h3>
         <span className="text-sm text-muted-foreground">{lecture.orgName}</span>
       </div>
 
