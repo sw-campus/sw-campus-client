@@ -94,8 +94,6 @@ export async function getCartItems(): Promise<CartItem[]> {
   if (res.status === 401) return []
 
   const data = res.data
-  // 디버깅: API 응답 확인
-  console.log('[Cart API] Raw response:', JSON.stringify(data, null, 2))
 
   const items =
     data && typeof data === 'object' && Array.isArray((data as AnyRecord).items)
@@ -104,7 +102,6 @@ export async function getCartItems(): Promise<CartItem[]> {
   const list = Array.isArray(data) ? data : (items ?? [])
 
   const result = (list as unknown[]).map(toCartItem).filter(Boolean) as CartItem[]
-  console.log('[Cart API] Mapped items:', JSON.stringify(result, null, 2))
 
   return result
 }
