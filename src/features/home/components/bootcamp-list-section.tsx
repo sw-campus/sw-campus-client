@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ArrowRight, Check, Star } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 

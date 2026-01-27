@@ -83,14 +83,13 @@ export default function MidBanner() {
                 delay: 5000,
                 disableOnInteraction: false,
               }}
-              navigation={{
-                prevEl: prevRef.current,
-                nextEl: nextRef.current,
-              }}
-              onBeforeInit={(swiper) => {
+              navigation={true}
+              onSwiper={(swiper) => {
                 if (swiper.params.navigation && typeof swiper.params.navigation !== 'boolean') {
                   swiper.params.navigation.prevEl = prevRef.current
                   swiper.params.navigation.nextEl = nextRef.current
+                  swiper.navigation.init()
+                  swiper.navigation.update()
                 }
               }}
               spaceBetween={8}

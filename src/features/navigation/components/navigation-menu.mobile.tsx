@@ -128,7 +128,7 @@ export function NavigationMenuMobileOverlay({
   onClose,
   items,
   isLoggedIn,
-  nickname,
+  nickname: _nickname,
   mypageHref,
   onLogout,
   isLoggingOut,
