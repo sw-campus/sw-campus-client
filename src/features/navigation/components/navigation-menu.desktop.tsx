@@ -30,7 +30,7 @@ const menuVariants: Variants = {
   },
   closed: {
     height: 0,
-    opacity: 0,
+    opacity: 1,
     overflow: 'hidden',
     transition: { duration: 0.25, ease: 'easeOut' },
   },
@@ -39,13 +39,13 @@ const menuVariants: Variants = {
 export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMouseLeave, onNavigate }: Props) {
   return (
     <motion.div
-      className="absolute left-0 top-[76px] z-40 hidden w-full md:block"
+      className="hidden w-full md:block"
       initial="closed"
       animate={showDesktop ? 'open' : 'closed'}
       variants={menuVariants}
-      style={{ pointerEvents: showDesktop ? 'auto' : 'none' }}
+      style={{ pointerEvents: showDesktop ? 'auto' : 'none', backgroundColor: '#020f2b' }}
     >
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-8">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-8 py-4">
         <NavigationMenu
           viewport={false}
           className="w-full"
