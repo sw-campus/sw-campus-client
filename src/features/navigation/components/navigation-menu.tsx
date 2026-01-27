@@ -22,6 +22,7 @@ export default function Navigation({
   mypageHref,
   onLogout,
   isLoggingOut,
+  isHome = false,
 }: {
   open: boolean
   onClose: () => void
@@ -33,6 +34,7 @@ export default function Navigation({
   mypageHref?: string
   onLogout?: () => void
   isLoggingOut?: boolean
+  isHome?: boolean
 }) {
   const CLOSE_DELAY_MS = 180
 
@@ -101,6 +103,7 @@ export default function Navigation({
         onMouseEnter={handleDesktopMouseEnter}
         onMouseLeave={handleDesktopMouseLeave}
         onNavigate={href => router.push(href)}
+        isHome={isHome}
       />
     </>
   )

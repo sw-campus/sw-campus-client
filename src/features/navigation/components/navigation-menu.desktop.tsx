@@ -19,6 +19,7 @@ type Props = {
   onMouseEnter?: () => void
   onMouseLeave?: () => void
   onNavigate: (href: string) => void
+  isHome?: boolean
 }
 
 const menuVariants: Variants = {
@@ -36,14 +37,18 @@ const menuVariants: Variants = {
   },
 }
 
-export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMouseLeave, onNavigate }: Props) {
+export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMouseLeave, onNavigate, isHome = false }: Props) {
+  const bgColor = isHome ? '#020f2b' : '#ffffff'
+  const textColor = isHome ? 'text-header-text' : 'text-gray-900'
+  const hoverBg = isHome ? 'hover:bg-white/10 hover:text-white' : 'hover:bg-gray-100'
+
   return (
     <motion.div
       className="hidden w-full md:block"
       initial="closed"
       animate={showDesktop ? 'open' : 'closed'}
       variants={menuVariants}
-      style={{ pointerEvents: showDesktop ? 'auto' : 'none', backgroundColor: '#020f2b' }}
+      style={{ pointerEvents: showDesktop ? 'auto' : 'none', backgroundColor: bgColor }}
     >
       <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-8 py-4">
         <NavigationMenu
@@ -62,7 +67,7 @@ export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMous
                     <>
                       <NavigationMenuTrigger
                         onClick={() => onNavigate(item.href)}
-                        className="bg-transparent text-header-text hover:bg-white/10 hover:text-white"
+                        className={`bg-transparent ${textColor} ${hoverBg}`}
                       >
                         {item.title}
                       </NavigationMenuTrigger>
@@ -82,7 +87,7 @@ export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMous
                     </>
                   ) : (
                     <Link href={item.href} passHref>
-                      <NavigationMenuLink className="bg-transparent px-3 py-2 text-sm font-medium text-header-text hover:bg-white/10 hover:text-white">
+                      <NavigationMenuLink className={`bg-transparent px-3 py-2 text-sm font-medium ${textColor} ${hoverBg}`}>
                         {item.title}
                       </NavigationMenuLink>
                     </Link>

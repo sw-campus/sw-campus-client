@@ -20,6 +20,7 @@ interface DesktopHeaderProps {
   onLogoutClick: () => void
   onCategoryEnter: (id: number) => void
   onOtherNavEnter: () => void
+  isHome?: boolean
 }
 
 export function DesktopHeader({
@@ -33,9 +34,14 @@ export function DesktopHeader({
   onLogoutClick,
   onCategoryEnter,
   onOtherNavEnter,
+  isHome = false,
 }: DesktopHeaderProps) {
+  const headerBg = isHome ? 'bg-[#020f2b]' : 'bg-white'
+  const textColor = isHome ? 'text-header-text' : 'text-gray-900'
+  const logoFilter = isHome ? 'brightness-0 invert' : ''
+
   return (
-    <header className="hidden w-full bg-[#020f2b] md:flex">
+    <header className={`hidden w-full md:flex ${headerBg}`}>
       <div className="mx-auto flex w-full max-w-[1448px] items-center justify-between px-6 py-3">
       {/* 좌측: 로고 */}
       <div className="flex items-center gap-3">
@@ -45,10 +51,10 @@ export function DesktopHeader({
             alt="SOFTWARE CAMPUS 로고"
             width={52}
             height={52}
-            className="size-[52px] shrink-0 object-contain brightness-0 invert"
+            className={`size-[52px] shrink-0 object-contain ${logoFilter}`}
             priority
           />
-          <div className="flex flex-col justify-center text-base leading-none font-extrabold tracking-tight text-header-text">
+          <div className={`flex flex-col justify-center text-base leading-none font-extrabold tracking-tight ${textColor}`}>
             <span>SOFTWARE</span>
             <span>CAMPUS</span>
           </div>
@@ -56,7 +62,7 @@ export function DesktopHeader({
       </div>
 
       {/* 중앙: 네비게이션 (lg 이상) */}
-      <nav className="flex gap-8 text-base font-medium text-header-text">
+      <nav className={`flex gap-8 text-base font-medium ${textColor}`}>
         {categories
           .filter(c => !c.type || c.type === 'LECTURE')
           .map(category => {
@@ -109,7 +115,7 @@ export function DesktopHeader({
       </nav>
 
       {/* 우측: 사용자 정보 */}
-      <div className="flex items-center gap-3 text-header-text">
+      <div className={`flex items-center gap-3 ${textColor}`}>
         {!hasHydrated ? (
           <div className="h-6 w-24" />
         ) : isLoggedIn ? (

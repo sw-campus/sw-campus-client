@@ -41,6 +41,8 @@ export default function HeaderSection() {
   // 로그인/회원가입 페이지에서는 헤더 숨김
   if (pathname === '/login' || pathname.startsWith('/signup')) return null
 
+  const isHome = pathname === '/'
+
   // 게시판 카테고리를 네비게이션 아이템으로 변환하는 재귀 함수
   const mapBoardToNav = (category: BoardCategory): NavCategoryItem => ({
     categoryId: category.id,
@@ -79,6 +81,7 @@ export default function HeaderSection() {
         onOpenNav={() => setOpen(true)}
         onCategoryEnter={handleCategoryEnter}
         onOtherNavEnter={handleOtherNavEnter}
+        isHome={isHome}
       />
       <Navigation
         open={open}
@@ -94,6 +97,7 @@ export default function HeaderSection() {
         mypageHref={mypageHref}
         onLogout={handleLogout}
         isLoggingOut={isLoggingOut}
+        isHome={isHome}
       />
     </>
   )
