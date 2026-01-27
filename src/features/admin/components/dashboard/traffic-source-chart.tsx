@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 
+import { LuChevronDown, LuChevronUp, LuGlobe } from 'react-icons/lu'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 import { useTrafficSourcesQuery } from '../../hooks/use-analytics'
 
@@ -12,26 +13,23 @@ interface TrafficSourceChartProps {
   period: number
 }
 
-// 트래픽 소스별 색상 팔레트
 const COLORS = [
-  '#3b82f6', // Blue
-  '#10b981', // Emerald
-  '#f59e0b', // Amber
-  '#ef4444', // Red
-  '#8b5cf6', // Violet
-  '#ec4899', // Pink
-  '#06b6d4', // Cyan
-  '#84cc16', // Lime
-  '#f97316', // Orange
-  '#6366f1', // Indigo
+  '#3b82f6',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#ec4899',
+  '#06b6d4',
+  '#84cc16',
+  '#f97316',
+  '#6366f1',
 ]
 
-// 트래픽 소스를 사용자 친화적인 이름으로 변환
 function getReadableSourceName(source: string, medium: string): string {
   const key = `${source.toLowerCase()}/${medium.toLowerCase()}`
 
   const sourceMapping: Record<string, string> = {
-    // 소셜 미디어 광고
     'ig/paid': '인스타그램 광고',
     'instagram/paid': '인스타그램 광고',
     'ig/social': '인스타그램',
@@ -40,36 +38,23 @@ function getReadableSourceName(source: string, medium: string): string {
     'facebook/paid': '페이스북 광고',
     'fb/social': '페이스북',
     'facebook/social': '페이스북',
-
-    // 검색 광고
     'google/cpc': '구글 광고',
     'naver/cpc': '네이버 광고',
     'kakao/cpc': '카카오 광고',
-
-    // 직접 유입
     '(direct)/(none)': '직접 유입',
     'direct/(none)': '직접 유입',
-
-    // 오가닉 검색
     'google/organic': '구글 검색',
     'naver/organic': '네이버 검색',
-
-    // 레퍼럴
     'accounts.google.com/referral': '구글 계정',
+    'accounts.kakao.com/referral': '카카오 계정',
     'pcmap.place.naver.com/referral': '네이버 지도',
     't1.daumcdn.net/referral': '카카오/다음',
-
-    // 미설정
     '(not set)/(not set)': '기타',
     '(data not available)/(data not available)': '기타',
   }
 
-  // 정확히 일치하는 경우
-  if (sourceMapping[key]) {
-    return sourceMapping[key]
-  }
+  if (sourceMapping[key]) return sourceMapping[key]
 
-  // 부분 매칭 (소스 기반)
   const sourceLower = source.toLowerCase()
   if (sourceLower.includes('instagram') || sourceLower === 'ig') {
     return medium.toLowerCase() === 'organic' ? '인스타그램' : '인스타그램 광고'
@@ -87,17 +72,11 @@ function getReadableSourceName(source: string, medium: string): string {
     if (medium.toLowerCase() === 'organic') return '네이버 검색'
     return '네이버'
   }
-
-  // 레퍼럴 처리
   if (medium.toLowerCase() === 'referral') {
-    // IP 주소 형태는 기타로 처리
-    if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(source)) {
-      return '기타'
-    }
+    if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(source)) return '기타'
     return `${source} 추천`
   }
 
-  // 기본값: 원본 표시
   return `${source} / ${medium}`
 }
 
@@ -105,7 +84,6 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
   const { data, isLoading } = useTrafficSourcesQuery(period, 10)
   const [expanded, setExpanded] = useState(false)
 
-  // 같은 이름의 소스끼리 합산
   const chartData = (() => {
     if (!data) return []
 
@@ -129,96 +107,146 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
         users: stats.users,
         color: COLORS[index % COLORS.length],
       }))
-      .sort((a, b) => b.value - a.value) // 세션 수로 내림차순 정렬
+      .sort((a, b) => b.value - a.value)
   })()
+
+  const totalSessions = chartData.reduce((acc, item) => acc + item.value, 0)
+  const totalUsers = chartData.reduce((acc, item) => acc + item.users, 0)
 
   if (isLoading) {
     return (
-      <Card className="bg-card h-full">
-        <CardHeader>
-          <CardTitle className="text-foreground">트래픽 소스</CardTitle>
-        </CardHeader>
-        <CardContent className="flex h-[200px] items-center justify-center">
-          <span className="text-muted-foreground text-sm">로딩 중...</span>
-        </CardContent>
-      </Card>
+      <div className="bento-card relative h-full overflow-hidden p-3 sm:p-5">
+        <div className="grid-pattern absolute inset-0 opacity-30" />
+        <div className="relative z-10 flex h-full flex-col">
+          <div className="bg-muted mb-3 h-4 w-20 animate-pulse rounded sm:mb-4 sm:h-5 sm:w-24" />
+          <div className="flex flex-1 items-center justify-center">
+            <div className="bg-muted h-28 w-28 animate-pulse rounded-full sm:h-36 sm:w-36" />
+          </div>
+        </div>
+      </div>
     )
   }
 
   return (
-    <Card className="bg-card flex h-full flex-col">
-      <CardHeader>
-        <CardTitle className="text-foreground">트래픽 소스</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center gap-4">
+    <div className="bento-card group relative h-full overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-violet-500/5" />
+      <div className="grid-pattern absolute inset-0 opacity-30" />
+
+      <div className="absolute top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/5 blur-2xl sm:h-32 sm:w-32" />
+
+      <div className="relative z-10 flex h-full flex-col p-3 sm:p-5">
+        <div className="mb-2 flex items-center gap-2 sm:mb-3 lg:mb-4">
+          <div className="rounded-lg bg-indigo-500/10 p-1.5 sm:p-2">
+            <LuGlobe className="h-3.5 w-3.5 text-indigo-600 sm:h-4 sm:w-4" />
+          </div>
+          <h3 className="text-foreground text-xs font-bold sm:text-sm lg:text-base">트래픽 소스</h3>
+        </div>
+
         {chartData.length > 0 ? (
-          <>
-            <div className="h-[200px] w-[200px] shrink-0">
-              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 sm:gap-4">
+            <div className="relative h-28 w-28 sm:h-36 sm:w-36 lg:h-44 lg:w-44">
+              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
+                  <defs>
+                    {chartData.map((entry, index) => (
+                      <linearGradient key={index} id={`trafficGrad-${index}`} x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor={entry.color} stopOpacity={1} />
+                        <stop offset="100%" stopColor={entry.color} stopOpacity={0.6} />
+                      </linearGradient>
+                    ))}
+                  </defs>
                   <Pie
                     data={chartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
+                    innerRadius="55%"
+                    outerRadius="85%"
                     paddingAngle={2}
                     dataKey="value"
+                    strokeWidth={0}
                   >
                     {chartData.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} />
+                      <Cell key={index} fill={`url(#trafficGrad-${index})`} />
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                    }}
-                    formatter={(value, name, props) => {
-                      const sessions = typeof value === 'number' ? value : 0
-                      const users = props?.payload?.users ?? 0
-                      return [`${sessions.toLocaleString()}회 (${users.toLocaleString()}명)`, name]
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload
+                        const percentage = totalSessions > 0 ? ((data.value / totalSessions) * 100).toFixed(1) : 0
+                        return (
+                          <div className="rounded-lg border border-white/20 bg-popover/95 px-2 py-1.5 shadow-xl backdrop-blur-sm sm:rounded-xl sm:px-3 sm:py-2">
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                              <div className="h-2 w-2 rounded-full sm:h-2.5 sm:w-2.5" style={{ backgroundColor: data.color }} />
+                              <span className="text-foreground text-xs font-medium sm:text-sm">{data.name}</span>
+                            </div>
+                            <div className="mt-0.5 space-y-0.5 sm:mt-1">
+                              <p className="font-mono-data text-foreground text-xs sm:text-sm">
+                                {data.value.toLocaleString()}회
+                                <span className="text-muted-foreground ml-1 text-[10px] sm:text-xs">({percentage}%)</span>
+                              </p>
+                              <p className="text-muted-foreground text-[10px] sm:text-xs">{data.users.toLocaleString()}명</p>
+                            </div>
+                          </div>
+                        )
+                      }
+                      return null
                     }}
                   />
                 </PieChart>
               </ResponsiveContainer>
+
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                <span className="font-mono-data text-foreground text-lg font-bold sm:text-2xl lg:text-3xl">{totalSessions.toLocaleString()}</span>
+                <span className="text-muted-foreground text-[9px] sm:text-[10px] lg:text-xs">세션</span>
+              </div>
             </div>
-            <div className="flex flex-col gap-1">
-              {(expanded ? chartData : chartData.slice(0, 5)).map((item, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-muted-foreground truncate text-xs" title={item.name}>
-                    {item.name}: {item.value.toLocaleString()}
-                  </span>
-                </div>
-              ))}
-              {chartData.length > 5 && (
+
+            <div className="flex w-full flex-col gap-1 lg:gap-1.5">
+              {(expanded ? chartData : chartData.slice(0, 4)).map((item, index) => {
+                const percentage = totalSessions > 0 ? ((item.value / totalSessions) * 100).toFixed(1) : '0'
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between rounded-md bg-card/50 px-2 py-1 transition-all hover:bg-card/80 sm:rounded-lg sm:px-2.5 sm:py-1.5"
+                  >
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full sm:h-2 sm:w-2 lg:h-2.5 lg:w-2.5" style={{ backgroundColor: item.color }} />
+                      <span className="text-foreground max-w-[80px] truncate text-[10px] sm:max-w-[100px] sm:text-xs lg:max-w-none lg:text-sm">{item.name}</span>
+                    </div>
+                    <span className="text-muted-foreground text-[9px] sm:text-[10px] lg:text-xs">{percentage}%</span>
+                  </div>
+                )
+              })}
+
+              {chartData.length > 4 && (
                 <button
                   type="button"
                   onClick={() => setExpanded(!expanded)}
-                  className="text-primary hover:text-primary/80 cursor-pointer text-left text-xs"
+                  className="mt-0.5 flex items-center justify-center gap-1 text-[10px] text-indigo-600 transition-colors hover:text-indigo-700 sm:mt-1 sm:text-xs"
                 >
-                  {expanded ? '접기 ▲' : `...외 ${chartData.length - 5}개 더보기 ▼`}
+                  {expanded ? (
+                    <>
+                      접기 <LuChevronUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                    </>
+                  ) : (
+                    <>
+                      +{chartData.length - 4}개 더보기 <LuChevronDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                    </>
+                  )}
                 </button>
               )}
             </div>
-            {/* 요약 정보 */}
-            {(() => {
-              const totalSessions = chartData.reduce((acc, item) => acc + item.value, 0)
-              const totalUsers = chartData.reduce((acc, item) => acc + item.users, 0)
-              const avgSessions = totalUsers > 0 ? (totalSessions / totalUsers).toFixed(2) : '0'
-              return (
-                <div className="border-border mt-2 border-t pt-2">
-                  <span className="text-muted-foreground text-xs">평균 {avgSessions}회 방문</span>
-                </div>
-              )
-            })()}
-          </>
+          </div>
         ) : (
-          <span className="text-muted-foreground text-sm">데이터가 없습니다</span>
+          <div className="flex flex-1 flex-col items-center justify-center gap-2">
+            <div className="bg-muted rounded-full p-2 sm:p-3">
+              <LuGlobe className="text-muted-foreground h-5 w-5 sm:h-6 sm:w-6" />
+            </div>
+            <span className="text-muted-foreground text-xs sm:text-sm">데이터가 없습니다</span>
+          </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

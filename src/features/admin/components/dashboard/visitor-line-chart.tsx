@@ -1,8 +1,8 @@
 'use client'
 
-import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Area, Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 import { AnalyticsReport } from '../../api/analytics-api'
 import { Period } from './shared/period-toggle'
@@ -14,7 +14,6 @@ interface VisitorLineChartProps {
 }
 
 export function VisitorLineChart({ report, isLoading, period }: VisitorLineChartProps) {
-  // 일별 데이터를 차트용으로 변환
   const chartData =
     report?.dailyStats?.map(stat => ({
       date:
@@ -28,13 +27,13 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
   const getPeriodLabel = (p: Period) => {
     switch (p) {
       case 1:
-        return '일간'
+        return '오늘'
       case 7:
-        return '주간'
+        return '이번 주'
       case 30:
-        return '월간'
+        return '이번 달'
       default:
-        return '주간'
+        return '이번 주'
     }
   }
 
@@ -42,87 +41,179 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
 
   if (isLoading) {
     return (
-      <Card className="bg-card">
-        <CardHeader>
-          <CardTitle className="text-foreground">{periodLabel} 방문자수</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex h-[200px] items-center justify-center">
-            <div className="text-muted-foreground">로딩 중...</div>
+      <div className="bento-card relative h-full overflow-hidden p-4 sm:p-6">
+        <div className="grid-pattern absolute inset-0 opacity-30" />
+        <div className="relative z-10">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="bg-muted h-5 w-28 animate-pulse rounded-lg sm:h-6 sm:w-32" />
+            <div className="flex gap-2 sm:gap-4">
+              <div className="bg-muted h-4 w-20 animate-pulse rounded sm:w-24" />
+              <div className="bg-muted h-4 w-20 animate-pulse rounded sm:w-24" />
+            </div>
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex h-[200px] items-center justify-center sm:h-[280px]">
+            <div className="flex flex-col items-center gap-3">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-lime-500 border-t-transparent sm:h-8 sm:w-8" />
+              <span className="text-muted-foreground text-xs sm:text-sm">데이터 로딩 중...</span>
+            </div>
+          </div>
+        </div>
+      </div>
     )
   }
 
+  // Calculate bar size based on period and screen (will use smaller on mobile via CSS)
+  const getBarSize = () => {
+    if (period === 7) return 20
+    if (period === 30) return 8
+    return 16
+  }
+
   return (
-    <Card className="bg-card">
-      <CardHeader className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-3">
-          <CardTitle className="text-foreground whitespace-nowrap">{periodLabel} 방문자수</CardTitle>
-        </div>
-        <div className="text-muted-foreground flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="h-2.5 w-2.5 rounded-full bg-[hsl(var(--primary))]" />
-            <span>
-              총 방문자: <strong className="text-foreground">{report?.totalUsers?.toLocaleString() ?? 0}</strong>
-            </span>
+    <div className="bento-card group relative h-full overflow-hidden p-3 sm:p-4 lg:p-6">
+      {/* Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-lime-500/5 to-cyan-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="grid-pattern absolute inset-0 opacity-30" />
+
+      <div className="relative z-10 flex h-full flex-col">
+        {/* Header */}
+        <div className="mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center sm:justify-between lg:mb-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 animate-ping rounded-full bg-lime-500/30" />
+              <div className="relative h-2 w-2 rounded-full bg-lime-500 sm:h-3 sm:w-3" />
+            </div>
+            <div>
+              <h3 className="text-foreground text-sm font-bold tracking-tight sm:text-lg lg:text-xl">{periodLabel} 방문자 현황</h3>
+              <p className="text-muted-foreground hidden text-xs sm:block">실시간 트래픽 모니터링</p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="h-2.5 w-2.5 rounded-full bg-[#10b981]" />
-            <span>
-              신규 방문자: <strong className="text-foreground">{report?.newUsers?.toLocaleString() ?? 0}</strong>
-            </span>
+
+          {/* Stats badges */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 rounded-full bg-lime-500/10 px-2 py-1 sm:gap-2 sm:px-3 sm:py-1.5">
+              <div className="h-2 w-2 rounded-full bg-lime-500 sm:h-2.5 sm:w-2.5" />
+              <span className="text-muted-foreground text-[10px] sm:text-xs">총 방문자</span>
+              <span className="font-mono-data text-foreground text-xs font-bold sm:text-sm">
+                {report?.totalUsers?.toLocaleString() ?? 0}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 rounded-full bg-cyan-500/10 px-2 py-1 sm:gap-2 sm:px-3 sm:py-1.5">
+              <div className="h-2 w-2 rounded-full bg-cyan-500 sm:h-2.5 sm:w-2.5" />
+              <span className="text-muted-foreground text-[10px] sm:text-xs">신규 방문자</span>
+              <span className="font-mono-data text-foreground text-xs font-bold sm:text-sm">
+                {report?.newUsers?.toLocaleString() ?? 0}
+              </span>
+            </div>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
+
+        {/* Chart */}
         {chartData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={200} minWidth={1} minHeight={1}>
-            <ComposedChart data={chartData}>
-              <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis
-                dataKey="date"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                allowDecimals={false}
-                domain={[0, 'auto']}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                }}
-                formatter={(value, name) => {
-                  const label = name === 'visitors' ? '방문자' : '신규 방문자'
-                  return [`${value ?? 0}`, label]
-                }}
-              />
-              <Bar dataKey="visitors" fill="hsl(var(--primary))" barSize={20} radius={[4, 4, 0, 0]} />
-              <Line
-                type="monotone"
-                dataKey="newVisitors"
-                stroke="#10b981" // Emerald-500
-                strokeWidth={2}
-                dot={period === 7 ? { fill: '#10b981' } : false}
-              />
-            </ComposedChart>
-          </ResponsiveContainer>
+          <div className="min-h-0 flex-1">
+            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={180}>
+              <ComposedChart data={chartData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
+                <defs>
+                  {/* Gradient for bars */}
+                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#84cc16" stopOpacity={0.9} />
+                    <stop offset="100%" stopColor="#84cc16" stopOpacity={0.4} />
+                  </linearGradient>
+                  {/* Gradient for area */}
+                  <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#06b6d4" stopOpacity={0} />
+                  </linearGradient>
+                  {/* Glow filter */}
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                    <feMerge>
+                      <feMergeNode in="coloredBlur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} />
+
+                <XAxis
+                  dataKey="date"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={10}
+                  tickLine={false}
+                  axisLine={false}
+                  dy={5}
+                  interval="preserveStartEnd"
+                />
+
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={10}
+                  tickLine={false}
+                  axisLine={false}
+                  allowDecimals={false}
+                  domain={[0, 'auto']}
+                  dx={-5}
+                  width={35}
+                />
+
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="rounded-lg border border-white/20 bg-popover/95 p-2 shadow-xl backdrop-blur-sm sm:rounded-xl sm:p-3">
+                          <p className="text-muted-foreground mb-1 text-[10px] font-medium sm:mb-2 sm:text-xs">{label}</p>
+                          <div className="space-y-0.5 sm:space-y-1">
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                              <div className="h-1.5 w-1.5 rounded-full bg-lime-500 sm:h-2 sm:w-2" />
+                              <span className="text-foreground text-xs sm:text-sm">
+                                방문자: <span className="font-mono-data font-bold">{payload[0]?.value?.toLocaleString()}</span>
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                              <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 sm:h-2 sm:w-2" />
+                              <span className="text-foreground text-xs sm:text-sm">
+                                신규: <span className="font-mono-data font-bold">{payload[1]?.value?.toLocaleString()}</span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    }
+                    return null
+                  }}
+                />
+
+                <Bar dataKey="visitors" fill="url(#barGradient)" radius={[4, 4, 0, 0]} barSize={getBarSize()} />
+
+                <Area
+                  type="monotone"
+                  dataKey="newVisitors"
+                  stroke="#06b6d4"
+                  strokeWidth={2}
+                  fill="url(#areaGradient)"
+                  dot={false}
+                  activeDot={{
+                    fill: '#06b6d4',
+                    strokeWidth: 2,
+                    stroke: '#ffffff',
+                    r: 4,
+                  }}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
         ) : (
-          <div className="flex h-[200px] items-center justify-center">
-            <div className="text-muted-foreground">데이터가 없습니다</div>
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 sm:gap-3">
+            <div className="bg-muted rounded-full p-3 sm:p-4">
+              <svg className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <span className="text-muted-foreground text-xs sm:text-sm">데이터가 없습니다</span>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

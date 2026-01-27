@@ -1,8 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Card } from '@/components/ui/card'
-
 import type { OrganizationSummary } from '../types/organization.type'
 
 interface OrganizationCardProps {
@@ -10,62 +8,93 @@ interface OrganizationCardProps {
 }
 
 export function OrganizationCard({ organization }: OrganizationCardProps) {
-  // 이름/로고 문자열 기반 Hue 산출 → 밝은 파스텔 톤 생성
-  const getHue = (input: string) => {
-    let hash = 0
-    for (let i = 0; i < input.length; i++) {
-      hash = input.charCodeAt(i) + ((hash << 5) - hash)
-    }
-    return Math.abs(hash) % 360
-  }
-  const h = getHue(organization.logoUrl || organization.name)
-  const accentCircleBg = `hsla(${h}, 70%, 90%, 0.55)`
-  const cardGradStart = `hsla(${h}, 70%, 93%, 0.55)`
-  const cardGradEnd = `hsla(${h}, 70%, 88%, 0.35)`
-  const tagBg = `hsla(${h}, 70%, 80%, 0.35)`
-  const tagDotBg = `hsla(${h}, 70%, 55%, 0.9)`
+  const hasRecruiting = organization.recruitingLectureCount > 0
 
   return (
     <Link href={`/organizations/${organization.id}`} className="group block">
-      <Card
-        className="flex h-full flex-col items-center rounded-2xl p-5 text-center shadow-sm ring-1 ring-white/30 backdrop-blur-xl transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
-        style={{ backgroundImage: `linear-gradient(180deg, ${cardGradStart}, ${cardGradEnd})` }}
-      >
-        {/* Circular Logo with Ring */}
-        <div
-          className="ring-border group-hover:ring-primary/30 relative mb-4 flex h-18 w-18 items-center justify-center overflow-hidden rounded-full shadow-sm ring-2 transition-all group-hover:shadow-md"
-          style={{ backgroundColor: accentCircleBg }}
-        >
+      {/* Mobile: 세로 레이아웃 */}
+      <div className="flex flex-col gap-4 rounded-xl bg-card p-4 shadow-[4px_4px_15px_0px_rgba(161,161,170,0.25)] transition-all duration-200 hover:shadow-[4px_4px_20px_0px_rgba(161,161,170,0.35)] md:hidden">
+        {/* Top Section: Logo + Info */}
+        <div className="flex items-center gap-2">
+          {/* Logo - 원형 */}
+          <div className="relative flex h-[50px] w-[50px] flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-2.5 shadow-[2px_2px_10px_0px_rgba(161,161,170,0.25)]">
+            {organization.logoUrl ? (
+              <Image
+                src={organization.logoUrl}
+                alt={organization.name}
+                fill
+                sizes="50px"
+                className="object-contain p-2"
+              />
+            ) : (
+              <span className="text-xl">🏢</span>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="min-w-0 flex-1">
+            {/* Organization Name */}
+            <p className="truncate text-sm font-semibold text-foreground">{organization.name}</p>
+
+            {/* Description */}
+            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{organization.description}</p>
+          </div>
+        </div>
+
+        {/* Bottom Section: Recruiting Badge */}
+        <div className="flex justify-center">
+          {hasRecruiting ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-4 py-2 text-xs text-foreground">
+              <span className="h-1 w-1 rounded-full bg-amber-500" />
+              {organization.recruitingLectureCount}개 교육과정 모집 중
+            </span>
+          ) : (
+            <span className="inline-flex items-center rounded-full bg-muted px-4 py-2 text-xs text-muted-foreground">
+              아직 모집 중인 과정이 없어요.
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop: 가로 레이아웃 (피그마 디자인) */}
+      <div className="hidden h-[90px] items-center rounded-xl bg-card px-5 shadow-[4px_4px_15px_0px_rgba(161,161,170,0.25)] transition-all duration-200 hover:shadow-[4px_4px_20px_0px_rgba(161,161,170,0.35)] md:flex">
+        {/* Logo */}
+        <div className="relative flex h-[50px] w-[50px] flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[2px_2px_10px_0px_rgba(161,161,170,0.25)]">
           {organization.logoUrl ? (
             <Image
               src={organization.logoUrl}
               alt={organization.name}
               fill
-              sizes="72px"
-              className="object-cover object-center"
+              sizes="50px"
+              className="object-contain p-2"
             />
           ) : (
-            <span className="text-2xl">🏢</span>
+            <span className="text-xl">🏢</span>
           )}
         </div>
 
-        {/* Organization Name */}
-        <h3 className="text-foreground mb-1.5 text-base font-semibold">{organization.name}</h3>
+        {/* Info - 가로 배치 */}
+        <div className="ml-3 min-w-0 flex-1">
+          {/* Organization Name */}
+          <p className="truncate text-base font-semibold text-foreground">{organization.name}</p>
+          {/* Description */}
+          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{organization.description}</p>
+        </div>
 
-        {/* Description */}
-        <p className="text-muted-foreground mb-3 line-clamp-2 text-sm leading-relaxed">{organization.description}</p>
-
-        {/* Recruiting Badge - 모집 중 태그 */}
-        {organization.recruitingLectureCount > 0 && (
-          <span
-            className="mt-auto inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium shadow-sm"
-            style={{ backgroundColor: tagBg }}
-          >
-            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: tagDotBg }} />
-            {organization.recruitingLectureCount}개 교육과정 모집중
-          </span>
-        )}
-      </Card>
+        {/* Recruiting Badge - 우측 */}
+        <div className="ml-4 flex-shrink-0">
+          {hasRecruiting ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-4 py-2 text-sm text-foreground">
+              <span className="h-1 w-1 rounded-full bg-amber-500" />
+              {organization.recruitingLectureCount}개 교육과정 모집 중
+            </span>
+          ) : (
+            <span className="inline-flex items-center rounded-full bg-muted px-4 py-2 text-sm text-muted-foreground">
+              아직 모집 중인 과정이 없어요.
+            </span>
+          )}
+        </div>
+      </div>
     </Link>
   )
 }

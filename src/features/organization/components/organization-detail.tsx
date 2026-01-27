@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, ExternalLink, Star, User } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -18,96 +18,103 @@ import {
   type Review,
   type ReviewSortType,
 } from '@/features/lecture/api/review-api.types'
-import { LectureList } from '@/features/lecture/components/lecture-list'
-import { formatDate, StarRating } from '@/features/lecture/components/detail/detail-shared'
-import PhotoSlider from '@/features/lecture/components/detail/photo-slider'
-import type { Lecture } from '@/features/lecture/types/lecture.type'
+import { LectureCard } from '@/features/lecture/components/lecture-card'
+import { LectureListItem } from '@/features/lecture/components/lecture-list-item'
+import { mapLectureResponseToSummary } from '@/features/lecture/utils/map-lecture-response-to-summary'
 
+import {
+  fetchOrganizationLectures,
+  LECTURE_SORT_LABELS,
+  type LectureSortType,
+} from '../api/organization-api'
 import type { OrganizationDetail as OrganizationDetailType } from '../types/organization.type'
+
+// 별점 컴포넌트
+function StarRatingDisplay({ score, size = 'md' }: { score: number; size?: 'sm' | 'md' }) {
+  const starSize = size === 'sm' ? 'h-4 w-4' : 'h-[18px] w-[18px]'
+  return (
+    <div className="flex items-center gap-0">
+      {[1, 2, 3, 4, 5].map(i => (
+        <Star
+          key={i}
+          className={`${starSize} ${i <= score ? 'fill-amber-400 text-amber-400' : 'fill-muted text-muted'}`}
+        />
+      ))}
+    </div>
+  )
+}
 
 interface OrganizationDetailProps {
   organization: OrganizationDetailType
-  lectures?: Lecture[]
-  isCoursesError?: boolean
+  totalReviews?: number
+  totalLectures?: number
 }
 
 function OrganizationReviewCard({ review }: { review: Review }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
-    <Card className="group bg-card/40 flex flex-col border-0 p-5 shadow-sm backdrop-blur-xl transition-all duration-200 hover:scale-[1.02] hover:shadow-lg">
-      {/* Header: Rating */}
-      <div className="mb-4 flex items-center gap-2">
-        <StarRating score={review.score} />
-        <span className="text-lg font-bold text-yellow-500">{review.score.toFixed(1)}</span>
-      </div>
-
-      {/* Content: Comment */}
-      <p className="text-muted-foreground mb-4 flex-1 text-sm leading-relaxed">{review.comment}</p>
-
-      {/* Detail Scores Toggle & Lecture Link */}
-      <div className="mb-3 flex items-center gap-3">
-        {review.detailScores && review.detailScores.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-primary hover:text-primary/80 flex items-center gap-1 text-xs font-medium transition-colors"
-          >
-            {isExpanded ? (
-              <>
-                상세 점수 접기 <ChevronUp className="h-4 w-4" />
-              </>
-            ) : (
-              <>
-                상세 점수 보기 <ChevronDown className="h-4 w-4" />
-              </>
-            )}
-          </button>
-        )}
+    <Card className="rounded-xl border-0 bg-card p-4 shadow-[4px_4px_15px_0px_rgba(161,161,170,0.25)]">
+      {/* Header: User Info + Rating + Lecture Link */}
+      <div className="mb-4 flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          {/* User Avatar */}
+          <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
+            <User className="text-muted-foreground h-5 w-5" />
+          </div>
+          {/* User Info */}
+          <div>
+            <p className="text-foreground text-sm font-medium">ID : {review.nickname}</p>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="text-sm font-medium text-amber-500">{review.score.toFixed(1)}</span>
+              <StarRatingDisplay score={review.score} />
+            </div>
+          </div>
+        </div>
+        {/* Lecture Link */}
         <Link
           href={`/lectures/${review.lectureId}#review`}
-          className="text-muted-foreground hover:text-primary flex items-center gap-1 text-xs font-medium transition-colors"
+          className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
         >
-          강의보기 <ChevronRight className="h-4 w-4" />
+          강의 보기
+          <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
 
+      {/* Content: Comment */}
+      <p className="text-foreground mb-4 text-sm leading-relaxed">{review.comment}</p>
+
+      {/* Detail Scores Toggle */}
+      {review.detailScores && review.detailScores.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
+        >
+          상세 점수 보기
+          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </button>
+      )}
+
       {/* Detail Scores Expanded */}
       {isExpanded && review.detailScores && review.detailScores.length > 0 && (
-        <div className="mb-4 space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="mt-4 space-y-3 rounded-lg bg-muted p-4">
           {review.detailScores.map(detail => (
             <div key={detail.category} className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-800">
+                <span className="text-foreground text-sm font-medium">
                   {CATEGORY_LABELS[detail.category] || detail.category}
                 </span>
-                <div className="flex items-center gap-1.5">
-                  <StarRating score={detail.score} size="sm" />
-                  <span className="min-w-[2rem] text-right text-sm font-bold text-yellow-500">
-                    {detail.score.toFixed(1)}
-                  </span>
+                <div className="flex items-center gap-2">
+                  <StarRatingDisplay score={detail.score} size="sm" />
+                  <span className="text-sm font-medium text-amber-500">{detail.score.toFixed(1)}</span>
                 </div>
               </div>
-              {detail.comment && (
-                <p className="rounded-md bg-gray-50 px-3 py-2 text-sm leading-relaxed text-gray-600">
-                  {detail.comment}
-                </p>
-              )}
+              {detail.comment && <p className="text-muted-foreground text-sm leading-relaxed">{detail.comment}</p>}
             </div>
           ))}
         </div>
       )}
-
-      {/* Footer: Author */}
-      <div className="border-border/30 flex items-center gap-3 border-t pt-4">
-        <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold">
-          {review.nickname.charAt(0)}
-        </div>
-        <div>
-          <p className="text-foreground text-sm font-semibold">{review.nickname}</p>
-          <p className="text-muted-foreground text-xs">{formatDate(review.createdAt)}</p>
-        </div>
-      </div>
     </Card>
   )
 }
@@ -195,7 +202,7 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['organizationReviews', organizationId, currentPage, sortType],
+    queryKey: ['organizationReviews', organizationId, currentPage, PAGE_SIZE, sortType],
     queryFn: () => getOrganizationReviews(organizationId, currentPage, PAGE_SIZE, sortType),
     staleTime: 1000 * 60,
   })
@@ -205,14 +212,19 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
     setCurrentPage(0)
   }
 
-  const reviews = reviewData?.content ?? []
-  const totalPages = reviewData?.page?.totalPages ?? 0
-  const totalElements = reviewData?.page?.totalElements ?? 0
+  // 서버에서 블라인드 필터링된 후기 목록을 받음
+  const reviews = reviewData?.reviews ?? []
+  const totalCount = reviewData?.totalCount ?? 0
+  const isUnblinded = reviewData?.isUnblinded ?? false
+
+  // 블라인드 해제 사용자만 페이지네이션 표시
+  const totalPages = isUnblinded ? Math.ceil(totalCount / PAGE_SIZE) : 0
+  const hiddenCount = isUnblinded ? 0 : Math.max(0, totalCount - reviews.length)
 
   if (isLoading) {
     return (
-      <section>
-        <h2 className="text-foreground mb-6 text-xl font-bold">수강생 분들의 솔직한 후기예요.</h2>
+      <section className="px-4">
+        <h2 className="text-foreground mb-2 text-base font-bold">수강생 분들의 솔직한 후기예요.</h2>
         <div className="text-muted-foreground py-12 text-center text-sm">후기를 불러오는 중...</div>
       </section>
     )
@@ -220,8 +232,8 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
 
   if (isError) {
     return (
-      <section>
-        <h2 className="text-foreground mb-6 text-xl font-bold">수강생 분들의 솔직한 후기예요.</h2>
+      <section className="px-4">
+        <h2 className="text-foreground mb-2 text-base font-bold">수강생 분들의 솔직한 후기예요.</h2>
         <div className="text-destructive py-12 text-center text-sm">후기를 불러오지 못했습니다.</div>
       </section>
     )
@@ -229,11 +241,11 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
 
   if (reviews.length === 0 && currentPage === 0) {
     return (
-      <section>
-        <h2 className="text-foreground mb-6 text-xl font-bold">수강생 분들의 솔직한 후기예요.</h2>
-        <Card className="bg-card/40 flex h-60 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl">
+      <section className="px-4">
+        <h2 className="text-foreground mb-2 text-base font-bold">수강생 분들의 솔직한 후기예요.</h2>
+        <Card className="bg-card flex h-48 flex-col items-center justify-center rounded-xl border text-center">
           <div className="mb-3 text-4xl">💬</div>
-          <p className="text-foreground text-lg font-medium">아직 작성된 후기가 없습니다.</p>
+          <p className="text-foreground text-base font-medium">아직 작성된 후기가 없습니다.</p>
           <p className="text-muted-foreground mt-2 text-sm">첫 번째 후기를 남겨보세요!</p>
         </Card>
       </section>
@@ -241,31 +253,148 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
   }
 
   return (
-    <section>
+    <section className="px-4">
       {/* Header with title and sort */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-foreground text-xl font-bold">수강생 분들의 솔직한 후기예요.</h2>
-          <p className="text-muted-foreground mt-1 text-sm">총 {totalElements}개의 후기</p>
+      <div className="mb-6">
+        <h2 className="text-foreground mb-4 text-base font-bold">수강생 분들의 솔직한 후기예요.</h2>
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground text-sm">총 {totalCount}개의 후기</p>
+          {isUnblinded && (
+            <Select value={sortType} onValueChange={handleSortChange}>
+              <SelectTrigger className="h-10 w-auto min-w-[120px] border-border" aria-label="정렬 기준 선택">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(REVIEW_SORT_LABELS) as ReviewSortType[]).map(key => (
+                  <SelectItem key={key} value={key}>
+                    {REVIEW_SORT_LABELS[key]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
-        <Select value={sortType} onValueChange={handleSortChange}>
-          <SelectTrigger className="w-[140px]" aria-label="정렬 기준 선택">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {(Object.keys(REVIEW_SORT_LABELS) as ReviewSortType[]).map(key => (
-              <SelectItem key={key} value={key}>
-                {REVIEW_SORT_LABELS[key]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
-      {/* Review Cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* Review Cards - 모바일: 세로, 데스크탑: 3열 그리드 (items-start로 개별 높이 유지) */}
+      <div className="space-y-3 md:grid md:grid-cols-3 md:items-start md:gap-4 md:space-y-0">
         {reviews.map(review => (
           <OrganizationReviewCard key={review.reviewId} review={review} />
+        ))}
+      </div>
+
+      {/* 블라인드 상태 사용자에게 안내 오버레이 */}
+      {!isUnblinded && hiddenCount > 0 && (
+        <div className="relative mt-4 overflow-hidden rounded-xl border border-gray-200 bg-linear-to-b from-gray-50 to-white p-6 text-center shadow-sm">
+          <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent via-white/60 to-white/90" />
+          <div className="relative z-10">
+            <div className="mb-3 text-4xl">🔒</div>
+            <p className="text-foreground mb-1 text-sm font-semibold">{hiddenCount}개의 후기가 더 있습니다</p>
+            <p className="text-muted-foreground mb-4 text-xs">
+              리뷰를 작성하거나 설문조사를 완료하면 모든 후기를 확인할 수 있어요
+            </p>
+            <Button asChild size="sm" className="w-full sm:w-auto">
+              <Link href="/login">로그인하고 후기 더 보기</Link>
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Pagination - 블라인드 해제 사용자만 표시 */}
+      {isUnblinded && totalPages > 1 && (
+        <ReviewPagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+      )}
+    </section>
+  )
+}
+
+const PROGRAMS_PAGE_SIZE = 12
+
+function OrganizationProgramsSection({ organizationId }: { organizationId: number }) {
+  const [currentPage, setCurrentPage] = useState(0)
+  const [sortType, setSortType] = useState<LectureSortType>('LATEST')
+
+  const {
+    data: lectureData,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['organization', organizationId, 'lectures', currentPage, PROGRAMS_PAGE_SIZE, sortType],
+    queryFn: () => fetchOrganizationLectures(organizationId, currentPage, PROGRAMS_PAGE_SIZE, sortType),
+    staleTime: 1000 * 60,
+  })
+
+  const handleSortChange = (value: LectureSortType) => {
+    setSortType(value)
+    setCurrentPage(0)
+  }
+
+  const lectures = lectureData?.lectures ?? []
+  const totalCount = lectureData?.page?.totalElements ?? 0
+  const totalPages = lectureData?.page?.totalPages ?? 0
+
+  if (isLoading) {
+    return (
+      <section className="px-4 md:px-6">
+        <div className="text-muted-foreground py-12 text-center text-sm">프로그램을 불러오는 중...</div>
+      </section>
+    )
+  }
+
+  if (isError) {
+    return (
+      <section className="px-4 md:px-6">
+        <Card className="bg-card flex h-48 flex-col items-center justify-center rounded-xl border text-center">
+          <div className="mb-3 text-4xl">⚠️</div>
+          <p className="text-destructive text-base font-medium">프로그램 목록을 불러오는 데 실패했습니다.</p>
+          <p className="text-muted-foreground mt-2 text-sm">잠시 후 다시 시도해주세요.</p>
+        </Card>
+      </section>
+    )
+  }
+
+  if (lectures.length === 0 && currentPage === 0) {
+    return (
+      <section className="px-4 md:px-6">
+        <Card className="bg-card flex h-48 flex-col items-center justify-center rounded-xl border text-center">
+          <div className="mb-3 text-4xl">📚</div>
+          <p className="text-foreground text-base font-medium">등록된 프로그램이 없습니다.</p>
+          <p className="text-muted-foreground mt-2 text-sm">추후 새로운 프로그램이 개설되면 업데이트됩니다.</p>
+        </Card>
+      </section>
+    )
+  }
+
+  return (
+    <section className="px-4 md:px-6">
+      {/* Header with title and sort */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground text-sm">총 {totalCount}개의 프로그램</p>
+          <Select value={sortType} onValueChange={handleSortChange}>
+            <SelectTrigger className="h-10 w-auto min-w-[120px] border-border" aria-label="정렬 기준 선택">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="LATEST">최신순</SelectItem>
+              <SelectItem value="SCORE_DESC">별점 높은순</SelectItem>
+              <SelectItem value="START_SOON">개강 빠른순</SelectItem>
+              <SelectItem value="REVIEW_COUNT_DESC">리뷰 많은순</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* 모바일: LectureListItem */}
+      <div className="grid w-full min-w-0 grid-cols-1 gap-4 overflow-hidden md:hidden">
+        {lectures.map(lecture => (
+          <LectureListItem key={lecture.lectureId} lecture={lecture} />
+        ))}
+      </div>
+      {/* 데스크탑: LectureCard */}
+      <div className="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-4">
+        {lectures.map(lecture => (
+          <LectureCard key={lecture.lectureId} lecture={mapLectureResponseToSummary(lecture)} />
         ))}
       </div>
 
@@ -277,7 +406,11 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
   )
 }
 
-export function OrganizationDetail({ organization, lectures = [], isCoursesError = false }: OrganizationDetailProps) {
+export function OrganizationDetail({
+  organization,
+  totalReviews = 0,
+  totalLectures = 0,
+}: OrganizationDetailProps) {
   // Collect facility images that exist
   const facilityImages = [
     organization.facilityImageUrl,
@@ -286,131 +419,114 @@ export function OrganizationDetail({ organization, lectures = [], isCoursesError
     organization.facilityImageUrl4,
   ].filter(Boolean) as string[]
 
-  // Use first facility image as hero background, or a default
+  // Use first facility image or default
   const heroImage = facilityImages[0] || `https://picsum.photos/seed/${organization.id}/1200/400`
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-hidden">
       {/* ===== HERO BANNER ===== */}
-      <div className="relative -mx-6 -mt-6 mb-8 h-56 overflow-hidden rounded-t-xl md:h-72">
+      <div className="relative -mx-4 -mt-4 h-[250px] overflow-hidden md:-mx-6 md:-mt-6">
         <Image
           src={heroImage}
-          alt={`${organization.name} 배경`}
+          alt={`${organization.name} 시설`}
           fill
-          sizes="(max-width: 768px) 100vw, 1200px"
+          sizes="100vw"
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/40 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          {/* Logo */}
-          <div className="mb-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-white shadow-lg ring-4 ring-white/20 md:h-24 md:w-24">
-            {organization.logoUrl ? (
-              <Image
-                src={organization.logoUrl}
-                alt={organization.name}
-                width={96}
-                height={96}
-                className="h-full w-full object-contain p-2"
-              />
-            ) : (
-              <span className="text-4xl">🏢</span>
+        {/* Text on Image - Glassmorphism */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+          <div className="rounded-2xl bg-black/40 px-6 py-4 backdrop-blur-md">
+            <span className="mb-1 block text-xs font-medium uppercase tracking-widest text-white/90">훈련기관</span>
+            <h1 className="text-xl font-bold text-white drop-shadow-lg md:text-2xl">{organization.name}</h1>
+            {organization.homepage && (
+              <Link
+                href={organization.homepage}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/30"
+              >
+                홈페이지
+                <ExternalLink className="h-3.5 w-3.5" />
+              </Link>
             )}
           </div>
-
-          {/* Name */}
-          <h1 className="mb-4 text-2xl font-bold text-white drop-shadow-lg md:text-3xl">{organization.name}</h1>
-
-          {/* Homepage Button */}
-          <Link
-            href={organization.homepage || '#'}
-            target={organization.homepage ? '_blank' : undefined}
-            rel={organization.homepage ? 'noopener noreferrer' : undefined}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6 py-2.5 text-sm font-semibold shadow-lg transition-all duration-200 hover:scale-105"
-          >
-            홈페이지 바로가기
-          </Link>
         </div>
       </div>
 
       {/* ===== ACCESSIBLE TABS (Radix UI) ===== */}
       <Tabs defaultValue="intro" className="w-full">
-        <TabsList className="no-scrollbar mb-8 flex h-auto w-full gap-3 overflow-x-auto bg-transparent p-0 whitespace-nowrap">
+        <TabsList className="border-border mx-4 mb-0 flex h-auto w-auto gap-0 border-b bg-transparent p-0 md:mx-6">
           <TabsTrigger
             value="intro"
-            className="data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=inactive]:bg-card/60 data-[state=inactive]:text-muted-foreground hover:bg-card/80 hover:text-foreground rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 data-[state=active]:shadow-md"
+            className="text-muted-foreground data-[state=active]:border-foreground data-[state=active]:text-foreground flex-1 rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium transition-all data-[state=active]:border-b-2"
           >
             기관 소개
           </TabsTrigger>
           <TabsTrigger
             value="reviews"
-            className="data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=inactive]:bg-card/60 data-[state=inactive]:text-muted-foreground hover:bg-card/80 hover:text-foreground rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 data-[state=active]:shadow-md"
+            className="text-muted-foreground data-[state=active]:border-foreground data-[state=active]:text-foreground flex-1 rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium transition-all data-[state=active]:border-b-2"
           >
-            수강생 후기
+            후기
+            {totalReviews > 0 && (
+              <span className="text-muted-foreground ml-1 text-xs">({totalReviews.toLocaleString()})</span>
+            )}
           </TabsTrigger>
           <TabsTrigger
             value="programs"
-            className="data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=inactive]:bg-card/60 data-[state=inactive]:text-muted-foreground hover:bg-card/80 hover:text-foreground rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 data-[state=active]:shadow-md"
+            className="text-muted-foreground data-[state=active]:border-foreground data-[state=active]:text-foreground flex-1 rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium transition-all data-[state=active]:border-b-2"
           >
-            등록된 프로그램
+            등록된 교육
+            {totalLectures > 0 && (
+              <span className="text-muted-foreground ml-1 text-xs">({totalLectures.toLocaleString()})</span>
+            )}
           </TabsTrigger>
         </TabsList>
 
         {/* ===== TAB CONTENT ===== */}
-        <div className="pb-20">
+        <div className="pb-20 pt-6">
           {/* 기관 소개 */}
-          <TabsContent value="intro">
-            <div className="space-y-10">
-              {/* Facility Images */}
+          <TabsContent value="intro" className="mt-0">
+            <div className="space-y-6 px-4 md:px-6">
+              {/* 기관 설명 */}
+              {organization.description && (
+                <section>
+                  <h2 className="text-foreground mb-2 text-base font-bold">이런 철학으로 운영해요</h2>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{organization.description}</p>
+                </section>
+              )}
+
+              {/* 시설 이미지 */}
               {facilityImages.length > 0 && (
                 <section>
-                  <h2 className="text-foreground mb-5 text-xl font-bold">{organization.name}의 현장이에요.</h2>
-                  <div className="mx-auto max-w-4xl">
-                    <PhotoSlider photos={facilityImages} />
+                  <h2 className="text-foreground mb-3 text-base font-bold">교육 현장</h2>
+                  <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                    {facilityImages.map((img, idx) => (
+                      <div key={idx} className="relative aspect-square overflow-hidden rounded-lg">
+                        <Image src={img} alt={`시설 이미지 ${idx + 1}`} fill sizes="200px" className="object-cover" />
+                      </div>
+                    ))}
                   </div>
                 </section>
               )}
 
-              {/* Philosophy */}
-              <section>
-                <h2 className="text-foreground mb-5 text-xl font-bold">이런 철학으로 운영해요</h2>
-                <Card className="bg-card/40 border-0 p-6 shadow-sm backdrop-blur-xl transition-all duration-200 hover:shadow-md md:p-8">
-                  <p className="text-muted-foreground text-base leading-relaxed whitespace-pre-line md:text-lg">
-                    {organization.description}
-                  </p>
-                </Card>
-              </section>
             </div>
           </TabsContent>
 
           {/* 수강생 후기 */}
-          <TabsContent value="reviews">
+          <TabsContent value="reviews" className="mt-0">
             <OrganizationReviewsSection organizationId={organization.id} />
           </TabsContent>
 
           {/* 등록된 프로그램 */}
-          <TabsContent value="programs">
-            <section>
-              {isCoursesError ? (
-                <Card className="bg-card/40 flex h-60 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl">
-                  <div className="mb-3 text-4xl">⚠️</div>
-                  <p className="text-destructive text-lg font-medium">프로그램 목록을 불러오는 데 실패했습니다.</p>
-                  <p className="text-muted-foreground mt-2 text-sm">잠시 후 다시 시도해주세요.</p>
-                </Card>
-              ) : lectures.length > 0 ? (
-                <LectureList lectures={lectures} />
-              ) : (
-                <Card className="bg-card/40 flex h-60 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl">
-                  <div className="mb-3 text-4xl">📚</div>
-                  <p className="text-foreground text-lg font-medium">등록된 프로그램이 없습니다.</p>
-                  <p className="text-muted-foreground mt-2 text-sm">추후 새로운 프로그램이 개설되면 업데이트됩니다.</p>
-                </Card>
-              )}
-            </section>
+          <TabsContent value="programs" className="mt-0">
+            <OrganizationProgramsSection organizationId={organization.id} />
           </TabsContent>
         </div>
       </Tabs>
     </div>
   )
 }
+
