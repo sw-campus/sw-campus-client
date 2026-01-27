@@ -77,6 +77,13 @@ export function useUnifiedCart() {
     })
   }
 
+  // 디버깅: 상세 정보 조회 상태
+  console.log('[useUnifiedCart] isLoggedIn:', isLoggedIn)
+  console.log('[useUnifiedCart] baseItems:', JSON.stringify(baseItems, null, 2))
+  console.log('[useUnifiedCart] lectureIdsNeedingDetail:', lectureIdsNeedingDetail)
+  console.log('[useUnifiedCart] detailQueries count:', detailQueries.length)
+  console.log('[useUnifiedCart] detailByLectureId:', Array.from(detailByLectureId.entries()))
+
   // 상세 정보로 보강된 아이템 목록
   const enrichedItems = baseItems.map(item => {
     const detail = detailByLectureId.get(item.lectureId)
@@ -88,6 +95,8 @@ export function useUnifiedCart() {
       thumbnailUrl: item.thumbnailUrl || detail?.thumbnailUrl,
     }
   })
+
+  console.log('[useUnifiedCart] enrichedItems:', JSON.stringify(enrichedItems, null, 2))
 
   // 로딩 상태 계산
   const isLoading = !hasHydrated || (isLoggedIn && serverCartQuery.isLoading)
