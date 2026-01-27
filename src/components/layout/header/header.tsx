@@ -81,6 +81,7 @@ export default function Header({
         hasHydrated={hasHydrated}
         mypageHref={mypageHref}
         onOpenNav={onOpenNav}
+        isHome={isHome}
       />
 
       <DesktopHeader
