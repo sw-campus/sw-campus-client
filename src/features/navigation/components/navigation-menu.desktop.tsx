@@ -39,13 +39,13 @@ const menuVariants: Variants = {
 export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMouseLeave, onNavigate }: Props) {
   return (
     <motion.div
-      className="hidden md:block"
+      className="absolute left-0 top-[76px] z-40 hidden w-full md:block"
       initial="closed"
       animate={showDesktop ? 'open' : 'closed'}
       variants={menuVariants}
       style={{ pointerEvents: showDesktop ? 'auto' : 'none' }}
     >
-      <div className="mx-auto mt-4 flex w-full max-w-7xl items-center justify-center px-8">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-8">
         <NavigationMenu
           viewport={false}
           className="w-full"

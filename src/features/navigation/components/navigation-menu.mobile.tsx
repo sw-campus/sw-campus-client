@@ -141,6 +141,7 @@ export function NavigationMenuMobileOverlay({
   const allMenuItems: MobileNavGroup[] = [
     ...items.lectures,
     { title: '훈련기관', href: '/organizations', items: [] },
+    { title: '부트캠프 비교', href: '/cart/compare', items: [] },
     ...items.community,
   ]
 
