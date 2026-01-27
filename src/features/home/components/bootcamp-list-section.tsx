@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ArrowRight, Check, Star } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -65,11 +66,23 @@ export function BootcampListSection() {
           <div className="size-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
         </div>
       ) : lecturesData && lecturesData.length > 0 ? (
-        <div className="flex flex-col gap-3 md:flex-row md:justify-center md:gap-6">
-          {lecturesData.slice(0, 4).map((lecture) => (
-            <BootcampListItem key={lecture.lectureId} lecture={lecture} />
+        <motion.div
+          key={resolvedCategoryId}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col gap-3 md:flex-row md:justify-center md:gap-6"
+        >
+          {lecturesData.slice(0, 4).map((lecture, index) => (
+            <motion.div
+              key={lecture.lectureId}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.12 }}
+            >
+              <BootcampListItem lecture={lecture} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       ) : (
         <div className="flex h-48 flex-col items-center justify-center gap-3 text-muted-foreground">
           <div className="rounded-full bg-muted/50 p-4">

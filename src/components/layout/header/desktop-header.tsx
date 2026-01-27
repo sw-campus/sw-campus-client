@@ -35,7 +35,7 @@ export function DesktopHeader({
   onOtherNavEnter,
 }: DesktopHeaderProps) {
   return (
-    <header className="absolute left-0 top-0 z-50 hidden w-full md:flex">
+    <header className="hidden w-full bg-[#020f2b] md:flex">
       <div className="mx-auto flex w-full max-w-[1448px] items-center justify-between px-6 py-3">
       {/* 좌측: 로고 */}
       <div className="flex items-center gap-3">
