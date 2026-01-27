@@ -132,7 +132,7 @@ function CommunityContentInner() {
   const totalPages = pageInfo?.totalPages ?? 1
 
   return (
-    <div className="custom-container mx-auto w-full max-w-7xl">
+    <div className="custom-container mx-auto w-full max-w-[1448px]">
       {/* 1. 상단 헤더 영역 */}
       <div className="mb-6 md:mb-8">
         <div className="flex items-start justify-between gap-3 md:gap-4">

@@ -142,10 +142,10 @@ html {
     @apply bg-background text-foreground font-['Pretendard_Variable'] antialiased;
   }
 
-  /* 데스크톱: 고정 너비 (768px 이상이면 바로 1280px 고정) */
+  /* 데스크톱: 고정 너비 (768px 이상이면 바로 1448px 고정) */
   @media (min-width: 768px) {
     html, body {
-      min-width: 1280px;
+      min-width: 1448px;
     }
   }
 
@@ -177,7 +177,12 @@ html {
 
   /* 페이지/섹션 공통 컨테이너 */
   .container-responsive {
-    @apply mx-auto w-full max-w-[1280px] px-4 md:px-12;
+    @apply mx-auto w-full max-w-[1448px] px-4 md:px-6;
+  }
+
+  /* 페이지 메인 컨테이너 (max-w-7xl 대체용) */
+  .page-container {
+    @apply mx-auto w-full max-w-[1448px];
   }
 
   /* 기존 custom-container 확장 */

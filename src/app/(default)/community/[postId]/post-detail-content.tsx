@@ -112,7 +112,7 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
 
   if (isLoading) {
     return (
-      <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 md:px-6 md:py-8 md:px-8">
+      <main className="relative mx-auto flex w-full max-w-[1448px] flex-1 flex-col gap-4 overflow-x-hidden py-6 md:px-6 md:py-8 md:px-8">
         <div className="mx-auto w-full space-y-4 md:max-w-3xl">
           <div className="ml-4 h-8 w-24 rounded-lg bg-gray-100 md:ml-0" />
           <div className="border-y border-gray-200/60 bg-white p-4 md:rounded-2xl md:border md:p-8">
@@ -149,7 +149,7 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
 
     if (!isLoggedIn && isAuthError) {
       return (
-        <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 md:px-6 md:py-8 md:px-8">
+        <main className="relative mx-auto flex w-full max-w-[1448px] flex-1 flex-col gap-4 overflow-x-hidden py-6 md:px-6 md:py-8 md:px-8">
           <div className="mx-auto w-full md:max-w-3xl">
             <Link
               href="/community"
@@ -177,7 +177,7 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
     }
 
     return (
-      <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 md:px-6 md:py-8 md:px-8">
+      <main className="relative mx-auto flex w-full max-w-[1448px] flex-1 flex-col gap-4 overflow-x-hidden py-6 md:px-6 md:py-8 md:px-8">
         <div className="mx-auto flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-20 md:max-w-3xl">
           <p className="text-lg font-medium text-gray-500">게시글을 찾을 수 없습니다</p>
           <Link
@@ -203,7 +203,7 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
   const relativeTime = formatRelativeTime(post.createdAt)
 
   return (
-    <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-hidden py-6 md:px-6 md:py-8 md:px-8">
+    <main className="relative mx-auto flex w-full max-w-[1448px] flex-1 flex-col gap-4 overflow-x-hidden py-6 md:px-6 md:py-8 md:px-8">
       <div className="mx-auto w-full md:max-w-3xl">
       {/* 뒤로가기 */}
       <Link

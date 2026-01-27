@@ -50,7 +50,7 @@ export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMous
       variants={menuVariants}
       style={{ pointerEvents: showDesktop ? 'auto' : 'none', backgroundColor: bgColor }}
     >
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-8 py-4">
+      <div className="page-container flex items-center justify-center px-8 pt-0 pb-4">
         <NavigationMenu
           viewport={false}
           className="w-full"

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Bot, User } from 'lucide-react'
+import { User } from 'lucide-react'
 
 import { HeaderIconAction } from '@/components/layout/header/header-icon-action'
 import type { UserType } from '@/store/auth-store'
@@ -42,7 +42,7 @@ export function DesktopHeader({
 
   return (
     <header className={`hidden w-full md:flex ${headerBg}`}>
-      <div className="mx-auto flex w-full max-w-[1448px] items-center justify-between px-6 py-3">
+      <div className="page-container flex items-center justify-between px-6 py-3">
       {/* 좌측: 로고 */}
       <div className="flex items-center gap-3">
         <Link href={userType === 'ADMIN' ? '/admin' : '/'} className="flex items-center gap-3">
@@ -54,7 +54,7 @@ export function DesktopHeader({
             className={`size-[52px] shrink-0 object-contain ${logoFilter}`}
             priority
           />
-          <div className={`flex flex-col justify-center text-base leading-none font-extrabold tracking-tight ${textColor}`}>
+          <div className={`flex flex-col justify-center text-base leading-none font-bold tracking-tight ${textColor}`}>
             <span>SOFTWARE</span>
             <span>CAMPUS</span>
           </div>
@@ -62,7 +62,7 @@ export function DesktopHeader({
       </div>
 
       {/* 중앙: 네비게이션 (lg 이상) */}
-      <nav className={`flex gap-8 text-base font-medium ${textColor}`}>
+      <nav className={`flex gap-8 text-base font-semibold tracking-tight ${textColor}`}>
         {categories
           .filter(c => !c.type || c.type === 'LECTURE')
           .map(category => {
@@ -115,21 +115,17 @@ export function DesktopHeader({
       </nav>
 
       {/* 우측: 사용자 정보 */}
-      <div className={`flex items-center gap-3 ${textColor}`}>
+      <div className={`flex items-center gap-5 ${textColor}`}>
         {!hasHydrated ? (
           <div className="h-6 w-24" />
         ) : isLoggedIn ? (
           <>
             <span className="text-base">
-              <span className="font-bold">{nickname}</span>님
+              {nickname} <span className="font-bold">님</span>
             </span>
 
             <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href={mypageHref}>
-              <User size={24} />
-            </HeaderIconAction>
-
-            <HeaderIconAction kind="link" ariaLabel="AI 비교" tooltip="AI 비교" href="/cart/compare">
-              <Bot size={24} />
+              <User size={28} />
             </HeaderIconAction>
           </>
         ) : (
@@ -137,10 +133,6 @@ export function DesktopHeader({
             <Link href="/login" className="flex items-center text-sm font-medium leading-none">
               로그인을 해주세요.
             </Link>
-
-            <HeaderIconAction kind="link" ariaLabel="AI 비교" tooltip="AI 비교" href="/cart/compare">
-              <Bot size={26} />
-            </HeaderIconAction>
           </>
         )}
       </div>
