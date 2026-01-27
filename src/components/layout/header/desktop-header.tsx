@@ -69,6 +69,7 @@ export function DesktopHeader({
               <Link
                 key={uniqueKey}
                 href={href}
+                className="hover:text-brand-gold"
                 onMouseEnter={() => onCategoryEnter(category.categoryId)}
                 onFocus={() => onCategoryEnter(category.categoryId)}
                 onClick={() => onCategoryEnter(category.categoryId)}
@@ -78,11 +79,11 @@ export function DesktopHeader({
             )
           })}
 
-        <Link href="/organizations" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
+        <Link href="/organizations" className="hover:text-brand-gold" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
           훈련 기관
         </Link>
 
-        <Link href="/cart/compare" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
+        <Link href="/cart/compare" className="hover:text-brand-gold" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
           부트캠프 비교
         </Link>
 
@@ -96,6 +97,7 @@ export function DesktopHeader({
               <Link
                 key={uniqueKey}
                 href={href}
+                className="hover:text-brand-gold"
                 prefetch={false}
                 onMouseEnter={onOtherNavEnter}
                 onFocus={onOtherNavEnter}
