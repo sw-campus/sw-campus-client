@@ -65,12 +65,21 @@ export function SurveyPageClient() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-[800px]">
-        <DialogHeader className="px-6 pt-6">
+      <DialogContent
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        className="
+          !flex !flex-col
+          !inset-0 !max-h-full !max-w-full !translate-x-0 !translate-y-0 !rounded-none
+          sm:!inset-auto sm:!top-1/2 sm:!left-1/2 sm:!-translate-x-1/2 sm:!-translate-y-1/2
+          sm:!max-h-[85vh] sm:!max-w-[calc(100%-2rem)] sm:!rounded-lg
+          md:!max-w-[800px]
+        "
+      >
+        <DialogHeader className="shrink-0 border-b px-4 py-4 sm:border-none sm:px-6 sm:pt-6 sm:pb-0">
           <DialogTitle>{STEP_TITLES[currentStep]}</DialogTitle>
         </DialogHeader>
 
-        <div className="max-h-[75vh] overflow-y-auto px-6 pb-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:pt-4 sm:pb-6">
           <SurveyContainer embedded onComplete={handleComplete} onStepChange={handleStepChange} />
         </div>
       </DialogContent>

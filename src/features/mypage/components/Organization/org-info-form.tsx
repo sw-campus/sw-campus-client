@@ -58,7 +58,7 @@ const INPUT_CLASS =
 const TEXTAREA_CLASS =
   'w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none'
 
-export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
+export function OrgInfoForm({ embedded = false, onSuccess }: { embedded?: boolean; onSuccess?: () => void }) {
   const router = useRouter()
 
   const [isPending, setIsPending] = useState(false)
@@ -163,7 +163,11 @@ export function OrgInfoForm({ embedded = false }: { embedded?: boolean }) {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       toast.success('저장되었습니다.')
-      router.push('/')
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        router.push('/')
+      }
     } finally {
       setIsPending(false)
     }
