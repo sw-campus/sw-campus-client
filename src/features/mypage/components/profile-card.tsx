@@ -3,10 +3,9 @@
 import { useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
-import { LuKey, LuPencil, LuUser, LuUserX } from 'react-icons/lu'
+import { User, Key, Pencil, UserX } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { type WithdrawResponse } from '@/features/mypage/api/member.api'
 import { api } from '@/lib/axios'
 
@@ -67,118 +66,57 @@ export function ProfileCard({ onEditClick }: ProfileCardProps) {
     setWithdrawCompleteOpen(true)
   }
 
-  // 공통 헤더 렌더링
-  const renderHeader = () => (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
-          <LuUser className="h-4 w-4" />
-        </div>
-        <span className="text-foreground text-lg font-semibold">내 프로필</span>
-      </div>
-      <div className="flex items-center gap-1">
-        {!isSocialUser && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground h-8 gap-1.5"
-            onClick={() => setChangePasswordOpen(true)}
-          >
-            <LuKey className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">비밀번호</span>
-          </Button>
-        )}
-        {canWithdraw && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
-            onClick={() => setWithdrawModalOpen(true)}
-            title="회원 탈퇴"
-          >
-            <LuUserX className="h-3.5 w-3.5" />
-          </Button>
-        )}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground h-8 gap-1.5"
-          onClick={handleEditClick}
-        >
-          <LuPencil className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">프로필 수정</span>
-        </Button>
-      </div>
-    </div>
-  )
-
-  // 공통 컨텐츠 렌더링
-  const renderContent = () => (
-    <div className="space-y-4">
-      {loading ? (
-        <div className="flex h-32 items-center justify-center">
-          <span className="text-muted-foreground text-sm">불러오는 중...</span>
-        </div>
-      ) : profile ? (
-        <div className="grid gap-3">
-          <ProfileRow label="이름" value={profile.name || '-'} />
-          <ProfileRow label="이메일" value={profile.email || '-'} />
-          <ProfileRow label="닉네임" value={profile.nickname || '-'} />
-          <ProfileRow label="연락처" value={profile.phone || '-'} />
-          <ProfileRow label="주소" value={profile.location || '-'} />
-        </div>
-      ) : (
-        <div className="flex h-32 items-center justify-center">
-          <span className="text-muted-foreground text-sm">프로필 정보를 불러올 수 없습니다.</span>
-        </div>
-      )}
-    </div>
-  )
-
   return (
     <>
-      {/* Mobile: 플랫 섹션 */}
-      <section className="border-border space-y-4 overflow-hidden border-b pb-6 sm:hidden">
-        {renderHeader()}
-        {renderContent()}
-      </section>
-
-      {/* Desktop: Card */}
-      <Card className="bg-card hidden h-full sm:block">
-        <CardHeader className="flex flex-row items-center justify-between pb-0">
+      {/* 공통 레이아웃 */}
+      <div className="p-4 sm:p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
           <div className="flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
-              <LuUser className="h-4 w-4" />
-            </div>
-            <CardTitle className="text-foreground text-lg">내 프로필</CardTitle>
+            <User className="w-5 h-5 text-[#FEB706]" />
+            <span className="text-base font-semibold text-[#020202]">내 정보</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {!isSocialUser && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground h-8 gap-1.5"
+              <button
+                className="h-8 px-3 text-xs sm:text-sm text-[#555555] hover:text-[#020202] hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5"
                 onClick={() => setChangePasswordOpen(true)}
               >
-                <LuKey className="h-3.5 w-3.5" />
+                <Key className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">비밀번호</span>
-              </Button>
+              </button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-foreground h-8 gap-1.5"
-              onClick={handleEditClick}
-            >
-              <LuPencil className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">프로필 수정</span>
-            </Button>
+            {canWithdraw && (
+              <button
+                className="h-8 w-8 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center"
+                onClick={() => setWithdrawModalOpen(true)}
+                title="회원 탈퇴"
+              >
+                <UserX className="w-4 h-4" />
+              </button>
+            )}
           </div>
-        </CardHeader>
-        <CardContent className="border-border space-y-4 border-t py-4">
-          {renderContent()}
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <div className="flex h-24 items-center justify-center">
+            <span className="text-sm text-[#888888]">불러오는 중...</span>
+          </div>
+        ) : profile ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <ProfileRowNew label="이름" value={profile.name || '-'} />
+            <ProfileRowNew label="이메일" value={profile.email || '-'} />
+            <ProfileRowNew label="닉네임" value={profile.nickname || '-'} />
+            <ProfileRowNew label="연락처" value={profile.phone || '-'} />
+            <ProfileRowNew label="주소" value={profile.location || '-'} className="sm:col-span-2" />
+          </div>
+        ) : (
+          <div className="flex h-24 items-center justify-center">
+            <span className="text-sm text-[#888888]">프로필 정보를 불러올 수 없습니다.</span>
+          </div>
+        )}
+      </div>
 
       {/* Password Verification Modal */}
       <PasswordVerifyModal open={verifyModalOpen} onOpenChange={setVerifyModalOpen} onVerified={onEditClick} />
@@ -201,11 +139,11 @@ export function ProfileCard({ onEditClick }: ProfileCardProps) {
   )
 }
 
-function ProfileRow({ label, value }: { label: string; value: string }) {
+function ProfileRowNew({ label, value, className = '' }: { label: string; value: string; className?: string }) {
   return (
-    <div className="flex items-start gap-3">
-      <span className="text-muted-foreground w-16 shrink-0 text-sm">{label}</span>
-      <span className="text-foreground text-sm font-medium break-all">{value}</span>
+    <div className={`flex items-center gap-4 py-2 px-3 bg-gray-50 rounded-lg ${className}`}>
+      <span className="text-xs sm:text-sm text-[#888888] w-14 sm:w-16 shrink-0">{label}</span>
+      <span className="text-sm sm:text-base text-[#020202] break-all">{value}</span>
     </div>
   )
 }

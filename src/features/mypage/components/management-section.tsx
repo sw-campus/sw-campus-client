@@ -3,12 +3,11 @@
 import { useState } from 'react'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { LuChevronDown, LuClipboardList, LuImage, LuPencil, LuStar, LuUpload } from 'react-icons/lu'
+import { ChevronDown, ClipboardList, Image as ImageIcon, Pencil, Star, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -115,7 +114,7 @@ export function ReviewManagementSection() {
     if (isLoading) {
       return (
         <div className="flex h-32 items-center justify-center">
-          <span className="text-muted-foreground text-sm">불러오는 중...</span>
+          <span className="text-sm text-[#888888]">불러오는 중...</span>
         </div>
       )
     }
@@ -123,7 +122,7 @@ export function ReviewManagementSection() {
     if ((lectures?.length ?? 0) === 0) {
       return (
         <div className="flex h-32 items-center justify-center">
-          <span className="text-muted-foreground text-sm">수료한 강의가 없습니다.</span>
+          <span className="text-sm text-[#888888]">수료한 강의가 없습니다.</span>
         </div>
       )
     }
@@ -133,64 +132,59 @@ export function ReviewManagementSection() {
         {lectures!.map(l => {
           const isExpanded = expandedCardId === l.certificateId
           return (
-            <div key={l.certificateId} className="overflow-hidden rounded-lg border">
-              {/* 헤더 - 클릭하여 펼치기/접기 (2줄: 제목 + 상태) */}
+            <div key={l.certificateId} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+              {/* 헤더 */}
               <button
                 type="button"
                 className="flex w-full items-center justify-between gap-2 p-3 text-left"
                 onClick={() => setExpandedCardId(isExpanded ? null : l.certificateId)}
               >
                 <div className="w-0 flex-1">
-                  {/* 1줄: 강의명 */}
-                  <p className={`text-foreground font-medium ${isExpanded ? '' : 'truncate'}`}>
+                  <p className={`text-[#020202] font-medium text-sm ${isExpanded ? '' : 'truncate'}`}>
                     {l.lectureName}
                   </p>
-                  {/* 2줄: 상태 뱃지 */}
                   <div className="mt-1 flex items-center gap-2 text-xs">
-                    <span className="text-muted-foreground">수료증</span>
+                    <span className="text-[#888888]">수료증</span>
                     <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${getApprovalStatusColor(l.certificateStatus)}`}>
                       {getApprovalStatusLabel(l.certificateStatus)}
                     </Badge>
-                    <span className="text-muted-foreground">후기</span>
+                    <span className="text-[#888888]">후기</span>
                     <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${getStatusBadgeClass(l)}`}>
                       {getStatusLabel(l)}
                     </Badge>
                   </div>
                 </div>
-                <LuChevronDown
-                  className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                />
+                <ChevronDown className={`w-4 h-4 text-[#888888] shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* 펼쳐진 내용: 액션 버튼만 */}
+              {/* 펼쳐진 내용 */}
               {isExpanded && (
-                <div className="border-t px-3 py-3">
+                <div className="border-t border-gray-200 px-3 py-3 bg-[#FFFCF4]">
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-8 flex-1 gap-1 text-xs"
+                      className="h-8 flex-1 gap-1 text-xs border-[#FEB706] text-[#020202] hover:bg-[#FEB706]/10"
                       onClick={() => {
                         setSelectedCertificate(l)
                         setCertImageError(null)
                         setCertImageOpen(true)
                       }}
                     >
-                      <LuImage className="h-3.5 w-3.5" />
+                      <ImageIcon className="w-3.5 h-3.5" />
                       수료증 확인
                     </Button>
                     {l.canWriteReview ? (
                       <Button
-                        variant="outline"
                         size="sm"
-                        className="h-8 flex-1 gap-1 text-xs"
+                        className="h-8 flex-1 gap-1 text-xs bg-[#262626] text-[#FEB706] hover:bg-[#333333]"
                         onClick={() => {
                           setCreateLectureId(l.lectureId)
                           setCreateLectureName(l.lectureName)
                           setCreateOpen(true)
                         }}
                       >
-                        <LuStar className="h-3.5 w-3.5" />
+                        <Star className="w-3.5 h-3.5" />
                         후기 작성
                       </Button>
                     ) : (
@@ -205,7 +199,7 @@ export function ReviewManagementSection() {
                           setEditOpen(true)
                         }}
                       >
-                        <LuPencil className="h-3.5 w-3.5" />
+                        <Pencil className="w-3.5 h-3.5" />
                         {isReadOnly(l) ? '후기 보기' : '후기 수정'}
                       </Button>
                     )}
@@ -221,81 +215,78 @@ export function ReviewManagementSection() {
 
   return (
     <>
-      {/* Mobile: 플랫 섹션 */}
-      <section className="border-border space-y-4 overflow-hidden border-b pb-6 sm:hidden">
-        <div className="flex items-center gap-2">
-          <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
-            <LuClipboardList className="h-4 w-4" />
-          </div>
-          <span className="text-foreground text-lg font-semibold">내 후기 관리</span>
-        </div>
-        {renderMobileAccordion()}
-      </section>
-
-      {/* Desktop: Card 디자인 */}
-      <Card className="bg-card hidden h-full overflow-hidden sm:block">
-        <CardHeader className="pb-0">
+      {/* 공통 레이아웃 */}
+      <div className="p-4 sm:p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
           <div className="flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
-              <LuClipboardList className="h-4 w-4" />
-            </div>
-            <CardTitle className="text-foreground text-lg">내 후기 관리</CardTitle>
+            <ClipboardList className="w-5 h-5 text-[#FEB706]" />
+            <span className="text-base font-semibold text-[#020202]">내 후기 관리</span>
           </div>
-        </CardHeader>
-        <CardContent className="border-border border-t py-4">
+          <span className="text-xs text-[#888888]">총 {lectures?.length ?? 0}건</span>
+        </div>
+
+        {/* Content - Mobile */}
+        <div className="sm:hidden">
+          {renderMobileAccordion()}
+        </div>
+
+        {/* Content - Desktop */}
+        <div className="hidden sm:block">
           {isLoading ? (
-            <div className="flex h-32 items-center justify-center">
-              <span className="text-muted-foreground text-sm">불러오는 중...</span>
+            <div className="flex h-24 items-center justify-center">
+              <span className="text-sm text-[#888888]">불러오는 중...</span>
             </div>
           ) : (lectures?.length ?? 0) === 0 ? (
-            <div className="flex h-32 items-center justify-center">
-              <span className="text-muted-foreground text-sm">수료한 강의가 없습니다.</span>
+            <div className="flex h-24 flex-col items-center justify-center gap-2">
+              <ClipboardList className="w-8 h-8 text-gray-300" />
+              <span className="text-sm text-[#888888]">수료한 강의가 없습니다.</span>
             </div>
           ) : (
             <TooltipProvider>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12 text-center">#</TableHead>
-                      <TableHead>강의명</TableHead>
-                      <TableHead className="w-20">수료증</TableHead>
-                      <TableHead className="w-20">후기</TableHead>
-                      <TableHead className="w-20 text-center">관리</TableHead>
+                    <TableRow className="border-b border-gray-100 bg-gray-50">
+                      <TableHead className="w-12 text-center text-[#888888] text-xs font-medium">#</TableHead>
+                      <TableHead className="text-[#888888] text-xs font-medium">강의명</TableHead>
+                      <TableHead className="w-20 text-[#888888] text-xs font-medium">수료증</TableHead>
+                      <TableHead className="w-20 text-[#888888] text-xs font-medium">후기</TableHead>
+                      <TableHead className="w-20 text-center text-[#888888] text-xs font-medium">관리</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {lectures!.map((l, idx) => (
-                      <TableRow key={l.certificateId} className="hover:bg-muted/50 transition-colors">
-                        <TableCell className="text-muted-foreground text-center">{idx + 1}</TableCell>
-                        <TableCell className="text-foreground max-w-[200px] truncate font-medium" title={l.lectureName}>
+                      <TableRow key={l.certificateId} className="hover:bg-gray-50 transition-colors border-b border-gray-50">
+                        <TableCell className="text-center text-[#888888] text-sm">{idx + 1}</TableCell>
+                        <TableCell className="max-w-[200px] truncate text-sm text-[#020202]" title={l.lectureName}>
                           {l.lectureName}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
+                          <Badge variant="secondary" className={`text-[10px] ${getApprovalStatusColor(l.certificateStatus)}`}>
                             {getApprovalStatusLabel(l.certificateStatus)}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={`text-xs ${getStatusBadgeClass(l)}`}>
+                          <Badge variant="secondary" className={`text-[10px] ${getStatusBadgeClass(l)}`}>
                             {getStatusLabel(l)}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          <div className="flex justify-center gap-1">
+                          <div className="flex justify-center gap-0.5">
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8"
+                                  className="h-7 w-7 hover:bg-gray-100"
                                   onClick={() => {
                                     setSelectedCertificate(l)
                                     setCertImageError(null)
                                     setCertImageOpen(true)
                                   }}
                                 >
-                                  <LuImage className="h-4 w-4" />
+                                  <ImageIcon className="w-3.5 h-3.5 text-[#555555]" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
@@ -308,14 +299,14 @@ export function ReviewManagementSection() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8"
+                                    className="h-7 w-7 hover:bg-[#FEB706]/10"
                                     onClick={() => {
                                       setCreateLectureId(l.lectureId)
                                       setCreateLectureName(l.lectureName)
                                       setCreateOpen(true)
                                     }}
                                   >
-                                    <LuStar className="h-4 w-4" />
+                                    <Star className="w-3.5 h-3.5 text-[#FEB706]" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>후기 작성</TooltipContent>
@@ -326,7 +317,7 @@ export function ReviewManagementSection() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8"
+                                    className="h-7 w-7 hover:bg-gray-100"
                                     onClick={() => {
                                       setSelectedReviewId(l.reviewId ?? null)
                                       setSelectedLectureId(l.lectureId)
@@ -334,7 +325,7 @@ export function ReviewManagementSection() {
                                       setEditOpen(true)
                                     }}
                                   >
-                                    <LuPencil className="h-4 w-4" />
+                                    <Pencil className="w-3.5 h-3.5 text-[#555555]" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>{isReadOnly(l) ? '리뷰 조회' : '리뷰 수정'}</TooltipContent>
@@ -349,8 +340,8 @@ export function ReviewManagementSection() {
               </div>
             </TooltipProvider>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Edit review modal */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
@@ -490,7 +481,7 @@ export function ReviewManagementSection() {
                         htmlFor="cert-image-input"
                         className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 transition hover:border-gray-400 hover:bg-gray-100"
                       >
-                        <LuUpload className="h-4 w-4" />
+                        <Upload className="h-4 w-4" />
                         <span>이미지 변경</span>
                       </label>
                       <input

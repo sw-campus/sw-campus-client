@@ -7,27 +7,13 @@ export default function MyPage() {
   const { userType } = useAuthStore()
 
   if (userType === 'PERSONAL') {
-    return (
-      <>
-        {/* Mobile: compare 페이지처럼 플랫 디자인 */}
-        <div className="px-4 py-6 sm:hidden">
-          <MyPageDashboard />
-        </div>
-
-        {/* Desktop: custom-card 래퍼 사용 */}
-        <div className="custom-container hidden sm:block">
-          <div className="custom-card">
-            <MyPageDashboard />
-          </div>
-        </div>
-      </>
-    )
+    return <MyPageDashboard />
   }
 
   // userType이 null이거나 알 수 없을 때
   return (
-    <div className="flex h-96 items-center justify-center">
-      <span className="text-lg text-neutral-500">로그인 후 이용 가능합니다.</span>
+    <div className="flex h-96 items-center justify-center bg-[#F5F5F5]">
+      <span className="text-lg text-[#888888]">로그인 후 이용 가능합니다.</span>
     </div>
   )
 }
