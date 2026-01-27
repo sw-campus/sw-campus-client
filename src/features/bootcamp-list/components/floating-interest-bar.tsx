@@ -1,38 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
-import { useRouter, usePathname } from 'next/navigation'
+import type { CartItem } from '@/features/cart/types/cart.type'
+import { useFloatingBarStore } from '@/store/floating-bar.store'
 
-import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
-import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
+interface FloatingInterestBarProps {
+  items: CartItem[]
+  onRemove: (id: string) => void
+  onCompare: () => void
+  isOpen: boolean
+  onToggleOpen: () => void
+}
 
-export default function FloatingCart() {
-  const router = useRouter()
-  const pathname = usePathname()
+export function FloatingInterestBar({
+  items,
+  onRemove,
+  onCompare,
+  isOpen,
+  onToggleOpen,
+}: FloatingInterestBarProps) {
+  const setFloatingBarOpen = useFloatingBarStore((state) => state.setIsOpen)
 
-  const { items, hasHydrated } = useUnifiedCart()
-  const { mutate: remove } = useUnifiedRemoveFromCart()
-
-  const [isOpen, setIsOpen] = useState(false)
-
-  // bootcamp-list, lecture 상세/검색 페이지에서는 자체 FloatingInterestBar 사용
-  if (pathname === '/bootcamp-list' || pathname.startsWith('/lectures/')) return null
-
-  // hydration 완료 전에는 렌더링하지 않음 (flash 방지)
-  if (!hasHydrated) return null
-
-  // 비교 페이지에서는 FloatingCart 숨김 (CartItemSidebar가 동일 기능 제공)
-  if (pathname === '/cart/compare') return null
-
-  // 아이템이 없으면 표시하지 않음
+  // 로컬 상태를 전역 스토어와 동기화
+  useEffect(() => {
+    setFloatingBarOpen(isOpen)
+  }, [isOpen, setFloatingBarOpen])
   if (items.length === 0) return null
 
   // 최대 5개까지만 표시
   const displayItems = items.slice(0, 5)
 
   return (
-    <div className="fixed -bottom-48 left-0 right-0 z-40 max-w-[360px] mx-auto pb-48 bg-[#FFFCF4] lg:hidden">
+    <div className="fixed -bottom-48 left-0 right-0 z-40 max-w-[360px] mx-auto pb-48 bg-[#FFFCF4]">
       <div
         className="p-3 flex flex-col gap-3"
         style={{
@@ -46,7 +46,7 @@ export default function FloatingCart() {
       >
         {/* 헤더 - 클릭하면 토글 */}
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={onToggleOpen}
           className="w-full flex items-center justify-between"
         >
           <div className="flex items-center gap-2">
@@ -80,7 +80,7 @@ export default function FloatingCart() {
                 >
                   {/* X 버튼 */}
                   <button
-                    onClick={() => remove(item.lectureId)}
+                    onClick={() => onRemove(item.lectureId)}
                     className="absolute top-1 right-1 w-4 h-4 rounded-full bg-white flex items-center justify-center"
                     style={{ border: '1px solid black' }}
                   >
@@ -109,7 +109,7 @@ export default function FloatingCart() {
 
             {/* AI 비교 버튼 */}
             <button
-              onClick={() => router.push('/cart/compare')}
+              onClick={onCompare}
               className="w-full h-10 bg-[#262626] rounded-lg flex items-center justify-center"
             >
               <span className="text-xs text-[#FEB706] font-medium">

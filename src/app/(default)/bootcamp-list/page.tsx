@@ -33,7 +33,6 @@ import {
   DEFAULT_SORT,
   DEFAULT_PAGE_SIZE,
 } from '@/features/lecture/types/filter.type'
-import { trackSearch } from '@/lib/analytics'
 import { Search, ChevronDown, Minus, Maximize2 } from 'lucide-react'
 
 const initialFilterValues: FilterValues = {
@@ -49,7 +48,7 @@ const initialFilterValues: FilterValues = {
   region: '',
 }
 
-function SearchContentInner() {
+function BootcampListContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -92,7 +91,7 @@ function SearchContentInner() {
 
   // 카트에 있는 항목인지 확인
   const isInCart = (lectureId: string) => {
-    return (cartItems ?? []).some(item => item.lectureId === lectureId)
+    return cartItems.some(item => item.lectureId === lectureId)
   }
 
   // 비교 선택 토글
@@ -123,7 +122,7 @@ function SearchContentInner() {
       ?? filterValues.subCategoryId
       ?? filterValues.mainCategoryId
     if (categoryId) {
-      params.append('categoryIds', String(categoryId))
+      params.append('categoryId', String(categoryId))
     }
 
     // 모집 상태 ('모집 중' → '모집중', '마감' → '마감')
@@ -159,7 +158,7 @@ function SearchContentInner() {
     if (filterValues.region) {
       const regionParam = REGION_QUERY_MAP[filterValues.region]
       if (regionParam) {
-        params.append('regions', regionParam)
+        params.append('location', regionParam)
       }
     }
 
@@ -173,14 +172,7 @@ function SearchContentInner() {
 
   const handleSearch = () => {
     const params = buildQueryParams()
-    const trimmedText = searchValue.trim()
-
-    // GA4 검색 이벤트 추적
-    if (trimmedText) {
-      trackSearch(trimmedText)
-    }
-
-    router.push(`/lectures/search?${params.toString()}`)
+    router.push(`/bootcamp-list?${params.toString()}`)
   }
 
   const handleFilterClick = () => {
@@ -189,7 +181,7 @@ function SearchContentInner() {
 
   const handleFilterApply = () => {
     const params = buildQueryParams()
-    router.push(`/lectures/search?${params.toString()}`)
+    router.push(`/bootcamp-list?${params.toString()}`)
     setIsFilterModalOpen(false)
   }
 
@@ -197,7 +189,7 @@ function SearchContentInner() {
     const params = new URLSearchParams(searchParams.toString())
     params.set('page', String(newPage))
     params.set('size', DEFAULT_PAGE_SIZE)
-    router.push(`/lectures/search?${params.toString()}`)
+    router.push(`/bootcamp-list?${params.toString()}`)
   }
 
   const handleAddToCart = (lecture: LectureSummary) => {
@@ -218,15 +210,15 @@ function SearchContentInner() {
   }
 
   // 선택된 카트 아이템
-  const selectedCartItems = (cartItems ?? []).filter(item => selectedIds.includes(item.lectureId))
+  const selectedCartItems = cartItems.filter(item => selectedIds.includes(item.lectureId))
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center overflow-x-hidden">
       {/* Hero Banner */}
       <div className="w-full">
         <HeroBanner
-          title="강의 검색"
-          description={"원하는 분야의 강의를 검색해\nAI로 각 강의를 비교해보며, 최적의 강의를 선택해보세요."}
+          title="부트캠프"
+          description={"원하는 분야의 부트캠프 강의를 선택해\nAI로 각 강의를 비교해보며, 최적의 강의를 선택해보세요."}
           backgroundImageUrl="/images/bootcamp-hero.jpg"
         />
       </div>
@@ -234,11 +226,11 @@ function SearchContentInner() {
       {/* ========== MOBILE LAYOUT ========== */}
       <main className="w-full max-w-[360px] px-4 pb-[100px] flex flex-col items-center gap-6 lg:hidden bg-white">
         {/* Section Title */}
-        <SectionTitle title="강의 검색" />
+        <SectionTitle title="부트캠프" />
 
         {/* Interest Courses (카트 목록) */}
         <InterestCourseSection
-          items={cartItems ?? []}
+          items={cartItems}
           selectedIds={selectedIds}
           onToggleSelect={handleToggleSelect}
           onRemove={handleRemoveFromCart}
@@ -259,8 +251,8 @@ function SearchContentInner() {
           <div className="w-full flex flex-col gap-4">
             <div className="relative flex items-center gap-4">
               <ComparisonCard
-                title={(cartItems ?? []).find(c => c.lectureId === selectedIds[0])?.title || ''}
-                imageUrl={(cartItems ?? []).find(c => c.lectureId === selectedIds[0])?.thumbnailUrl || ''}
+                title={cartItems.find(c => c.lectureId === selectedIds[0])?.title || ''}
+                imageUrl={cartItems.find(c => c.lectureId === selectedIds[0])?.thumbnailUrl || ''}
               />
 
               {/* VS Badge */}
@@ -269,8 +261,8 @@ function SearchContentInner() {
               </div>
 
               <ComparisonCard
-                title={(cartItems ?? []).find(c => c.lectureId === selectedIds[1])?.title || ''}
-                imageUrl={(cartItems ?? []).find(c => c.lectureId === selectedIds[1])?.thumbnailUrl || ''}
+                title={cartItems.find(c => c.lectureId === selectedIds[1])?.title || ''}
+                imageUrl={cartItems.find(c => c.lectureId === selectedIds[1])?.thumbnailUrl || ''}
               />
             </div>
 
@@ -307,10 +299,10 @@ function SearchContentInner() {
                   key={lecture.id}
                   lecture={lecture}
                   isHighlighted={false}
-                  isInCart={isInCart(String(lecture.id))}
+                  isInCart={isInCart(lecture.id)}
                   onAddToCart={() => handleAddToCart(lecture)}
-                  onRemoveFromCart={() => handleRemoveFromCart(String(lecture.id))}
-                  onCompare={() => handleCompare(String(lecture.id))}
+                  onRemoveFromCart={() => handleRemoveFromCart(lecture.id)}
+                  onCompare={() => handleCompare(lecture.id)}
                   isPending={isAddPending}
                   variant="mobile"
                 />
@@ -333,7 +325,7 @@ function SearchContentInner() {
       <div className="hidden lg:block w-full">
         {/* Section Title */}
         <div className="w-full max-w-[1448px] mx-auto px-6 pt-6">
-          <SectionTitle title="강의 검색" />
+          <SectionTitle title="부트캠프" />
         </div>
 
         {/* Main Layout: Filter | Interest List + AI Banner + Card Grid */}
@@ -369,7 +361,7 @@ function SearchContentInner() {
                 <div className="p-4 bg-white flex gap-4 items-stretch">
                   {/* Interest List */}
                   <PCInterestList
-                    items={cartItems ?? []}
+                    items={cartItems}
                     selectedIds={selectedIds}
                     onToggleSelect={handleToggleSelect}
                     isFilterOpen={isPCFilterOpen}
@@ -423,7 +415,7 @@ function SearchContentInner() {
                     const params = new URLSearchParams(searchParams.toString())
                     params.set('sort', e.target.value)
                     params.set('page', '1')
-                    router.push(`/lectures/search?${params.toString()}`)
+                    router.push(`/bootcamp-list?${params.toString()}`)
                   }}
                   className="h-10 w-full px-4 py-2 bg-white rounded-lg border border-[#020202] text-xs text-[#020202] appearance-none cursor-pointer pr-8"
                 >
@@ -454,10 +446,10 @@ function SearchContentInner() {
                     key={lecture.id}
                     lecture={lecture}
                     isHighlighted={false}
-                    isInCart={isInCart(String(lecture.id))}
+                    isInCart={isInCart(lecture.id)}
                     onAddToCart={() => handleAddToCart(lecture)}
-                    onRemoveFromCart={() => handleRemoveFromCart(String(lecture.id))}
-                    onCompare={() => handleCompare(String(lecture.id))}
+                    onRemoveFromCart={() => handleRemoveFromCart(lecture.id)}
+                    onCompare={() => handleCompare(lecture.id)}
                     isPending={isAddPending}
                     variant="desktop"
                   />
@@ -482,7 +474,7 @@ function SearchContentInner() {
 
       {/* PC Cart Sidebar - 컴포넌트 자체에서 위치 계산 */}
       <PCCartSidebar
-        items={cartItems ?? []}
+        items={cartItems}
         onRemove={handleRemoveFromCart}
         onCompare={handleGoToCompare}
       />
@@ -501,7 +493,7 @@ function SearchContentInner() {
       {/* 하단 플로팅 관심 항목 바 - Mobile only */}
       <div className="lg:hidden">
         <FloatingInterestBar
-          items={cartItems ?? []}
+          items={cartItems}
           onRemove={handleRemoveFromCart}
           onCompare={handleGoToCompare}
           isOpen={isFloatingBarOpen}
@@ -513,10 +505,10 @@ function SearchContentInner() {
 }
 
 // useSearchParams를 사용하므로 Suspense boundary 필수
-export default function SearchContent() {
+export default function BootcampListPage() {
   return (
     <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
-      <SearchContentInner />
+      <BootcampListContent />
     </Suspense>
   )
 }

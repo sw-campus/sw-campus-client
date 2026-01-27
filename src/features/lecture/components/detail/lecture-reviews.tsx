@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, ChevronUp, Star } from 'lucide-react'
+import { ChevronDown, ChevronUp, Pencil, Star } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { FaUser } from 'react-icons/fa'
 import { toast } from 'sonner'
@@ -248,7 +248,8 @@ export default function LectureReviews({ lectureId }: Props) {
       size="sm"
       onClick={handleWriteClick}
     >
-      후기 작성
+      <Pencil className="w-4 h-4 mr-1" />
+      후기 작성하기
     </Button>
   )
 
@@ -264,10 +265,10 @@ export default function LectureReviews({ lectureId }: Props) {
 
     if (!reviews || reviews.length === 0) {
       return (
-        <Card className="bg-card/40 flex h-40 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl">
-          <div className="mb-2 text-3xl">💬</div>
+        <Card className="bg-card/40 flex h-56 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl mb-8">
+          <div className="mb-3 text-4xl">💬</div>
           <p className="text-foreground text-sm font-medium">아직 작성된 후기가 없습니다.</p>
-          <p className="text-muted-foreground mt-1 text-xs">첫 번째 후기를 남겨보세요!</p>
+          <p className="text-muted-foreground mt-2 text-xs">첫 번째 후기를 남겨보세요!</p>
         </Card>
       )
     }
