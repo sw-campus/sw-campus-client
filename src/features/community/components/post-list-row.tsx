@@ -38,17 +38,17 @@ export function PostListRow({ post }: PostListRowProps) {
       onClick={() => router.push(`/community/${post.id}`)}
       className={`group relative flex w-full cursor-pointer overflow-hidden rounded-xl border transition-all duration-200 active:scale-[0.98] active:shadow-inner sm:rounded-2xl ${
         post.pinned
-          ? 'border-orange-200/80 bg-gradient-to-r from-orange-50/90 via-amber-50/50 to-white active:from-orange-100/90'
-          : 'border-gray-100 bg-white hover:border-orange-200/60 hover:shadow-lg hover:shadow-orange-50/50 active:bg-gray-50/80'
+          ? 'border-primary/30 bg-primary/5 active:bg-primary/10'
+          : 'border-gray-100 bg-white hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 active:bg-gray-50/80'
       }`}
     >
       {/* 좌측 악센트 바 */}
       <div className={`w-1 shrink-0 transition-all duration-300 ${
         post.pinned
-          ? 'bg-gradient-to-b from-orange-500 to-amber-500'
+          ? 'bg-primary'
           : isPopular
             ? 'bg-gradient-to-b from-rose-400 to-pink-400 group-hover:from-rose-500 group-hover:to-pink-500'
-            : 'bg-gray-200 group-hover:bg-gradient-to-b group-hover:from-orange-400 group-hover:to-amber-400'
+            : 'bg-gray-200 group-hover:bg-primary'
       }`} />
 
       {/* 메인 콘텐츠 */}
@@ -58,7 +58,7 @@ export function PostListRow({ post }: PostListRowProps) {
           {/* 배지 영역 */}
           <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto scrollbar-hide sm:gap-2">
             {post.pinned && (
-              <span className="inline-flex shrink-0 items-center gap-0.5 rounded-md bg-gradient-to-r from-orange-500 to-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm sm:gap-1 sm:rounded-lg sm:px-2 sm:py-1 sm:text-xs">
+              <span className="inline-flex shrink-0 items-center gap-0.5 rounded-md bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground shadow-sm sm:gap-1 sm:rounded-lg sm:px-2 sm:py-1 sm:text-xs">
                 <FiMapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                 공지
               </span>
@@ -97,7 +97,7 @@ export function PostListRow({ post }: PostListRowProps) {
         </div>
 
         {/* 제목 */}
-        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900 transition-colors group-hover:text-orange-600 sm:line-clamp-1 sm:text-[15px]">
+        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900 transition-colors group-hover:text-primary sm:line-clamp-1 sm:text-[15px]">
           <Link href={`/community/${post.id}`} onClick={e => e.stopPropagation()}>
             {post.title}
           </Link>

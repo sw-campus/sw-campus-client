@@ -36,7 +36,7 @@ export default function WritePostPage() {
       <main className="custom-container mx-auto w-full max-w-7xl md:!px-10">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">로그인이 필요합니다</p>
-          <Link href={`/login?returnUrl=${encodeURIComponent(pathname)}`} className="mt-4 inline-block text-orange-500 hover:underline">
+          <Link href={`/login?returnUrl=${encodeURIComponent(pathname)}`} className="mt-4 inline-block text-primary hover:underline">
             로그인하기
           </Link>
         </div>

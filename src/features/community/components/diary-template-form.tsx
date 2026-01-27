@@ -10,11 +10,15 @@ export const DIARY_MIN_LENGTH = 20
 // 부트캠프 성장일기 템플릿 질문들
 export const DIARY_QUESTIONS = {
   learnedSkills: {
+    title: '배운 기술',
+    subtitle: '이번 주 가장 기억에 남는 3가지',
     label: '1. 이번 주에 배운 기술이나 개념 중 가장 기억에 남는 3가지는 무엇인가요?',
     placeholder:
       '예시: Spring Security, JWT 토큰, OAuth2.0 등을 배웠습니다. 특히 JWT 토큰이 어떻게 인증을 처리하는지 깊이 이해하게 되었습니다.',
   },
   problemSolving: {
+    title: '문제 해결',
+    subtitle: '막힌 부분과 해결 과정',
     label: '2. 이번 주 과정 중 막혔던 문제나 오류가 있었나요? 어떻게 해결했나요?',
     sublabel: '(없다면 가장 인상 깊었던 실습 내용)',
     placeholder: `[문제] CORS 오류가 발생해서 API 호출이 안됐습니다.
@@ -22,11 +26,15 @@ export const DIARY_QUESTIONS = {
 [해결] Spring Security 설정에서 CORS 설정을 추가해서 해결했습니다.`,
   },
   classReview: {
+    title: '수업 리뷰',
+    subtitle: '진도, 강의 스타일, 분위기',
     label: '3. 이번 주 수업 진도 속도, 강사님의 강의 스타일, 혹은 반 분위기는 어땠나요?',
     placeholder:
       '예시: 진도가 너무 빨라서 벅차고 강사님은 이론보다 실습 위주입니다. 반 분위기는 다들 야간자율학습을 할 정도로 열정적입니다.',
   },
   nextWeekPlan: {
+    title: '다음 주 계획',
+    subtitle: '보완하고 싶은 부분',
     label: '4. 다음 주에는 어떤 부분을 보완하고 싶나요?',
     placeholder: '예시: 주말 동안 자바의 정석 상권 1회독 하기, 밀린 알고리즘 문제 3개 풀기',
   },
@@ -188,13 +196,16 @@ export function validateDiaryForm(formData: DiaryFormData): Partial<Record<keyof
  *
  * 시맨틱 HTML 구조를 사용하여 prose 클래스에서 자동으로 스타일링됩니다.
  */
-function buildSection(number: number, label: string, content: string, sublabel?: string): string {
-  const sublabelHtml = sublabel ? ` <small>${sublabel}</small>` : ''
+function buildSection(number: number, title: string, subtitle: string, content: string): string {
+  const paddedNumber = String(number).padStart(2, '0')
 
   return `
-<section class="diary-section">
-  <h3>${label}${sublabelHtml}</h3>
-  <div data-diary-section="${number}">
+<section class="diary-section" data-section="${number}">
+  <div class="diary-section-header">
+    <span class="diary-section-number">${paddedNumber}</span>
+    <h3>${title}<small>${subtitle}</small></h3>
+  </div>
+  <div class="diary-section-content" data-diary-section="${number}">
     ${content}
   </div>
 </section>`
@@ -206,10 +217,10 @@ function buildSection(number: number, label: string, content: string, sublabel?:
 export function buildDiaryBody(formData: DiaryFormData): string {
   return `
 <div class="diary-template">
-  ${buildSection(1, DIARY_QUESTIONS.learnedSkills.label, formData.learnedSkills)}
-  ${buildSection(2, DIARY_QUESTIONS.problemSolving.label, formData.problemSolving, DIARY_QUESTIONS.problemSolving.sublabel)}
-  ${buildSection(3, DIARY_QUESTIONS.classReview.label, formData.classReview)}
-  ${buildSection(4, DIARY_QUESTIONS.nextWeekPlan.label, formData.nextWeekPlan)}
+  ${buildSection(1, DIARY_QUESTIONS.learnedSkills.title, DIARY_QUESTIONS.learnedSkills.subtitle, formData.learnedSkills)}
+  ${buildSection(2, DIARY_QUESTIONS.problemSolving.title, DIARY_QUESTIONS.problemSolving.subtitle, formData.problemSolving)}
+  ${buildSection(3, DIARY_QUESTIONS.classReview.title, DIARY_QUESTIONS.classReview.subtitle, formData.classReview)}
+  ${buildSection(4, DIARY_QUESTIONS.nextWeekPlan.title, DIARY_QUESTIONS.nextWeekPlan.subtitle, formData.nextWeekPlan)}
 </div>
 `.trim()
 }
@@ -223,8 +234,9 @@ export function parseDiaryBody(html: string): DiaryFormData | null {
   try {
     // 각 섹션의 내용을 추출하는 패턴
     // data-diary-section 속성을 사용하여 더 안정적으로 파싱합니다.
-    // 새로운 시맨틱 구조: <section> 내부의 <div data-diary-section="N">...</div>
-    const sectionPattern = /<div[^>]*data-diary-section="[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/section>/g
+    // 새로운 구조: <div class="diary-section-content" data-diary-section="N">...</div>
+    // 기존 구조도 호환: <div data-diary-section="N">...</div>
+    const sectionPattern = /<div[^>]*data-diary-section="[^"]*"[^>]*>([\s\S]*?)<\/div>(?:\s*<\/section>)?/g
     const matches = [...html.matchAll(sectionPattern)]
 
     if (matches.length !== 4) {

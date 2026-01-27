@@ -137,13 +137,13 @@ function CommunityContentInner() {
       <div className="mb-6 sm:mb-8">
         <div className="flex items-start justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1 space-y-2 sm:space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 px-2.5 py-1 sm:px-3">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange-500" />
-              <span className="text-[11px] font-semibold text-orange-700 sm:text-xs">커뮤니티</span>
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-2.5 py-1 sm:px-3">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+              <span className="text-[11px] font-semibold text-primary sm:text-xs">커뮤니티</span>
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
               부트캠프{' '}
-              <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
+              <span className="text-primary">
                 수강일기
               </span>
             </h1>
@@ -158,7 +158,7 @@ function CommunityContentInner() {
               <Button
                 variant="outline"
                 onClick={() => router.push(`/community/user/${currentMember.userId}`)}
-                className="h-10 gap-2 rounded-xl border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 transition-all duration-200 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
+                className="h-10 gap-2 rounded-xl border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 transition-all duration-200 hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
               >
                 <FiUser className="h-4 w-4" />
                 내 프로필
@@ -166,7 +166,7 @@ function CommunityContentInner() {
             )}
             <Button
               onClick={handleWriteClick}
-              className="group relative h-10 gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 text-sm font-bold shadow-lg shadow-orange-200/50 transition-all duration-200 hover:shadow-xl hover:shadow-orange-200/60 active:scale-[0.98]"
+              className="group relative h-10 gap-2 overflow-hidden rounded-xl bg-primary px-5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-200 hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98]"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <FiEdit3 className="h-4 w-4" />
@@ -209,7 +209,7 @@ function CommunityContentInner() {
               onClick={() => setIsLectureModalOpen(true)}
               className={`h-9 shrink-0 gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition-all duration-200 active:scale-95 sm:h-10 sm:gap-2 sm:rounded-xl sm:px-4 sm:text-sm ${
                 selectedLecture
-                  ? 'border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 shadow-sm'
+                  ? 'border-primary/30 bg-primary/5 text-primary shadow-sm'
                   : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -217,7 +217,7 @@ function CommunityContentInner() {
               <span className="hidden xs:inline">강의</span>
               <span>필터</span>
               {selectedLecture && (
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-bold text-white sm:h-5 sm:w-5 sm:text-[10px]">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground sm:h-5 sm:w-5 sm:text-[10px]">
                   1
                 </span>
               )}
@@ -253,12 +253,12 @@ function CommunityContentInner() {
           <span className="text-xs font-medium text-gray-500 sm:text-sm">강의 필터:</span>
           <Badge
             variant="secondary"
-            className="h-7 gap-1.5 rounded-lg bg-gradient-to-r from-orange-50 to-amber-50 px-2.5 text-orange-700 shadow-sm ring-1 ring-orange-200/60 sm:h-8 sm:gap-2 sm:rounded-xl sm:px-3.5"
+            className="h-7 gap-1.5 rounded-lg bg-primary/5 px-2.5 text-primary shadow-sm ring-1 ring-primary/20 sm:h-8 sm:gap-2 sm:rounded-xl sm:px-3.5"
           >
             <span className="max-w-[140px] truncate text-xs font-medium sm:max-w-[180px] sm:text-sm">{selectedLecture.name}</span>
             <button
               onClick={handleClearLectureFilter}
-              className="flex h-4 w-4 items-center justify-center rounded transition-colors hover:bg-orange-200/60 sm:h-5 sm:w-5 sm:rounded-lg"
+              className="flex h-4 w-4 items-center justify-center rounded transition-colors hover:bg-primary/20 sm:h-5 sm:w-5 sm:rounded-lg"
             >
               <FiX className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </button>
@@ -345,7 +345,7 @@ function CommunityContentInner() {
                               onClick={() => setPage(pageNum)}
                               className={`h-11 w-11 items-center justify-center rounded-xl text-sm font-medium transition-all active:scale-95 sm:h-10 sm:w-10 ${
                                 pageNum === page
-                                  ? 'flex bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/40'
+                                  ? 'flex bg-primary text-primary-foreground shadow-md shadow-primary/30'
                                   : `text-gray-600 hover:bg-white hover:shadow-sm ${isMobileVisible ? 'flex' : 'hidden sm:flex'}`
                               }`}
                             >
@@ -401,7 +401,7 @@ function CommunityContentInner() {
       {/* 모바일 플로팅 글쓰기 버튼 */}
       <button
         onClick={handleWriteClick}
-        className="group fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-xl shadow-orange-400/30 ring-4 ring-orange-100/50 transition-all duration-200 active:scale-90 sm:hidden"
+        className="group fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/30 ring-4 ring-primary/20 transition-all duration-200 active:scale-90 sm:hidden"
         aria-label="글쓰기"
       >
         <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent opacity-0 transition-opacity duration-200 group-active:opacity-100" />

@@ -101,14 +101,14 @@ export function LectureSearchModal({ isOpen, onClose, onSelect }: LectureSearchM
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="강의명을 입력하세요"
-                className="pl-10 border-gray-300 focus:border-orange-500 focus:ring-orange-200"
+                className="pl-10 border-gray-300 focus:border-primary focus:ring-primary/30"
                 autoFocus
               />
             </div>
             <Button
               onClick={handleSearch}
               disabled={isLoading || !searchQuery.trim()}
-              className="bg-orange-500 hover:bg-orange-600"
+              className="bg-primary hover:bg-primary/90"
             >
               {isLoading ? '검색 중...' : '검색'}
             </Button>
@@ -125,7 +125,7 @@ export function LectureSearchModal({ isOpen, onClose, onSelect }: LectureSearchM
                 <button
                   key={lecture.lectureId}
                   onClick={() => handleSelectLecture(lecture)}
-                  className="w-full rounded-lg border border-gray-200 p-4 text-left transition-colors hover:border-orange-300 hover:bg-orange-50"
+                  className="w-full rounded-lg border border-gray-200 p-4 text-left transition-colors hover:border-primary/40 hover:bg-primary/5"
                 >
                   <div className="mb-2 font-medium text-gray-900">{lecture.lectureName}</div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">

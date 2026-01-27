@@ -20,6 +20,7 @@ import {
 } from '@/features/lecture/api/review-api.types'
 import { LectureCard } from '@/features/lecture/components/lecture-card'
 import { LectureListItem } from '@/features/lecture/components/lecture-list-item'
+import PhotoSlider from '@/features/lecture/components/detail/photo-slider'
 import { mapLectureResponseToSummary } from '@/features/lecture/utils/map-lecture-response-to-summary'
 
 import {
@@ -445,7 +446,7 @@ export function OrganizationDetail({
                 href={organization.homepage}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/30"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 홈페이지
                 <ExternalLink className="h-3.5 w-3.5" />
@@ -457,29 +458,29 @@ export function OrganizationDetail({
 
       {/* ===== ACCESSIBLE TABS (Radix UI) ===== */}
       <Tabs defaultValue="intro" className="w-full">
-        <TabsList className="border-border mx-4 mb-0 flex h-auto w-auto gap-0 border-b bg-transparent p-0 md:mx-6">
+        <TabsList className="flex h-auto w-full border-b border-[#888888]/50">
           <TabsTrigger
             value="intro"
-            className="text-muted-foreground data-[state=active]:border-foreground data-[state=active]:text-foreground flex-1 rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium transition-all data-[state=active]:border-b-2"
+            className="flex-1 border-b-2 border-transparent py-3 text-sm font-normal text-foreground data-[state=active]:border-b-[#FEB706] data-[state=active]:font-semibold"
           >
             기관 소개
           </TabsTrigger>
           <TabsTrigger
             value="reviews"
-            className="text-muted-foreground data-[state=active]:border-foreground data-[state=active]:text-foreground flex-1 rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium transition-all data-[state=active]:border-b-2"
+            className="flex-1 border-b-2 border-transparent py-3 text-sm font-normal text-foreground data-[state=active]:border-b-[#FEB706] data-[state=active]:font-semibold"
           >
             후기
             {totalReviews > 0 && (
-              <span className="text-muted-foreground ml-1 text-xs">({totalReviews.toLocaleString()})</span>
+              <span className="text-xs font-normal text-[#888888]">({totalReviews.toLocaleString()})</span>
             )}
           </TabsTrigger>
           <TabsTrigger
             value="programs"
-            className="text-muted-foreground data-[state=active]:border-foreground data-[state=active]:text-foreground flex-1 rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium transition-all data-[state=active]:border-b-2"
+            className="flex-1 border-b-2 border-transparent py-3 text-sm font-normal text-foreground data-[state=active]:border-b-[#FEB706] data-[state=active]:font-semibold"
           >
             등록된 교육
             {totalLectures > 0 && (
-              <span className="text-muted-foreground ml-1 text-xs">({totalLectures.toLocaleString()})</span>
+              <span className="text-xs font-normal text-[#888888]">({totalLectures.toLocaleString()})</span>
             )}
           </TabsTrigger>
         </TabsList>
@@ -497,17 +498,11 @@ export function OrganizationDetail({
                 </section>
               )}
 
-              {/* 시설 이미지 */}
+              {/* 시설 이미지 - 슬라이드 */}
               {facilityImages.length > 0 && (
                 <section>
                   <h2 className="text-foreground mb-3 text-base font-bold">교육 현장</h2>
-                  <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-                    {facilityImages.map((img, idx) => (
-                      <div key={idx} className="relative aspect-square overflow-hidden rounded-lg">
-                        <Image src={img} alt={`시설 이미지 ${idx + 1}`} fill sizes="200px" className="object-cover" />
-                      </div>
-                    ))}
-                  </div>
+                  <PhotoSlider photos={facilityImages} />
                 </section>
               )}
 
