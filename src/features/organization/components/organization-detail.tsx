@@ -24,7 +24,6 @@ import { mapLectureResponseToSummary } from '@/features/lecture/utils/map-lectur
 
 import {
   fetchOrganizationLectures,
-  LECTURE_SORT_LABELS,
   type LectureSortType,
 } from '../api/organization-api'
 import type { OrganizationDetail as OrganizationDetailType } from '../types/organization.type'

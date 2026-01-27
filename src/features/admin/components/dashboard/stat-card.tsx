@@ -75,12 +75,10 @@ export function StatCard({
   // Animated counter effect with easing
   useEffect(() => {
     if (value === 0) {
-      setDisplayValue(0)
-      setIsAnimating(false)
       return
     }
 
-    setIsAnimating(true)
+    let isActive = true
     const duration = 1200
     const startTime = performance.now()
     const startValue = 0
@@ -91,24 +89,31 @@ export function StatCard({
     }
 
     const animate = (currentTime: number) => {
+      if (!isActive) return
+
       const elapsed = currentTime - startTime
       const progress = Math.min(elapsed / duration, 1)
       const easedProgress = easeOutExpo(progress)
       const current = Math.round(startValue + (value - startValue) * easedProgress)
 
       setDisplayValue(current)
+      setIsAnimating(progress < 1)
 
       if (progress < 1) {
         requestAnimationFrame(animate)
-      } else {
-        setDisplayValue(value)
-        setIsAnimating(false)
       }
     }
 
     const animationId = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(animationId)
+    return () => {
+      isActive = false
+      cancelAnimationFrame(animationId)
+    }
   }, [value])
+
+  // value가 0일 때 displayValue와 isAnimating 동기화
+  const effectiveDisplayValue = value === 0 ? 0 : displayValue
+  const effectiveIsAnimating = value === 0 ? false : isAnimating
 
   // Generate sparkline data if not provided
   const chartData = sparklineData?.map((v, i) => ({ value: v, index: i })) || []
@@ -176,10 +181,10 @@ export function StatCard({
               className={cn(
                 'font-mono-data text-foreground text-3xl font-bold tracking-tight sm:text-4xl',
                 size === 'large' && 'text-4xl sm:text-5xl',
-                isAnimating && 'animate-count'
+                effectiveIsAnimating && 'animate-count'
               )}
             >
-              {customFormatter ? customFormatter(displayValue) : displayValue.toLocaleString()}
+              {customFormatter ? customFormatter(effectiveDisplayValue) : effectiveDisplayValue.toLocaleString()}
             </span>
             {subtext && (
               <span className={cn('mt-1 text-xs font-medium', colors.text)}>

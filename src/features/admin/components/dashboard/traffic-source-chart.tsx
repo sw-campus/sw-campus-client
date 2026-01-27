@@ -5,8 +5,6 @@ import { useState } from 'react'
 import { LuChevronDown, LuChevronUp, LuGlobe } from 'react-icons/lu'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 
-import { cn } from '@/lib/utils'
-
 import { useTrafficSourcesQuery } from '../../hooks/use-analytics'
 
 interface TrafficSourceChartProps {
@@ -111,7 +109,6 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
   })()
 
   const totalSessions = chartData.reduce((acc, item) => acc + item.value, 0)
-  const totalUsers = chartData.reduce((acc, item) => acc + item.users, 0)
 
   if (isLoading) {
     return (

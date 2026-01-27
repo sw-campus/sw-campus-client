@@ -2,8 +2,6 @@
 
 import { Area, Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
-import { cn } from '@/lib/utils'
-
 import { AnalyticsReport } from '../../api/analytics-api'
 import { Period } from './shared/period-toggle'
 

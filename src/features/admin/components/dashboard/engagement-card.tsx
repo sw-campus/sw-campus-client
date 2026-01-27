@@ -2,8 +2,6 @@
 
 import { LuClock, LuEye, LuMousePointer2, LuZap } from 'react-icons/lu'
 
-import { cn } from '@/lib/utils'
-
 import { Period } from './shared/period-toggle'
 
 interface EngagementCardProps {
