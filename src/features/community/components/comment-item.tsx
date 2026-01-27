@@ -155,13 +155,13 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
     <div
       ref={commentRef}
       id={`comment-${comment.id}`}
-      className={`${depth > 0 ? 'ml-2 border-l-2 border-orange-100 pl-2 sm:ml-6 sm:pl-5' : ''} ${isHighlighted ? 'animate-highlight' : ''}`}
+      className={`${depth > 0 ? 'ml-2 border-l-2 border-primary/20 pl-2 sm:ml-6 sm:pl-5' : ''} ${isHighlighted ? 'animate-highlight' : ''}`}
     >
       <div className="group rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all duration-200 hover:border-gray-300/80 hover:shadow-md sm:p-5">
         {/* 작성자 정보 */}
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            {depth > 0 && <FiCornerDownRight className="h-4 w-4 text-orange-400" />}
+            {depth > 0 && <FiCornerDownRight className="h-4 w-4 text-primary" />}
             <UserProfileLink
               userId={comment.authorId}
               className="transition-transform hover:scale-110"
@@ -171,7 +171,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             <div className="flex items-center gap-2">
               <UserProfileLink
                 userId={comment.authorId}
-                className="font-semibold text-gray-800 transition-colors hover:text-orange-600"
+                className="font-semibold text-gray-800 transition-colors hover:text-primary"
               >
                 {comment.authorNickname}
               </UserProfileLink>
@@ -230,7 +230,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             <textarea
               value={editBody}
               onChange={e => setEditBody(e.target.value)}
-              className="w-full resize-none rounded-xl border border-gray-200 p-3 text-sm transition-all focus:border-orange-300 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+              className="w-full resize-none rounded-xl border border-gray-200 p-3 text-sm transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20 focus:outline-none"
               rows={3}
             />
             <div className="flex justify-end gap-2">
@@ -249,7 +249,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
                 size="sm"
                 onClick={handleUpdate}
                 disabled={isUpdating || !editBody.trim()}
-                className="gap-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 shadow-sm"
+                className="gap-1.5 rounded-lg bg-primary text-primary-foreground shadow-sm"
               >
                 {isUpdating && <FiLoader className="h-3.5 w-3.5 animate-spin" />}
                 {isUpdating ? '수정 중...' : '수정'}
@@ -272,7 +272,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
           <div className="mt-3 border-t border-gray-100 pt-2 sm:mt-4 sm:pt-3">
             <button
               onClick={() => onReply(comment.id)}
-              className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-gray-400 transition-all hover:bg-orange-50 hover:text-orange-600 active:scale-95 sm:gap-1.5 sm:rounded-lg sm:px-3 sm:text-[13px]"
+              className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-gray-400 transition-all hover:bg-primary/5 hover:text-primary active:scale-95 sm:gap-1.5 sm:rounded-lg sm:px-3 sm:text-[13px]"
             >
               <FiMessageCircle className="h-3.5 w-3.5" />
               답글
@@ -306,13 +306,13 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
 
       {/* 인라인 답글 입력 폼 */}
       {isReplyFormVisible && replyFormProps && (
-        <form onSubmit={replyFormProps.onSubmit} className="mt-2 ml-2 border-l-2 border-orange-200 pl-2 sm:ml-6 sm:pl-4">
+        <form onSubmit={replyFormProps.onSubmit} className="mt-2 ml-2 border-l-2 border-primary/30 pl-2 sm:ml-6 sm:pl-4">
           {/* 접근성을 위한 시각적으로 숨겨진 라벨 */}
           <label htmlFor={`reply-input-${comment.id}`} className="sr-only">
             {comment.authorNickname}님에게 답글 작성
           </label>
-          <div className="flex items-center gap-2 rounded-lg border border-orange-200 bg-orange-50/50 p-1.5 focus-within:border-orange-300">
-            <FiCornerDownRight className="h-3 w-3 shrink-0 text-orange-400" />
+          <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 p-1.5 focus-within:border-primary/50">
+            <FiCornerDownRight className="h-3 w-3 shrink-0 text-primary" />
             <input
               id={`reply-input-${comment.id}`}
               ref={replyTextareaRef as React.RefObject<HTMLInputElement>}
@@ -326,7 +326,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             <button
               type="button"
               onClick={replyFormProps.onCancel}
-              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-orange-100 hover:text-orange-600"
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-primary/10 hover:text-primary"
             >
               <FiX className="h-3.5 w-3.5" />
             </button>
@@ -334,7 +334,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
               type="submit"
               disabled={replyFormProps.isCreating || !replyFormProps.body.trim()}
               size="sm"
-              className="h-6 shrink-0 rounded-md bg-orange-500 px-2 text-xs font-medium hover:bg-orange-600 disabled:opacity-50"
+              className="h-6 shrink-0 rounded-md bg-primary px-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
               <FiSend className="h-3 w-3" />
             </Button>

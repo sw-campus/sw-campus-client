@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import DOMPurify from 'dompurify'
 import Link from 'next/link'
@@ -17,6 +17,7 @@ import {
   FiCheck,
   FiMapPin,
 } from 'react-icons/fi'
+import { toast } from 'sonner'
 
 import { UserAvatar } from '@/components/ui/user-avatar'
 
@@ -61,6 +62,27 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
   const [isCopied, setIsCopied] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isLikerModalOpen, setIsLikerModalOpen] = useState(false)
+
+  // URL 해시에서 댓글 ID 확인 후 해당 댓글이 없으면 토스트 표시
+  useEffect(() => {
+    // 게시글이 삭제된 경우(error) 해시 체크 하지 않음
+    if (isLoading || !post || error) return
+
+    const hash = window.location.hash
+    if (hash.startsWith('#comment-')) {
+      const commentId = hash.replace('#comment-', '')
+      // 댓글 섹션이 렌더링된 후 확인하기 위해 약간의 지연
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`comment-${commentId}`)
+        if (!element) {
+          toast.info('삭제된 댓글입니다.')
+          // 해시 제거
+          window.history.replaceState(null, '', window.location.pathname)
+        }
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading, post, error])
 
   // React Compiler가 자동 최적화하므로 useMemo 대신 IIFE 사용
   const imagesNotInBody = (() => {
@@ -159,14 +181,14 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
               <span>목록</span>
             </Link>
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-16">
-              <div className="mb-4 rounded-full bg-orange-100 p-4">
-                <FiEye className="h-8 w-8 text-orange-500" />
+              <div className="mb-4 rounded-full bg-primary/10 p-4">
+                <FiEye className="h-8 w-8 text-primary" />
               </div>
               <p className="mb-2 text-lg font-semibold text-gray-700">로그인이 필요합니다</p>
               <p className="mb-6 text-sm text-gray-500">게시글 내용을 확인하려면 로그인해 주세요.</p>
               <Link
                 href={`/login?returnUrl=${encodeURIComponent(pathname)}`}
-                className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-600 active:scale-95"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 active:scale-95"
               >
                 로그인하기
               </Link>
@@ -182,7 +204,7 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
           <p className="text-lg font-medium text-gray-500">게시글을 찾을 수 없습니다</p>
           <Link
             href="/community"
-            className="mt-4 inline-flex items-center gap-1 text-orange-500 transition-colors hover:text-orange-600 hover:underline"
+            className="mt-4 inline-flex items-center gap-1 text-primary transition-colors hover:text-primary/80 hover:underline"
           >
             <FiArrowLeft className="h-4 w-4" />
             목록으로 돌아가기
@@ -222,7 +244,7 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               {post.pinned && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 px-2.5 py-1 text-xs font-semibold text-orange-700">
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                   <FiMapPin className="h-3 w-3" />
                   공지
                 </span>
@@ -282,7 +304,7 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
               <div className="flex flex-col">
                 <UserProfileLink
                   userId={post.authorId}
-                  className="font-semibold text-gray-900 transition-colors hover:text-orange-600"
+                  className="font-semibold text-gray-900 transition-colors hover:text-primary"
                 >
                   {post.authorNickname ?? '익명'}
                 </UserProfileLink>
@@ -324,7 +346,7 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
           {isLoggedIn ? (
             <>
               <div
-                className="prose prose-gray max-w-none prose-p:leading-relaxed prose-headings:font-bold prose-headings:tracking-tight prose-a:text-orange-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md prose-blockquote:border-l-orange-400 prose-blockquote:bg-orange-50/50 prose-blockquote:py-1 prose-blockquote:not-italic prose-code:rounded prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-normal prose-code:before:content-none prose-code:after:content-none"
+                className="prose prose-gray max-w-none prose-p:leading-relaxed prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-1 prose-blockquote:not-italic prose-code:rounded prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-normal prose-code:before:content-none prose-code:after:content-none"
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.body) }}
               />
 
@@ -346,14 +368,14 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
             </>
           ) : (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-white py-16">
-              <div className="mb-4 rounded-full bg-orange-100 p-4">
-                <FiEye className="h-8 w-8 text-orange-500" />
+              <div className="mb-4 rounded-full bg-primary/10 p-4">
+                <FiEye className="h-8 w-8 text-primary" />
               </div>
               <p className="mb-2 text-lg font-semibold text-gray-700">로그인이 필요합니다</p>
               <p className="mb-6 text-sm text-gray-500">게시글 내용을 확인하려면 로그인해 주세요.</p>
               <Link
                 href={`/login?returnUrl=${encodeURIComponent(pathname)}`}
-                className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-600 active:scale-95"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 active:scale-95"
               >
                 로그인하기
               </Link>
@@ -415,11 +437,11 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
                   disabled={isPinning}
                   className={`flex h-10 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium transition-all active:scale-95 ${
                     post.pinned
-                      ? 'border-orange-200 bg-orange-50 text-orange-600'
+                      ? 'border-primary/30 bg-primary/5 text-primary'
                       : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <FiMapPin className={`h-4 w-4 ${post.pinned ? 'fill-orange-600' : ''}`} />
+                  <FiMapPin className={`h-4 w-4 ${post.pinned ? 'fill-primary' : ''}`} />
                   <span className="hidden sm:inline">{post.pinned ? '고정 해제' : '공지 고정'}</span>
                 </button>
               )}

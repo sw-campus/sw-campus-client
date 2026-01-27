@@ -39,7 +39,7 @@ export function OrganizationList() {
       {/* Hero Banner */}
       <div className="relative -mx-4 -mt-4 mb-8 h-[250px] overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 md:-mx-6 md:-mt-6">
         <Image
-          src="/images/main_banner.png"
+          src="/images/org/organization_banner.jpg"
           alt="훈련기관 배경"
           fill
           sizes="100vw"

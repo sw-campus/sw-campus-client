@@ -338,7 +338,13 @@ api.interceptors.response.use(
     // 공통 에러 처리
     if (status === 400) toast.error(message ?? '잘못된 요청입니다')
     if (status === 403) toast.error(message ?? '접근 권한이 없습니다')
-    if (status === 404) toast.error(message ?? '요청한 리소스를 찾을 수 없습니다')
+    if (status === 404) {
+      // 게시글/댓글 상세 조회 404는 페이지 UI에서 처리하므로 토스트 생략
+      const isPostDetailRequest = /\/posts\/\d+$/i.test(requestUrl)
+      if (!isPostDetailRequest) {
+        toast.error(message ?? '요청한 리소스를 찾을 수 없습니다')
+      }
+    }
     if (status === 409) toast.error(message ?? '이미 처리된 요청입니다')
     if (status === 429) toast.error(message ?? '요청이 너무 많습니다. 잠시 후 다시 시도해주세요')
     if (status >= 500) toast.error(message ?? '서버 오류가 발생했습니다')

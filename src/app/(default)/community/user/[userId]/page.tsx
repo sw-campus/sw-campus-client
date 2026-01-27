@@ -80,7 +80,7 @@ export default function UserProfilePage() {
       {/* 프로필 헤더 */}
       <div className="mb-6 w-full self-stretch overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 sm:mb-8 sm:rounded-3xl">
         {/* 커버 이미지 */}
-        <div className="relative h-24 bg-gradient-to-br from-orange-400 via-amber-400 to-orange-500 sm:h-40">
+        <div className="relative h-24 bg-primary sm:h-40">
           <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
           <div className="absolute -bottom-1 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent" />
         </div>
@@ -121,7 +121,7 @@ export default function UserProfilePage() {
                 {/* 활동 통계 */}
                 <div className={`mt-4 grid w-full rounded-xl bg-gray-50 py-3 sm:mt-6 sm:rounded-2xl sm:py-4 ${isOwnProfile ? 'grid-cols-3' : 'grid-cols-2'}`}>
                   <div className="flex flex-col items-center justify-center border-r border-gray-200">
-                    <p className="text-xl font-bold text-orange-600 sm:text-2xl">{formatNumber(profile.postCount)}</p>
+                    <p className="text-xl font-bold text-primary sm:text-2xl">{formatNumber(profile.postCount)}</p>
                     <p className="mt-0.5 text-xs text-gray-500 sm:text-sm">작성글</p>
                   </div>
                   <div className={`flex flex-col items-center justify-center ${isOwnProfile ? 'border-r border-gray-200' : ''}`}>

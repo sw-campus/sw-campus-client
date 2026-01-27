@@ -186,7 +186,7 @@ html {
   }
 
   .prose .diary-section {
-    @apply rounded-xl border-l-4 border-orange-500 bg-linear-to-br from-orange-50 to-amber-50 p-5;
+    @apply rounded-xl border-l-4 border-orange-500 bg-gradient-to-br from-orange-50 to-amber-50 p-5;
   }
 
   .prose .diary-section h3 {
