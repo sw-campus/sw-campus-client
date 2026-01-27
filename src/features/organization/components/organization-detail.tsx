@@ -18,15 +18,12 @@ import {
   type Review,
   type ReviewSortType,
 } from '@/features/lecture/api/review-api.types'
+import PhotoSlider from '@/features/lecture/components/detail/photo-slider'
 import { LectureCard } from '@/features/lecture/components/lecture-card'
 import { LectureListItem } from '@/features/lecture/components/lecture-list-item'
-import PhotoSlider from '@/features/lecture/components/detail/photo-slider'
 import { mapLectureResponseToSummary } from '@/features/lecture/utils/map-lecture-response-to-summary'
 
-import {
-  fetchOrganizationLectures,
-  type LectureSortType,
-} from '../api/organization-api'
+import { fetchOrganizationLectures, type LectureSortType } from '../api/organization-api'
 import type { OrganizationDetail as OrganizationDetailType } from '../types/organization.type'
 
 // 별점 컴포넌트
@@ -54,7 +51,7 @@ function OrganizationReviewCard({ review }: { review: Review }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
-    <Card className="rounded-xl border-0 bg-card p-4 shadow-[4px_4px_15px_0px_rgba(161,161,170,0.25)]">
+    <Card className="bg-card rounded-xl border-0 p-4 shadow-[4px_4px_15px_0px_rgba(161,161,170,0.25)]">
       {/* Header: User Info + Rating + Lecture Link */}
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
@@ -98,7 +95,7 @@ function OrganizationReviewCard({ review }: { review: Review }) {
 
       {/* Detail Scores Expanded */}
       {isExpanded && review.detailScores && review.detailScores.length > 0 && (
-        <div className="mt-4 space-y-3 rounded-lg bg-muted p-4">
+        <div className="bg-muted mt-4 space-y-3 rounded-lg p-4">
           {review.detailScores.map(detail => (
             <div key={detail.category} className="space-y-1.5">
               <div className="flex items-center justify-between">
@@ -261,7 +258,7 @@ function OrganizationReviewsSection({ organizationId }: { organizationId: number
           <p className="text-muted-foreground text-sm">총 {totalCount}개의 후기</p>
           {isUnblinded && (
             <Select value={sortType} onValueChange={handleSortChange}>
-              <SelectTrigger className="h-10 w-auto min-w-[120px] border-border" aria-label="정렬 기준 선택">
+              <SelectTrigger className="border-border h-10 w-auto min-w-[120px]" aria-label="정렬 기준 선택">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -372,7 +369,7 @@ function OrganizationProgramsSection({ organizationId }: { organizationId: numbe
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">총 {totalCount}개의 프로그램</p>
           <Select value={sortType} onValueChange={handleSortChange}>
-            <SelectTrigger className="h-10 w-auto min-w-[120px] border-border" aria-label="정렬 기준 선택">
+            <SelectTrigger className="border-border h-10 w-auto min-w-[120px]" aria-label="정렬 기준 선택">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -406,11 +403,7 @@ function OrganizationProgramsSection({ organizationId }: { organizationId: numbe
   )
 }
 
-export function OrganizationDetail({
-  organization,
-  totalReviews = 0,
-  totalLectures = 0,
-}: OrganizationDetailProps) {
+export function OrganizationDetail({ organization, totalReviews = 0, totalLectures = 0 }: OrganizationDetailProps) {
   // Collect facility images that exist
   const facilityImages = [
     organization.facilityImageUrl,
@@ -420,33 +413,26 @@ export function OrganizationDetail({
   ].filter(Boolean) as string[]
 
   // Use first facility image or default
-  const heroImage = facilityImages[0] || `https://picsum.photos/seed/${organization.id}/1200/400`
+  const heroImage = '/images/org/organization_detail_banner.jpg'
 
   return (
     <div className="w-full overflow-hidden">
       {/* ===== HERO BANNER ===== */}
       <div className="relative -mx-4 -mt-4 h-[250px] overflow-hidden md:-mx-6 md:-mt-6">
-        <Image
-          src={heroImage}
-          alt={`${organization.name} 시설`}
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority
-        />
+        <Image src={heroImage} alt={`${organization.name} 시설`} fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
 
         {/* Text on Image - Glassmorphism */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <div className="rounded-2xl bg-black/40 px-6 py-4 backdrop-blur-md">
-            <span className="mb-1 block text-xs font-medium uppercase tracking-widest text-white/90">훈련기관</span>
+            <span className="mb-1 block text-xs font-medium tracking-widest text-white/90 uppercase">훈련기관</span>
             <h1 className="text-xl font-bold text-white drop-shadow-lg md:text-2xl">{organization.name}</h1>
             {organization.homepage && (
               <Link
                 href={organization.homepage}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 mt-3 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               >
                 홈페이지
                 <ExternalLink className="h-3.5 w-3.5" />
@@ -461,13 +447,13 @@ export function OrganizationDetail({
         <TabsList className="flex h-auto w-full border-b border-[#888888]/50">
           <TabsTrigger
             value="intro"
-            className="flex-1 border-b-2 border-transparent py-3 text-sm font-normal text-foreground data-[state=active]:border-b-[#FEB706] data-[state=active]:font-semibold"
+            className="text-foreground flex-1 border-b-2 border-transparent py-3 text-sm font-normal data-[state=active]:border-b-[#FEB706] data-[state=active]:font-semibold"
           >
             기관 소개
           </TabsTrigger>
           <TabsTrigger
             value="reviews"
-            className="flex-1 border-b-2 border-transparent py-3 text-sm font-normal text-foreground data-[state=active]:border-b-[#FEB706] data-[state=active]:font-semibold"
+            className="text-foreground flex-1 border-b-2 border-transparent py-3 text-sm font-normal data-[state=active]:border-b-[#FEB706] data-[state=active]:font-semibold"
           >
             후기
             {totalReviews > 0 && (
@@ -476,7 +462,7 @@ export function OrganizationDetail({
           </TabsTrigger>
           <TabsTrigger
             value="programs"
-            className="flex-1 border-b-2 border-transparent py-3 text-sm font-normal text-foreground data-[state=active]:border-b-[#FEB706] data-[state=active]:font-semibold"
+            className="text-foreground flex-1 border-b-2 border-transparent py-3 text-sm font-normal data-[state=active]:border-b-[#FEB706] data-[state=active]:font-semibold"
           >
             등록된 교육
             {totalLectures > 0 && (
@@ -486,7 +472,7 @@ export function OrganizationDetail({
         </TabsList>
 
         {/* ===== TAB CONTENT ===== */}
-        <div className="pb-20 pt-6">
+        <div className="pt-6 pb-20">
           {/* 기관 소개 */}
           <TabsContent value="intro" className="mt-0">
             <div className="space-y-6 px-4 md:px-6">
@@ -505,7 +491,6 @@ export function OrganizationDetail({
                   <PhotoSlider photos={facilityImages} />
                 </section>
               )}
-
             </div>
           </TabsContent>
 
@@ -523,4 +508,3 @@ export function OrganizationDetail({
     </div>
   )
 }
-

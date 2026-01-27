@@ -182,31 +182,23 @@ html {
 
   /* 부트캠프 성장일기 템플릿 스타일 */
   .prose .diary-template {
-    @apply flex flex-col gap-4;
+    @apply flex flex-col gap-2;
   }
 
   .prose .diary-section {
-    @apply relative overflow-hidden rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50 p-0 shadow-sm;
-  }
-
-  .prose .diary-section-header {
-    @apply flex items-center gap-4 border-b border-orange-100 bg-gradient-to-r from-orange-100/50 to-transparent px-5 py-4;
-  }
-
-  .prose .diary-section-number {
-    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-sm font-bold text-white shadow-sm;
+    @apply rounded-xl border-l-4 border-orange-500 bg-gradient-to-br from-orange-50 to-amber-50 p-5;
   }
 
   .prose .diary-section h3 {
-    @apply m-0 text-base font-semibold text-orange-800;
+    @apply mt-0 mb-3 text-base font-semibold text-orange-700;
   }
 
   .prose .diary-section h3 small {
-    @apply mt-0.5 block text-xs font-normal text-orange-600/70;
+    @apply text-xs font-normal text-gray-500;
   }
 
-  .prose .diary-section-content {
-    @apply px-5 py-4 leading-relaxed text-gray-700;
+  .prose .diary-section > div {
+    @apply leading-relaxed text-gray-700;
   }
 }
 
