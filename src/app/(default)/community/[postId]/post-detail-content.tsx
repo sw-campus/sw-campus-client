@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import DOMPurify from 'dompurify'
 import Link from 'next/link'
@@ -17,6 +17,7 @@ import {
   FiCheck,
   FiMapPin,
 } from 'react-icons/fi'
+import { toast } from 'sonner'
 
 import { UserAvatar } from '@/components/ui/user-avatar'
 
@@ -61,6 +62,27 @@ export default function PostDetailContent({ postId, initialData }: PostDetailCon
   const [isCopied, setIsCopied] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isLikerModalOpen, setIsLikerModalOpen] = useState(false)
+
+  // URL 해시에서 댓글 ID 확인 후 해당 댓글이 없으면 토스트 표시
+  useEffect(() => {
+    // 게시글이 삭제된 경우(error) 해시 체크 하지 않음
+    if (isLoading || !post || error) return
+
+    const hash = window.location.hash
+    if (hash.startsWith('#comment-')) {
+      const commentId = hash.replace('#comment-', '')
+      // 댓글 섹션이 렌더링된 후 확인하기 위해 약간의 지연
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`comment-${commentId}`)
+        if (!element) {
+          toast.info('삭제된 댓글입니다.')
+          // 해시 제거
+          window.history.replaceState(null, '', window.location.pathname)
+        }
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading, post, error])
 
   // React Compiler가 자동 최적화하므로 useMemo 대신 IIFE 사용
   const imagesNotInBody = (() => {
