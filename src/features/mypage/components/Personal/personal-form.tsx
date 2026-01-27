@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 import { FiX } from 'react-icons/fi'
@@ -12,13 +13,22 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldSet } from '@/components/ui/field'
 import AddressInput from '@/features/auth/components/address-input'
+import { PROFILE_QUERY_KEY } from '@/features/mypage/components/profile-card'
 import { api } from '@/lib/axios'
 import { useAuthStore } from '@/store/auth-store'
 import { useSignupStore } from '@/store/signup-store'
 
 const profileSchema = z.object({
-  nickname: z.string().min(1, '닉네임을 입력해주세요.'),
-  phone: z.string().min(1, '휴대폰 번호를 입력해주세요.'),
+  nickname: z
+    .string()
+    .min(1, '닉네임을 입력해주세요.')
+    .max(12, '닉네임은 12자 이내로 입력해주세요.'),
+  phone: z
+    .string()
+    .min(1, '휴대폰 번호를 입력해주세요.')
+    .regex(/^[0-9]+$/, '휴대폰 번호는 숫자만 입력해주세요. (하이픈 제외)')
+    .min(10, '휴대폰 번호는 10자리 이상이어야 합니다.')
+    .max(11, '휴대폰 번호는 11자리 이하여야 합니다.'),
   // AddressInput은 store 기반이므로 location은 선택적으로만 유지
   location: z.string().optional(),
 })
@@ -39,7 +49,7 @@ type MyProfileResponse = {
 // 모달 스크린샷처럼: 라운드, 얇은 보더, 포커스 앰버 컬러
 
 const INPUT_CLASS =
-  'h-10 sm:h-11 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-200 focus:outline-none'
+  'h-10 sm:h-11 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/50 focus:outline-none'
 
 // AddressInput(daum.Postcode)이 동작하려면 postcode 스크립트가 필요합니다.
 const DAUM_POSTCODE_SCRIPT_ID = 'daum-postcode-script'
@@ -63,11 +73,12 @@ const loadDaumPostcodeScript = () => {
 
 export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: boolean; onSuccess?: () => void }) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [isPending, setIsPending] = useState(false)
   const [isCheckingNickname, setIsCheckingNickname] = useState(false)
-  const [showAddressEditor, setShowAddressEditor] = useState(false)
+  const [addressError, setAddressError] = useState<string>('')
 
-  const { setAddress, setDetailAddress, address, detailAddress } = useSignupStore()
+  const { setAddress, address } = useSignupStore()
   const { setNickname } = useAuthStore()
   const [profileEmail, setProfileEmail] = useState<string>('')
   const [profileName, setProfileName] = useState<string>('')
@@ -84,8 +95,7 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
   })
 
   const {
-    handleSubmit,
-    formState: { isValid, errors },
+    formState: { errors },
     register,
   } = methods
 
@@ -128,17 +138,16 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
         setProfileEmail(data.email)
         setProfileName(data.name)
 
-        // react-hook-form 값 세팅
+        // react-hook-form 값 세팅 (휴대폰 번호는 하이픈 제거)
         methods.reset({
           nickname: data.nickname ?? '',
-          phone: data.phone ?? '',
+          phone: (data.phone ?? '').replace(/-/g, ''),
           location: '',
         })
 
-        // 주소는 백엔드 값으로 초기 세팅 (수정 시 AddressInput 노출)
+        // 주소는 백엔드 값으로 초기 세팅
         const loc = (data.location ?? '').trim()
         setAddress(loc)
-        setDetailAddress('')
       } catch {
         toast.error('내 정보 조회에 실패했습니다.')
       } finally {
@@ -151,66 +160,93 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
     return () => {
       mounted = false
     }
-  }, [methods, setAddress, setDetailAddress])
+  }, [methods, setAddress])
 
-  const onSubmit = async (values: ProfileFormValues) => {
+  // 주소 입력 시 에러 초기화
+  useEffect(() => {
+    if (address && addressError) {
+      setAddressError('')
+    }
+  }, [address, addressError])
+
+  const handleSave = async () => {
+    // react-hook-form 검증
+    const isValid = await methods.trigger()
+    if (!isValid) {
+      const firstError = Object.values(methods.formState.errors)[0]
+      if (firstError?.message) {
+        toast.error(firstError.message as string)
+      }
+      return
+    }
+
+    // 주소 검증
+    const location = (address ?? '').trim()
+    if (!location) {
+      setAddressError('주소를 입력해주세요.')
+      toast.error('주소를 입력해주세요.')
+      return
+    }
+    setAddressError('')
+
+    const values = methods.getValues()
     setIsPending(true)
     try {
-      const location = [address, detailAddress].filter(Boolean).join(' ').trim()
-      if (!location) {
-        toast.error('주소를 입력해주세요.')
-        return
-      }
-
       await api.patch('/mypage/profile', {
         nickname: values.nickname,
         phone: values.phone,
         location,
       })
-      // 전역 상태 업데이트 (헤더 닉네임 반영)
       setNickname(values.nickname)
       toast.success('저장되었습니다.')
       if (onSuccess) {
+        // 모달(intercept route) 닫기: router.back() 이후 어떤 상태 업데이트도
+        // 동기적으로 실행하면 Next.js 네비게이션 트랜지션을 방해하므로,
+        // onSuccess() 호출 후 모든 후속 작업을 비동기로 지연시킨다.
         onSuccess()
-      } else {
-        router.back()
-        router.refresh()
+        setTimeout(() => {
+          setIsPending(false)
+          queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY })
+        }, 100)
+        return
       }
+      queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY })
+      router.back()
     } catch {
       toast.error('저장에 실패했습니다.')
-    } finally {
       setIsPending(false)
     }
   }
 
   const formContent = (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
         <FieldSet>
           <FieldGroup className="grid grid-cols-1 gap-6">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-800">이름</label>
-              <div className={`${INPUT_CLASS} flex items-center bg-gray-50`}>
+              <label className="text-foreground mb-1 block text-sm font-medium">이름</label>
+              <div className={`${INPUT_CLASS} bg-muted flex items-center`}>
                 <span className="truncate">{profileName || '-'}</span>
               </div>
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-800">이메일</label>
-              <div className={`${INPUT_CLASS} flex items-center bg-gray-50`}>
+              <label className="text-foreground mb-1 block text-sm font-medium">이메일</label>
+              <div className={`${INPUT_CLASS} bg-muted flex items-center`}>
                 <span className="truncate">{profileEmail || '-'}</span>
               </div>
             </div>
 
             <div>
-              <label htmlFor="nickname" className="mb-1 block text-sm font-medium text-gray-800">
-                닉네임
+              <label htmlFor="nickname" className="text-foreground mb-1 block text-sm font-medium">
+                닉네임 <span className="text-destructive">*</span>
               </label>
               <div className="flex items-center gap-2">
                 <input
                   id="nickname"
                   type="text"
                   placeholder="예) dev master"
+                  maxLength={12}
                   {...register('nickname')}
                   className={INPUT_CLASS}
                 />
@@ -218,54 +254,39 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
                   type="button"
                   onClick={onCheckNickname}
                   disabled={isCheckingNickname || isLoading}
-                  className="h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+                  className="bg-foreground text-background hover:bg-foreground/90 disabled:bg-muted disabled:text-muted-foreground h-10 shrink-0 rounded-md px-4 text-sm font-semibold disabled:cursor-not-allowed"
                 >
-                  {isCheckingNickname ? '확인 중...' : '인증'}
+                  {isCheckingNickname ? '확인 중...' : '중복확인'}
                 </button>
               </div>
-              {errors.nickname && <p className="mt-1 text-xs text-red-600">{errors.nickname.message}</p>}
+              {errors.nickname && <p className="mt-1 text-xs text-destructive">{errors.nickname.message}</p>}
             </div>
 
             <div>
-              <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-800">
-                휴대폰 번호
+              <label htmlFor="phone" className="text-foreground mb-1 block text-sm font-medium">
+                휴대폰 번호 <span className="text-destructive">*</span>
               </label>
               <input
                 id="phone"
                 type="text"
-                placeholder="예) 010-1234-5678"
+                placeholder="예) 01012345678"
+                maxLength={11}
                 {...register('phone')}
                 className={INPUT_CLASS}
               />
-              {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone.message}</p>}
+              {errors.phone && <p className="mt-1 text-xs text-destructive">{errors.phone.message}</p>}
             </div>
 
-            <div>
-              {!showAddressEditor ? (
-                <div className="flex items-center gap-2">
-                  <div className={`${INPUT_CLASS} flex flex-1 items-center bg-gray-50`}>
-                    <span className="truncate">{address || '주소를 입력해주세요.'}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddressEditor(true)}
-                    className="h-10 shrink-0 rounded-md bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
-                  >
-                    수정
-                  </button>
-                </div>
-              ) : (
-                <AddressInput autoOpen variant="light" />
-              )}
-            </div>
+            <AddressInput variant="light" required error={addressError} />
           </FieldGroup>
 
           {/* Footer */}
           <div className="pt-2">
             <Button
-              type="submit"
-              disabled={!isValid || isPending || isLoading}
-              className="h-11 w-full rounded-md bg-gray-900 px-6 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+              type="button"
+              onClick={handleSave}
+              disabled={isPending || isLoading}
+              className="bg-foreground text-background hover:bg-foreground/90 disabled:bg-muted disabled:text-muted-foreground h-11 w-full rounded-md px-6 text-sm font-semibold disabled:cursor-not-allowed"
             >
               {isLoading ? '불러오는 중...' : isPending ? '저장 중...' : '저장'}
             </Button>
@@ -287,15 +308,15 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
   // 단독 페이지/컴포넌트로 렌더링될 때의 카드 UI
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="bg-card rounded-2xl border border-border shadow-sm">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-4 sm:px-8 sm:py-6">
-          <h2 className="text-xl font-semibold text-gray-900">개인 정보 수정</h2>
+        <div className="flex items-center justify-between border-b border-border px-4 py-4 sm:px-8 sm:py-6">
+          <h2 className="text-foreground text-xl font-semibold">개인 정보 수정</h2>
 
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-10 w-10 items-center justify-center rounded-md"
             aria-label="닫기"
           >
             <FiX className="h-5 w-5" aria-hidden />

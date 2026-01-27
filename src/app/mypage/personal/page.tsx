@@ -8,11 +8,19 @@ export default function MyPage() {
 
   if (userType === 'PERSONAL') {
     return (
-      <div className="custom-container">
-        <div className="custom-card">
+      <>
+        {/* Mobile: compare 페이지처럼 플랫 디자인 */}
+        <div className="px-4 py-6 sm:hidden">
           <MyPageDashboard />
         </div>
-      </div>
+
+        {/* Desktop: custom-card 래퍼 사용 */}
+        <div className="custom-container hidden sm:block">
+          <div className="custom-card">
+            <MyPageDashboard />
+          </div>
+        </div>
+      </>
     )
   }
 
