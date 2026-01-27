@@ -185,6 +185,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
   const [isInCart, setIsInCart] = useState(false)
   const [isFloatingBarOpen, setIsFloatingBarOpen] = useState(false)
   const [isHeaderFixed, setIsHeaderFixed] = useState(false)
+  const [isScrolling, setIsScrolling] = useState(false)
 
   const headerRef = useRef<HTMLDivElement>(null)
   const headerPlaceholderRef = useRef<HTMLDivElement>(null)
@@ -238,9 +239,13 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
     const sectionIds: TabType[] = ['overview', 'intro', 'curriculum', 'review']
 
     const handleScrollForTabs = () => {
+      // 프로그래매틱 스크롤 중에는 자동 탭 변경 방지
+      if (isScrolling) return
+
       const isMobile = window.innerWidth < 1024
       const prefix = isMobile ? 'mobile-' : ''
-      const headerOffset = isMobile ? 180 : 100
+      // PC: 헤더(80px) + 탭(56px) + 여유 = 200px, 모바일: 200px
+      const headerOffset = isMobile ? 200 : 200
       const scrollPosition = window.scrollY + headerOffset
 
       // 각 섹션의 절대 위치 계산
@@ -250,6 +255,15 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
         if (element) {
           sectionPositions.push({ id, offsetTop: element.offsetTop })
         }
+      }
+
+      // 페이지 끝에 도달했는지 확인
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100
+
+      // 페이지 끝이면 마지막 섹션(후기) 활성화
+      if (isAtBottom && sectionPositions.length > 0) {
+        setActiveTab('review')
+        return
       }
 
       // 현재 스크롤 위치보다 위에 있는 섹션 중 가장 마지막 섹션
@@ -267,7 +281,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
     handleScrollForTabs() // 초기 실행
 
     return () => window.removeEventListener('scroll', handleScrollForTabs)
-  }, [])
+  }, [isScrolling])
 
 
   const formatCurrency = (amount: number) => {
@@ -275,17 +289,25 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
   }
 
   const scrollToSection = (tabId: TabType) => {
+    setIsScrolling(true)
     setActiveTab(tabId)
     const isMobile = window.innerWidth < 1024
     const prefix = isMobile ? 'mobile-' : ''
     const element = document.getElementById(prefix + tabId)
     if (element) {
-      const offset = 160 // sticky buttons + tab height
+      // PC: 헤더(80px) + 탭(56px) + 여백 = 150px, 모바일: 160px
+      const offset = isMobile ? 160 : 150
       const elementPosition = element.getBoundingClientRect().top + window.scrollY
       window.scrollTo({
         top: elementPosition - offset,
         behavior: 'smooth'
       })
+      // 스크롤 애니메이션 완료 후 isScrolling 해제 (긴 스크롤을 위해 1.2초)
+      setTimeout(() => {
+        setIsScrolling(false)
+      }, 1200)
+    } else {
+      setIsScrolling(false)
     }
   }
 
@@ -671,7 +693,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
                   </section>
 
                   {/* Section: 후기 */}
-                  <section id="review" className="scroll-mt-[200px]">
+                  <section id="review" className="scroll-mt-[200px] min-h-[400px]">
                     <LectureReviews lectureId={lecture.id} />
                   </section>
                 </div>
@@ -928,19 +950,20 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
           <div className="flex flex-col gap-3">
             <p className="text-sm text-[#555555]">
               <span className="font-semibold text-[#020202] underline">{lecture.aiSummary.location}</span>에서{' '}
-              <span className="font-semibold text-[#020202] underline">{lecture.aiSummary.schedule}</span>
+              <span className="font-semibold text-[#020202] underline">{lecture.aiSummary.schedule}</span>으로
             </p>
             <p className="text-sm text-[#555555]">
-              으로 진행되는{' '}
+              진행되는{' '}
               <span className="font-semibold text-[#020202] underline">{lecture.aiSummary.type}</span>{' '}
               <span className="font-semibold text-[#020202] underline">{lecture.aiSummary.category}</span> 과정입니다.
             </p>
             <p className="text-sm text-[#555555]">
               주요 서비스로{' '}
               <span className="font-semibold text-[#020202] underline">{lecture.aiSummary.services}</span>
+              {' '}등을 제공하며,
             </p>
             <p className="text-sm text-[#555555]">
-              등을 제공하며, 선발절차에 코딩테스트는{' '}
+              선발절차에 코딩테스트는{' '}
               <span className="font-semibold text-[#020202] underline">
                 {lecture.aiSummary.hasCodingTest ? '있습니다.' : '없습니다.'}
               </span>
@@ -1216,7 +1239,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
         </section>
 
         {/* Section: 후기 */}
-        <section id="mobile-review" className="pb-6 border-b border-gray-200 flex flex-col gap-6 scroll-mt-40">
+        <section id="mobile-review" className="pb-6 border-b border-gray-200 flex flex-col gap-6 scroll-mt-40 min-h-[300px]">
           <LectureReviews lectureId={lecture.id} />
         </section>
 
