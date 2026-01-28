@@ -3,18 +3,31 @@
 import { X, ChevronDown } from 'lucide-react'
 import { useCategoryTree } from '@/features/category/hooks/use-category-tree'
 import { REGION_FILTERS } from '@/features/lecture/types/filter.type'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { Checkbox } from '@/components/ui/checkbox'
 
 export interface FilterValues {
   mainCategory: string
   subCategory: string
-  detailCategory: string
+  detailCategories: string[]
   mainCategoryId: number | null
   subCategoryId: number | null
-  detailCategoryId: number | null
+  detailCategoryIds: number[]
   recruitStatus: string[]
   cost: string[]
   selectionProcess: string[]
-  region: string
+  regions: string[]
 }
 
 interface FilterModalProps {
@@ -65,7 +78,20 @@ export function FilterModal({
   }
 
   // 대분류 변경 핸들러
-  const handleMainCategoryChange = (categoryId: number) => {
+  const handleMainCategoryChange = (value: string) => {
+    if (value === 'all') {
+      onFilterChange({
+        ...filterValues,
+        mainCategoryId: null,
+        mainCategory: '',
+        subCategoryId: null,
+        subCategory: '',
+        detailCategoryIds: [],
+        detailCategories: [],
+      })
+      return
+    }
+    const categoryId = Number(value)
     const category = categoryTree.find((cat) => cat.categoryId === categoryId)
     onFilterChange({
       ...filterValues,
@@ -73,40 +99,86 @@ export function FilterModal({
       mainCategory: category?.categoryName ?? '',
       subCategoryId: null,
       subCategory: '',
-      detailCategoryId: null,
-      detailCategory: '',
+      detailCategoryIds: [],
+      detailCategories: [],
     })
   }
 
   // 중분류 변경 핸들러
-  const handleSubCategoryChange = (categoryId: number) => {
+  const handleSubCategoryChange = (value: string) => {
+    if (value === 'all') {
+      onFilterChange({
+        ...filterValues,
+        subCategoryId: null,
+        subCategory: '',
+        detailCategoryIds: [],
+        detailCategories: [],
+      })
+      return
+    }
+    const categoryId = Number(value)
     const category = subCategories.find((cat) => cat.categoryId === categoryId)
     onFilterChange({
       ...filterValues,
       subCategoryId: categoryId,
       subCategory: category?.categoryName ?? '',
-      detailCategoryId: null,
-      detailCategory: '',
+      detailCategoryIds: [],
+      detailCategories: [],
     })
   }
 
-  // 소분류 변경 핸들러
-  const handleDetailCategoryChange = (categoryId: number) => {
-    const category = detailCategories.find((cat) => cat.categoryId === categoryId)
-    onFilterChange({
-      ...filterValues,
-      detailCategoryId: categoryId,
-      detailCategory: category?.categoryName ?? '',
-    })
+  // 안전한 배열 접근
+  const regions = filterValues.regions ?? []
+  const detailCategoryIds = filterValues.detailCategoryIds ?? []
+  const detailCategoriesArr = filterValues.detailCategories ?? []
+
+  // 소분류 토글 핸들러 (다중 선택)
+  const handleDetailCategoryToggle = (categoryId: number, categoryName: string) => {
+    const isSelected = detailCategoryIds.includes(categoryId)
+    if (isSelected) {
+      onFilterChange({
+        ...filterValues,
+        detailCategoryIds: detailCategoryIds.filter((id) => id !== categoryId),
+        detailCategories: detailCategoriesArr.filter((name) => name !== categoryName),
+      })
+    } else {
+      onFilterChange({
+        ...filterValues,
+        detailCategoryIds: [...detailCategoryIds, categoryId],
+        detailCategories: [...detailCategoriesArr, categoryName],
+      })
+    }
   }
 
-  // 지역 변경 핸들러
-  const handleRegionChange = (region: string) => {
-    onFilterChange({
-      ...filterValues,
-      region,
-    })
+  // 지역 토글 핸들러 (다중 선택)
+  const handleRegionToggle = (region: string) => {
+    const isSelected = regions.includes(region)
+    if (isSelected) {
+      onFilterChange({
+        ...filterValues,
+        regions: regions.filter((r) => r !== region),
+      })
+    } else {
+      onFilterChange({
+        ...filterValues,
+        regions: [...regions, region],
+      })
+    }
   }
+
+  // 선택된 소분류 표시 텍스트
+  const detailCategoryDisplayText = detailCategoryIds.length === 0
+    ? '전체'
+    : detailCategoryIds.length === 1
+      ? detailCategoriesArr[0]
+      : `${detailCategoriesArr[0]} 외 ${detailCategoryIds.length - 1}개`
+
+  // 선택된 지역 표시 텍스트
+  const regionDisplayText = regions.length === 0
+    ? '전체 지역'
+    : regions.length === 1
+      ? regions[0]
+      : `${regions[0]} 외 ${regions.length - 1}개`
 
   return (
     <div className="fixed inset-0 z-50 px-4 py-8 bg-black/70 overflow-auto flex items-start justify-center">
@@ -129,76 +201,74 @@ export function FilterModal({
               <div className="w-full flex gap-1">
                 <div className="flex-1 flex flex-col gap-1">
                   <span className="text-xs text-[#888888]">대분류</span>
-                  <div className="relative">
-                    <select
-                      value={filterValues.mainCategoryId ?? ''}
-                      onChange={(e) => {
-                        const value = e.target.value
-                        if (value) {
-                          handleMainCategoryChange(Number(value))
-                        }
-                      }}
-                      className="w-full p-2.5 bg-[#F2F2F2] rounded-lg text-xs text-black appearance-none cursor-pointer pr-8"
-                    >
-                      <option value="">전체</option>
+                  <Select
+                    value={filterValues.mainCategoryId?.toString() ?? 'all'}
+                    onValueChange={handleMainCategoryChange}
+                  >
+                    <SelectTrigger className="w-full h-10 bg-[#F2F2F2] border-none rounded-lg text-xs text-black">
+                      <SelectValue placeholder="전체" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">전체</SelectItem>
                       {categoryTree.map((cat) => (
-                        <option key={cat.categoryId} value={cat.categoryId}>
+                        <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
                           {cat.categoryName}
-                        </option>
+                        </SelectItem>
                       ))}
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-black absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  </div>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex-1 flex flex-col gap-1">
                   <span className="text-xs text-[#888888]">중분류</span>
-                  <div className="relative">
-                    <select
-                      value={filterValues.subCategoryId ?? ''}
-                      onChange={(e) => {
-                        const value = e.target.value
-                        if (value) {
-                          handleSubCategoryChange(Number(value))
-                        }
-                      }}
-                      disabled={!filterValues.mainCategoryId}
-                      className="w-full p-2.5 bg-[#F2F2F2] rounded-lg text-xs text-black appearance-none cursor-pointer pr-8 disabled:text-[#888888] disabled:cursor-not-allowed"
-                    >
-                      <option value="">전체</option>
+                  <Select
+                    value={filterValues.subCategoryId?.toString() ?? 'all'}
+                    onValueChange={handleSubCategoryChange}
+                    disabled={!filterValues.mainCategoryId}
+                  >
+                    <SelectTrigger className="w-full h-10 bg-[#F2F2F2] border-none rounded-lg text-xs text-black disabled:text-[#888888] disabled:cursor-not-allowed">
+                      <SelectValue placeholder="전체" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">전체</SelectItem>
                       {subCategories.map((cat) => (
-                        <option key={cat.categoryId} value={cat.categoryId}>
+                        <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
                           {cat.categoryName}
-                        </option>
+                        </SelectItem>
                       ))}
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-black absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  </div>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              {/* Detail Category */}
+              {/* Detail Category (다중 선택 드롭다운) */}
               <div className="w-full flex flex-col gap-1">
                 <span className="text-xs text-[#888888]">소분류</span>
-                <div className="relative">
-                  <select
-                    value={filterValues.detailCategoryId ?? ''}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      if (value) {
-                        handleDetailCategoryChange(Number(value))
-                      }
-                    }}
-                    disabled={!filterValues.subCategoryId || detailCategories.length === 0}
-                    className="w-full p-2.5 bg-[#F2F2F2] rounded-lg text-xs text-black appearance-none cursor-pointer pr-8 disabled:text-[#888888] disabled:cursor-not-allowed"
-                  >
-                    <option value="">전체</option>
-                    {detailCategories.map((cat) => (
-                      <option key={cat.categoryId} value={cat.categoryId}>
-                        {cat.categoryName}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-[#888888] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      disabled={!filterValues.subCategoryId || detailCategories.length === 0}
+                      className="w-full h-10 px-3 bg-[#F2F2F2] rounded-lg text-xs text-black flex items-center justify-between disabled:text-[#888888] disabled:cursor-not-allowed"
+                    >
+                      <span className="truncate">{detailCategoryDisplayText}</span>
+                      <ChevronDown className="w-4 h-4 flex-shrink-0 opacity-50" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[280px] p-2 max-h-[300px] overflow-y-auto" align="start">
+                    <div className="flex flex-col gap-1">
+                      {detailCategories.map((cat) => (
+                        <label
+                          key={cat.categoryId}
+                          className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-primary/10 cursor-pointer"
+                        >
+                          <Checkbox
+                            checked={detailCategoryIds.includes(cat.categoryId)}
+                            onCheckedChange={() => handleDetailCategoryToggle(cat.categoryId, cat.categoryName)}
+                          />
+                          <span className="text-sm">{cat.categoryName}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
           </div>
@@ -255,24 +325,33 @@ export function FilterModal({
             </div>
           </div>
 
-          {/* Region Section */}
+          {/* Region Section (다중 선택 드롭다운) */}
           <div className="w-full p-3 border-b border-[#020202] flex flex-col gap-6">
             <span className="text-base text-black">지역</span>
-            <div className="relative">
-              <select
-                value={filterValues.region}
-                onChange={(e) => handleRegionChange(e.target.value)}
-                className="w-full p-2.5 bg-[#F2F2F2] rounded-lg text-xs text-black appearance-none cursor-pointer pr-8"
-              >
-                <option value="">전체 지역</option>
-                {REGION_FILTERS.map((region) => (
-                  <option key={region} value={region}>
-                    {region}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-4 h-4 text-[#888888] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="w-full h-10 px-3 bg-[#F2F2F2] rounded-lg text-xs text-black flex items-center justify-between">
+                  <span className="truncate">{regionDisplayText}</span>
+                  <ChevronDown className="w-4 h-4 flex-shrink-0 opacity-50" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[280px] p-2 max-h-[300px] overflow-y-auto" align="start">
+                <div className="flex flex-col gap-1">
+                  {REGION_FILTERS.map((region) => (
+                    <label
+                      key={region}
+                      className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-primary/10 cursor-pointer"
+                    >
+                      <Checkbox
+                        checked={regions.includes(region)}
+                        onCheckedChange={() => handleRegionToggle(region)}
+                      />
+                      <span className="text-sm">{region}</span>
+                    </label>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 

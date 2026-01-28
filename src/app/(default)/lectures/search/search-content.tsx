@@ -41,14 +41,14 @@ import { trackSearch } from '@/lib/analytics'
 const initialFilterValues: FilterValues = {
   mainCategory: '',
   subCategory: '',
-  detailCategory: '',
+  detailCategories: [],
   mainCategoryId: null,
   subCategoryId: null,
-  detailCategoryId: null,
+  detailCategoryIds: [],
   recruitStatus: [],
   cost: [],
   selectionProcess: [],
-  region: '',
+  regions: [],
 }
 
 function SearchContentInner() {
@@ -140,10 +140,16 @@ function SearchContentInner() {
       params.append('text', trimmedText)
     }
 
-    // 카테고리 ID (가장 하위 카테고리 우선)
-    const categoryId = filterValues.detailCategoryId ?? filterValues.subCategoryId ?? filterValues.mainCategoryId
-    if (categoryId) {
-      params.append('categoryIds', String(categoryId))
+    // 카테고리 ID (소분류 다중 선택 시 각각 추가, 없으면 중분류 또는 대분류)
+    const detailCategoryIds = filterValues.detailCategoryIds ?? []
+    if (detailCategoryIds.length > 0) {
+      detailCategoryIds.forEach(id => {
+        params.append('categoryIds', String(id))
+      })
+    } else if (filterValues.subCategoryId) {
+      params.append('categoryIds', String(filterValues.subCategoryId))
+    } else if (filterValues.mainCategoryId) {
+      params.append('categoryIds', String(filterValues.mainCategoryId))
     }
 
     // 모집 상태 ('모집 중' → '모집중', '마감' → '마감')
@@ -175,13 +181,14 @@ function SearchContentInner() {
       }
     })
 
-    // 지역
-    if (filterValues.region) {
-      const regionParam = REGION_QUERY_MAP[filterValues.region]
+    // 지역 (다중 선택)
+    const regions = filterValues.regions ?? []
+    regions.forEach(region => {
+      const regionParam = REGION_QUERY_MAP[region]
       if (regionParam) {
         params.append('regions', regionParam)
       }
-    }
+    })
 
     // 정렬
     params.append('sort', sortValue || DEFAULT_SORT)
