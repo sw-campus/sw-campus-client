@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+
+import Link from 'next/link'
 import { FiLoader, FiMessageCircle, FiSend, FiSmile } from 'react-icons/fi'
 
 import { Button } from '@/components/ui/button'
@@ -175,9 +177,9 @@ export function CommentSection({ postId }: CommentSectionProps) {
           </div>
           <p className="text-gray-600">
             댓글을 작성하려면{' '}
-            <a href="/login" className="font-bold text-primary underline-offset-2 transition-colors hover:text-primary/80 hover:underline">
+            <Link href="/login" className="font-bold text-primary underline-offset-2 transition-colors hover:text-primary/80 hover:underline">
               로그인
-            </a>
+            </Link>
             이 필요합니다.
           </p>
         </div>
