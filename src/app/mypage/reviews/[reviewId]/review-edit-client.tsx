@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Star } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -8,20 +8,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { CATEGORY_LABELS, type ReviewCategory } from '@/features/lecture/api/review-api.types'
-import { api } from '@/lib/axios'
-
-type ReviewDetail = {
-  reviewId: number
-  lectureId: number
-  nickname?: string
-  comment: string
-  score: number
-  detailScores?: Array<{
-    category: ReviewCategory
-    score: number
-    comment?: string
-  }>
-}
+import { useReviewDetailQuery, useUpdateReviewMutation } from '@/features/lecture/hooks/use-review-query'
 
 interface ReviewEditClientProps {
   reviewId: number
@@ -30,59 +17,55 @@ interface ReviewEditClientProps {
 export function ReviewEditClient({ reviewId }: ReviewEditClientProps) {
   const router = useRouter()
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [saving, setSaving] = useState(false)
+  const { data, isLoading, error } = useReviewDetailQuery(reviewId)
+  const { mutate: updateReview, isPending: isSaving } = useUpdateReviewMutation(reviewId)
 
-  const [data, setData] = useState<ReviewDetail | null>(null)
-  const [score, setScore] = useState<number>(0)
-  const [comment, setComment] = useState<string>('')
-  const [detailScores, setDetailScores] = useState<
-    Array<{ category: ReviewCategory; score: number; comment?: string }>
-  >([])
+  // 폼 수정 여부 추적
+  const [formEdited, setFormEdited] = useState(false)
+  const [editedScore, setEditedScore] = useState<number | null>(null)
+  const [editedComment, setEditedComment] = useState<string | null>(null)
+  const [editedDetailScores, setEditedDetailScores] = useState<
+    Array<{ category: ReviewCategory; score: number; comment?: string }> | null
+  >(null)
 
-  useEffect(() => {
-    if (!reviewId || Number.isNaN(reviewId)) return
-    let cancelled = false
-    ;(async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const { data } = await api.get<ReviewDetail>(`/reviews/${reviewId}`)
-        if (cancelled) return
-        setData(data)
-        setScore(data.score ?? 0)
-        setComment(data.comment ?? '')
-        setDetailScores(
-          (data.detailScores ?? []).map(d => ({ category: d.category, score: d.score, comment: d.comment })),
-        )
-      } catch {
-        if (!cancelled) setError('리뷰 정보를 불러오지 못했습니다.')
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-    return () => {
-      cancelled = true
+  // 현재 표시할 값 (수정된 값이 있으면 수정된 값, 없으면 서버 데이터)
+  const score = editedScore ?? data?.score ?? 0
+  const comment = editedComment ?? data?.comment ?? ''
+  const detailScores =
+    editedDetailScores ??
+    data?.detailScores?.map(d => ({ category: d.category, score: d.score, comment: d.comment })) ??
+    []
+
+  const handleScoreChange = (value: number) => {
+    setEditedScore(value)
+    setFormEdited(true)
+  }
+
+  const handleCommentChange = (value: string) => {
+    setEditedComment(value)
+    setFormEdited(true)
+  }
+
+  const handleDetailScoreChange = (idx: number, field: 'score' | 'comment', value: number | string) => {
+    const newScores = [...detailScores]
+    if (field === 'score') {
+      newScores[idx] = { ...newScores[idx], score: value as number }
+    } else {
+      newScores[idx] = { ...newScores[idx], comment: value as string }
     }
-  }, [reviewId])
+    setEditedDetailScores(newScores)
+    setFormEdited(true)
+  }
 
-  const handleSave = async () => {
-    if (!data) return
-    try {
-      setSaving(true)
-      const payload = { score, comment, detailScores }
-      try {
-        await api.put(`/reviews/${data.reviewId}`, payload)
-      } catch {
-        await api.patch(`/reviews/${data.reviewId}`, payload)
-      }
-      router.back()
-    } catch {
-      setError('리뷰 저장에 실패했습니다.')
-    } finally {
-      setSaving(false)
-    }
+  const handleSave = () => {
+    updateReview(
+      { score, comment, detailScores },
+      {
+        onSuccess: () => {
+          router.back()
+        },
+      },
+    )
   }
 
   return (
@@ -97,10 +80,12 @@ export function ReviewEditClient({ reviewId }: ReviewEditClientProps) {
       </header>
 
       <Card className="bg-card/40 border-0 p-5 shadow-sm backdrop-blur-xl">
-        {loading && <p className="text-muted-foreground text-sm">불러오는 중...</p>}
-        {error && !loading && <p className="text-destructive-foreground text-sm">{error}</p>}
+        {isLoading && <p className="text-muted-foreground text-sm">불러오는 중...</p>}
+        {error && !isLoading && (
+          <p className="text-destructive-foreground text-sm">리뷰 정보를 불러오지 못했습니다.</p>
+        )}
 
-        {!loading && !error && data && (
+        {!isLoading && !error && data && (
           <div className="space-y-6">
             <div className="flex items-start justify-between">
               <div>
@@ -115,7 +100,7 @@ export function ReviewEditClient({ reviewId }: ReviewEditClientProps) {
                   max={5}
                   step={0.5}
                   value={score}
-                  onChange={e => setScore(Number(e.target.value))}
+                  onChange={e => handleScoreChange(Number(e.target.value))}
                   className="w-20 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm"
                 />
               </div>
@@ -125,7 +110,7 @@ export function ReviewEditClient({ reviewId }: ReviewEditClientProps) {
               <label className="text-foreground mb-1 block text-sm font-medium">한줄 후기</label>
               <textarea
                 value={comment}
-                onChange={e => setComment(e.target.value)}
+                onChange={e => handleCommentChange(e.target.value)}
                 rows={3}
                 className="text-foreground w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm placeholder-gray-400"
                 placeholder="후기를 입력하세요"
@@ -146,19 +131,14 @@ export function ReviewEditClient({ reviewId }: ReviewEditClientProps) {
                           max={5}
                           step={0.5}
                           value={d.score}
-                          onChange={e => {
-                            const v = Number(e.target.value)
-                            setDetailScores(prev => prev.map((x, i) => (i === idx ? { ...x, score: v } : x)))
-                          }}
+                          onChange={e => handleDetailScoreChange(idx, 'score', Number(e.target.value))}
                           className="w-16 rounded-md border border-gray-200 bg-white px-2 py-1 text-right text-sm"
                         />
                       </div>
                     </div>
                     <textarea
                       value={d.comment ?? ''}
-                      onChange={e =>
-                        setDetailScores(prev => prev.map((x, i) => (i === idx ? { ...x, comment: e.target.value } : x)))
-                      }
+                      onChange={e => handleDetailScoreChange(idx, 'comment', e.target.value)}
                       rows={2}
                       className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
                       placeholder="세부 의견을 입력하세요"
@@ -172,8 +152,8 @@ export function ReviewEditClient({ reviewId }: ReviewEditClientProps) {
               <Button variant="secondary" className="rounded-full" onClick={() => router.back()}>
                 취소
               </Button>
-              <Button className="rounded-full" disabled={saving} onClick={handleSave}>
-                저장
+              <Button className="rounded-full" disabled={isSaving || !formEdited} onClick={handleSave}>
+                {isSaving ? '저장 중...' : '저장'}
               </Button>
             </div>
           </div>
