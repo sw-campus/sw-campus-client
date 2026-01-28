@@ -10,7 +10,7 @@ import type { UserType } from '@/store/auth-store'
 interface MobileHeaderProps {
   isLoggedIn: boolean
   nickname: string | null
-  userType: UserType
+  userType: UserType | null
   hasHydrated: boolean
   mypageHref: string
   onOpenNav: () => void
