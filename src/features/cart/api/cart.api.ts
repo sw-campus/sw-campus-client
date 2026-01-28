@@ -94,13 +94,16 @@ export async function getCartItems(): Promise<CartItem[]> {
   if (res.status === 401) return []
 
   const data = res.data
+
   const items =
     data && typeof data === 'object' && Array.isArray((data as AnyRecord).items)
       ? ((data as AnyRecord).items as unknown[])
       : null
   const list = Array.isArray(data) ? data : (items ?? [])
 
-  return (list as unknown[]).map(toCartItem).filter(Boolean) as CartItem[]
+  const result = (list as unknown[]).map(toCartItem).filter(Boolean) as CartItem[]
+
+  return result
 }
 
 export async function addCartLecture(lectureId: LectureId): Promise<void> {

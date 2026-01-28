@@ -114,14 +114,14 @@ export function CommentSection({ postId }: CommentSectionProps) {
     <section className="mt-12 border-t border-gray-100 pt-10">
       {/* 헤더 */}
       <div className="mb-8 flex items-center gap-4">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-100 to-amber-100 shadow-sm">
-          <FiMessageCircle className="h-5 w-5 text-orange-600" />
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 shadow-sm">
+          <FiMessageCircle className="h-5 w-5 text-primary" />
         </div>
         <div>
           <h2 className="text-xl font-bold text-gray-900">
             댓글
             {totalCount > 0 && (
-              <span className="ml-2 inline-flex h-7 min-w-7 items-center justify-center rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 px-2.5 text-sm font-bold tabular-nums text-white shadow-sm">
+              <span className="ml-2 inline-flex h-7 min-w-7 items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-bold tabular-nums text-primary-foreground shadow-sm">
                 {totalCount}
               </span>
             )}
@@ -134,7 +134,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
       {isLoggedIn ? (
         !replyTo && (
           <form onSubmit={handleSubmit} className="mb-10">
-            <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-sm transition-all duration-300 focus-within:border-orange-300/80 focus-within:shadow-lg focus-within:shadow-orange-100/40">
+            <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-sm transition-all duration-300 focus-within:border-primary/50 focus-within:shadow-lg focus-within:shadow-primary/10">
               {/* 접근성을 위한 시각적으로 숨겨진 라벨 */}
               <label htmlFor="comment-input" className="sr-only">
                 댓글 작성
@@ -155,7 +155,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
                 <Button
                   type="submit"
                   disabled={isCreating || !body.trim()}
-                  className="h-10 gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 font-bold shadow-md shadow-orange-200/50 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-orange-200/60 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                  className="h-10 gap-2 rounded-xl bg-primary px-5 font-bold text-primary-foreground shadow-md shadow-primary/30 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/40 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
                 >
                   {isCreating ? (
                     <FiLoader className="h-4 w-4 animate-spin" />
@@ -175,7 +175,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
           </div>
           <p className="text-gray-600">
             댓글을 작성하려면{' '}
-            <a href="/login" className="font-bold text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline">
+            <a href="/login" className="font-bold text-primary underline-offset-2 transition-colors hover:text-primary/80 hover:underline">
               로그인
             </a>
             이 필요합니다.
@@ -199,7 +199,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
       ) : (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/30 to-white py-20">
           <div className="relative mb-5">
-            <div className="absolute -inset-3 rounded-full bg-gradient-to-br from-orange-100/40 to-amber-100/40 blur-lg" />
+            <div className="absolute -inset-3 rounded-full bg-primary/10 blur-lg" />
             <div className="relative rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 p-5 shadow-sm">
               <FiSmile className="h-10 w-10 text-gray-300" />
             </div>

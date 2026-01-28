@@ -4,17 +4,11 @@ import { useState } from 'react'
 
 import Link from 'next/link'
 import { useParams, useRouter, notFound } from 'next/navigation'
-import {
-  FiArrowLeft,
-  FiCalendar,
-  FiFileText,
-  FiMessageCircle,
-  FiBookmark,
-} from 'react-icons/fi'
+import { FiArrowLeft, FiCalendar, FiFileText, FiMessageCircle, FiBookmark } from 'react-icons/fi'
 
 import { UserAvatar } from '@/components/ui/user-avatar'
-import { useUserProfile, useUserPosts, useUserCommentedPosts } from '@/features/community/hooks/use-user-profile'
 import { DEFAULT_POST_SORT } from '@/features/community/api/post-api.types'
+import { useUserProfile, useUserPosts, useUserCommentedPosts } from '@/features/community/hooks/use-user-profile'
 import { useBookmarksQuery } from '@/features/mypage/hooks/use-bookmarks-query'
 import { useCurrentMemberQuery } from '@/features/mypage/hooks/use-current-member-query'
 
@@ -34,7 +28,11 @@ export default function UserProfilePage() {
 
   const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(userId)
   const { data: postsData, isLoading: postsLoading } = useUserPosts(userId, { page: postsPage, size: 10, sort })
-  const { data: commentedData, isLoading: commentedLoading } = useUserCommentedPosts(userId, { page: commentedPage, size: 10, sort })
+  const { data: commentedData, isLoading: commentedLoading } = useUserCommentedPosts(userId, {
+    page: commentedPage,
+    size: 10,
+    sort,
+  })
   const { data: currentMember } = useCurrentMemberQuery()
 
   const isOwnProfile = currentMember?.userId === userId
@@ -63,7 +61,9 @@ export default function UserProfilePage() {
   const tabs = [
     { id: 'posts' as const, label: '작성한 글', icon: FiFileText, count: profile?.postCount ?? 0 },
     { id: 'commented' as const, label: '댓글 단 글', icon: FiMessageCircle, count: profile?.commentedPostCount ?? 0 },
-    ...(isOwnProfile ? [{ id: 'bookmarks' as const, label: '북마크', icon: FiBookmark, count: bookmarks?.length ?? 0 }] : []),
+    ...(isOwnProfile
+      ? [{ id: 'bookmarks' as const, label: '북마크', icon: FiBookmark, count: bookmarks?.length ?? 0 }]
+      : []),
   ]
 
   return (
@@ -80,9 +80,9 @@ export default function UserProfilePage() {
       {/* 프로필 헤더 */}
       <div className="mb-6 w-full self-stretch overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 md:mb-8 md:rounded-3xl">
         {/* 커버 이미지 */}
-        <div className="relative h-24 bg-gradient-to-br from-orange-400 via-amber-400 to-orange-500 md:h-40">
+        <div className="bg-primary relative h-24">
           <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-          <div className="absolute -bottom-1 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent" />
+          <div className="absolute right-0 -bottom-1 left-0 h-12 bg-linear-to-t from-white to-transparent" />
         </div>
 
         <div className="relative w-full px-4 pb-4 md:px-8 md:pb-8">
@@ -107,9 +107,7 @@ export default function UserProfilePage() {
               />
 
               <div className="w-full pt-12 md:pt-20">
-                <h1 className="text-xl font-bold text-gray-900 md:text-3xl">
-                  {profile.nickname}
-                </h1>
+                <h1 className="text-xl font-bold text-gray-900 md:text-3xl">{profile.nickname}</h1>
 
                 <div className="mt-3 md:mt-4">
                   <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 md:gap-2 md:px-4 md:py-2">
@@ -119,18 +117,26 @@ export default function UserProfilePage() {
                 </div>
 
                 {/* 활동 통계 */}
-                <div className={`mt-4 grid w-full rounded-xl bg-gray-50 py-3 md:mt-6 md:rounded-2xl md:py-4 ${isOwnProfile ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                <div
+                  className={`mt-4 grid w-full rounded-xl bg-gray-50 py-3 md:mt-6 md:rounded-2xl md:py-4 ${isOwnProfile ? 'grid-cols-3' : 'grid-cols-2'}`}
+                >
                   <div className="flex flex-col items-center justify-center border-r border-gray-200">
-                    <p className="text-xl font-bold text-orange-600 md:text-2xl">{formatNumber(profile.postCount)}</p>
-                    <p className="mt-0.5 text-xs text-gray-500 md:text-sm">작성글</p>
+                    <p className="text-primary text-xl font-bold">{formatNumber(profile.postCount)}</p>
+                    <p className="mt-0.5 text-xs text-gray-500">작성글</p>
                   </div>
-                  <div className={`flex flex-col items-center justify-center ${isOwnProfile ? 'border-r border-gray-200' : ''}`}>
-                    <p className="text-xl font-bold text-success md:text-2xl">{formatNumber(profile.commentedPostCount)}</p>
+                  <div
+                    className={`flex flex-col items-center justify-center ${isOwnProfile ? 'border-r border-gray-200' : ''}`}
+                  >
+                    <p className="text-success text-xl font-bold md:text-2xl">
+                      {formatNumber(profile.commentedPostCount)}
+                    </p>
                     <p className="mt-0.5 text-xs text-gray-500 md:text-sm">댓글</p>
                   </div>
                   {isOwnProfile && (
                     <div className="flex flex-col items-center justify-center">
-                      <p className="text-xl font-bold text-blue-600 md:text-2xl">{formatNumber(bookmarks?.length ?? 0)}</p>
+                      <p className="text-xl font-bold text-blue-600 md:text-2xl">
+                        {formatNumber(bookmarks?.length ?? 0)}
+                      </p>
                       <p className="mt-0.5 text-xs text-gray-500 md:text-sm">북마크</p>
                     </div>
                   )}
@@ -156,12 +162,14 @@ export default function UserProfilePage() {
             >
               <tab.icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
               <span className="hidden md:inline">{tab.label}</span>
-              <span className="md:hidden">{tab.id === 'posts' ? '작성글' : tab.id === 'commented' ? '댓글' : '북마크'}</span>
-              <span className={`rounded-full px-1.5 py-0.5 text-[10px] md:px-2 md:text-xs ${
-                activeTab === tab.id
-                  ? 'bg-white/20 text-white'
-                  : 'bg-gray-100 text-gray-500'
-              }`}>
+              <span className="md:hidden">
+                {tab.id === 'posts' ? '작성글' : tab.id === 'commented' ? '댓글' : '북마크'}
+              </span>
+              <span
+                className={`rounded-full px-1.5 py-0.5 text-[10px] md:px-2 md:text-xs ${
+                  activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                }`}
+              >
                 {formatNumber(tab.count)}
               </span>
             </button>
@@ -183,17 +191,9 @@ export default function UserProfilePage() {
             ) : postsData?.posts && postsData.posts.length > 0 ? (
               <>
                 {postsData.posts.map(post => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    onClick={() => router.push(`/community/${post.id}`)}
-                  />
+                  <PostCard key={post.id} post={post} onClick={() => router.push(`/community/${post.id}`)} />
                 ))}
-                <Pagination
-                  page={postsPage}
-                  totalPages={postsData.page?.totalPages ?? 1}
-                  onPageChange={setPostsPage}
-                />
+                <Pagination page={postsPage} totalPages={postsData.page?.totalPages ?? 1} onPageChange={setPostsPage} />
               </>
             ) : (
               <EmptyState
@@ -217,11 +217,7 @@ export default function UserProfilePage() {
             ) : commentedData?.posts && commentedData.posts.length > 0 ? (
               <>
                 {commentedData.posts.map(post => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    onClick={() => router.push(`/community/${post.id}`)}
-                  />
+                  <PostCard key={post.id} post={post} onClick={() => router.push(`/community/${post.id}`)} />
                 ))}
                 <Pagination
                   page={commentedPage}

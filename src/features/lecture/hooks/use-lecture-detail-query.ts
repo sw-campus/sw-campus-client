@@ -2,11 +2,16 @@ import { useQuery } from '@tanstack/react-query'
 
 import { getLectureDetail, type LectureDetail } from '@/features/lecture/api/lecture-api'
 
-export function useLectureDetailQuery(lectureId: string | null | undefined) {
+interface UseLectureDetailQueryOptions {
+  initialData?: LectureDetail
+}
+
+export function useLectureDetailQuery(lectureId: string | null | undefined, options?: UseLectureDetailQueryOptions) {
   return useQuery<LectureDetail, unknown>({
     queryKey: ['lectureDetail', lectureId],
     queryFn: () => getLectureDetail(lectureId!),
     enabled: !!lectureId,
     staleTime: 1000 * 60,
+    initialData: options?.initialData,
   })
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FiBell, FiCheckCircle, FiMessageSquare, FiCornerDownRight, FiInbox, FiChevronDown, FiTrash2 } from 'react-icons/fi'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -58,6 +59,10 @@ function NotificationItem({
 
       if (currentPath === `/community/${notification.postId}`) {
         setTimeout(() => {
+          // 게시글이 삭제되어 에러 페이지가 표시된 경우 토스트 생략
+          const postArticle = document.querySelector('article')
+          if (!postArticle) return
+
           const element = document.getElementById(`comment-${notification.targetId}`)
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -65,6 +70,8 @@ function NotificationItem({
             setTimeout(() => {
               element.classList.remove('animate-highlight')
             }, 2500)
+          } else {
+            toast.info('삭제된 댓글입니다.')
           }
         }, 150)
       } else {

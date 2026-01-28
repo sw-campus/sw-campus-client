@@ -4,9 +4,14 @@ import HeaderSection from '@/components/layout/header/header-section'
 export default function MyPageLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <HeaderSection />
+      {/* 모바일에서는 헤더/푸터 숨김 */}
+      <div className="hidden sm:block">
+        <HeaderSection />
+      </div>
       {children}
-      <Footer />
+      <div className="hidden sm:block">
+        <Footer />
+      </div>
     </>
   )
 }

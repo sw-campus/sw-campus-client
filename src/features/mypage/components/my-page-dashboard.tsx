@@ -27,16 +27,16 @@ export function MyPageDashboard() {
       </div>
 
       {/* Main Grid */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Left Column: Profile + Activity Summary + Bookmarks */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Left Column: Profile + Activity Summary + Review Management */}
         <div className="flex flex-col gap-6">
           <ProfileCard onEditClick={handleEditProfile} />
           <ActivitySummary onEditSurvey={handleEditSurvey} />
-          <BookmarkSection />
+          <ReviewManagementSection />
         </div>
 
-        {/* Right Column: Review Management */}
-        <ReviewManagementSection />
+        {/* Right Column: Bookmarks */}
+        <BookmarkSection />
       </div>
     </div>
   )

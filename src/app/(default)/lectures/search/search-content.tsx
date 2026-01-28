@@ -1,461 +1,506 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { useState, useRef, Suspense } from 'react'
 
+import { Search, ChevronDown, Minus, Maximize2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useCategoryTree } from '@/features/category'
-import type { CategoryTreeNode } from '@/features/category/types/category.type'
-import { LectureList } from '@/features/lecture/components/lecture-list'
-import { LectureSearchSidebar } from '@/features/lecture/components/lecture-search/lecture-search-sidebar'
+import {
+  HeroBanner,
+  SectionTitle,
+  InterestCourseSection,
+  FloatingInterestBar,
+  ComparisonCard,
+  FilterSection,
+  FilterModal,
+  LectureCard,
+  Pagination,
+  PCFilterSidebar,
+  PCCartSidebar,
+  PCInterestList,
+  PCAIBanner,
+} from '@/features/bootcamp-list'
+import type { FilterValues } from '@/features/bootcamp-list'
+import { useUnifiedAddToCart } from '@/features/cart/hooks/use-unified-add-to-cart'
+import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
+import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 import { useSearchLectureQuery } from '@/features/lecture/hooks/use-search-lecture-query'
 import {
-  SORT_OPTIONS,
-  DEFAULT_SORT,
   COST_QUERY_MAP,
   PROCEDURE_QUERY_MAP,
-  REGION_QUERY_MAP,
   STATUS_QUERY_MAP,
-  FilterGroupKey,
+  REGION_QUERY_MAP,
+  SORT_OPTIONS,
+  DEFAULT_SORT,
   DEFAULT_PAGE_SIZE,
 } from '@/features/lecture/types/filter.type'
+import type { LectureSummary } from '@/features/lecture/types/lecture.type'
 import { mapLectureResponseToSummary } from '@/features/lecture/utils/map-lecture-response-to-summary'
 import { trackSearch } from '@/lib/analytics'
 
-const filterSelectTriggerClass =
-  'flex items-center justify-between gap-1 rounded-full border border-input bg-background px-3 py-1 text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+const initialFilterValues: FilterValues = {
+  mainCategory: '',
+  subCategory: '',
+  detailCategory: '',
+  mainCategoryId: null,
+  subCategoryId: null,
+  detailCategoryId: null,
+  recruitStatus: [],
+  cost: [],
+  selectionProcess: [],
+  region: '',
+}
 
 function SearchContentInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  // API 쿼리 - URL 파라미터 기반
   const queryString = searchParams.toString()
-  const { data, isLoading, isError } = useSearchLectureQuery(queryString)
+  const { data, isLoading: isLectureLoading } = useSearchLectureQuery(queryString)
 
-  const lectures = (data?.content ?? []).map(mapLectureResponseToSummary)
+  // API 응답 변환
+  const lectures: LectureSummary[] = (data?.content ?? []).map(mapLectureResponseToSummary)
   const pageInfo = {
-    currentPage: data?.page?.number ?? 0,
-    totalPages: data?.page?.totalPages ?? 0,
+    currentPage: (data?.page?.number ?? 0) + 1, // 0-indexed → 1-indexed
+    totalPages: data?.page?.totalPages ?? 1,
     totalElements: data?.page?.totalElements ?? 0,
-    size: data?.page?.size ?? 20,
-    isFirst: (data?.page?.number ?? 0) === 0,
-    isLast: (data?.page?.number ?? 0) >= (data?.page?.totalPages ?? 1) - 1,
   }
 
-  const { data: categoryTree } = useCategoryTree()
+  // 통합 카트 훅 사용
+  const { items: cartItems, isLoading: isCartLoading } = useUnifiedCart()
+  const { addToCart, isPending: isAddPending } = useUnifiedAddToCart()
+  const { mutate: removeFromCart } = useUnifiedRemoveFromCart()
 
-  const [level1Id, setLevel1Id] = useState<number | null>(null)
-  const [level2Id, setLevel2Id] = useState<number | null>(null)
-  const [level3Ids, setLevel3Ids] = useState<string[]>([])
+  // 비교를 위해 선택된 항목 (카트 내에서 선택)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
 
-  const [selectedCost, setSelectedCost] = useState<string | null>(null)
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
-  const [selectedSort, setSelectedSort] = useState(DEFAULT_SORT)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [activeFilters, setActiveFilters] = useState<Record<FilterGroupKey, string[]>>({
-    procedure: [],
-    region: [],
-  })
+  // UI 상태
+  const [searchValue, setSearchValue] = useState(searchParams.get('text') ?? '')
+  const [sortValue, setSortValue] = useState(searchParams.get('sort') ?? DEFAULT_SORT)
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
+  const [filterValues, setFilterValues] = useState<FilterValues>(initialFilterValues)
+  const [isInterestSectionOpen, setIsInterestSectionOpen] = useState(false)
+  const [isFloatingBarOpen, setIsFloatingBarOpen] = useState(false)
 
-  // 모바일에서 필터 사이드바 토글
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  // PC 필터 사이드바 상태
+  const [isPCFilterOpen, setIsPCFilterOpen] = useState(true)
 
-  // URL 파라미터 변경 추적을 위한 상태
-  const [prevCategoryParams, setPrevCategoryParams] = useState<string>('')
+  // PC AI 비교 섹션 상태 (기본: 펼쳐짐)
+  const [isPCCompareSectionOpen, setIsPCCompareSectionOpen] = useState(true)
 
-  const level1Categories = categoryTree ?? []
+  // 메인 콘텐츠 영역 참조 (장바구니 위치 계산용)
+  const mainContentRef = useRef<HTMLDivElement>(null)
 
-  const level2Categories = (() => {
-    if (!level1Id || !categoryTree) return []
-    const parent = categoryTree.find((c: CategoryTreeNode) => c.categoryId === level1Id)
-    return parent?.children ?? []
-  })()
-
-  const level3Categories = (() => {
-    if (!level2Id || !level2Categories.length) return []
-    const parent = level2Categories.find((c: CategoryTreeNode) => c.categoryId === level2Id)
-    return parent?.children ?? []
-  })()
-
-  // URL 파라미터 변경 시 카테고리 상태 동기화 (렌더링 중 조건부 업데이트)
-  const currentCategoryParams = searchParams.getAll('categoryIds').join(',')
-  if (categoryTree && categoryTree.length > 0 && currentCategoryParams !== prevCategoryParams) {
-    setPrevCategoryParams(currentCategoryParams)
-
-    const categoryIdsParam = searchParams.getAll('categoryIds')
-    if (categoryIdsParam.length === 0) {
-      setLevel1Id(null)
-      setLevel2Id(null)
-      setLevel3Ids([])
-    } else {
-      type CategoryPath = { l1: number; l2?: number; l3?: number }
-      const pathMap = new Map<number, CategoryPath>()
-      for (const l1 of categoryTree) {
-        pathMap.set(l1.categoryId, { l1: l1.categoryId })
-        if (l1.children) {
-          for (const l2 of l1.children) {
-            pathMap.set(l2.categoryId, { l1: l1.categoryId, l2: l2.categoryId })
-            if (l2.children) {
-              for (const l3 of l2.children) {
-                pathMap.set(l3.categoryId, { l1: l1.categoryId, l2: l2.categoryId, l3: l3.categoryId })
-              }
-            }
-          }
-        }
-      }
-
-      let foundL1: number | null = null
-      let foundL2: number | null = null
-      const foundL3s: string[] = []
-
-      categoryIdsParam.forEach(idStr => {
-        const id = Number(idStr)
-        if (!id) return
-
-        const path = pathMap.get(id)
-        if (path) {
-          if (path.l1 && path.l1 !== foundL1) {
-            foundL1 = path.l1
-            foundL2 = null
-          }
-          if (path.l2 && path.l1 === foundL1) {
-            foundL2 = path.l2
-          }
-          if (path.l3) foundL3s.push(String(path.l3))
-        }
-      })
-
-      setLevel1Id(foundL1)
-      setLevel2Id(foundL2)
-      setLevel3Ids(foundL3s)
-    }
+  // 카트에 있는 항목인지 확인
+  const isInCart = (lectureId: string) => {
+    return (cartItems ?? []).some(item => item.lectureId === lectureId)
   }
 
-  const toggleFilter = (group: FilterGroupKey, label: string) => {
-    setActiveFilters(prev => {
-      const currentGroup = prev[group] ?? []
-      const nextGroup = currentGroup.includes(label)
-        ? currentGroup.filter(option => option !== label)
-        : [...currentGroup, label]
-
-      return {
-        ...prev,
-        [group]: nextGroup,
-      }
-    })
+  // 비교 선택 토글
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]))
   }
 
-  const isActive = (group: FilterGroupKey, label: string) => (activeFilters[group] ?? []).includes(label)
-
-  const handleCostClick = (cost: string) => {
-    setSelectedCost(prev => (prev === cost ? null : cost))
+  // 카트에서 제거 시 선택 목록에서도 제거
+  const handleRemoveFromCart = (lectureId: string) => {
+    removeFromCart(lectureId)
+    setSelectedIds(prev => prev.filter(id => id !== lectureId))
   }
 
-  const handleStatusClick = (status: string) => {
-    setSelectedStatus(prev => (prev === status ? null : status))
-  }
-
-  const handleSearch = () => {
+  // URL 파라미터 빌드 및 네비게이션
+  const buildQueryParams = () => {
     const params = new URLSearchParams()
 
-    let finalCategoryIds: string[] = []
-    if (level3Ids.length > 0) {
-      finalCategoryIds = level3Ids
-    } else if (level2Id) {
-      finalCategoryIds = [String(level2Id)]
-    } else if (level1Id) {
-      finalCategoryIds = [String(level1Id)]
-    }
-
-    finalCategoryIds.forEach(id => {
-      params.append('categoryIds', id)
-    })
-
-    if (selectedCost) {
-      const costParam = COST_QUERY_MAP[selectedCost]
-      if (costParam) {
-        params.append(costParam, 'true')
-      }
-    }
-
-    if (selectedStatus) {
-      const statusParam = STATUS_QUERY_MAP[selectedStatus]
-      if (statusParam) {
-        params.append('status', statusParam)
-      }
-    }
-
-    ;(activeFilters.procedure ?? []).forEach(filter => {
-      const parameter = PROCEDURE_QUERY_MAP[filter]
-      if (parameter) {
-        if (filter.includes('없음')) {
-          params.append(parameter, 'false')
-        } else {
-          params.append(parameter, 'true')
-        }
-      }
-    })
-    ;(activeFilters.region ?? []).forEach(region => {
-      const shortRegion = REGION_QUERY_MAP[region] ?? region
-      params.append('regions', shortRegion)
-    })
-
-    const trimmedText = searchTerm.trim()
+    // 검색어
+    const trimmedText = searchValue.trim()
     if (trimmedText) {
       params.append('text', trimmedText)
     }
 
-    const sortValue = selectedSort || DEFAULT_SORT
-    params.append('sort', sortValue)
+    // 카테고리 ID (가장 하위 카테고리 우선)
+    const categoryId = filterValues.detailCategoryId ?? filterValues.subCategoryId ?? filterValues.mainCategoryId
+    if (categoryId) {
+      params.append('categoryIds', String(categoryId))
+    }
 
+    // 모집 상태 ('모집 중' → '모집중', '마감' → '마감')
+    filterValues.recruitStatus.forEach(status => {
+      const normalizedStatus = status === '모집 중' ? '모집중' : status
+      const statusParam = STATUS_QUERY_MAP[normalizedStatus]
+      if (statusParam) {
+        params.append('status', statusParam)
+      }
+    })
+
+    // 비용
+    filterValues.cost.forEach(cost => {
+      const costParam = COST_QUERY_MAP[cost]
+      if (costParam) {
+        params.append(costParam, 'true')
+      }
+    })
+
+    // 선발 절차
+    filterValues.selectionProcess.forEach(proc => {
+      const procParam = PROCEDURE_QUERY_MAP[proc]
+      if (procParam) {
+        if (proc.includes('없음')) {
+          params.append(procParam, 'false')
+        } else {
+          params.append(procParam, 'true')
+        }
+      }
+    })
+
+    // 지역
+    if (filterValues.region) {
+      const regionParam = REGION_QUERY_MAP[filterValues.region]
+      if (regionParam) {
+        params.append('regions', regionParam)
+      }
+    }
+
+    // 정렬
+    params.append('sort', sortValue || DEFAULT_SORT)
     params.set('size', DEFAULT_PAGE_SIZE)
     params.set('page', '1')
 
-    const queryString = params.toString()
-    const destination = `/lectures/search${queryString ? `?${queryString}` : ''}`
+    return params
+  }
 
-    // GA4 검색 이벤트 추적 (인기 검색어용)
+  const handleSearch = () => {
+    const params = buildQueryParams()
+    const trimmedText = searchValue.trim()
+
+    // GA4 검색 이벤트 추적
     if (trimmedText) {
       trackSearch(trimmedText)
     }
 
-    router.push(destination)
+    router.push(`/lectures/search?${params.toString()}`)
+  }
 
-    // 모바일에서 검색 후 필터 닫기
-    setIsFilterOpen(false)
+  const handleFilterClick = () => {
+    setIsFilterModalOpen(true)
+  }
+
+  const handleFilterApply = () => {
+    const params = buildQueryParams()
+    router.push(`/lectures/search?${params.toString()}`)
+    setIsFilterModalOpen(false)
   }
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
+    params.set('page', String(newPage))
     params.set('size', DEFAULT_PAGE_SIZE)
-    params.set('page', String(newPage + 1))
     router.push(`/lectures/search?${params.toString()}`)
   }
 
-  const getPageNumbers = () => {
-    const { currentPage, totalPages } = pageInfo
-    const maxVisible = 5
-    let start = Math.max(0, currentPage - Math.floor(maxVisible / 2))
-    const end = Math.min(totalPages - 1, start + maxVisible - 1)
+  const handleAddToCart = (lecture: LectureSummary) => {
+    addToCart({ lectureId: lecture.id })
+  }
 
-    if (end - start + 1 < maxVisible) {
-      start = Math.max(0, end - maxVisible + 1)
+  const handleCompare = (lectureId: string) => {
+    // 해당 강의가 카트에 없으면 추가
+    if (!isInCart(lectureId)) {
+      addToCart({ lectureId })
     }
-
-    const pages = []
-    for (let i = start; i <= end; i++) {
-      pages.push(i)
-    }
-    return pages
+    // 비교 페이지로 이동
+    router.push('/cart/compare')
   }
 
-  const handleLevel1Change = (value: number | null) => {
-    setLevel1Id(value)
-    setLevel2Id(null)
-    setLevel3Ids([])
+  const handleGoToCompare = () => {
+    router.push('/cart/compare')
   }
 
-  const handleLevel2Change = (value: number | null) => {
-    setLevel2Id(value)
-    setLevel3Ids([])
-  }
+  // 선택된 카트 아이템
+  const selectedCartItems = (cartItems ?? []).filter(item => selectedIds.includes(item.lectureId))
 
   return (
-    <div className="custom-container">
-      <div className="flex flex-col gap-4 md:flex-row md:gap-6">
-        {/* 모바일: 필터 토글 버튼 */}
-        <div className="flex items-center justify-between md:hidden">
-          <span className="text-sm text-gray-600">
-            총 <strong className="text-primary">{pageInfo.totalElements}</strong>개의 강의
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="flex items-center gap-2"
-          >
-            <span>🔍</span>
-            <span>{isFilterOpen ? '필터 닫기' : '필터 열기'}</span>
-          </Button>
-        </div>
+    <div className="flex min-h-screen w-full flex-col items-center overflow-x-hidden bg-white">
+      {/* Hero Banner */}
+      <div className="w-full">
+        <HeroBanner
+          title="강의 검색"
+          description={'원하는 분야의 강의를 검색해\nAI로 각 강의를 비교해보며, 최적의 강의를 선택해보세요.'}
+          backgroundImageUrl="/images/bootcamp-hero.jpg"
+        />
+      </div>
 
-        {/* 사이드바 - 모바일에서는 토글, 데스크탑에서는 항상 표시 */}
-        <div className={`${isFilterOpen ? 'block' : 'hidden'} md:block`}>
-          <LectureSearchSidebar
-            level1Id={level1Id}
-            level2Id={level2Id}
-            level3Ids={level3Ids}
-            onLevel1Change={handleLevel1Change}
-            onLevel2Change={handleLevel2Change}
-            onLevel3Change={setLevel3Ids}
-            level1Categories={level1Categories}
-            level2Categories={level2Categories}
-            level3Categories={level3Categories}
-            selectedCost={selectedCost}
-            selectedStatus={selectedStatus}
-            activeFilters={activeFilters}
-            onCostClick={handleCostClick}
-            onStatusClick={handleStatusClick}
-            toggleFilter={toggleFilter}
-            isActive={isActive}
-            onSearch={handleSearch}
-          />
-        </div>
+      {/* ========== MOBILE LAYOUT ========== */}
+      <main className="flex w-full max-w-[360px] flex-col items-center gap-6 bg-white px-4 pb-[100px] lg:hidden">
+        {/* Section Title */}
+        <SectionTitle title="강의 검색" />
 
-        {/* 오른쪽: 검색 + 결과 + 강의 목록 */}
-        <div className="flex min-w-0 flex-1 flex-col gap-4">
-          {/* 검색창 + 정렬 */}
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-            <div className="flex flex-1 items-center gap-2">
-              <Input
-                className="flex-1"
-                type="text"
-                placeholder="검색어를 입력해주세요."
-                value={searchTerm}
-                onChange={event => setSearchTerm(event.target.value)}
-                onKeyDown={event => {
-                  if (event.key === 'Enter') {
-                    handleSearch()
-                  }
-                }}
+        {/* Interest Courses (카트 목록) */}
+        <InterestCourseSection
+          items={cartItems ?? []}
+          selectedIds={selectedIds}
+          onToggleSelect={handleToggleSelect}
+          onRemove={handleRemoveFromCart}
+          isOpen={isInterestSectionOpen}
+          onToggleOpen={() => setIsInterestSectionOpen(prev => !prev)}
+          isLoading={isCartLoading}
+          closedMessage={
+            <p className="text-center text-base leading-relaxed text-[#020202]">
+              <span className="font-semibold text-[#FEB706]">AI 비교분석 기능</span>으로
+              <br />
+              최적의 강의를 한 눈에 비교해보세요.
+            </p>
+          }
+        />
+
+        {/* VS 비교 섹션 - 선택된 과정 2개 표시 (토글과 연동) */}
+        {isInterestSectionOpen && selectedIds.length >= 2 && (
+          <div className="flex w-full flex-col gap-4">
+            <div className="relative flex items-center gap-4">
+              <ComparisonCard
+                title={(cartItems ?? []).find(c => c.lectureId === selectedIds[0])?.title || ''}
+                imageUrl={(cartItems ?? []).find(c => c.lectureId === selectedIds[0])?.thumbnailUrl || ''}
               />
-              <Button type="button" className="bg-primary hover:bg-primary/90 text-white" onClick={handleSearch}>
-                검색
-              </Button>
+
+              {/* VS Badge */}
+              <div className="absolute top-1/2 left-1/2 z-10 flex h-[45px] w-[45px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#020202]">
+                <span className="text-base font-bold text-[#FEB706]">VS</span>
+              </div>
+
+              <ComparisonCard
+                title={(cartItems ?? []).find(c => c.lectureId === selectedIds[1])?.title || ''}
+                imageUrl={(cartItems ?? []).find(c => c.lectureId === selectedIds[1])?.thumbnailUrl || ''}
+              />
             </div>
-            <Select value={selectedSort} onValueChange={value => setSelectedSort(value)}>
-              <SelectTrigger className={`${filterSelectTriggerClass} w-full md:w-[180px]`}>
-                <SelectValue placeholder="정렬" />
-              </SelectTrigger>
-              <SelectContent>
-                {SORT_OPTIONS.map(option => (
-                  <SelectItem key={`sort-${option.value}`} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
 
-          {/* 결과 수 - 데스크탑만 */}
-          <div className="hidden text-sm text-gray-600 md:block">
-            총 <strong className="text-primary">{pageInfo.totalElements}</strong>개의 강의가 검색되었습니다.
+            {/* AI 비교 분석 버튼 */}
+            <button
+              onClick={handleGoToCompare}
+              className="flex h-10 w-full items-center justify-center rounded-xl bg-[#F9F9F9] shadow-[2px_2px_10px_rgba(161,161,170,0.25)]"
+            >
+              <span className="text-xs text-[#020202]">AI 비교 분석 자세히 보기</span>
+            </button>
           </div>
+        )}
 
-          {/* 강의 목록 */}
-          <div className="min-w-0 flex-1">
-            {isLoading ? (
-              <div className="py-10 text-center text-sm">강의 목록을 불러오는 중...</div>
-            ) : isError ? (
-              <div className="text-destructive py-10 text-center text-sm">강의 목록을 불러오지 못했습니다.</div>
+        {/* Filter & Search */}
+        <div className="flex w-full flex-col gap-6">
+          <FilterSection
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            onSearch={handleSearch}
+            sortValue={sortValue}
+            onSortChange={setSortValue}
+            onFilterClick={handleFilterClick}
+          />
+
+          {/* Lecture List */}
+          <div className="flex w-full flex-col gap-4">
+            {isLectureLoading ? (
+              <div className="py-10 text-center text-sm text-gray-500">강의 목록을 불러오는 중...</div>
             ) : lectures.length === 0 ? (
-              <div className="py-10 text-center text-sm">검색 결과가 없습니다.</div>
+              <div className="py-10 text-center text-sm text-gray-500">검색 결과가 없습니다.</div>
             ) : (
-              <>
-                <LectureList lectures={lectures} maxColumns={3} />
-
-                {/* 페이지네이션 */}
-                {pageInfo.totalPages > 1 && (
-                  <div className="mt-8 flex flex-col items-center gap-4">
-                    {/* 페이지네이션 버튼 */}
-                    <div className="flex items-center gap-1">
-                      {/* 처음 */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(0)}
-                        disabled={pageInfo.isFirst}
-                        className="h-9 w-9"
-                        aria-label="첫 페이지로 이동"
-                      >
-                        «
-                      </Button>
-                      {/* 이전 */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(pageInfo.currentPage - 1)}
-                        disabled={pageInfo.isFirst}
-                        className="h-9 w-9"
-                        aria-label="이전 페이지로 이동"
-                      >
-                        ‹
-                      </Button>
-
-                      {/* 페이지 번호 */}
-                      {getPageNumbers().map(pageNum => (
-                        <Button
-                          key={pageNum}
-                          variant={pageNum === pageInfo.currentPage ? 'default' : 'ghost'}
-                          size="sm"
-                          onClick={() => handlePageChange(pageNum)}
-                          className={`h-9 w-9 ${
-                            pageNum === pageInfo.currentPage
-                              ? 'bg-gray-700 text-white hover:bg-gray-600'
-                              : 'text-gray-600 hover:bg-gray-100'
-                          }`}
-                        >
-                          {pageNum + 1}
-                        </Button>
-                      ))}
-
-                      {/* 다음 */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(pageInfo.currentPage + 1)}
-                        disabled={pageInfo.isLast}
-                        className="h-9 w-9"
-                        aria-label="다음 페이지로 이동"
-                      >
-                        ›
-                      </Button>
-                      {/* 마지막 */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(pageInfo.totalPages - 1)}
-                        disabled={pageInfo.isLast}
-                        className="h-9 w-9"
-                        aria-label="마지막 페이지로 이동"
-                      >
-                        »
-                      </Button>
-                    </div>
-
-                    {/* Go to page */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-500">Go to page:</span>
-                      <Select
-                        value={String(pageInfo.currentPage + 1)}
-                        onValueChange={value => handlePageChange(Number(value) - 1)}
-                      >
-                        <SelectTrigger className="h-8 w-16">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.from({ length: pageInfo.totalPages }, (_, i) => (
-                            <SelectItem key={i} value={String(i + 1)}>
-                              {i + 1}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                )}
-              </>
+              lectures.map(lecture => (
+                <LectureCard
+                  key={lecture.id}
+                  lecture={lecture}
+                  isHighlighted={false}
+                  isInCart={isInCart(String(lecture.id))}
+                  onAddToCart={() => handleAddToCart(lecture)}
+                  onRemoveFromCart={() => handleRemoveFromCart(String(lecture.id))}
+                  onCompare={() => handleCompare(String(lecture.id))}
+                  isPending={isAddPending}
+                  variant="mobile"
+                />
+              ))
             )}
           </div>
         </div>
+
+        {/* Pagination */}
+        {pageInfo.totalPages > 1 && (
+          <Pagination
+            currentPage={pageInfo.currentPage}
+            totalPages={pageInfo.totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
+      </main>
+
+      {/* ========== DESKTOP LAYOUT ========== */}
+      <div className="hidden w-full lg:block">
+        {/* Section Title */}
+        <div className="mx-auto w-full max-w-[1448px] px-6 pt-6">
+          <SectionTitle title="강의 검색" />
+        </div>
+
+        {/* Main Layout: Filter | Interest List + AI Banner + Card Grid */}
+        <div ref={mainContentRef} data-main-content className="mx-auto flex w-full max-w-[1448px] gap-6 px-6 py-6">
+          {/* Left: Filter Sidebar */}
+          <PCFilterSidebar
+            isOpen={isPCFilterOpen}
+            onToggle={() => setIsPCFilterOpen(prev => !prev)}
+            filterValues={filterValues}
+            onFilterChange={setFilterValues}
+            onApply={handleFilterApply}
+            onReset={() => setFilterValues(initialFilterValues)}
+          />
+
+          {/* Center: Main Content */}
+          <div className="flex flex-1 flex-col gap-6">
+            {/* AI 비교 섹션 - 접기/펼치기 */}
+            {isPCCompareSectionOpen ? (
+              <div className="w-full overflow-hidden rounded-xl border border-[#E5E5E5] shadow-[4px_4px_20px_rgba(0,0,0,0.15)]">
+                {/* 브라우저 타이틀바 */}
+                <div className="flex h-8 items-center justify-end border-b border-[#E5E5E5] bg-[#F5F5F5] px-3">
+                  {/* 최소화 버튼 */}
+                  <button
+                    onClick={() => setIsPCCompareSectionOpen(false)}
+                    className="flex h-6 w-6 items-center justify-center rounded transition-colors hover:bg-[#E5E5E5]"
+                    title="최소화"
+                  >
+                    <Minus className="h-4 w-4 text-[#666666]" />
+                  </button>
+                </div>
+
+                {/* 콘텐츠 영역 */}
+                <div className="flex items-stretch gap-4 bg-white p-4">
+                  {/* Interest List */}
+                  <PCInterestList
+                    items={cartItems ?? []}
+                    selectedIds={selectedIds}
+                    onToggleSelect={handleToggleSelect}
+                    isFilterOpen={isPCFilterOpen}
+                  />
+
+                  {/* AI Recommendation Banner + VS */}
+                  <div className="flex flex-1">
+                    <PCAIBanner selectedItems={selectedCartItems} isFilterOpen={isPCFilterOpen} />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsPCCompareSectionOpen(true)}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-[#D1D5DB] bg-[#F9F9F9] p-3 shadow-[4px_4px_12px_rgba(0,0,0,0.15)]"
+              >
+                <Maximize2 className="h-4 w-4 text-[#020202]" />
+                <span className="text-base text-[#020202]">AI 비교 분석</span>
+              </button>
+            )}
+
+            {/* Search Row */}
+            <div className="flex w-full items-center gap-2">
+              <div className="flex h-10 flex-1 items-center gap-1 rounded-lg border border-[#020202] bg-white px-6 py-2">
+                <Search className="h-4 w-4 text-[#888888]" />
+                <input
+                  type="text"
+                  value={searchValue}
+                  onChange={e => setSearchValue(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      handleSearch()
+                    }
+                  }}
+                  placeholder="검색어를 입력해주세요."
+                  className="flex-1 bg-transparent text-xs text-[#020202] outline-none placeholder:text-[#888888]"
+                />
+              </div>
+              <button
+                onClick={handleSearch}
+                className="flex h-10 w-20 items-center justify-center rounded-lg bg-[#262626] px-6 py-2"
+              >
+                <span className="text-xs text-white">검색</span>
+              </button>
+              <div className="relative min-w-[213px]">
+                <select
+                  value={sortValue}
+                  onChange={e => {
+                    setSortValue(e.target.value)
+                    // 정렬 변경 시 바로 검색 실행
+                    const params = new URLSearchParams(searchParams.toString())
+                    params.set('sort', e.target.value)
+                    params.set('page', '1')
+                    router.push(`/lectures/search?${params.toString()}`)
+                  }}
+                  className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-[#020202] bg-white px-4 py-2 pr-8 text-xs text-[#020202]"
+                >
+                  {SORT_OPTIONS.map(opt => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-black" />
+              </div>
+            </div>
+
+            {/* Lecture Grid - 필터 열림: 3열, 닫힘: 4열 */}
+            <div className={`grid w-full gap-6 ${isPCFilterOpen ? 'grid-cols-3' : 'grid-cols-4'} `}>
+              {isLectureLoading ? (
+                <div className="col-span-full py-10 text-center text-sm text-gray-500">강의 목록을 불러오는 중...</div>
+              ) : lectures.length === 0 ? (
+                <div className="col-span-full py-10 text-center text-sm text-gray-500">검색 결과가 없습니다.</div>
+              ) : (
+                lectures.map(lecture => (
+                  <LectureCard
+                    key={lecture.id}
+                    lecture={lecture}
+                    isHighlighted={false}
+                    isInCart={isInCart(String(lecture.id))}
+                    onAddToCart={() => handleAddToCart(lecture)}
+                    onRemoveFromCart={() => handleRemoveFromCart(String(lecture.id))}
+                    onCompare={() => handleCompare(String(lecture.id))}
+                    isPending={isAddPending}
+                    variant="desktop"
+                  />
+                ))
+              )}
+            </div>
+
+            {/* Pagination */}
+            {pageInfo.totalPages > 1 && (
+              <div className="flex w-full justify-center pt-4">
+                <Pagination
+                  currentPage={pageInfo.currentPage}
+                  totalPages={pageInfo.totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* PC Cart Sidebar - 컴포넌트 자체에서 위치 계산 */}
+      <PCCartSidebar items={cartItems ?? []} onRemove={handleRemoveFromCart} onCompare={handleGoToCompare} />
+
+      {/* Filter Modal - Mobile only */}
+      <div className="lg:hidden">
+        <FilterModal
+          isOpen={isFilterModalOpen}
+          onClose={() => setIsFilterModalOpen(false)}
+          filterValues={filterValues}
+          onFilterChange={setFilterValues}
+          onApply={handleFilterApply}
+        />
+      </div>
+
+      {/* 하단 플로팅 관심 항목 바 - Mobile only */}
+      <div className="lg:hidden">
+        <FloatingInterestBar
+          items={cartItems ?? []}
+          onRemove={handleRemoveFromCart}
+          onCompare={handleGoToCompare}
+          isOpen={isFloatingBarOpen}
+          onToggleOpen={() => setIsFloatingBarOpen(prev => !prev)}
+        />
       </div>
     </div>
   )
 }
 
+// useSearchParams를 사용하므로 Suspense boundary 필수
 export default function SearchContent() {
   return (
     <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>

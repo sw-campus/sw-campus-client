@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { LuImage, LuPencil, LuStar, LuUpload } from 'react-icons/lu'
+import { LuChevronDown, LuClipboardList, LuImage, LuPencil, LuStar, LuUpload } from 'react-icons/lu'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
@@ -12,14 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import {
-  getApprovalStatusLabel,
-  getApprovalStatusColor,
-  canEditByStatus,
-} from '@/features/admin/types/approval.type'
+import { getApprovalStatusLabel, getApprovalStatusColor, canEditByStatus } from '@/features/admin/types/approval.type'
 import type { CompletedLecture } from '@/features/mypage/api/completed-lectures.api'
 import { ReviewForm } from '@/features/mypage/components/review/review-form'
-import { completedLecturesQueryKey, useCompletedLecturesQuery } from '@/features/mypage/hooks/use-completed-lectures-query'
+import {
+  completedLecturesQueryKey,
+  useCompletedLecturesQuery,
+} from '@/features/mypage/hooks/use-completed-lectures-query'
 
 export function ReviewManagementSection() {
   const queryClient = useQueryClient()
@@ -47,6 +46,9 @@ export function ReviewManagementSection() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fullImageUrl, setFullImageUrl] = useState<string | null>(null)
+
+  // Mobile accordion state
+  const [expandedCardId, setExpandedCardId] = useState<number | null>(null)
 
   const getStatusLabel = (lecture: CompletedLecture): string => {
     if (lecture.canWriteReview) return '작성 가능'
@@ -107,92 +109,183 @@ export function ReviewManagementSection() {
     await queryClient.invalidateQueries({ queryKey: completedLecturesQueryKey })
   }
 
+  // 모바일용 아코디언 아이템 렌더링
+  const renderMobileAccordion = () => {
+    if (isLoading) {
+      return (
+        <div className="flex h-32 items-center justify-center">
+          <span className="text-muted-foreground text-sm">불러오는 중...</span>
+        </div>
+      )
+    }
+
+    if ((lectures?.length ?? 0) === 0) {
+      return (
+        <div className="flex h-32 items-center justify-center">
+          <span className="text-muted-foreground text-sm">수료한 강의가 없습니다.</span>
+        </div>
+      )
+    }
+
+    return (
+      <div className="space-y-2">
+        {lectures!.map(l => {
+          const isExpanded = expandedCardId === l.certificateId
+          return (
+            <div key={l.certificateId} className="overflow-hidden rounded-lg border">
+              {/* 헤더 - 클릭하여 펼치기/접기 (2줄: 제목 + 상태) */}
+              <button
+                type="button"
+                className="flex w-full items-center justify-between gap-2 p-3 text-left"
+                onClick={() => setExpandedCardId(isExpanded ? null : l.certificateId)}
+              >
+                <div className="w-0 flex-1">
+                  {/* 1줄: 강의명 */}
+                  <p className={`text-foreground font-medium ${isExpanded ? '' : 'truncate'}`}>{l.lectureName}</p>
+                  {/* 2줄: 상태 뱃지 */}
+                  <div className="mt-1 flex items-center gap-2 text-xs">
+                    <span className="text-muted-foreground">수료증</span>
+                    <Badge
+                      variant="secondary"
+                      className={`px-1.5 py-0 text-[10px] ${getApprovalStatusColor(l.certificateStatus)}`}
+                    >
+                      {getApprovalStatusLabel(l.certificateStatus)}
+                    </Badge>
+                    <span className="text-muted-foreground">후기</span>
+                    <Badge variant="secondary" className={`px-1.5 py-0 text-[10px] ${getStatusBadgeClass(l)}`}>
+                      {getStatusLabel(l)}
+                    </Badge>
+                  </div>
+                </div>
+                <LuChevronDown
+                  className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* 펼쳐진 내용: 액션 버튼만 */}
+              {isExpanded && (
+                <div className="border-t px-3 py-3">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon-sm"
+                      className="h-8 flex-1 gap-1 text-xs"
+                      onClick={() => {
+                        setSelectedCertificate(l)
+                        setCertImageError(null)
+                        setCertImageOpen(true)
+                      }}
+                    >
+                      <LuImage className="h-3.5 w-3.5" />
+                      수료증 확인
+                    </Button>
+                    {l.canWriteReview ? (
+                      <Button
+                        variant="outline"
+                        size="icon-sm"
+                        className="h-8 flex-1 gap-1 text-xs"
+                        onClick={() => {
+                          setCreateLectureId(l.lectureId)
+                          setCreateLectureName(l.lectureName)
+                          setCreateOpen(true)
+                        }}
+                      >
+                        <LuStar className="h-3.5 w-3.5" />
+                        후기 작성
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="icon-sm"
+                        className="h-8 flex-1 gap-1 text-xs"
+                        onClick={() => {
+                          setSelectedReviewId(l.reviewId ?? null)
+                          setSelectedLectureId(l.lectureId)
+                          setSelectedReviewReadOnly(isReadOnly(l))
+                          setEditOpen(true)
+                        }}
+                      >
+                        <LuPencil className="h-3.5 w-3.5" />
+                        {isReadOnly(l) ? '후기 보기' : '후기 수정'}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
-    <Card className="bg-card h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-foreground text-lg">내 후기 관리</CardTitle>
-      </CardHeader>
-      <CardContent className="pt-4">
-        {isLoading ? (
-          <div className="flex h-32 items-center justify-center">
-            <span className="text-muted-foreground text-sm">불러오는 중...</span>
+    <>
+      {/* Mobile: 플랫 섹션 */}
+      <section className="border-border space-y-4 overflow-hidden border-b pb-6 sm:hidden">
+        <div className="flex items-center gap-2">
+          <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
+            <LuClipboardList className="h-4 w-4" />
           </div>
-        ) : (lectures?.length ?? 0) === 0 ? (
-          <div className="flex h-32 items-center justify-center">
-            <span className="text-muted-foreground text-sm">수료한 강의가 없습니다.</span>
+          <span className="text-foreground text-lg font-semibold">내 후기 관리</span>
+        </div>
+        {renderMobileAccordion()}
+      </section>
+
+      {/* Desktop: Card 디자인 */}
+      <Card className="bg-card hidden h-full overflow-hidden sm:block">
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-2">
+            <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
+              <LuClipboardList className="h-4 w-4" />
+            </div>
+            <CardTitle className="text-foreground text-lg">내 후기 관리</CardTitle>
           </div>
-        ) : (
-          <TooltipProvider>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12 text-center">#</TableHead>
-                    <TableHead>강의명</TableHead>
-                    <TableHead className="hidden w-20 md:table-cell">수료증</TableHead>
-                    <TableHead className="hidden w-20 md:table-cell">후기</TableHead>
-                    <TableHead className="w-20 text-center">관리</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {lectures!.map((l, idx) => (
-                    <TableRow key={l.certificateId} className="hover:bg-muted/50 transition-colors">
-                      <TableCell className="text-muted-foreground text-center">{idx + 1}</TableCell>
-                      <TableCell className="text-foreground max-w-[200px] truncate font-medium" title={l.lectureName}>
-                        {l.lectureName}
-                        {/* Mobile info */}
-                        <div className="mt-1 flex items-center gap-2 md:hidden">
-                          <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
-                            {getApprovalStatusLabel(l.certificateStatus)}
-                          </Badge>
+        </CardHeader>
+        <CardContent className="border-border border-t py-4">
+          {isLoading ? (
+            <div className="flex h-32 items-center justify-center">
+              <span className="text-muted-foreground text-sm">불러오는 중...</span>
+            </div>
+          ) : (lectures?.length ?? 0) === 0 ? (
+            <div className="flex h-32 items-center justify-center">
+              <span className="text-muted-foreground text-sm">수료한 강의가 없습니다.</span>
+            </div>
+          ) : (
+            <TooltipProvider>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12 text-center">#</TableHead>
+                      <TableHead>강의명</TableHead>
+                      <TableHead className="w-20">수료증</TableHead>
+                      <TableHead className="w-20">후기</TableHead>
+                      <TableHead className="w-20 text-center">관리</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {lectures!.map((l, idx) => (
+                      <TableRow key={l.certificateId} className="hover:bg-muted/50 transition-colors">
+                        <TableCell className="text-muted-foreground text-center">{idx + 1}</TableCell>
+                        <TableCell className="text-foreground max-w-[200px] truncate font-medium" title={l.lectureName}>
+                          {l.lectureName}
+                        </TableCell>
+                        <TableCell>
                           <Badge
                             variant="secondary"
-                            className={`text-xs ${getStatusBadgeClass(l)}`}
+                            className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}
                           >
+                            {getApprovalStatusLabel(l.certificateStatus)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className={`text-xs ${getStatusBadgeClass(l)}`}>
                             {getStatusLabel(l)}
                           </Badge>
-                        </div>
-                      </TableCell>
-                      {/* 수료증 상태 */}
-                      <TableCell className="hidden md:table-cell">
-                        <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
-                          {getApprovalStatusLabel(l.certificateStatus)}
-                        </Badge>
-                      </TableCell>
-                      {/* 후기 상태 */}
-                      <TableCell className="hidden md:table-cell">
-                        <Badge
-                          variant="secondary"
-                          className={`text-xs ${getStatusBadgeClass(l)}`}
-                        >
-                          {getStatusLabel(l)}
-                        </Badge>
-                      </TableCell>
-                      {/* 관리 버튼: 수료증 + 후기 */}
-                      <TableCell className="text-center">
-                        <div className="flex justify-center gap-1">
-                          {/* 수료증 버튼 */}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => {
-                                  setSelectedCertificate(l)
-                                  setCertImageError(null)
-                                  setCertImageOpen(true)
-                                }}
-                              >
-                                <LuImage className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {canEditByStatus(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
-                            </TooltipContent>
-                          </Tooltip>
-                          {/* 후기 버튼 */}
-                          {l.canWriteReview ? (
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex justify-center gap-1">
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
@@ -200,46 +293,67 @@ export function ReviewManagementSection() {
                                   size="icon"
                                   className="h-8 w-8"
                                   onClick={() => {
-                                    setCreateLectureId(l.lectureId)
-                                    setCreateLectureName(l.lectureName)
-                                    setCreateOpen(true)
+                                    setSelectedCertificate(l)
+                                    setCertImageError(null)
+                                    setCertImageOpen(true)
                                   }}
                                 >
-                                  <LuStar className="h-4 w-4" />
+                                  <LuImage className="h-4 w-4" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>후기 작성</TooltipContent>
+                              <TooltipContent>
+                                {canEditByStatus(l.certificateStatus) ? '수료증 확인/수정' : '수료증 확인'}
+                              </TooltipContent>
                             </Tooltip>
-                          ) : (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => {
-                                    setSelectedReviewId(l.reviewId ?? null)
-                                    setSelectedLectureId(l.lectureId)
-                                    setSelectedReviewReadOnly(isReadOnly(l))
-                                    setEditOpen(true)
-                                  }}
-                                >
-                                  <LuPencil className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>{isReadOnly(l) ? '리뷰 조회' : '리뷰 수정'}</TooltipContent>
-                            </Tooltip>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </TooltipProvider>
-        )}
-      </CardContent>
+                            {l.canWriteReview ? (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => {
+                                      setCreateLectureId(l.lectureId)
+                                      setCreateLectureName(l.lectureName)
+                                      setCreateOpen(true)
+                                    }}
+                                  >
+                                    <LuStar className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>후기 작성</TooltipContent>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => {
+                                      setSelectedReviewId(l.reviewId ?? null)
+                                      setSelectedLectureId(l.lectureId)
+                                      setSelectedReviewReadOnly(isReadOnly(l))
+                                      setEditOpen(true)
+                                    }}
+                                  >
+                                    <LuPencil className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>{isReadOnly(l) ? '리뷰 조회' : '리뷰 수정'}</TooltipContent>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </TooltipProvider>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Edit review modal */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
@@ -332,11 +446,7 @@ export function ReviewManagementSection() {
                     onClick={() => setFullImageUrl(previewUrl)}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={previewUrl}
-                      alt="새 수료증 미리보기"
-                      className="h-auto max-h-64 w-full object-contain"
-                    />
+                    <img src={previewUrl} alt="새 수료증 미리보기" className="h-auto max-h-64 w-full object-contain" />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition hover:bg-black/10">
                       <span className="rounded bg-black/50 px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100">
                         클릭하여 원본 보기
@@ -445,6 +555,6 @@ export function ReviewManagementSection() {
           )}
         </DialogContent>
       </Dialog>
-    </Card>
+    </>
   )
 }

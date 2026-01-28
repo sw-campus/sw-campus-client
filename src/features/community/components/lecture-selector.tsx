@@ -47,7 +47,7 @@ export function LectureSelector({ selectedLecture, onOpenModal, onRemove, error 
         <button
           type="button"
           onClick={onOpenModal}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 py-4 text-gray-500 transition-colors hover:border-orange-400 hover:text-orange-500"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 py-4 text-gray-500 transition-colors hover:border-primary hover:text-primary"
         >
           <FiSearch className="h-5 w-5" />
           <span>강의 검색하기</span>
