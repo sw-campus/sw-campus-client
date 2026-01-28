@@ -5,7 +5,7 @@ import MidBanner from '@/features/banner/components/mid-banner'
 
 export function BannerCarousel() {
   return (
-    <section className="flex flex-col gap-2 py-[30px] md:gap-3 md:py-[50px]">
+    <section className="flex flex-col gap-1 py-[30px] md:gap-2 md:py-[50px]">
       {/* 배너 상단 텍스트 */}
       <h2 className="text-foreground container-responsive mb-2 text-center text-xl font-bold md:mb-4 md:text-[32px]">
         소프트웨어 캠퍼스의 배너는 <br className="md:hidden" />

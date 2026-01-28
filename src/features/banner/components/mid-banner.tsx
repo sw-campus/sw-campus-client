@@ -35,12 +35,12 @@ export default function MidBanner() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-2 overflow-visible md:gap-3">
+      <div className="flex flex-col gap-1 overflow-visible md:gap-2">
         <div className="flex gap-2">
           {[0, 1].map(i => (
             <div
               key={i}
-              className="bg-muted flex h-[140px] w-[calc(50%-4px)] shrink-0 animate-pulse items-center justify-between border border-gray-200 md:h-[180px]"
+              className="bg-muted flex h-[90px] w-[calc(50%-4px)] shrink-0 animate-pulse items-center justify-between border border-gray-200 md:h-[180px]"
             />
           ))}
         </div>
@@ -67,7 +67,7 @@ export default function MidBanner() {
   }
 
   return (
-    <div className="flex flex-col gap-2 overflow-visible md:gap-3">
+    <div className="flex flex-col gap-1 overflow-visible md:gap-2">
       {/* 중형 배너 슬라이더 - 중배너가 있을 때만 표시 */}
       {hasMiddleBanners && (
         <div className="relative">
@@ -79,8 +79,8 @@ export default function MidBanner() {
                 delay: 5000,
                 disableOnInteraction: false,
               }}
-              spaceBetween={8}
-              slidesPerView={1.5}
+              spaceBetween={4}
+              slidesPerView={1}
             >
               {middleBanners.map(banner => {
                 const href = getBannerLink(banner)
@@ -88,7 +88,7 @@ export default function MidBanner() {
 
                 const content = (
                   <div
-                    className="relative h-[140px] w-full overflow-hidden border border-gray-200 shadow-lg md:h-[180px]"
+                    className="relative h-[90px] w-full overflow-hidden border border-gray-200 shadow-lg md:h-[180px]"
                     style={{ backgroundColor: banner.backgroundColor || '#ffffff' }}
                   >
                     {banner.imageUrl ? (

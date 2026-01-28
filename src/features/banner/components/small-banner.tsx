@@ -35,7 +35,7 @@ export default function SmallBanner() {
         {[0, 1, 2].map(i => (
           <div
             key={i}
-            className="bg-muted h-[120px] w-[calc(33.33%-11px)] shrink-0 animate-pulse border border-gray-200 md:h-[150px]"
+            className="bg-muted h-[90px] w-[calc(33.33%-11px)] shrink-0 animate-pulse border border-gray-200 md:h-[150px]"
           />
         ))}
       </div>
@@ -63,11 +63,11 @@ export default function SmallBanner() {
         rewind={true}
         navigation={true}
         autoplay={{
-          delay: 5000,
+          delay: 3000,
           disableOnInteraction: false,
         }}
-        spaceBetween={8}
-        slidesPerView={2.5}
+        spaceBetween={4}
+        slidesPerView={2}
       >
         {banners.map(banner => {
           const href = getBannerLink(banner)
@@ -75,7 +75,7 @@ export default function SmallBanner() {
 
           const content = (
             <div
-              className="relative h-[120px] w-full overflow-hidden border border-gray-200 shadow md:h-[150px]"
+              className="relative h-[90px] w-full overflow-hidden border border-gray-200 shadow md:h-[150px]"
               style={{ backgroundColor: banner.backgroundColor || '#ffffff' }}
             >
               {banner.imageUrl ? (
