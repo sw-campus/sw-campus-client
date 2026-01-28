@@ -13,6 +13,9 @@ import { DEFAULT_PAGE_SIZE } from '@/features/lecture/types/filter.type'
 
 import { BootcampListItem } from './bootcamp-list-item'
 
+/** 카드 높이 (데스크탑 기준) - BootcampListItem computed height */
+const CARD_HEIGHT_DESKTOP = 352.5
+
 export function BootcampListSection() {
   // 카테고리 트리에서 첫 번째 대분류의 중분류(children)를 가져옴
   const { data: categoryTree } = useCategoryTree()
@@ -36,16 +39,18 @@ export function BootcampListSection() {
         {/* 섹션 헤더 */}
         <div className="flex flex-col gap-6 md:gap-8">
           <h2 className="text-center text-xl font-bold md:text-[32px]">
-            수강생 후기 <span className="text-brand-gold">BEST</span> 부트캠프들을 한눈에 살펴보세요.
+            수강생 후기 <span className="text-brand-gold">BEST</span> 부트캠프들을
+            <br className="md:hidden" />{' '}
+            한눈에 살펴보세요.
           </h2>
 
           {/* 카테고리 탭 */}
-          <div className="scrollbar-hide -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:justify-center md:px-0">
+          <div className="flex flex-wrap justify-center gap-1.5 md:gap-2">
             {subcategories.map(category => (
               <button
                 key={category.categoryId}
                 onClick={() => setSelectedCategoryId(category.categoryId)}
-                className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                className={`shrink-0 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors md:px-4 md:py-2 md:text-sm ${
                   resolvedCategoryId === category.categoryId
                     ? 'bg-primary text-primary-foreground'
                     : 'border-border bg-muted text-muted-foreground hover:bg-muted/80 border'
@@ -59,7 +64,10 @@ export function BootcampListSection() {
 
         {/* 부트캠프 리스트 */}
         {isLoading ? (
-          <div className="flex h-48 items-center justify-center">
+          <div
+            className="flex h-48 items-center justify-center"
+            style={{ minHeight: `${CARD_HEIGHT_DESKTOP}px` }}
+          >
             <div className="border-muted border-t-primary size-8 animate-spin rounded-full border-4" />
           </div>
         ) : lecturesData && lecturesData.length > 0 ? (
@@ -81,7 +89,10 @@ export function BootcampListSection() {
             ))}
           </motion.div>
         ) : (
-          <div className="text-muted-foreground flex h-48 flex-col items-center justify-center gap-3">
+          <div
+            className="text-muted-foreground flex h-48 flex-col items-center justify-center gap-3"
+            style={{ minHeight: `${CARD_HEIGHT_DESKTOP}px` }}
+          >
             <div className="bg-muted/50 rounded-full p-4">
               <span className="text-2xl">🔍</span>
             </div>
@@ -92,7 +103,7 @@ export function BootcampListSection() {
         {/* 더보기 버튼 */}
         <Button
           variant="outline"
-          className="mx-auto h-auto min-w-[320px] gap-2 rounded-full px-8 py-4 text-base"
+          className="mx-auto h-auto min-w-[260px] gap-2 rounded-full px-6 py-3 text-sm md:min-w-[320px] md:px-8 md:py-4 md:text-base"
           asChild
         >
           <Link
@@ -103,7 +114,7 @@ export function BootcampListSection() {
             }
           >
             <span className="text-brand-gold font-bold">{selectedCategoryName || '전체'}</span> 프로그램 더보기
-            <ArrowRight className="size-5" />
+            <ArrowRight className="size-4 md:size-5" />
           </Link>
         </Button>
       </div>

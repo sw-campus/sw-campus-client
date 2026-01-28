@@ -8,9 +8,6 @@ import Link from 'next/link'
 import { SocialLoginButtons } from '@/features/auth/components/social-login-button'
 import type { Provider } from '@/features/auth/hooks/use-o-auth-urls'
 
-const INPUT_BASE_CLASS =
-  'h-10 w-full rounded-md border border-gray-200 bg-gray-50 px-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100'
-
 type LoginFormCardProps = {
   email: string
   password: string
@@ -35,76 +32,123 @@ export function LoginFormCard({
   onFindAccountClick,
 }: LoginFormCardProps) {
   return (
-    <form
-      onSubmit={onSubmit}
-      className="w-full max-w-md rounded-2xl border border-gray-200 bg-white/90 p-6 text-gray-900 shadow-xl backdrop-blur-xl md:rounded-3xl md:p-10"
-    >
-      {/* 로고 */}
-      <div className="mb-8 flex flex-col items-center gap-3 text-center">
-        <div className="flex h-18 w-18 items-center justify-center overflow-hidden rounded-2xl bg-gray-100 ring-1 ring-gray-200">
-          <Image src="/images/logo.png" alt="SOFTWARE CAMPUS 로고" width={56} height={56} className="object-contain" />
+    <form onSubmit={onSubmit} className="flex w-full max-w-sm flex-col px-6">
+      {/* 로고 & 헤더 */}
+      <div className="mb-8 flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="mb-3 flex h-12 w-12 items-center justify-center">
+          <Image
+            src="/images/logo.png"
+            alt="SOFTWARE CAMPUS"
+            width={48}
+            height={48}
+            className="object-contain"
+            priority
+          />
         </div>
-        <div className="leading-none font-extrabold tracking-tight text-gray-900">
-          <div className="text-lg">SOFTWARE</div>
-          <div className="text-lg">CAMPUS</div>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">로그인</h1>
+      </div>
+
+      {/* 폼 필드 */}
+      <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-backwards">
+        {/* 이메일 */}
+        <div className="group relative">
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={e => onChangeEmail(e.target.value)}
+            placeholder=" "
+            className="peer w-full border-b-2 border-border bg-transparent py-2.5 text-foreground outline-none transition-colors duration-200 placeholder:text-transparent focus:border-primary"
+            autoComplete="email"
+          />
+          <label
+            htmlFor="email"
+            className="pointer-events-none absolute left-0 top-2.5 text-sm text-muted-foreground transition-all duration-200 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-primary peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs"
+          >
+            이메일
+          </label>
         </div>
-        <p className="text-sm text-gray-500">환영합니다. 로그인해 주세요.</p>
+
+        {/* 비밀번호 */}
+        <div className="group relative">
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={e => onChangePassword(e.target.value)}
+            placeholder=" "
+            className="peer w-full border-b-2 border-border bg-transparent py-2.5 text-foreground outline-none transition-colors duration-200 placeholder:text-transparent focus:border-primary"
+            autoComplete="current-password"
+          />
+          <label
+            htmlFor="password"
+            className="pointer-events-none absolute left-0 top-2.5 text-sm text-muted-foreground transition-all duration-200 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-primary peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs"
+          >
+            비밀번호
+          </label>
+        </div>
       </div>
 
-      {/* 이메일 */}
-      <div className="mb-4">
-        <label className="mb-1 block text-gray-700">이메일</label>
-        <input
-          type="email"
-          placeholder="이메일을 입력하세요"
-          value={email}
-          onChange={e => onChangeEmail(e.target.value)}
-          className={INPUT_BASE_CLASS}
-        />
-      </div>
-
-      {/* 비밀번호 */}
-      <div className="mb-3">
-        <label className="mb-1 block text-gray-700">비밀번호</label>
-        <input
-          type="password"
-          placeholder="비밀번호를 입력하세요"
-          value={password}
-          onChange={e => onChangePassword(e.target.value)}
-          className={INPUT_BASE_CLASS}
-        />
-      </div>
-
-      {/* 비번 찾기 + 회원가입 */}
-      <div className="mb-4 flex items-center justify-between text-gray-600">
+      {/* 비밀번호 찾기 */}
+      <div className="mt-3 flex justify-end animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-backwards">
         <button
           type="button"
           onClick={onFindAccountClick}
-          className="underline-offset-2 hover:text-gray-900 hover:underline"
+          className="text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           비밀번호 찾기
         </button>
-
-        <Link href={signupHref} className="underline-offset-2 hover:text-gray-900 hover:underline">
-          회원가입
-        </Link>
       </div>
 
       {/* 로그인 버튼 */}
       <button
         type="submit"
         disabled={isLoading}
-        className="mt-1 h-10 w-full rounded-md bg-orange-500 font-semibold text-white transition hover:bg-orange-600 disabled:opacity-60"
+        className="mt-5 h-11 w-full rounded-xl bg-primary font-medium text-primary-foreground transition-all duration-200 hover:brightness-105 active:scale-[0.98] disabled:opacity-60 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-backwards"
       >
-        {isLoading ? '로그인 중...' : '로그인'}
+        {isLoading ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+            로그인 중
+          </span>
+        ) : (
+          '로그인'
+        )}
       </button>
 
+      {/* 구분선 */}
+      <div className="relative my-5 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-backwards">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-background px-4 text-xs text-muted-foreground">또는</span>
+        </div>
+      </div>
+
       {/* 소셜 로그인 */}
-      <SocialLoginButtons
-        onGoogle={() => onOAuthStart('google')}
-        onGithub={() => onOAuthStart('github')}
-        onKakao={() => onOAuthStart('kakao')}
-      />
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-backwards">
+        <SocialLoginButtons
+          onGoogle={() => onOAuthStart('google')}
+          onGithub={() => onOAuthStart('github')}
+          onKakao={() => onOAuthStart('kakao')}
+        />
+      </div>
+
+      {/* 회원가입 */}
+      <p className="mt-6 text-center text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-backwards">
+        계정이 없으신가요?{' '}
+        <Link href={signupHref} className="font-medium text-foreground underline-offset-4 hover:underline">
+          회원가입
+        </Link>
+      </p>
     </form>
   )
 }

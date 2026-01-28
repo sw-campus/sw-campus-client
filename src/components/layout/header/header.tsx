@@ -76,7 +76,6 @@ export default function Header({
     <>
       <MobileHeader
         isLoggedIn={isLoggedIn}
-        nickname={nickname}
         userType={userType}
         hasHydrated={hasHydrated}
         mypageHref={mypageHref}

@@ -36,8 +36,10 @@ export function PartnerSection() {
         <h2 className="text-xl font-bold md:text-[32px]">
           협력 중인 <span className="text-brand-gold">훈련 기관</span>을 확인 해보세요.
         </h2>
-        <p className="text-muted-foreground text-base md:text-lg">
-          소프트웨어 캠퍼스와 협력한 {totalCount}곳의 훈련 기관에서 진행하는 부트캠프를 확인해보세요.
+        <p className="text-muted-foreground text-sm md:text-lg">
+          소프트웨어 캠퍼스와 협력한 {totalCount}곳의 훈련 기관에서
+          <br className="md:hidden" />
+          진행하는 부트캠프를 확인해보세요.
         </p>
       </div>
 
@@ -95,7 +97,7 @@ export function PartnerSection() {
       )}
 
       {/* 전체보기 버튼 */}
-      <Button variant="outline" className="mx-auto h-auto min-w-[320px] gap-2 rounded-full px-8 py-4 text-base" asChild>
+      <Button variant="outline" className="mx-auto h-auto min-w-[260px] gap-2 rounded-full px-6 py-3 text-sm md:min-w-[320px] md:px-8 md:py-4 md:text-base" asChild>
         <Link href="/organizations">훈련 기관 더보기</Link>
       </Button>
     </section>
@@ -113,18 +115,18 @@ interface PartnerCardProps {
 function PartnerCard({ partner }: PartnerCardProps) {
   return (
     <Link href={`/organizations/${partner.id}`}>
-      <div className="bg-brand-gold-light flex h-[140px] w-full flex-col items-center justify-center gap-4 rounded-xl p-4 shadow-[4px_4px_15px_rgba(161,161,170,0.25)] transition-shadow hover:shadow-md md:h-[150px] md:w-[210px] md:gap-4 md:p-4">
+      <div className="bg-brand-gold-light flex h-[110px] w-full flex-col items-center justify-center gap-2 rounded-xl px-5 py-3 shadow-[4px_4px_15px_rgba(161,161,170,0.25)] transition-shadow hover:shadow-md md:h-[150px] md:w-[210px] md:gap-4 md:p-4">
         {/* 로고 - 흰색 원형 배경 */}
-        <div className="flex size-16 items-center justify-center overflow-hidden rounded-full bg-white shadow-[4px_4px_10px_rgba(161,161,170,0.25)] md:size-[65px] md:p-1.5">
+        <div className="flex size-12 items-center justify-center overflow-hidden rounded-full bg-white shadow-[4px_4px_10px_rgba(161,161,170,0.25)] md:size-[65px] md:p-1.5">
           {partner.logoUrl ? (
             <Image src={partner.logoUrl} alt={partner.name} width={80} height={80} className="object-contain" />
           ) : (
-            <span className="text-3xl md:text-4xl">🏢</span>
+            <span className="text-2xl md:text-4xl">🏢</span>
           )}
         </div>
 
         {/* 기관명 */}
-        <p className="line-clamp-2 w-full text-center text-sm font-medium break-keep md:text-sm">{partner.name}</p>
+        <p className="line-clamp-1 w-full text-center text-xs font-medium md:line-clamp-2 md:break-keep md:text-sm">{partner.name}</p>
       </div>
     </Link>
   )
