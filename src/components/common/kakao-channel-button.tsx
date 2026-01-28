@@ -1,6 +1,7 @@
 'use client'
 
 import Script from 'next/script'
+import { usePathname } from 'next/navigation'
 
 import { useFloatingBarStore } from '@/store/floating-bar.store'
 import { useMediaQuery } from '@/hooks/use-media-query'
@@ -21,8 +22,14 @@ const KAKAO_JAVASCRIPT_KEY = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY
 const KAKAO_CHANNEL_ID = process.env.NEXT_PUBLIC_KAKAO_CHANNEL_ID
 
 export default function KakaoChannelButton() {
+  const pathname = usePathname()
   const isFloatingBarOpen = useFloatingBarStore((state) => state.isOpen)
   const isDesktop = useMediaQuery('(min-width: 1280px)')
+
+  // 로그인/회원가입 페이지에서는 숨김
+  if (pathname === '/login' || pathname?.startsWith('/signup')) {
+    return null
+  }
 
   const handleKakaoLoad = () => {
     if (window.Kakao && !window.Kakao.isInitialized() && KAKAO_JAVASCRIPT_KEY) {
@@ -57,7 +64,7 @@ export default function KakaoChannelButton() {
         integrity="sha384-tJkjbtDbvoxO+diRuDtwRO9JXR7pjWnfjfRn5ePUpl7e7RJCxKCwwnfqUAdXh53p"
         crossOrigin="anonymous"
         onLoad={handleKakaoLoad}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
       <div
         id="kakao-chat-channel-button"

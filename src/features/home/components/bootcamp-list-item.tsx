@@ -50,21 +50,21 @@ export function BootcampListItem({ lecture }: BootcampListItemProps) {
   return (
     <Link
       href={`/lectures/${lecture.lectureId}`}
-      className="flex w-full flex-col gap-6 rounded-xl bg-white p-6 shadow-[4px_4px_20px_rgba(194,147,32,0.25)] transition-all hover:shadow-[4px_4px_24px_rgba(194,147,32,0.35)] md:w-[332px]"
+      className="flex w-full flex-col gap-3 rounded-xl bg-white p-4 shadow-[4px_4px_20px_rgba(194,147,32,0.25)] transition-all hover:shadow-[4px_4px_24px_rgba(194,147,32,0.35)] md:w-[332px] md:gap-6 md:p-6"
     >
       {/* 콘텐츠 영역 */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1 md:gap-3">
         {/* 상단: 카테고리 | 별점 + 리뷰수 + 모집중 */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-[#555555]">{lecture.categoryName || '부트캠프'}</span>
-          <div className="flex items-center gap-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="shrink-0 text-xs text-[#555555] md:text-sm">{lecture.categoryName || '부트캠프'}</span>
+          <div className="flex shrink-0 items-center gap-1">
             <Star
-              className={`size-[18px] ${hasReviews ? 'fill-brand-gold text-brand-gold' : 'fill-muted-foreground/40 text-muted-foreground/40'}`}
+              className={`size-4 md:size-[18px] ${hasReviews ? 'fill-brand-gold text-brand-gold' : 'fill-muted-foreground/40 text-muted-foreground/40'}`}
             />
-            <span className="text-base">{score.toFixed(1)}</span>
-            <span className="text-xs text-[#555555]">({reviewCount})</span>
+            <span className="text-sm md:text-base">{score.toFixed(1)}</span>
+            <span className="text-[10px] text-[#555555] md:text-xs">({reviewCount})</span>
             {lecture.status === 'RECRUITING' && (
-              <span className="ml-1 flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-medium text-emerald-700">
+              <span className="ml-1 flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[11px] font-medium text-emerald-700 md:px-2.5 md:py-1 md:text-xs">
                 <span className="size-1.5 rounded-full bg-emerald-500" />
                 모집중
               </span>
@@ -73,16 +73,16 @@ export function BootcampListItem({ lecture }: BootcampListItemProps) {
         </div>
 
         {/* 강의명 */}
-        <h3 className="line-clamp-3 h-[100px] text-2xl font-bold break-keep">{lecture.lectureName}</h3>
+        <h3 className="line-clamp-1 text-sm font-bold break-keep md:line-clamp-3 md:h-[100px] md:text-2xl">{lecture.lectureName}</h3>
 
         {/* 기관명 */}
-        <span className="text-base text-[#555555]">{lecture.orgName}</span>
+        <span className="text-sm text-[#555555] md:text-base">{lecture.orgName}</span>
 
-        {/* 날짜 */}
-        <span className="text-xs text-[#888888]">{dateRange || '-'}</span>
+        {/* 날짜 - 모바일에서 숨김 */}
+        <span className="hidden text-xs text-[#888888] md:block">{dateRange || '-'}</span>
 
-        {/* 태그 */}
-        <div className="flex gap-1.5 overflow-hidden">
+        {/* 태그 - 모바일에서 숨김 */}
+        <div className="hidden gap-1.5 overflow-hidden md:flex">
           {recruitLabel && (
             <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[11px] font-medium text-amber-700">
               #{recruitLabel}
@@ -107,7 +107,7 @@ export function BootcampListItem({ lecture }: BootcampListItemProps) {
           <Button
             variant="outline"
             size="icon-sm"
-            className="text-brand-gold hover:text-brand-gold h-12 flex-1 rounded-lg border-transparent bg-neutral-800 text-base hover:bg-neutral-800"
+            className="text-brand-gold hover:text-brand-gold h-8 flex-1 rounded-lg border-transparent bg-neutral-800 text-xs hover:bg-neutral-800 md:h-12 md:text-base"
             onClick={e => {
               e.preventDefault()
               removeFromCart(lecture.lectureId)
@@ -121,7 +121,7 @@ export function BootcampListItem({ lecture }: BootcampListItemProps) {
             item={{ lectureId: String(lecture.lectureId) }}
             variant="outline"
             size="icon-sm"
-            className="bg-brand-gold-light hover:bg-brand-gold-light h-12 flex-1 rounded-lg border-transparent text-base text-[#020202]"
+            className="bg-brand-gold-light hover:bg-brand-gold-light h-8 flex-1 rounded-lg border-transparent text-xs text-[#020202] md:h-12 md:text-base"
           >
             관심등록
           </AddToCartButton>
@@ -129,7 +129,7 @@ export function BootcampListItem({ lecture }: BootcampListItemProps) {
         <AddToCartButton
           item={{ lectureId: String(lecture.lectureId) }}
           size="icon-sm"
-          className="bg-brand-gold hover:bg-brand-gold h-12 flex-1 rounded-lg text-base text-neutral-700"
+          className="bg-brand-gold hover:bg-brand-gold h-8 flex-1 rounded-lg text-xs text-neutral-700 md:h-12 md:text-base"
           onClick={() => router.push('/cart/compare')}
         >
           비교하기

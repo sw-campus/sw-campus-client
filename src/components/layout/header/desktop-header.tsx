@@ -37,12 +37,12 @@ export function DesktopHeader({
   onOtherNavEnter,
   isHome = false,
 }: DesktopHeaderProps) {
-  const headerBg = isHome ? 'bg-[#020f2b]' : 'bg-white'
+  const headerBg = isHome ? 'bg-[#041032]' : 'bg-white'
   const textColor = isHome ? 'text-header-text' : 'text-gray-900'
   const logoFilter = isHome ? 'brightness-0 invert' : ''
 
   return (
-    <header className={`hidden w-full md:flex ${headerBg}`}>
+    <header className={`relative hidden w-full md:flex ${headerBg}`}>
       <div className="page-container flex items-center justify-between px-6 py-3">
       {/* 좌측: 로고 */}
       <div className="flex items-center gap-3">
@@ -63,7 +63,7 @@ export function DesktopHeader({
       </div>
 
       {/* 중앙: 네비게이션 (lg 이상) */}
-      <nav className={`flex gap-8 text-base font-semibold tracking-tight ${textColor}`}>
+      <nav className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex gap-8 text-base font-semibold tracking-tight ${textColor}`}>
         {categories
           .filter(c => !c.type || c.type === 'LECTURE')
           .map(category => {
@@ -121,25 +121,27 @@ export function DesktopHeader({
           <div className="h-6 w-24" />
         ) : isLoggedIn ? (
           <>
-            <span className="text-base">
+            <span className="text-sm">
               {nickname} <span className="font-bold">님</span>
             </span>
 
             <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href={mypageHref}>
-              <User size={28} />
+              <User size={20} />
             </HeaderIconAction>
 
             <NotificationDropdown />
 
             <HeaderIconAction kind="button" ariaLabel="로그아웃" tooltip="로그아웃" onClick={onLogoutClick}>
-              <LogOut size={24} />
+              <LogOut size={20} />
             </HeaderIconAction>
           </>
         ) : (
-          <Link href="/login" className="flex items-center gap-2 text-sm font-medium leading-none">
-            로그인을 해주세요.
-            <LogIn size={18} />
-          </Link>
+          <HeaderIconAction kind="link" ariaLabel="로그인" tooltip="로그인" href="/login">
+            <div className="flex items-center gap-2 text-sm font-medium leading-none">
+              로그인을 해주세요.
+              <LogIn size={18} />
+            </div>
+          </HeaderIconAction>
         )}
       </div>
       </div>

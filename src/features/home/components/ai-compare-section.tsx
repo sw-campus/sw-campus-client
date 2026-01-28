@@ -10,13 +10,10 @@ import { AiComparePreview } from '@/components/common/ai-compare-preview'
 import { InterestLectureList } from '@/components/common/interest-lecture-list'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import {
-  InterestLectureSection,
-  ComparisonCard,
-} from '@/features/bootcamp-list'
-import type { CartItem } from '@/features/cart/types/cart.type'
+import { InterestLectureSection, ComparisonCard } from '@/features/bootcamp-list'
 import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
+import type { CartItem } from '@/features/cart/types/cart.type'
 import { useCartCompareStore } from '@/store/cart-compare.store'
 
 export function AiCompareSection() {
@@ -48,10 +45,7 @@ export function AiCompareSection() {
   // 카트에서 제거 시 선택 슬롯에서도 제거
   const handleRemoveFromCart = (lectureId: string) => {
     removeFromCart(lectureId)
-    setSelectedSlots(prev => [
-      prev[0] === lectureId ? null : prev[0],
-      prev[1] === lectureId ? null : prev[1],
-    ])
+    setSelectedSlots(prev => [prev[0] === lectureId ? null : prev[0], prev[1] === lectureId ? null : prev[1]])
   }
 
   // 비교 페이지로 이동
@@ -64,8 +58,8 @@ export function AiCompareSection() {
   }
 
   // 비교할 과정들 (슬롯 순서 유지, null이면 null)
-  const compareSlots: (CartItem | null)[] = selectedSlots.map(
-    id => (id !== null ? items.find(item => item.lectureId === id) ?? null : null),
+  const compareSlots: (CartItem | null)[] = selectedSlots.map(id =>
+    id !== null ? (items.find(item => item.lectureId === id) ?? null) : null,
   )
 
   // 카테고리 잠금: 선택된 항목 중 첫 번째의 카테고리
@@ -77,8 +71,7 @@ export function AiCompareSection() {
       <section className="container-responsive flex flex-col items-center gap-4 pt-[30px] pb-4 md:gap-6 md:pt-[100px] md:pb-[50px]">
         <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
           <span className="text-brand-gold">AI 비교분석</span> 기능으로
-          <br className="md:hidden" />{' '}
-          최적의 강의를 한눈에 비교해보세요.
+          <br className="md:hidden" /> 최적의 강의를 한눈에 비교해보세요.
         </h2>
         <div className="flex h-40 w-full items-center justify-center">
           <span className="text-muted-foreground">로딩 중...</span>
@@ -92,8 +85,7 @@ export function AiCompareSection() {
       <section className="container-responsive flex flex-col items-center gap-4 pt-[30px] pb-4 md:gap-6 md:pt-[100px] md:pb-[50px]">
         <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
           <span className="text-brand-gold">AI 비교분석</span> 기능으로
-          <br className="md:hidden" />{' '}
-          최적의 강의를 한눈에 비교해보세요.
+          <br className="md:hidden" /> 최적의 강의를 한눈에 비교해보세요.
         </h2>
         <Card className="w-full shadow-lg">
           <CardContent className="flex flex-col items-center gap-4 p-8">
@@ -113,8 +105,7 @@ export function AiCompareSection() {
       {/* 섹션 타이틀 — 데스크톱에서만 표시 (모바일은 InterestLectureSection의 closedMessage 사용) */}
       <h2 className="text-foreground hidden text-center text-xl font-bold md:block md:text-[32px]">
         <span className="text-brand-gold">AI 비교분석</span> 기능으로
-        <br />
-        최적의 강의를 한눈에 비교해보세요.
+        <br className="md:hidden" /> 최적의 강의를 한눈에 비교해보세요.
       </h2>
 
       {/* ========== MOBILE LAYOUT ========== */}
@@ -172,7 +163,7 @@ export function AiCompareSection() {
       <div className="hidden h-[clamp(300px,50vh,500px)] w-full gap-4 md:grid md:grid-cols-4">
         {/* 관심 과정 카드 (1/4) */}
         <Card className="min-h-0 shadow-lg">
-          <CardContent className="flex flex-1 flex-col min-h-0 px-4">
+          <CardContent className="flex min-h-0 flex-1 flex-col px-4">
             <InterestLectureList
               items={items}
               selectedIds={selectedIds}
@@ -180,7 +171,7 @@ export function AiCompareSection() {
               onRemove={handleRemoveFromCart}
               lockedCategory={lockedCategory}
               variant="card"
-              className="flex-1 min-h-0"
+              className="min-h-0 flex-1"
             />
           </CardContent>
         </Card>
