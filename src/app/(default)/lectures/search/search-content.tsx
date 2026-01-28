@@ -81,7 +81,7 @@ function SearchContentInner() {
   const [sortValue, setSortValue] = useState(searchParams.get('sort') ?? DEFAULT_SORT)
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const [filterValues, setFilterValues] = useState<FilterValues>(initialFilterValues)
-  const [isInterestSectionOpen, setIsInterestSectionOpen] = useState(false)
+  const [isInterestSectionOpen, setIsInterestSectionOpen] = useState(true)
   const [isFloatingBarOpen, setIsFloatingBarOpen] = useState(false)
 
   // PC 필터 사이드바 상태

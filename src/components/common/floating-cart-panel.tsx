@@ -75,7 +75,7 @@ export function FloatingCartPanel({
             className="w-full flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <span className="text-xs text-black font-medium">관심 항목</span>
+              <span className="text-xs text-black font-medium">관심 과정</span>
               <div className="min-w-[20px] h-5 px-1.5 bg-[#FEB706] rounded-full flex items-center justify-center">
                 <span className="text-xs font-bold text-[#020202]">{items.length}</span>
               </div>
@@ -155,7 +155,7 @@ export function FloatingCartPanel({
       >
         <div className="w-[72px] bg-[#FFFCF4] rounded-lg border border-[#FEB706] p-2 flex flex-col items-center gap-2 shadow-[2px_2px_10px_rgba(161,161,170,0.25)]">
           {/* Header */}
-          <span className="text-[10px] text-black text-center font-medium">관심 항목</span>
+          <span className="text-[10px] text-black text-center font-medium">관심 과정</span>
 
           {/* Cart Items - 최대 10개 */}
           <div className="flex flex-col gap-1.5 w-full">
