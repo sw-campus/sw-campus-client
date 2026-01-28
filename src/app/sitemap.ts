@@ -44,14 +44,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  // 동적 강의 페이지
+  // 동적 페이지들을 병렬로 fetch (성능 최적화)
+  const [lecturesResult, orgsResult, postsResult] = await Promise.allSettled([
+    fetch(`${env.NEXT_PUBLIC_API_URL}/lectures?size=1000`, { next: { revalidate: 3600 } }),
+    fetch(`${env.NEXT_PUBLIC_API_URL}/organizations?size=1000`, { next: { revalidate: 3600 } }),
+    fetch(`${env.NEXT_PUBLIC_API_URL}/posts?size=1000`, { next: { revalidate: 3600 } }),
+  ])
+
+  // 강의 페이지
   let lectureRoutes: MetadataRoute.Sitemap = []
-  try {
-    const lecturesRes = await fetch(`${env.NEXT_PUBLIC_API_URL}/lectures?size=1000`, {
-      next: { revalidate: 3600 },
-    })
-    if (lecturesRes.ok) {
-      const lecturesData = await lecturesRes.json()
+  if (lecturesResult.status === 'fulfilled' && lecturesResult.value.ok) {
+    try {
+      const lecturesData = await lecturesResult.value.json()
       const lectures: LectureListItem[] = lecturesData.content || []
       lectureRoutes = lectures.map(lecture => ({
         url: `${env.NEXT_PUBLIC_BASE_URL}/lectures/${lecture.id}`,
@@ -59,19 +63,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: 'weekly' as const,
         priority: 0.7,
       }))
+    } catch {
+      // JSON 파싱 에러 시 빈 배열 유지
     }
-  } catch {
-    // API 에러 시 빈 배열 유지
   }
 
-  // 동적 기관 페이지
+  // 기관 페이지
   let organizationRoutes: MetadataRoute.Sitemap = []
-  try {
-    const orgsRes = await fetch(`${env.NEXT_PUBLIC_API_URL}/organizations?size=1000`, {
-      next: { revalidate: 3600 },
-    })
-    if (orgsRes.ok) {
-      const orgsData = await orgsRes.json()
+  if (orgsResult.status === 'fulfilled' && orgsResult.value.ok) {
+    try {
+      const orgsData = await orgsResult.value.json()
       const organizations: OrganizationListItem[] = orgsData.content || orgsData || []
       organizationRoutes = organizations.map(org => ({
         url: `${env.NEXT_PUBLIC_BASE_URL}/organizations/${org.id}`,
@@ -79,19 +80,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: 'weekly' as const,
         priority: 0.6,
       }))
+    } catch {
+      // JSON 파싱 에러 시 빈 배열 유지
     }
-  } catch {
-    // API 에러 시 빈 배열 유지
   }
 
-  // 동적 커뮤니티 게시글 페이지
+  // 커뮤니티 게시글 페이지
   let postRoutes: MetadataRoute.Sitemap = []
-  try {
-    const postsRes = await fetch(`${env.NEXT_PUBLIC_API_URL}/posts?size=1000`, {
-      next: { revalidate: 3600 },
-    })
-    if (postsRes.ok) {
-      const postsData = await postsRes.json()
+  if (postsResult.status === 'fulfilled' && postsResult.value.ok) {
+    try {
+      const postsData = await postsResult.value.json()
       const posts: PostListItem[] = postsData.content || []
       postRoutes = posts.map(post => ({
         url: `${env.NEXT_PUBLIC_BASE_URL}/community/${post.id}`,
@@ -99,9 +97,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: 'weekly' as const,
         priority: 0.5,
       }))
+    } catch {
+      // JSON 파싱 에러 시 빈 배열 유지
     }
-  } catch {
-    // API 에러 시 빈 배열 유지
   }
 
   return [...staticRoutes, ...lectureRoutes, ...organizationRoutes, ...postRoutes]
