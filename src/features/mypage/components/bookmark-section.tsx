@@ -4,7 +4,6 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Bookmark, FileText, MessageCircle, Heart } from 'lucide-react'
 
-import { formatRelativeTime } from '@/lib/format-relative-time'
 
 import { useBookmarksQuery } from '../hooks/use-bookmarks-query'
 

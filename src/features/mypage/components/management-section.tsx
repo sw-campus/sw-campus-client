@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, ClipboardList, GraduationCap, Image as ImageIcon, Pencil, Star, Upload } from 'lucide-react'
+import { ChevronDown, GraduationCap, Image as ImageIcon, Pencil, Star, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'

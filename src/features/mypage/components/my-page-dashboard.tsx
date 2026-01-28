@@ -26,7 +26,6 @@ import { useCurrentMemberQuery } from '../hooks/use-current-member-query'
 import { useSurveyStatusQuery, useSurveyResultsQuery } from '../hooks/use-survey'
 import { RECOMMENDED_JOB_LABELS } from '../types/survey.type'
 import { JOB_TYPE_INFO } from './survey/survey-results-step'
-import { BookmarkSection } from './bookmark-section'
 import { ReviewManagementSection } from './management-section'
 import { PROFILE_QUERY_KEY } from './profile-card'
 import { PasswordChangeModal } from './password-change-modal'
@@ -790,7 +789,7 @@ function CommunityContentSection({
     }
   }
 
-  const { title, Icon, emptyText } = getTabInfo()
+  const { Icon, emptyText } = getTabInfo()
 
   // 탭에 따른 데이터
   const getData = () => {

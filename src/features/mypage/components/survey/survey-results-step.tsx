@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { Code2, Database, Layers, Palette, Pencil, RefreshCw, Sparkles, type LucideIcon } from 'lucide-react'
+import { Pencil, RefreshCw, Sparkles } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -28,13 +28,6 @@ interface SurveyResultsStepProps {
   onEditBasic: () => void
   onRetakeAptitude: () => void
   onClose?: () => void
-}
-
-const RECOMMENDED_JOB_ICONS: Record<RecommendedJob, LucideIcon> = {
-  FRONTEND: Palette,
-  BACKEND: Code2,
-  DATA: Database,
-  FULLSTACK: Layers,
 }
 
 // MBTI 스타일 직무 타입 정보
@@ -85,10 +78,6 @@ export const JOB_TYPE_INFO: Record<RecommendedJob, {
   },
 }
 
-function RecommendedJobIcon({ job, className }: { job: RecommendedJob | undefined; className?: string }) {
-  const Icon = job ? RECOMMENDED_JOB_ICONS[job] : Sparkles
-  return <Icon className={className} />
-}
 
 export function SurveyResultsStep({
   survey,
