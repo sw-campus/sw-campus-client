@@ -39,20 +39,20 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
 
   if (isLoading) {
     return (
-      <div className="bento-card relative h-full overflow-hidden p-4 sm:p-6">
+      <div className="bento-card relative h-full overflow-hidden p-4 md:p-6">
         <div className="grid-pattern absolute inset-0 opacity-30" />
         <div className="relative z-10">
-          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="bg-muted h-5 w-28 animate-pulse rounded-lg sm:h-6 sm:w-32" />
-            <div className="flex gap-2 sm:gap-4">
-              <div className="bg-muted h-4 w-20 animate-pulse rounded sm:w-24" />
-              <div className="bg-muted h-4 w-20 animate-pulse rounded sm:w-24" />
+          <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="bg-muted h-5 w-28 animate-pulse rounded-lg md:h-6 md:w-32" />
+            <div className="flex gap-2 md:gap-4">
+              <div className="bg-muted h-4 w-20 animate-pulse rounded md:w-24" />
+              <div className="bg-muted h-4 w-20 animate-pulse rounded md:w-24" />
             </div>
           </div>
-          <div className="flex h-[200px] items-center justify-center sm:h-[280px]">
+          <div className="flex h-[200px] items-center justify-center md:h-[280px]">
             <div className="flex flex-col items-center gap-3">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-lime-500 border-t-transparent sm:h-8 sm:w-8" />
-              <span className="text-muted-foreground text-xs sm:text-sm">데이터 로딩 중...</span>
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-lime-500 border-t-transparent md:h-8 md:w-8" />
+              <span className="text-muted-foreground text-xs md:text-sm">데이터 로딩 중...</span>
             </div>
           </div>
         </div>
@@ -68,40 +68,38 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
   }
 
   return (
-    <div className="bento-card group relative h-full overflow-hidden p-3 sm:p-4 lg:p-6">
+    <div className="bento-card group relative h-full overflow-hidden p-3 md:p-4 lg:p-6">
       {/* Gradient overlay on hover */}
       <div className="absolute inset-0 bg-linear-to-br from-lime-500/5 to-cyan-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       <div className="grid-pattern absolute inset-0 opacity-30" />
 
       <div className="relative z-10 flex h-full flex-col">
         {/* Header */}
-        <div className="mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center sm:justify-between lg:mb-6">
-          <div className="flex items-center gap-2 sm:gap-3">
+        <div className="mb-3 flex flex-col gap-2 md:mb-4 md:flex-row md:items-center md:justify-between lg:mb-6">
+          <div className="flex items-center gap-2 md:gap-3">
             <div className="relative">
               <div className="absolute inset-0 animate-ping rounded-full bg-lime-500/30" />
-              <div className="relative h-2 w-2 rounded-full bg-lime-500 sm:h-3 sm:w-3" />
+              <div className="relative h-2 w-2 rounded-full bg-lime-500 md:h-3 md:w-3" />
             </div>
             <div>
-              <h3 className="text-foreground text-sm font-bold tracking-tight sm:text-lg lg:text-xl">
-                {periodLabel} 방문자 현황
-              </h3>
-              <p className="text-muted-foreground hidden text-xs sm:block">실시간 트래픽 모니터링</p>
+              <h3 className="text-foreground text-sm font-bold tracking-tight md:text-lg lg:text-xl">{periodLabel} 방문자 현황</h3>
+              <p className="text-muted-foreground hidden text-xs md:block">실시간 트래픽 모니터링</p>
             </div>
           </div>
 
           {/* Stats badges */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <div className="flex items-center gap-1.5 rounded-full bg-lime-500/10 px-2 py-1 sm:gap-2 sm:px-3 sm:py-1.5">
-              <div className="h-2 w-2 rounded-full bg-lime-500 sm:h-2.5 sm:w-2.5" />
-              <span className="text-muted-foreground text-[10px] sm:text-xs">총 방문자</span>
-              <span className="font-mono-data text-foreground text-xs font-bold sm:text-sm">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
+            <div className="flex items-center gap-1.5 rounded-full bg-lime-500/10 px-2 py-1 md:gap-2 md:px-3 md:py-1.5">
+              <div className="h-2 w-2 rounded-full bg-lime-500 md:h-2.5 md:w-2.5" />
+              <span className="text-muted-foreground text-[10px] md:text-xs">총 방문자</span>
+              <span className="font-mono-data text-foreground text-xs font-bold md:text-sm">
                 {report?.totalUsers?.toLocaleString() ?? 0}
               </span>
             </div>
-            <div className="flex items-center gap-1.5 rounded-full bg-cyan-500/10 px-2 py-1 sm:gap-2 sm:px-3 sm:py-1.5">
-              <div className="h-2 w-2 rounded-full bg-cyan-500 sm:h-2.5 sm:w-2.5" />
-              <span className="text-muted-foreground text-[10px] sm:text-xs">신규 방문자</span>
-              <span className="font-mono-data text-foreground text-xs font-bold sm:text-sm">
+            <div className="flex items-center gap-1.5 rounded-full bg-cyan-500/10 px-2 py-1 md:gap-2 md:px-3 md:py-1.5">
+              <div className="h-2 w-2 rounded-full bg-cyan-500 md:h-2.5 md:w-2.5" />
+              <span className="text-muted-foreground text-[10px] md:text-xs">신규 방문자</span>
+              <span className="font-mono-data text-foreground text-xs font-bold md:text-sm">
                 {report?.newUsers?.toLocaleString() ?? 0}
               </span>
             </div>
@@ -161,23 +159,19 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
                   content={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
                       return (
-                        <div className="bg-popover/95 rounded-lg border border-white/20 p-2 shadow-xl backdrop-blur-sm sm:rounded-xl sm:p-3">
-                          <p className="text-muted-foreground mb-1 text-[10px] font-medium sm:mb-2 sm:text-xs">
-                            {label}
-                          </p>
-                          <div className="space-y-0.5 sm:space-y-1">
-                            <div className="flex items-center gap-1.5 sm:gap-2">
-                              <div className="h-1.5 w-1.5 rounded-full bg-lime-500 sm:h-2 sm:w-2" />
-                              <span className="text-foreground text-xs sm:text-sm">
-                                방문자:{' '}
-                                <span className="font-mono-data font-bold">{payload[0]?.value?.toLocaleString()}</span>
+                        <div className="rounded-lg border border-white/20 bg-popover/95 p-2 shadow-xl backdrop-blur-sm md:rounded-xl md:p-3">
+                          <p className="text-muted-foreground mb-1 text-[10px] font-medium md:mb-2 md:text-xs">{label}</p>
+                          <div className="space-y-0.5 md:space-y-1">
+                            <div className="flex items-center gap-1.5 md:gap-2">
+                              <div className="h-1.5 w-1.5 rounded-full bg-lime-500 md:h-2 md:w-2" />
+                              <span className="text-foreground text-xs md:text-sm">
+                                방문자: <span className="font-mono-data font-bold">{payload[0]?.value?.toLocaleString()}</span>
                               </span>
                             </div>
-                            <div className="flex items-center gap-1.5 sm:gap-2">
-                              <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 sm:h-2 sm:w-2" />
-                              <span className="text-foreground text-xs sm:text-sm">
-                                신규:{' '}
-                                <span className="font-mono-data font-bold">{payload[1]?.value?.toLocaleString()}</span>
+                            <div className="flex items-center gap-1.5 md:gap-2">
+                              <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 md:h-2 md:w-2" />
+                              <span className="text-foreground text-xs md:text-sm">
+                                신규: <span className="font-mono-data font-bold">{payload[1]?.value?.toLocaleString()}</span>
                               </span>
                             </div>
                           </div>
@@ -208,23 +202,13 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 sm:gap-3">
-            <div className="bg-muted rounded-full p-3 sm:p-4">
-              <svg
-                className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 md:gap-3">
+            <div className="bg-muted rounded-full p-3 md:p-4">
+              <svg className="text-muted-foreground h-6 w-6 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <span className="text-muted-foreground text-xs sm:text-sm">데이터가 없습니다</span>
+            <span className="text-muted-foreground text-xs md:text-sm">데이터가 없습니다</span>
           </div>
         )}
       </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { HeroBanner } from '@/features/bootcamp-list'
 import { OrganizationList } from '@/features/organization/components/organization-list'
 
 export const metadata: Metadata = {
@@ -15,8 +16,18 @@ export const metadata: Metadata = {
 
 export default function OrganizationsPage() {
   return (
-    <div className="bg-background min-h-screen">
-      <div className="mx-auto max-w-3xl px-4 md:max-w-7xl md:px-6">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center overflow-x-hidden">
+      {/* Hero Banner */}
+      <div className="w-full">
+        <HeroBanner
+          title="훈련기관"
+          description="훈련기관을 살펴보고 훈련기관 별 교육과정도 확인해보세요."
+          backgroundImageUrl="/images/org/organization_banner.jpg"
+        />
+      </div>
+
+      {/* Content */}
+      <div className="w-full max-w-[1448px] mx-auto px-4 md:px-6 py-6">
         <OrganizationList />
       </div>
     </div>

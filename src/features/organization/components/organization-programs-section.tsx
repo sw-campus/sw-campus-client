@@ -3,16 +3,11 @@
 import { useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
 
 import { Card } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { LectureCard as BootcampLectureCard } from '@/features/bootcamp-list/components/lecture-card'
-import { useUnifiedAddToCart } from '@/features/cart/hooks/use-unified-add-to-cart'
-import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
-import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
+import { BootcampListItem } from '@/features/home/components/bootcamp-list-item'
 import { LectureListItem } from '@/features/lecture/components/lecture-list-item'
-import { mapLectureResponseToSummary } from '@/features/lecture/utils/map-lecture-response-to-summary'
 
 import { fetchOrganizationLectures, type LectureSortType } from '../api/organization-api'
 
@@ -25,14 +20,8 @@ interface OrganizationProgramsSectionProps {
 }
 
 export function OrganizationProgramsSection({ organizationId }: OrganizationProgramsSectionProps) {
-  const router = useRouter()
   const [currentPage, setCurrentPage] = useState(0)
   const [sortType, setSortType] = useState<LectureSortType>('LATEST')
-
-  // 장바구니 훅
-  const { items: cartItems } = useUnifiedCart()
-  const { addToCart, isPending: isAddPending } = useUnifiedAddToCart()
-  const { mutate: removeFromCart, isPending: isRemovePending } = useUnifiedRemoveFromCart()
 
   const {
     data: lectureData,
@@ -47,14 +36,6 @@ export function OrganizationProgramsSection({ organizationId }: OrganizationProg
   const handleSortChange = (value: LectureSortType) => {
     setSortType(value)
     setCurrentPage(0)
-  }
-
-  const handleCompare = () => {
-    router.push('/cart/compare')
-  }
-
-  const isInCart = (lectureId: string) => {
-    return cartItems.some(item => String(item.lectureId) === String(lectureId))
   }
 
   const lectures = lectureData?.lectures ?? []
@@ -119,24 +100,11 @@ export function OrganizationProgramsSection({ organizationId }: OrganizationProg
           <LectureListItem key={lecture.lectureId} lecture={lecture} />
         ))}
       </div>
-      {/* 데스크탑: BootcampLectureCard (variant='desktop') */}
+      {/* 데스크탑: BootcampListItem (메인화면과 동일한 카드) */}
       <div className="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-4">
-        {lectures.map(lecture => {
-          const lectureSummary = mapLectureResponseToSummary(lecture)
-          const lectureId = String(lecture.lectureId)
-          return (
-            <BootcampLectureCard
-              key={lecture.lectureId}
-              lecture={lectureSummary}
-              variant="desktop"
-              isInCart={isInCart(lectureId)}
-              onAddToCart={() => addToCart({ lectureId })}
-              onRemoveFromCart={() => removeFromCart(lectureId)}
-              onCompare={handleCompare}
-              isPending={isAddPending || isRemovePending}
-            />
-          )
-        })}
+        {lectures.map(lecture => (
+          <BootcampListItem key={lecture.lectureId} lecture={lecture} />
+        ))}
       </div>
 
       {/* Pagination */}

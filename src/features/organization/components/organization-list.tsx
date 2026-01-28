@@ -3,7 +3,6 @@
 import { useState } from 'react'
 
 import { Search } from 'lucide-react'
-import Image from 'next/image'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -35,28 +34,7 @@ export function OrganizationList() {
   }
 
   return (
-    <div className="w-full">
-      {/* Hero Banner */}
-      <div className="relative -mx-4 -mt-4 mb-8 h-[250px] overflow-hidden bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 md:-mx-6 md:-mt-6">
-        <Image
-          src="/images/org/organization_banner.jpg"
-          alt="훈련기관 배경"
-          fill
-          sizes="100vw"
-          className="object-cover opacity-50"
-          priority
-        />
-        <div className="absolute inset-0 bg-linear-to-b from-black/40 via-black/30 to-black/50" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <h1 className="mb-3 text-2xl font-bold text-white md:text-3xl">훈련기관</h1>
-          <p className="max-w-md text-sm leading-relaxed text-white/90 md:text-base">
-            훈련기관을 살펴보고 훈련기관 별 교육과정도 확인해보세요.
-          </p>
-        </div>
-      </div>
-
-      {/* Content Section */}
-      <div className="px-4 pb-20 md:px-6">
+    <div className="w-full pb-20">
         {/* Search Section */}
         <div className="mb-6 space-y-4 md:space-y-0">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -124,7 +102,6 @@ export function OrganizationList() {
               {searchTerm && <p className="mt-2 text-sm">다른 검색어로 시도해보세요.</p>}
             </div>
           ))}
-      </div>
     </div>
   )
 }

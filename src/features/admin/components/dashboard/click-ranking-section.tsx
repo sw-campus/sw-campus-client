@@ -7,6 +7,7 @@ import { LuChevronRight, LuImage, LuTrendingUp } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
 import { cn } from '@/lib/utils'
 
 import { useTopBannersQuery, useTopLecturesQuery } from '../../hooks/use-analytics'
@@ -22,11 +23,11 @@ function RankBadge({ rank }: { rank: number }) {
   return (
     <span
       className={cn(
-        'inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold sm:h-6 sm:w-6 sm:text-xs',
+        'inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold md:h-6 md:w-6 md:text-xs',
         rank === 1 && 'bg-linear-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-500/30',
         rank === 2 && 'bg-linear-to-br from-gray-300 to-gray-400 text-white',
         rank === 3 && 'bg-linear-to-br from-orange-300 to-orange-400 text-white',
-        rank > 3 && 'bg-muted text-muted-foreground',
+        rank > 3 && 'bg-muted text-muted-foreground'
       )}
     >
       {rank}
@@ -94,22 +95,22 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-2">
         {/* 배너 클릭 Top 5 */}
         <div className="bento-card group relative overflow-hidden">
           <div className="absolute inset-0 bg-linear-to-br from-purple-500/5 via-transparent to-pink-500/5" />
           <div className="grid-pattern absolute inset-0 opacity-30" />
-          <div className="absolute -top-8 -right-8 h-20 w-20 rounded-full bg-purple-500/10 blur-2xl sm:-top-10 sm:-right-10 sm:h-28 sm:w-28" />
+          <div className="absolute -top-8 -right-8 h-20 w-20 rounded-full bg-purple-500/10 blur-2xl md:-top-10 md:-right-10 md:h-28 md:w-28" />
 
-          <div className="relative z-10 flex h-full flex-col p-3 sm:p-5">
-            <div className="mb-3 flex items-center justify-between sm:mb-4">
+          <div className="relative z-10 flex h-full flex-col p-3 md:p-5">
+            <div className="mb-3 flex items-center justify-between md:mb-4">
               <div className="flex items-center gap-2">
-                <div className="rounded-lg bg-purple-500/10 p-1.5 sm:p-2">
-                  <LuImage className="h-3.5 w-3.5 text-purple-600 sm:h-4 sm:w-4" />
+                <div className="rounded-lg bg-purple-500/10 p-1.5 md:p-2">
+                  <LuImage className="h-3.5 w-3.5 text-purple-600 md:h-4 md:w-4" />
                 </div>
                 <div>
-                  <h3 className="text-foreground text-xs font-bold sm:text-sm">배너 클릭 Top 5</h3>
-                  <p className="text-muted-foreground text-[9px] sm:text-[10px]">{periodLabel} 기준</p>
+                  <h3 className="text-foreground text-xs font-bold md:text-sm">배너 클릭 Top 5</h3>
+                  <p className="text-muted-foreground text-[9px] md:text-[10px]">{periodLabel} 기준</p>
                 </div>
               </div>
             </div>
@@ -118,11 +119,9 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
               <Table className="table-fixed">
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-muted-foreground w-10 text-[10px] sm:w-12 sm:text-xs">순위</TableHead>
-                    <TableHead className="text-muted-foreground w-auto text-[10px] sm:text-xs">배너명</TableHead>
-                    <TableHead className="text-muted-foreground w-14 text-right text-[10px] sm:w-16 sm:text-xs">
-                      클릭
-                    </TableHead>
+                    <TableHead className="text-muted-foreground w-10 text-[10px] md:w-12 md:text-xs">순위</TableHead>
+                    <TableHead className="text-muted-foreground w-auto text-[10px] md:text-xs">배너명</TableHead>
+                    <TableHead className="text-muted-foreground w-14 text-right text-[10px] md:w-16 md:text-xs">클릭</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -130,31 +129,28 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                     <SkeletonRows />
                   ) : banners.length === 0 ? (
                     <TableRow>
-                      <TableCell
-                        colSpan={3}
-                        className="text-muted-foreground py-6 text-center text-xs sm:py-8 sm:text-sm"
-                      >
+                      <TableCell colSpan={3} className="text-muted-foreground py-6 text-center text-xs md:py-8 md:text-sm">
                         데이터가 없습니다
                       </TableCell>
                     </TableRow>
                   ) : (
                     banners.map((banner, idx) => (
                       <TableRow key={`${banner.bannerId}-${idx}`} className="hover:bg-card/50">
-                        <TableCell className="py-2 sm:py-3">
+                        <TableCell className="py-2 md:py-3">
                           <RankBadge rank={idx + 1} />
                         </TableCell>
-                        <TableCell className="max-w-0 py-2 sm:py-3">
+                        <TableCell className="max-w-0 py-2 md:py-3">
                           <div className="truncate" title={banner.bannerName || `배너 #${banner.bannerId}`}>
-                            <span className="text-foreground text-xs font-medium sm:text-sm">
+                            <span className="text-foreground text-xs font-medium md:text-sm">
                               {banner.bannerName || `배너 #${banner.bannerId}`}
                             </span>
-                            <span className="text-muted-foreground ml-1 hidden text-xs sm:inline">
+                            <span className="text-muted-foreground ml-1 hidden text-xs md:inline">
                               ({getBannerTypeLabel(banner.bannerType)})
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell className="py-2 text-right sm:py-3">
-                          <span className="font-mono-data text-foreground text-xs font-semibold sm:text-sm">
+                        <TableCell className="py-2 text-right md:py-3">
+                          <span className="font-mono-data text-foreground text-xs font-semibold md:text-sm">
                             {banner.clickCount.toLocaleString()}
                           </span>
                         </TableCell>
@@ -168,11 +164,11 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
             {banners.length >= 5 && (
               <Button
                 variant="ghost"
-                size="icon-sm"
-                className="mt-2 w-full text-xs text-purple-600 hover:bg-purple-50 hover:text-purple-700 sm:mt-3 sm:text-sm"
+                size="sm"
+                className="mt-2 w-full text-xs text-purple-600 hover:bg-purple-50 hover:text-purple-700 md:mt-3 md:text-sm"
                 onClick={() => setModalOpen('banners')}
               >
-                전체 보기 <LuChevronRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
+                전체 보기 <LuChevronRight className="ml-1 h-3 w-3 md:h-4 md:w-4" />
               </Button>
             )}
           </div>
@@ -182,17 +178,17 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
         <div className="bento-card group relative overflow-hidden">
           <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 via-transparent to-teal-500/5" />
           <div className="grid-pattern absolute inset-0 opacity-30" />
-          <div className="absolute -bottom-8 -left-8 h-20 w-20 rounded-full bg-emerald-500/10 blur-2xl sm:-bottom-10 sm:-left-10 sm:h-28 sm:w-28" />
+          <div className="absolute -bottom-8 -left-8 h-20 w-20 rounded-full bg-emerald-500/10 blur-2xl md:-bottom-10 md:-left-10 md:h-28 md:w-28" />
 
-          <div className="relative z-10 flex h-full flex-col p-3 sm:p-5">
-            <div className="mb-3 flex items-center justify-between sm:mb-4">
+          <div className="relative z-10 flex h-full flex-col p-3 md:p-5">
+            <div className="mb-3 flex items-center justify-between md:mb-4">
               <div className="flex items-center gap-2">
-                <div className="rounded-lg bg-emerald-500/10 p-1.5 sm:p-2">
-                  <LuTrendingUp className="h-3.5 w-3.5 text-emerald-600 sm:h-4 sm:w-4" />
+                <div className="rounded-lg bg-emerald-500/10 p-1.5 md:p-2">
+                  <LuTrendingUp className="h-3.5 w-3.5 text-emerald-600 md:h-4 md:w-4" />
                 </div>
                 <div>
-                  <h3 className="text-foreground text-xs font-bold sm:text-sm">인기 강의 Top 5</h3>
-                  <p className="text-muted-foreground text-[9px] sm:text-[10px]">{periodLabel} 기준</p>
+                  <h3 className="text-foreground text-xs font-bold md:text-sm">인기 강의 Top 5</h3>
+                  <p className="text-muted-foreground text-[9px] md:text-[10px]">{periodLabel} 기준</p>
                 </div>
               </div>
             </div>
@@ -201,13 +197,11 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
               <Table className="table-fixed">
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-muted-foreground w-8 text-[10px] sm:w-10 sm:text-xs">순위</TableHead>
-                    <TableHead className="text-muted-foreground w-auto text-[10px] sm:text-xs">강의명</TableHead>
-                    <TableHead className="text-muted-foreground hidden w-12 text-right text-xs sm:table-cell">
-                      조회
-                    </TableHead>
-                    <TableHead className="text-muted-foreground w-10 text-right text-[10px] sm:text-xs">신청</TableHead>
-                    <TableHead className="text-muted-foreground w-10 text-right text-[10px] sm:text-xs">공유</TableHead>
+                    <TableHead className="text-muted-foreground w-8 text-[10px] md:w-10 md:text-xs">순위</TableHead>
+                    <TableHead className="text-muted-foreground w-auto text-[10px] md:text-xs">강의명</TableHead>
+                    <TableHead className="text-muted-foreground hidden w-12 text-right text-xs md:table-cell">조회</TableHead>
+                    <TableHead className="text-muted-foreground w-10 text-right text-[10px] md:text-xs">신청</TableHead>
+                    <TableHead className="text-muted-foreground w-10 text-right text-[10px] md:text-xs">공유</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -215,36 +209,33 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                     <SkeletonRows />
                   ) : lectures.length === 0 ? (
                     <TableRow>
-                      <TableCell
-                        colSpan={5}
-                        className="text-muted-foreground py-6 text-center text-xs sm:py-8 sm:text-sm"
-                      >
+                      <TableCell colSpan={5} className="text-muted-foreground py-6 text-center text-xs md:py-8 md:text-sm">
                         데이터가 없습니다
                       </TableCell>
                     </TableRow>
                   ) : (
                     lectures.map((lecture, idx) => (
                       <TableRow key={`${lecture.lectureId}-${idx}`} className="hover:bg-card/50">
-                        <TableCell className="py-2 sm:py-3">
+                        <TableCell className="py-2 md:py-3">
                           <RankBadge rank={idx + 1} />
                         </TableCell>
-                        <TableCell className="max-w-0 py-2 sm:py-3">
+                        <TableCell className="max-w-0 py-2 md:py-3">
                           <div className="truncate" title={lecture.lectureName || `강의 #${lecture.lectureId}`}>
-                            <span className="text-foreground text-xs font-medium sm:text-sm">
+                            <span className="text-foreground text-xs font-medium md:text-sm">
                               {lecture.lectureName || `강의 #${lecture.lectureId}`}
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-muted-foreground hidden py-2 text-right text-xs sm:table-cell sm:py-3">
+                        <TableCell className="text-muted-foreground hidden py-2 text-right text-xs md:table-cell md:py-3">
                           {(lecture.views || 0).toLocaleString()}
                         </TableCell>
-                        <TableCell className="py-2 text-right sm:py-3">
-                          <span className="font-mono-data text-xs font-semibold text-blue-600 sm:text-sm">
+                        <TableCell className="py-2 text-right md:py-3">
+                          <span className="font-mono-data text-xs font-semibold text-blue-600 md:text-sm">
                             {lecture.applyClicks.toLocaleString()}
                           </span>
                         </TableCell>
-                        <TableCell className="py-2 text-right sm:py-3">
-                          <span className="font-mono-data text-xs font-semibold text-emerald-600 sm:text-sm">
+                        <TableCell className="py-2 text-right md:py-3">
+                          <span className="font-mono-data text-xs font-semibold text-emerald-600 md:text-sm">
                             {lecture.shareClicks.toLocaleString()}
                           </span>
                         </TableCell>
@@ -258,11 +249,11 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
             {lectures.length >= 5 && (
               <Button
                 variant="ghost"
-                size="icon-sm"
-                className="mt-2 w-full text-xs text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 sm:mt-3 sm:text-sm"
+                size="sm"
+                className="mt-2 w-full text-xs text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 md:mt-3 md:text-sm"
                 onClick={() => setModalOpen('lectures')}
               >
-                전체 보기 <LuChevronRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
+                전체 보기 <LuChevronRight className="ml-1 h-3 w-3 md:h-4 md:w-4" />
               </Button>
             )}
           </div>

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { LogIn, LogOut, User } from 'lucide-react'
 
 import { HeaderIconAction } from '@/components/layout/header/header-icon-action'
+import { NotificationDropdown } from '@/features/notification'
 import type { UserType } from '@/store/auth-store'
 
 import type { NavCategoryItem } from './header'
@@ -127,6 +128,8 @@ export function DesktopHeader({
             <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href={mypageHref}>
               <User size={28} />
             </HeaderIconAction>
+
+            <NotificationDropdown />
 
             <HeaderIconAction kind="button" ariaLabel="로그아웃" tooltip="로그아웃" onClick={onLogoutClick}>
               <LogOut size={24} />

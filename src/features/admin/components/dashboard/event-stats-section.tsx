@@ -66,22 +66,22 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
   if (isLoading) {
     return (
       <>
-        <div className="bento-card relative h-full overflow-hidden p-3 sm:p-5">
+        <div className="bento-card relative h-full overflow-hidden p-3 md:p-5">
           <div className="grid-pattern absolute inset-0 opacity-30" />
           <div className="relative z-10 flex h-full flex-col">
-            <div className="bg-muted mb-3 h-4 w-24 animate-pulse rounded sm:mb-4 sm:h-5 sm:w-32" />
+            <div className="bg-muted mb-3 h-4 w-24 animate-pulse rounded md:mb-4 md:h-5 md:w-32" />
             <div className="flex flex-1 items-center justify-center">
-              <div className="bg-muted/50 h-32 w-full animate-pulse rounded-lg sm:h-48" />
+              <div className="bg-muted/50 h-32 w-full animate-pulse rounded-lg md:h-48" />
             </div>
           </div>
         </div>
-        <div className="bento-card relative h-full overflow-hidden p-3 sm:p-5">
+        <div className="bento-card relative h-full overflow-hidden p-3 md:p-5">
           <div className="grid-pattern absolute inset-0 opacity-30" />
           <div className="relative z-10 flex h-full flex-col">
-            <div className="bg-muted mb-3 h-4 w-24 animate-pulse rounded sm:mb-4 sm:h-5 sm:w-32" />
-            <div className="flex flex-1 flex-col gap-2 sm:gap-3">
+            <div className="bg-muted mb-3 h-4 w-24 animate-pulse rounded md:mb-4 md:h-5 md:w-32" />
+            <div className="flex flex-1 flex-col gap-2 md:gap-3">
               {[1, 2, 3].map(i => (
-                <div key={i} className="bg-muted/50 h-12 animate-pulse rounded-lg sm:h-16 sm:rounded-xl" />
+                <div key={i} className="bg-muted/50 h-12 animate-pulse rounded-lg md:h-16 md:rounded-xl" />
               ))}
             </div>
           </div>
@@ -97,17 +97,17 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-amber-500/5" />
         <div className="grid-pattern absolute inset-0 opacity-30" />
 
-        <div className="absolute -top-6 -right-6 h-20 w-20 rounded-full bg-orange-500/10 blur-2xl sm:-top-10 sm:-right-10 sm:h-28 sm:w-28" />
+        <div className="absolute -top-6 -right-6 h-20 w-20 rounded-full bg-orange-500/10 blur-2xl md:-top-10 md:-right-10 md:h-28 md:w-28" />
 
-        <div className="relative z-10 flex h-full flex-col p-3 sm:p-5">
-          <div className="mb-3 flex items-center justify-between sm:mb-4">
+        <div className="relative z-10 flex h-full flex-col p-3 md:p-5">
+          <div className="mb-3 flex items-center justify-between md:mb-4">
             <div className="flex items-center gap-2">
-              <div className="rounded-lg bg-orange-500/10 p-1.5 sm:p-2">
-                <LuActivity className="h-3.5 w-3.5 text-orange-600 sm:h-4 sm:w-4" />
+              <div className="rounded-lg bg-orange-500/10 p-1.5 md:p-2">
+                <LuActivity className="h-3.5 w-3.5 text-orange-600 md:h-4 md:w-4" />
               </div>
               <div>
-                <h3 className="text-foreground text-xs font-bold sm:text-sm lg:text-base">배너 클릭 통계</h3>
-                <p className="text-muted-foreground text-[9px] sm:text-[10px] lg:text-xs">{periodLabel} 기준</p>
+                <h3 className="text-foreground text-xs font-bold md:text-sm lg:text-base">배너 클릭 통계</h3>
+                <p className="text-muted-foreground text-[9px] md:text-[10px] lg:text-xs">{periodLabel} 기준</p>
               </div>
             </div>
           </div>
@@ -165,27 +165,27 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-emerald-500/5" />
         <div className="grid-pattern absolute inset-0 opacity-30" />
 
-        <div className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full bg-blue-500/10 blur-2xl sm:-bottom-8 sm:-left-8 sm:h-24 sm:w-24" />
+        <div className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full bg-blue-500/10 blur-2xl md:-bottom-8 md:-left-8 md:h-24 md:w-24" />
 
-        <div className="relative z-10 flex h-full flex-col p-3 sm:p-5">
-          <div className="mb-3 flex items-center justify-between sm:mb-4">
+        <div className="relative z-10 flex h-full flex-col p-3 md:p-5">
+          <div className="mb-3 flex items-center justify-between md:mb-4">
             <div className="flex items-center gap-2">
-              <div className="rounded-lg bg-blue-500/10 p-1.5 sm:p-2">
-                <LuMousePointerClick className="h-3.5 w-3.5 text-blue-600 sm:h-4 sm:w-4" />
+              <div className="rounded-lg bg-blue-500/10 p-1.5 md:p-2">
+                <LuMousePointerClick className="h-3.5 w-3.5 text-blue-600 md:h-4 md:w-4" />
               </div>
               <div>
-                <h3 className="text-foreground text-xs font-bold sm:text-sm lg:text-base">사용자 액션</h3>
-                <p className="text-muted-foreground text-[9px] sm:text-[10px] lg:text-xs">{periodLabel} 합계</p>
+                <h3 className="text-foreground text-xs font-bold md:text-sm lg:text-base">사용자 액션</h3>
+                <p className="text-muted-foreground text-[9px] md:text-[10px] lg:text-xs">{periodLabel} 합계</p>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col gap-2 sm:gap-3 lg:gap-4">
+          <div className="flex flex-1 flex-col gap-2 md:gap-3 lg:gap-4">
             {actionStats.map((stat, index) => (
               <div
                 key={stat.title}
                 className={cn(
-                  'group/item relative overflow-hidden rounded-lg p-2.5 transition-all sm:rounded-xl sm:p-4 lg:p-5',
+                  'group/item relative overflow-hidden rounded-lg p-2.5 transition-all md:rounded-xl md:p-4 lg:p-5',
                   'bg-card/50 hover:bg-card/80 hover:shadow-md'
                 )}
                 style={{ animationDelay: `${index * 0.1}s` }}
@@ -194,13 +194,13 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
                 <div className={cn('absolute inset-0 bg-gradient-to-r opacity-50', stat.gradient)} />
 
                 <div className="relative flex items-center justify-between">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className={cn('rounded-md p-1.5 sm:rounded-lg sm:p-2', stat.bg)}>
-                      <stat.icon className={cn('h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5', stat.color)} />
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <div className={cn('rounded-md p-1.5 md:rounded-lg md:p-2', stat.bg)}>
+                      <stat.icon className={cn('h-3 w-3 md:h-4 md:w-4 lg:h-5 lg:w-5', stat.color)} />
                     </div>
-                    <span className="text-foreground text-xs font-medium sm:text-sm lg:text-base">{stat.title}</span>
+                    <span className="text-foreground text-xs font-medium md:text-sm lg:text-base">{stat.title}</span>
                   </div>
-                  <span className="font-mono-data text-foreground text-base font-bold sm:text-xl lg:text-2xl">
+                  <span className="font-mono-data text-foreground text-base font-bold md:text-xl lg:text-2xl">
                     {stat.value.toLocaleString()}
                   </span>
                 </div>

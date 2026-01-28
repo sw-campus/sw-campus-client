@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useRouter, usePathname } from 'next/navigation'
 
 import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
+import { useFloatingBarStore } from '@/store/floating-bar.store'
 
 export default function FloatingCart() {
   const router = useRouter()
@@ -14,7 +14,8 @@ export default function FloatingCart() {
   const { items, hasHydrated } = useUnifiedCart()
   const { mutate: remove } = useUnifiedRemoveFromCart()
 
-  const [isOpen, setIsOpen] = useState(false)
+  const isOpen = useFloatingBarStore((state) => state.isOpen)
+  const setIsOpen = useFloatingBarStore((state) => state.setIsOpen)
 
   // bootcamp-list, lecture 상세/검색 페이지에서는 자체 FloatingInterestBar 사용
   if (pathname === '/bootcamp-list' || pathname.startsWith('/lectures/')) return null
