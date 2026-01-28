@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
 import Script from 'next/script'
 import { usePathname } from 'next/navigation'
 
@@ -25,6 +27,7 @@ export default function KakaoChannelButton() {
   const pathname = usePathname()
   const isFloatingBarOpen = useFloatingBarStore((state) => state.isOpen)
   const isDesktop = useMediaQuery('(min-width: 1280px)')
+  const [pcLeftPosition, setPcLeftPosition] = useState<number | null>(null)
 
   // 로그인/회원가입 페이지에서는 숨김
   if (pathname === '/login' || pathname?.startsWith('/signup')) {
@@ -45,16 +48,36 @@ export default function KakaoChannelButton() {
     }
   }
 
-  // 데스크탑: 고정 위치
-  // 모바일: 플로팅 바 바로 위 (위로가기 버튼 아래)
-  const getBottomPosition = () => {
-    if (isDesktop) return 40 // 데스크탑: 아래쪽
-    return isFloatingBarOpen ? 195 : 60
-  }
+  // PC 버전 동적 위치 계산 (본문 컨테이너 오른쪽 끝 기준 - 위로가기 버튼과 동일)
+  useEffect(() => {
+    const updatePosition = () => {
+      const mainContent = document.querySelector('[data-main-content]') as HTMLElement
+      if (mainContent) {
+        const rect = mainContent.getBoundingClientRect()
+        setPcLeftPosition(rect.right + 12)
+      }
+    }
 
-  const getRightPosition = () => {
-    if (isDesktop) return 32 // xl:right-8 = 32px
-    return 16 // right-4 = 16px
+    updatePosition()
+    window.addEventListener('resize', updatePosition)
+
+    const observer = new MutationObserver(updatePosition)
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      window.removeEventListener('resize', updatePosition)
+      observer.disconnect()
+    }
+  }, [])
+
+  // 위치 스타일 계산
+  const getPositionStyle = (): React.CSSProperties => {
+    if (isDesktop && pcLeftPosition) {
+      // PC: 위로가기 버튼과 같은 가로 위치
+      return { left: pcLeftPosition, bottom: 40 }
+    }
+    // 모바일: 오른쪽 고정
+    return { right: 16, bottom: isFloatingBarOpen ? 195 : 60 }
   }
 
   return (
@@ -69,7 +92,7 @@ export default function KakaoChannelButton() {
       <div
         id="kakao-chat-channel-button"
         className="fixed z-50 transition-all duration-300"
-        style={{ bottom: getBottomPosition(), right: getRightPosition() }}
+        style={getPositionStyle()}
       />
     </>
   )

@@ -17,14 +17,14 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
         {/* Top Section: Logo + Info */}
         <div className="flex items-center gap-2">
           {/* Logo - 원형 */}
-          <div className="relative flex h-[50px] w-[50px] flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-2.5 shadow-[2px_2px_10px_0px_rgba(161,161,170,0.25)]">
+          <div className="relative flex h-[50px] w-[50px] flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[2px_2px_10px_0px_rgba(161,161,170,0.25)]">
             {organization.logoUrl ? (
               <Image
                 src={organization.logoUrl}
                 alt={organization.name}
                 fill
                 sizes="50px"
-                className="object-contain p-2"
+                className="object-cover"
               />
             ) : (
               <span className="text-xl">🏢</span>
@@ -66,7 +66,7 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
               alt={organization.name}
               fill
               sizes="50px"
-              className="object-contain p-2"
+              className="object-cover"
             />
           ) : (
             <span className="text-xl">🏢</span>
