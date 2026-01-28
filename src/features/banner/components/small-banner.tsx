@@ -67,10 +67,10 @@ export default function SmallBanner() {
           disableOnInteraction: false,
         }}
         spaceBetween={8}
-        slidesPerView={2}
+        slidesPerView={Math.min(banners.length, 2)}
         breakpoints={{
           768: {
-            slidesPerView: 4,
+            slidesPerView: Math.min(banners.length, 3),
           },
         }}
       >

@@ -83,7 +83,7 @@ export default function MidBanner() {
             slidesPerView={1}
             breakpoints={{
               768: {
-                slidesPerView: 2,
+                slidesPerView: middleBanners.length === 1 ? 1 : 2,
               },
             }}
           >
