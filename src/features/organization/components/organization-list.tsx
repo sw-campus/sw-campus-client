@@ -1,22 +1,39 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 import { Search } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { PCCartSidebar } from '@/features/bootcamp-list'
+import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
+import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 
 import { useOrganizationsQuery } from '../hooks/use-organizations'
 import { OrganizationCard } from './organization-card'
 
 export function OrganizationList() {
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [showRecruitingOnly, setShowRecruitingOnly] = useState(false)
 
   // API에서 기관 목록 조회 (서버 사이드 필터링)
   const { data: organizations = [], isLoading } = useOrganizationsQuery(searchTerm || undefined)
+
+  // 장바구니 (관심 항목)
+  const { items: cartItems } = useUnifiedCart()
+  const { mutate: removeFromCart } = useUnifiedRemoveFromCart()
+
+  const handleRemoveFromCart = (lectureId: string) => {
+    removeFromCart(lectureId)
+  }
+
+  const handleGoToCompare = () => {
+    router.push('/cart/compare')
+  }
 
   // 모집 중인 기관만 필터링
   const filteredOrganizations = showRecruitingOnly
@@ -102,6 +119,13 @@ export function OrganizationList() {
               {searchTerm && <p className="mt-2 text-sm">다른 검색어로 시도해보세요.</p>}
             </div>
           ))}
+
+      {/* PC Cart Sidebar - 데스크탑에서 오른쪽에 표시 */}
+      <PCCartSidebar
+        items={cartItems}
+        onRemove={handleRemoveFromCart}
+        onCompare={handleGoToCompare}
+      />
     </div>
   )
 }
