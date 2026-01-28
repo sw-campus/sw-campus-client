@@ -20,7 +20,7 @@ export function LectureCreateProjectFields() {
         <FieldLabel>프로젝트</FieldLabel>
         <FieldDescription>선택 항목입니다.</FieldDescription>
         <FieldContent>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <Controller
               control={control}
               name="projectNum"

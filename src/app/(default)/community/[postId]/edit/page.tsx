@@ -29,7 +29,7 @@ export default function EditPostPage() {
       <main className="custom-container mx-auto max-w-6xl">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-32 rounded bg-gray-200" />
-          <div className="custom-card">
+          <div>
             <div className="h-96 w-full rounded bg-gray-200" />
           </div>
         </div>
@@ -42,7 +42,7 @@ export default function EditPostPage() {
       <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">로그인이 필요합니다</p>
-          <Link href={`/login?returnUrl=${encodeURIComponent(pathname)}`} className="mt-4 inline-block text-orange-500 hover:underline">
+          <Link href={`/login?returnUrl=${encodeURIComponent(pathname)}`} className="mt-4 inline-block text-primary hover:underline">
             로그인하기
           </Link>
         </div>
@@ -56,7 +56,7 @@ export default function EditPostPage() {
       <main className="custom-container mx-auto max-w-6xl">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-32 rounded bg-gray-200" />
-          <div className="custom-card">
+          <div>
             <div className="h-96 w-full rounded bg-gray-200" />
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function EditPostPage() {
       <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">게시글을 찾을 수 없습니다</p>
-          <Link href="/community" className="mt-4 inline-block text-orange-500 hover:underline">
+          <Link href="/community" className="mt-4 inline-block text-primary hover:underline">
             목록으로 돌아가기
           </Link>
         </div>
@@ -84,7 +84,7 @@ export default function EditPostPage() {
       <main className="custom-container mx-auto max-w-6xl">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">수정 권한이 없습니다</p>
-          <Link href={`/community/${postId}`} className="mt-4 inline-block text-orange-500 hover:underline">
+          <Link href={`/community/${postId}`} className="mt-4 inline-block text-primary hover:underline">
             게시글로 돌아가기
           </Link>
         </div>
@@ -123,7 +123,7 @@ export default function EditPostPage() {
       </Link>
 
       {/* 폼 카드 */}
-      <div className="custom-card">
+      <div>
         <h1 className="mb-6 text-2xl font-bold text-gray-900">게시글 수정</h1>
 
         {categories.length > 0 ? (

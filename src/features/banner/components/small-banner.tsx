@@ -1,13 +1,10 @@
 'use client'
 
-import { useRef } from 'react'
-
 import Image from 'next/image'
 import Link from 'next/link'
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
-import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
-import { Autoplay } from 'swiper/modules'
+import 'swiper/css/navigation'
+import { Autoplay, Navigation } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { trackBannerClick } from '@/lib/analytics'
@@ -30,20 +27,17 @@ function isExternalLink(url: string): boolean {
 }
 
 export default function SmallBanner() {
-  const swiperRef = useRef<SwiperType | null>(null)
   const { data: banners, isLoading } = useBannersByTypeQuery('SMALL')
 
   if (isLoading) {
     return (
-      <div className="relative mx-auto mt-4 w-full overflow-visible rounded-3xl">
-        <div className="flex gap-4 overflow-visible">
-          {[0, 1, 2].map(i => (
-            <div
-              key={i}
-              className="bg-muted h-[200px] w-[calc(33.33%-11px)] shrink-0 animate-pulse rounded-2xl border border-gray-200"
-            />
-          ))}
-        </div>
+      <div className="relative flex w-full gap-2 overflow-visible">
+        {[0, 1, 2].map(i => (
+          <div
+            key={i}
+            className="bg-muted h-[90px] w-[calc(33.33%-11px)] shrink-0 animate-pulse border border-gray-200 md:h-[150px]"
+          />
+        ))}
       </div>
     )
   }
@@ -63,23 +57,21 @@ export default function SmallBanner() {
   }
 
   return (
-    <div className="relative mx-auto mt-4 w-full rounded-3xl">
+    <div className="relative w-full">
       <Swiper
-        onBeforeInit={swiper => {
-          swiperRef.current = swiper
-        }}
-        modules={[Autoplay]}
-        loop={true}
+        modules={[Autoplay, Navigation]}
+        rewind={true}
+        navigation={true}
         autoplay={{
-          delay: 5000,
+          delay: 3000,
           disableOnInteraction: false,
         }}
-        spaceBetween={16}
-        slidesPerView={3}
+        spaceBetween={8}
+        slidesPerView={Math.min(banners.length, 2)}
         breakpoints={{
-          0: { slidesPerView: 1 },
-          768: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
+          768: {
+            slidesPerView: Math.min(banners.length, 3),
+          },
         }}
       >
         {banners.map(banner => {
@@ -88,7 +80,7 @@ export default function SmallBanner() {
 
           const content = (
             <div
-              className="relative h-[200px] w-full overflow-hidden rounded-2xl border border-gray-200 shadow"
+              className="relative h-[90px] w-full overflow-hidden border border-gray-200 shadow md:h-[150px]"
               style={{ backgroundColor: banner.backgroundColor || '#ffffff' }}
             >
               {banner.imageUrl ? (
@@ -128,22 +120,6 @@ export default function SmallBanner() {
           )
         })}
       </Swiper>
-
-      {/* 커스텀 네비게이션 버튼 */}
-      <button
-        onClick={() => swiperRef.current?.slidePrev()}
-        className="absolute top-1/2 left-0 z-10 -translate-x-4 -translate-y-1/2 rounded-full bg-white/80 p-2.5 shadow-lg transition-all hover:scale-110 hover:text-orange-400 active:scale-95"
-        aria-label="이전 슬라이드"
-      >
-        <FiChevronLeft className="h-5 w-5" />
-      </button>
-      <button
-        onClick={() => swiperRef.current?.slideNext()}
-        className="absolute top-1/2 right-0 z-10 translate-x-4 -translate-y-1/2 rounded-full bg-white/80 p-2.5 shadow-lg transition-all hover:scale-110 hover:text-orange-400 active:scale-95"
-        aria-label="다음 슬라이드"
-      >
-        <FiChevronRight className="h-5 w-5" />
-      </button>
     </div>
   )
 }

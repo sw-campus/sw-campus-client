@@ -90,7 +90,7 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
           className={cn(
             'group relative flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-all duration-200',
             isSelected
-              ? 'bg-gradient-to-r from-orange-500 to-amber-500 font-medium text-white shadow-md shadow-orange-200/50'
+              ? 'bg-primary font-medium text-white shadow-md shadow-primary/30'
               : 'text-gray-600 hover:bg-gray-50/80 hover:text-gray-900',
             depth > 0 && 'ml-3 border-l-2 border-gray-100 pl-3',
           )}
@@ -190,7 +190,7 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
   return (
     <>
       {/* 모바일: 드릴다운 방식 탭 */}
-      <div className="relative lg:hidden">
+      <div className="relative md:hidden">
         {/* 오른쪽 스크롤 힌트 그라데이션 */}
         <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-8 bg-gradient-to-l from-white via-white/80 to-transparent" />
         <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 pr-8">
@@ -221,7 +221,7 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
               className={cn(
                 'shrink-0 rounded-full px-5 py-2 text-sm font-semibold transition-all active:scale-95',
                 selectedCategoryId === null
-                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/50'
+                  ? 'bg-primary text-white shadow-md shadow-primary/30'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
               )}
             >
@@ -238,7 +238,7 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
               className={cn(
                 'shrink-0 rounded-full px-5 py-2 text-sm font-semibold whitespace-nowrap transition-all active:scale-95',
                 selectedCategoryId === cat.id
-                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/50'
+                  ? 'bg-primary text-white shadow-md shadow-primary/30'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
               )}
             >
@@ -250,10 +250,10 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
       </div>
 
       {/* 데스크탑: 사이드바 트리 */}
-      <aside className="hidden w-64 shrink-0 lg:block">
+      <aside className="hidden w-64 shrink-0 md:block">
         <nav className="sticky top-24 space-y-1 rounded-2xl border border-gray-200/60 bg-white/80 p-4 shadow-sm backdrop-blur-xl">
           <h3 className="mb-4 flex items-center gap-2 px-2 text-xs font-bold tracking-wider text-gray-400 uppercase">
-            <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             카테고리
           </h3>
 
@@ -264,7 +264,7 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
             className={cn(
               'flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
               selectedCategoryId === null
-                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200/50'
+                ? 'bg-primary text-white shadow-md shadow-primary/30'
                 : 'text-gray-700 hover:bg-gray-50',
             )}
           >

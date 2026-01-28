@@ -118,7 +118,7 @@ export function LectureCreateRecruitProcedureFields({ selectTriggerClassName }: 
                     <Button
                       type="button"
                       variant="ghost"
-                      size="icon-sm"
+                      size="sm"
                       onClick={() => moveRecruit(idx, idx - 1)}
                       disabled={idx === 0}
                       aria-label="위로 이동"
@@ -128,7 +128,7 @@ export function LectureCreateRecruitProcedureFields({ selectTriggerClassName }: 
                     <Button
                       type="button"
                       variant="ghost"
-                      size="icon-sm"
+                      size="sm"
                       onClick={() => moveRecruit(idx, idx + 1)}
                       disabled={idx === recruitFields.length - 1}
                       aria-label="아래로 이동"
@@ -138,7 +138,7 @@ export function LectureCreateRecruitProcedureFields({ selectTriggerClassName }: 
                     <Button
                       type="button"
                       variant="ghost"
-                      size="icon-sm"
+                      size="sm"
                       onClick={() => removeRecruit(idx)}
                       aria-label="삭제"
                     >

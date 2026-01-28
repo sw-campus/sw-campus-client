@@ -1,27 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AiAuthModal, type AiAuthModalType } from '@/features/cart/components/ai-auth-modal'
-import { AiFinalRecommendation } from '@/features/cart/components/ai-final-recommendation'
-import { AiFloatingButton } from '@/features/cart/components/ai-floating-button'
+import { AiAnalysisSummary } from '@/features/cart/components/compare-table/ai-analysis-summary'
+import { AiAnalyzeButton } from '@/features/cart/components/compare-table/ai-analyze-button'
 import { CartItemSidebar } from '@/features/cart/components/compare-table/cart-item-sidebar'
+import { CompareHeroBanner } from '@/features/cart/components/compare-table/compare-hero-banner'
 import { CompareTable } from '@/features/cart/components/compare-table/compare-table'
 import { LectureSummaryCard } from '@/features/cart/components/compare-table/lecture-summary-card'
+import { StickyCompareHeader } from '@/features/cart/components/compare-table/sticky-compare-header'
+import { VsBadge } from '@/features/cart/components/compare-table/vs-badge'
 import { useAiCompare } from '@/features/cart/hooks/use-ai-compare'
 import { useCartComparePageModel } from '@/features/cart/hooks/use-cart-compare-page-model'
 import { getDragLectureId } from '@/features/cart/utils/cart-compare-dnd'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth-store'
 
-const LABEL_COL_GRID_CLASS = 'grid-cols-2 md:grid-cols-[13.75rem_minmax(0,1fr)_1px_minmax(0,1fr)]'
-const LABEL_COL_TABLE_CLASS = 'w-[5.5rem] md:w-[13.75rem]'
-
 export default function CartCompareSection() {
   const [isLeftOver, setIsLeftOver] = useState(false)
   const [isRightOver, setIsRightOver] = useState(false)
   const [authModalType, setAuthModalType] = useState<AiAuthModalType>(null)
+  const [_isSticky, setIsSticky] = useState(false)
+  const stickyTriggerRef = useRef<HTMLDivElement>(null)
 
   const isLoggedIn = useAuthStore(state => state.isLoggedIn)
 
@@ -102,126 +103,150 @@ export default function CartCompareSection() {
   }
 
   return (
-    <div className="mx-auto grid w-full gap-4 py-4 pb-40 md:py-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-      <CartItemSidebar
-        items={items}
-        isLoading={isLoading}
-        isError={isError}
-        canUseItem={canUseItem}
-        isAlreadySelected={isAlreadySelected}
-        onPick={pickFromList}
-      />
+    <div className="flex w-full flex-col overflow-x-hidden pb-32 md:overflow-x-visible">
+      {/* 히어로 배너 */}
+      <div className="page-container px-6">
+        <CompareHeroBanner />
+      </div>
 
-      <Card>
-        <CardHeader className="hidden md:block">
-          <CardTitle className="text-base">과정비교 페이지</CardTitle>
-          <div className="text-muted-foreground text-sm">
-            사이드바에서 강의를 드래그해서 왼쪽/오른쪽 영역에 놓으면 비교표가 업데이트됩니다.
-          </div>
-        </CardHeader>
-        {/* 모바일 헤더 */}
-        <CardHeader className="pb-2 md:hidden">
-          <CardTitle className="text-sm">과정 비교</CardTitle>
-          <div className="text-muted-foreground text-xs">
-            AI 심층 비교 목록에서 강의를 선택하세요
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className={cn('grid rounded-md', LABEL_COL_GRID_CLASS)}>
-            <div aria-hidden className="bg-muted/10 hidden md:block" />
-            <div
-              className={cn(isLeftOver && 'bg-muted/20')}
-              onDragEnter={e => {
-                e.preventDefault()
-                setIsLeftOver(true)
-              }}
-              onDragLeave={() => setIsLeftOver(false)}
-              onDragOver={e => {
-                e.preventDefault()
-                e.dataTransfer.dropEffect = 'copy'
-              }}
-              onDrop={e => {
-                e.preventDefault()
-                setIsLeftOver(false)
-                const lectureId = getDragLectureId(e)
-                if (!lectureId) return
-                handleDropLecture('left', lectureId)
-              }}
-              aria-label="왼쪽 드롭 영역"
-            >
-              <LectureSummaryCard
-                side="left"
-                title={left?.title ?? ''}
-                thumbnailUrl={leftDetail?.thumbnailUrl}
-                lectureId={leftId}
-                onClear={handleClearLeft}
-              />
-            </div>
-            <div aria-hidden className="hidden w-px md:block">
-              <div className="bg-border h-full w-px" />
-            </div>
-            <div
-              className={cn(isRightOver && 'bg-muted/20')}
-              onDragEnter={e => {
-                e.preventDefault()
-                setIsRightOver(true)
-              }}
-              onDragLeave={() => setIsRightOver(false)}
-              onDragOver={e => {
-                e.preventDefault()
-                e.dataTransfer.dropEffect = 'copy'
-              }}
-              onDrop={e => {
-                e.preventDefault()
-                setIsRightOver(false)
-                const lectureId = getDragLectureId(e)
-                if (!lectureId) return
-                handleDropLecture('right', lectureId)
-              }}
-              aria-label="오른쪽 드롭 영역"
-            >
-              <LectureSummaryCard
-                side="right"
-                title={right?.title ?? ''}
-                thumbnailUrl={rightDetail?.thumbnailUrl}
-                lectureId={rightId}
-                onClear={handleClearRight}
-              />
-            </div>
-          </div>
-          <CompareTable
-            leftTitle={left?.title}
-            rightTitle={right?.title}
-            leftDetail={leftDetailResolved}
-            rightDetail={rightDetailResolved}
-            labelColClassName={LABEL_COL_TABLE_CLASS}
-            aiResult={aiResult}
+      {/* 메인 컨텐츠 */}
+      <div className="page-container overflow-x-hidden px-4 py-6 md:overflow-x-visible md:px-6 md:py-8">
+        {/* 페이지 타이틀 */}
+        <div className="flex items-center border-b-[0.5px] border-foreground pb-6">
+          <h1 className="flex-1 text-[2rem] font-bold text-foreground">과정 비교 페이지</h1>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-[280px_minmax(0,1fr)]">
+          {/* 사이드바 - 모바일에서도 표시 (접을 수 있음) */}
+          <CartItemSidebar
+            items={items}
+            isLoading={isLoading}
+            isError={isError}
+            canUseItem={canUseItem}
+            isAlreadySelected={isAlreadySelected}
+            onPick={pickFromList}
           />
 
-          {/* AI 최종 추천 */}
-          {aiResult && (
-            <AiFinalRecommendation
-              recommendation={aiResult.finalRecommendation}
+          {/* 메인 비교 영역 */}
+          <div className="min-w-0 space-y-4 md:space-y-6">
+            {/* 강의 카드 + VS badge */}
+            <div className="relative flex items-center gap-4 md:gap-6">
+              {/* 왼쪽 강의 */}
+              <div
+                className={cn('min-w-0 flex-1 rounded-xl transition-colors', isLeftOver && 'ring-2 ring-primary ring-offset-2')}
+                onDragEnter={e => {
+                  e.preventDefault()
+                  setIsLeftOver(true)
+                }}
+                onDragLeave={() => setIsLeftOver(false)}
+                onDragOver={e => {
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'copy'
+                }}
+                onDrop={e => {
+                  e.preventDefault()
+                  setIsLeftOver(false)
+                  const lectureId = getDragLectureId(e)
+                  if (!lectureId) return
+                  handleDropLecture('left', lectureId)
+                }}
+                aria-label="왼쪽 드롭 영역"
+              >
+                <LectureSummaryCard
+                  side="left"
+                  title={left?.title ?? ''}
+                  thumbnailUrl={leftDetail?.thumbnailUrl}
+                  lectureId={leftId}
+                  orgName={left?.orgName}
+                  price={leftDetail?.price}
+                  onClear={handleClearLeft}
+                />
+              </div>
+
+              {/* 오른쪽 강의 */}
+              <div
+                className={cn('min-w-0 flex-1 rounded-xl transition-colors', isRightOver && 'ring-2 ring-primary ring-offset-2')}
+                onDragEnter={e => {
+                  e.preventDefault()
+                  setIsRightOver(true)
+                }}
+                onDragLeave={() => setIsRightOver(false)}
+                onDragOver={e => {
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'copy'
+                }}
+                onDrop={e => {
+                  e.preventDefault()
+                  setIsRightOver(false)
+                  const lectureId = getDragLectureId(e)
+                  if (!lectureId) return
+                  handleDropLecture('right', lectureId)
+                }}
+                aria-label="오른쪽 드롭 영역"
+              >
+                <LectureSummaryCard
+                  side="right"
+                  title={right?.title ?? ''}
+                  thumbnailUrl={rightDetail?.thumbnailUrl}
+                  lectureId={rightId}
+                  orgName={right?.orgName}
+                  price={rightDetail?.price}
+                  onClear={handleClearRight}
+                />
+              </div>
+
+              {/* VS Badge - 절대 위치 중앙 */}
+              <VsBadge />
+            </div>
+
+            {/* AI 분석 결과 요약 (결과가 있을 때만 표시) */}
+            <AiAnalysisSummary
+              aiResult={aiResult}
               leftTitle={left?.title ?? 'A과정'}
               rightTitle={right?.title ?? 'B과정'}
               leftId={leftId}
               rightId={rightId}
-              recommendationLevel={aiResult.recommendationLevel}
             />
-          )}
-        </CardContent>
-      </Card>
 
-      {/* AI 플로팅 버튼 - 화면 우하단 고정 */}
-      <AiFloatingButton
-        isEnabled={canAnalyze}
-        isLoading={isAiLoading}
-        hasResult={Boolean(aiResult)}
-        onAnalyze={handleAiAnalyze}
-        onClear={handleClearAi}
-        disabledReason={getDisabledReason()}
-        className="bottom-36 md:bottom-10"
-      />
+            {/* AI 분석 버튼 */}
+            <AiAnalyzeButton
+              isEnabled={canAnalyze}
+              isLoading={isAiLoading}
+              hasResult={Boolean(aiResult)}
+              onAnalyze={handleAiAnalyze}
+              onClear={handleClearAi}
+              disabledReason={getDisabledReason()}
+              className="w-full md:max-w-full"
+            />
+
+            {/* Sticky 트리거 포인트 */}
+            <div ref={stickyTriggerRef} />
+
+            {/* Sticky 헤더 (CompareTable 영역에 도달 시 활성화) */}
+            <StickyCompareHeader
+              triggerRef={stickyTriggerRef}
+              leftTitle={left?.title ?? ''}
+              leftId={leftId}
+              rightTitle={right?.title ?? ''}
+              rightId={rightId}
+              canAnalyze={canAnalyze}
+              isAiLoading={isAiLoading}
+              hasAiResult={Boolean(aiResult)}
+              onAiAnalyze={handleAiAnalyze}
+              onStickyChange={setIsSticky}
+            />
+
+            {/* 비교 테이블 */}
+            <CompareTable
+              leftTitle={left?.title}
+              rightTitle={right?.title}
+              leftDetail={leftDetailResolved}
+              rightDetail={rightDetailResolved}
+              aiResult={aiResult}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* AI 인증/설문 안내 모달 */}
       <AiAuthModal type={authModalType} onClose={() => setAuthModalType(null)} />

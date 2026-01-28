@@ -12,45 +12,49 @@ import { DistributionDonutChart } from './distribution-donut-chart'
 import { EngagementCard } from './engagement-card'
 import { EventStatsSection } from './event-stats-section'
 import { PopularSearchTermsCard } from './popular-search-terms-card'
+import { PeriodToggle, type Period } from './shared/period-toggle'
 import { StatCard } from './stat-card'
 import { TrafficSourceChart } from './traffic-source-chart'
 import { VisitorLineChart } from './visitor-line-chart'
-import { PeriodToggle, type Period } from './shared/period-toggle'
 
 export function AdminDashboard() {
   const [period, setPeriod] = useState<Period>(7)
   const { stats, pendingCounts, memberDistribution, isLoading } = useDashboardStats()
   const { data: analyticsReport, isLoading: isAnalyticsLoading } = useAnalyticsReportQuery(period)
 
-  // 동적 stats 데이터 (서브텍스트로 대기중 건수 표시)
+  // Stat cards configuration with accent colors
   const statCards = [
     {
       title: '회원관리',
       value: stats.members,
       icon: LuUsers,
       subtext: pendingCounts.organizations > 0 ? `기관 대기중: ${pendingCounts.organizations}` : undefined,
+      accentColor: 'lime' as const,
     },
     {
       title: '강의관리',
       value: stats.lectures,
       icon: LuBookOpen,
       subtext: pendingCounts.lectures > 0 ? `대기중: ${pendingCounts.lectures}` : undefined,
+      accentColor: 'cyan' as const,
     },
     {
       title: '수료증관리',
       value: stats.certificates,
       icon: LuAward,
       subtext: pendingCounts.certificates > 0 ? `대기중: ${pendingCounts.certificates}` : undefined,
+      accentColor: 'magenta' as const,
     },
     {
       title: '리뷰관리',
       value: stats.reviews,
       icon: LuStar,
       subtext: pendingCounts.reviews > 0 ? `대기중: ${pendingCounts.reviews}` : undefined,
+      accentColor: 'amber' as const,
     },
   ]
 
-  // 회원 분포 차트 데이터
+  // Member distribution chart data
   const distributionData = [
     { name: '일반 회원', value: memberDistribution.user, color: '#3b82f6' },
     { name: '기관 회원', value: memberDistribution.organization, color: '#10b981' },
@@ -58,54 +62,78 @@ export function AdminDashboard() {
   ]
 
   return (
-    <div className="flex flex-1 flex-col gap-6">
-      {/* Header with Global Period Selector */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-foreground text-2xl font-bold">대시보드</h1>
+    <div className="dashboard-terminal flex flex-1 flex-col gap-4 md:gap-6">
+      {/* Header with Period Selector */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-foreground text-xl font-bold tracking-tight md:text-2xl lg:text-3xl">대시보드</h1>
+          <p className="text-muted-foreground mt-0.5 text-xs md:mt-1 md:text-sm">SW Campus 운영 현황을 한눈에 확인하세요</p>
+        </div>
         <PeriodToggle period={period} onPeriodChange={setPeriod} />
       </div>
 
-      {/* Section 1: 핵심 지표 - 4열 그리드 */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {statCards.map(stat => (
-          <StatCard
+      {/* Bento Grid Layout */}
+      <div className="grid auto-rows-[minmax(100px,auto)] grid-cols-2 gap-3 md:auto-rows-[minmax(120px,auto)] md:gap-4 lg:grid-cols-4">
+        {/* Row 1: 4 Stat Cards (2x2 on mobile, 4 on desktop) */}
+        {statCards.map((stat, index) => (
+          <div
             key={stat.title}
-            title={stat.title}
-            value={isLoading ? 0 : stat.value}
-            icon={stat.icon}
-            subtext={isLoading ? undefined : stat.subtext}
-          />
+            className="stagger-1"
+            style={{ animationDelay: `${index * 0.1}s` }}
+          >
+            <StatCard
+              title={stat.title}
+              value={isLoading ? 0 : stat.value}
+              icon={stat.icon}
+              subtext={isLoading ? undefined : stat.subtext}
+              accentColor={stat.accentColor}
+            />
+          </div>
         ))}
-      </div>
 
-      {/* Section 2: 트렌드 - 방문자 차트 (전체 너비) */}
-      <VisitorLineChart report={analyticsReport} isLoading={isAnalyticsLoading} period={period} />
+        {/* Row 2: Visitor Chart (full width on mobile) + Engagement Card */}
+        <div className="col-span-2 lg:col-span-3 lg:row-span-2">
+          <VisitorLineChart report={analyticsReport} isLoading={isAnalyticsLoading} period={period} />
+        </div>
 
-      {/* Section 3: 참여도 & 분포 - 4열 그리드 */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* 참여도 카드 */}
-        <EngagementCard
-          period={period}
-          averageEngagementTime={analyticsReport?.averageEngagementTime || 0}
-          pageViews={analyticsReport?.pageViews || 0}
-          sessions={analyticsReport?.sessions || 0}
-          isLoading={isAnalyticsLoading}
-        />
-        {/* 디바이스 분포 */}
-        <DeviceDonutChart data={analyticsReport?.deviceStats} isLoading={isAnalyticsLoading} />
-        {/* 트래픽 소스 */}
-        <TrafficSourceChart period={period} />
-        {/* 회원 분포 */}
-        <DistributionDonutChart data={distributionData} isLoading={isLoading} />
-      </div>
+        <div className="col-span-2 md:col-span-1 lg:row-span-2">
+          <EngagementCard
+            period={period}
+            averageEngagementTime={analyticsReport?.averageEngagementTime || 0}
+            pageViews={analyticsReport?.pageViews || 0}
+            sessions={analyticsReport?.sessions || 0}
+            isLoading={isAnalyticsLoading}
+          />
+        </div>
 
-      {/* Section 4: 랭킹 - 배너/강의 클릭 순위 (전체 너비) */}
-      <ClickRankingSection period={period} />
+        {/* Row 3: Distribution Charts (1 col on mobile, 2 on tablet, 4 on desktop) */}
+        <div className="col-span-2 min-h-[280px] md:col-span-1 md:min-h-[320px]">
+          <DeviceDonutChart data={analyticsReport?.deviceStats} isLoading={isAnalyticsLoading} />
+        </div>
 
-      {/* Section 5: 인기 검색어 + 이벤트 통계 */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <PopularSearchTermsCard period={period} />
-        <EventStatsSection period={period} />
+        <div className="col-span-2 min-h-[280px] md:col-span-1 md:min-h-[320px]">
+          <TrafficSourceChart period={period} />
+        </div>
+
+        <div className="col-span-2 min-h-[280px] md:col-span-1 md:min-h-[320px]">
+          <DistributionDonutChart data={distributionData} isLoading={isLoading} />
+        </div>
+
+        <div className="col-span-2 min-h-[280px] md:col-span-1 md:min-h-[320px]">
+          <PopularSearchTermsCard period={period} />
+        </div>
+
+        {/* Row 4: Click Rankings (full width) */}
+        <div className="col-span-2 lg:col-span-4">
+          <ClickRankingSection period={period} />
+        </div>
+
+        {/* Row 5: Event Stats (stacked on mobile, side by side on tablet+) */}
+        <div className="col-span-2 lg:col-span-4">
+          <div className="grid h-full grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+            <EventStatsSection period={period} />
+          </div>
+        </div>
       </div>
     </div>
   )

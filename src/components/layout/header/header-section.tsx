@@ -2,18 +2,36 @@
 
 import { useState } from 'react'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import Header, { NavCategoryItem } from '@/components/layout/header/header'
+import { useLogout } from '@/features/auth/hooks/use-logout'
 import { useCategoryTree } from '@/features/category'
 import { type BoardCategory } from '@/features/community'
 import { useBoardCategories } from '@/features/community/hooks'
 import { Navigation } from '@/features/navigation'
+import { useAuthStore } from '@/store/auth-store'
 import { useDesktopNavigationStore } from '@/store/navigation.store'
 
 export default function HeaderSection() {
   const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const { isLoggedIn, nickname, userType } = useAuthStore()
+  const { logout, isPending: isLoggingOut } = useLogout()
+
+  const mypageHref =
+    userType === 'ADMIN' ? '/mypage/admin' : userType === 'ORGANIZATION' ? '/mypage/organization' : '/mypage/personal'
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      setOpen(false)
+      router.push('/')
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   const { data: categoryTree } = useCategoryTree()
   const { data: boardCategories } = useBoardCategories()
@@ -22,6 +40,8 @@ export default function HeaderSection() {
 
   // 로그인/회원가입 페이지에서는 헤더 숨김
   if (pathname === '/login' || pathname.startsWith('/signup')) return null
+
+  const isHome = pathname === '/'
 
   // 게시판 카테고리를 네비게이션 아이템으로 변환하는 재귀 함수
   const mapBoardToNav = (category: BoardCategory): NavCategoryItem => ({
@@ -55,12 +75,13 @@ export default function HeaderSection() {
   }
 
   return (
-    <div className="relative">
+    <>
       <Header
         categories={mergedCategories}
         onOpenNav={() => setOpen(true)}
         onCategoryEnter={handleCategoryEnter}
         onOtherNavEnter={handleOtherNavEnter}
+        isHome={isHome}
       />
       <Navigation
         open={open}
@@ -71,7 +92,13 @@ export default function HeaderSection() {
         onDesktopEnter={undefined}
         onDesktopLeave={handleDesktopLeave}
         categories={mergedCategories}
+        isLoggedIn={isLoggedIn}
+        nickname={nickname}
+        mypageHref={mypageHref}
+        onLogout={handleLogout}
+        isLoggingOut={isLoggingOut}
+        isHome={isHome}
       />
-    </div>
+    </>
   )
 }

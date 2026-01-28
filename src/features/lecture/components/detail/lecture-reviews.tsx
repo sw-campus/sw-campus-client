@@ -1,9 +1,9 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, ChevronUp, Star } from 'lucide-react'
+import { ChevronDown, ChevronUp, Pencil, Star } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { FaUser } from 'react-icons/fa'
 import { toast } from 'sonner'
@@ -28,9 +28,9 @@ function ReviewCard({ review }: { review: Review }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
-    <Card className="bg-card/40 border-0 p-4 shadow-sm backdrop-blur-xl transition-all duration-200 hover:shadow-md sm:p-5">
+    <Card className="bg-card/40 border-0 p-4 shadow-sm backdrop-blur-xl transition-all duration-200 hover:shadow-md md:p-5">
       {/* Header */}
-      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-0">
+      <div className="mb-3 flex flex-col gap-2 md:flex-row md:items-start md:justify-between md:gap-0">
         <div className="flex items-center gap-3">
           <FaUser className="h-4 w-4 shrink-0 text-gray-400" />
           <div>
@@ -43,7 +43,7 @@ function ReviewCard({ review }: { review: Review }) {
 
       {/* Comment - 총평이 있을 때만 표시 */}
       {review.comment && (
-        <p className="text-muted-foreground mb-4 text-xs leading-relaxed sm:text-sm">{review.comment}</p>
+        <p className="text-muted-foreground mb-4 text-xs leading-relaxed md:text-sm">{review.comment}</p>
       )}
 
       {/* Toggle Button */}
@@ -65,22 +65,22 @@ function ReviewCard({ review }: { review: Review }) {
 
       {/* Detail Scores */}
       {isExpanded && (
-        <div className="mt-3 space-y-2.5 rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:mt-4 sm:space-y-3 sm:p-4">
+        <div className="mt-3 space-y-2.5 rounded-xl border border-gray-200 bg-white p-3 shadow-sm md:mt-4 md:space-y-3 md:p-4">
           {review.detailScores.map(detail => (
             <div key={detail.category} className="space-y-1">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-semibold text-gray-800 sm:text-sm">
+                <span className="text-xs font-semibold text-gray-800 md:text-sm">
                   {CATEGORY_LABELS[detail.category] || detail.category}
                 </span>
                 <div className="flex shrink-0 items-center gap-1">
-                  <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 sm:h-4 sm:w-4" />
-                  <span className="min-w-6 text-right text-xs font-bold text-yellow-500 sm:min-w-8 sm:text-sm">
+                  <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 md:h-4 md:w-4" />
+                  <span className="min-w-6 text-right text-xs font-bold text-yellow-500 md:min-w-8 md:text-sm">
                     {detail.score.toFixed(1)}
                   </span>
                 </div>
               </div>
               {detail.comment && (
-                <p className="rounded-md bg-gray-50 px-2.5 py-1.5 text-xs leading-relaxed text-gray-600 sm:px-3 sm:py-2 sm:text-sm">
+                <p className="rounded-md bg-gray-50 px-2.5 py-1.5 text-xs leading-relaxed text-gray-600 md:px-3 md:py-2 md:text-sm">
                   {detail.comment}
                 </p>
               )}
@@ -109,8 +109,8 @@ export default function LectureReviews({ lectureId }: Props) {
   const [verifyStep, setVerifyStep] = useState<'select' | 'processing'>('select')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
-  // 리뷰 작성 상태
-  const categories: ReviewCategory[] = useMemo(() => ['TEACHER', 'CURRICULUM', 'MANAGEMENT', 'FACILITY', 'PROJECT'], [])
+  // 리뷰 작성 상태 (상수는 컴포넌트 외부에 정의하는 것이 더 좋지만, 기존 구조 유지)
+  const categories: ReviewCategory[] = ['TEACHER', 'CURRICULUM', 'MANAGEMENT', 'FACILITY', 'PROJECT']
   const [detailScores, setDetailScores] = useState<Record<ReviewCategory, { score: number; comment: string }>>({
     TEACHER: { score: 0, comment: '' },
     PROJECT: { score: 0, comment: '' },
@@ -248,7 +248,8 @@ export default function LectureReviews({ lectureId }: Props) {
       size="sm"
       onClick={handleWriteClick}
     >
-      후기 작성
+      <Pencil className="w-4 h-4 mr-1" />
+      후기 작성하기
     </Button>
   )
 
@@ -264,10 +265,10 @@ export default function LectureReviews({ lectureId }: Props) {
 
     if (!reviews || reviews.length === 0) {
       return (
-        <Card className="bg-card/40 flex h-40 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl">
-          <div className="mb-2 text-3xl">💬</div>
+        <Card className="bg-card/40 flex h-56 flex-col items-center justify-center border-0 text-center shadow-sm backdrop-blur-xl mb-8">
+          <div className="mb-3 text-4xl">💬</div>
           <p className="text-foreground text-sm font-medium">아직 작성된 후기가 없습니다.</p>
-          <p className="text-muted-foreground mt-1 text-xs">첫 번째 후기를 남겨보세요!</p>
+          <p className="text-muted-foreground mt-2 text-xs">첫 번째 후기를 남겨보세요!</p>
         </Card>
       )
     }

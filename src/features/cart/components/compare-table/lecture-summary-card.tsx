@@ -15,16 +15,21 @@ export function LectureSummaryCard({
   title,
   thumbnailUrl,
   lectureId,
+  orgName: _orgName,
+  price: _price,
   onClear,
 }: {
   side: Side
   title: string
   thumbnailUrl?: string | null
   lectureId?: string | null
+  orgName?: string | null
+  price?: number | null
   onClear: () => void
 }) {
   const reduceMotion = useReducedMotion()
   const hasSelection = Boolean(lectureId)
+  const sideLabel = side === 'left' ? 'A 강의' : 'B 강의'
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -34,10 +39,27 @@ export function LectureSummaryCard({
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, filter: 'blur(2px)' }}
         transition={reduceMotion ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
-        className="relative flex flex-col items-center gap-1.5 px-2 py-3 text-center md:gap-3 md:px-6 md:py-8"
+        className="relative w-full min-w-0 overflow-hidden rounded-xl bg-white p-3 shadow-[4px_4px_20px_0px_rgba(161,161,170,0.25)] md:p-5"
       >
-        {/* 닫기 버튼 */}
-        {hasSelection ? (
+        {/* 데스크톱: 라벨 + X 헤더 (항상 공간 확보, 미선택 시 invisible) */}
+        <div className={cn('mb-3 hidden items-center justify-between md:flex', !hasSelection && 'md:invisible')}>
+          <span className="text-sm text-foreground">{sideLabel}</span>
+          {hasSelection ? (
+            <button
+              type="button"
+              onClick={onClear}
+              aria-label={`${side === 'left' ? '왼쪽' : '오른쪽'} 선택 해제`}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <FiX className="size-4" />
+            </button>
+          ) : (
+            <div className="size-4" />
+          )}
+        </div>
+
+        {/* 모바일: 닫기 버튼 (오버레이) */}
+        {hasSelection && (
           <motion.button
             type="button"
             onClick={onClear}
@@ -45,47 +67,62 @@ export function LectureSummaryCard({
             initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
             animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 0.12, ease: 'easeOut' }}
-            className="bg-background text-muted-foreground hover:text-foreground absolute top-0.5 right-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border md:top-3 md:right-3 md:h-9 md:w-9"
+            className="bg-background text-muted-foreground hover:text-foreground absolute top-1.5 right-1.5 z-10 inline-flex size-5 items-center justify-center rounded-full border md:hidden"
           >
-            <FiX className="h-3.5 w-3.5 md:h-5 md:w-5" />
+            <FiX className="size-3" />
           </motion.button>
-        ) : null}
+        )}
 
-        {/* 이미지 */}
-        <div className="bg-muted/30 relative h-12 w-12 overflow-hidden rounded-full md:h-24 md:w-24">
-          {thumbnailUrl ? (
-            <Image
-              src={thumbnailUrl}
-              alt=""
-              fill
-              sizes="96px"
-              className="object-cover"
-              unoptimized={thumbnailUrl.startsWith('http')}
-            />
-          ) : null}
-        </div>
+        <div className="flex flex-col gap-3">
+          {/* 썸네일 - 모바일: h-[86px], 데스크톱: h-[181px] */}
+          <div className="bg-muted/30 relative h-[86px] w-full shrink-0 overflow-hidden rounded-lg md:h-[181px]">
+            {thumbnailUrl ? (
+              <Image
+                src={thumbnailUrl}
+                alt=""
+                fill
+                sizes="(max-width: 768px) 132px, 511px"
+                className="object-cover"
+                unoptimized={thumbnailUrl.startsWith('http')}
+              />
+            ) : (
+              <div className="flex size-full items-center justify-center">
+                <span className="text-muted-foreground text-sm md:text-lg">{side === 'left' ? 'A' : 'B'}</span>
+              </div>
+            )}
+          </div>
 
-        <div className="space-y-1">
+          {/* 제목 */}
           <div
             className={cn(
-              '[display:-webkit-box] overflow-hidden text-sm leading-snug font-bold break-keep [-webkit-box-orient:vertical] [-webkit-line-clamp:2] md:text-xl',
+              'truncate text-center text-sm font-bold text-foreground md:text-xl',
               !hasSelection && 'text-muted-foreground',
             )}
           >
             {hasSelection ? title : '미선택'}
           </div>
-          {!hasSelection && <div className="text-muted-foreground text-xs opacity-60 md:text-sm">강의를 선택해 주세요</div>}
-        </div>
 
-        {hasSelection ? (
-          <Button asChild size="sm" className="mt-1 h-8 w-full text-xs md:mt-2 md:h-10 md:w-40 md:text-sm">
-            <Link href={`/lectures/${lectureId}`}>자세히 보기</Link>
-          </Button>
-        ) : (
-          <Button disabled size="sm" className="mt-1 h-8 w-full text-xs md:mt-2 md:h-10 md:w-40 md:text-sm">
-            자세히 보기
-          </Button>
-        )}
+          {/* 자세히 보기 버튼 */}
+          {hasSelection ? (
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="h-8 w-full rounded-lg border-0 bg-[#f9f9f9] text-xs text-foreground hover:bg-[#f0f0f0] md:h-12 md:text-base"
+            >
+              <Link href={`/lectures/${lectureId}`}>자세히 보기</Link>
+            </Button>
+          ) : (
+            <Button
+              disabled
+              size="sm"
+              variant="outline"
+              className="h-8 w-full rounded-lg border-0 bg-[#f9f9f9] text-xs text-foreground md:h-12 md:text-base"
+            >
+              자세히 보기
+            </Button>
+          )}
+        </div>
       </motion.div>
     </AnimatePresence>
   )

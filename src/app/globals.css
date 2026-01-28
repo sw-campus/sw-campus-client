@@ -5,6 +5,15 @@
 
 @theme inline {
   /* ========================================
+   * 커스텀 Breakpoint
+   * - 이 값 이상에서 필터 사이드바가 인라인으로 표시됨
+   * - 이 값 미만에서는 플로팅(오버레이)으로 전환됨
+   * - 사용: filter-inline:클래스명 (min-width 기준)
+   * - 변경 시 이 값만 수정하면 전체 반영됨
+   * ======================================== */
+  --breakpoint-filter-inline: 1400px;
+
+  /* ========================================
    * Z-Index 토큰 (레이어 스태킹 순서)
    * - UI 요소 간의 일관된 z-index 관리를 위해 의미 있는 이름 사용
    * - 숫자가 높을수록 더 앞에 표시됨
@@ -15,6 +24,18 @@
   --z-modal: 500; /* 모달, 다이얼로그 */
   --z-toast: 1000; /* 토스트 알림 */
   --z-max: 9999; /* 최상위 (긴급/특수 상황에만 사용) */
+
+  /* ========================================
+   * Figma 브랜드 색상 토큰
+   * ======================================== */
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-light: var(--brand-gold-light);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-footer-bg: var(--footer-bg);
+  --color-footer-text: var(--footer-text);
+  --color-footer-muted: var(--footer-muted);
+  --color-header-text: var(--header-text);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -37,6 +58,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-error: var(--error);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -60,46 +82,64 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --background-20: oklch(1 0 0 / 0.2);
-  --background-50: oklch(1 0 0 / 0.5);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0 0 0 / 0.05);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0 0 0 / 0.05);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: var(--color-orange-300);
-  --accent-foreground: var(--color-orange-950);
-  --destructive: oklch(0.70 0.17 55);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: var(--color-orange-300);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0 0 0 / 0.05);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.65rem;
+
+  /* === Figma 브랜드 색상 === */
+  --brand-gold: oklch(0.82 0.18 85); /* #FEB706 */
+  --brand-gold-light: oklch(0.99 0.01 90); /* #FFFCF4 */
+  --text-secondary: oklch(0.42 0 0); /* #555555 */
+  --text-muted: oklch(0.58 0 0); /* #888888 */
+  --footer-bg: oklch(0.15 0 0); /* #020202 */
+  --footer-text: oklch(0.82 0 0); /* #C8C8C8 */
+  --footer-muted: oklch(0.45 0 0); /* #606060 */
+  --header-text: oklch(1 0 0 / 0.8); /* white 80% */
+
+  /* === 그림자 === */
+  --shadow-card: 4px 4px 20px oklch(0.71 0 0 / 0.25);
+  --shadow-card-gold: 4px 4px 20px oklch(0.7 0.12 70 / 0.25);
+  --shadow-sm: 2px 2px 10px oklch(0.71 0 0 / 0.25);
+
   /* 성공 상태 (green 계열) */
   --success: oklch(0.723 0.191 142.5);
   --success-foreground: oklch(0.982 0.018 155.826);
   /* 경고 상태 (amber 계열) */
   --warning: oklch(0.769 0.188 70.08);
   --warning-foreground: oklch(0.985 0.059 95.617);
+  /* 에러 상태 (orange 계열) */
+  --error: oklch(0.6 0.19 35);
+  --error-foreground: oklch(1 0 0);
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.141 0.005 285.823);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.141 0.005 285.823);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.141 0.005 285.823);
+  --primary: oklch(0.852 0.199 91.936);
+  --primary-foreground: oklch(0.421 0.095 57.708);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --muted: oklch(0.967 0.001 286.375);
+  --muted-foreground: oklch(0.552 0.016 285.938);
+  --accent: oklch(0.967 0.001 286.375);
+  --accent-foreground: oklch(0.21 0.006 285.885);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.92 0.004 286.32);
+  --input: oklch(0.92 0.004 286.32);
+  --ring: oklch(0.852 0.199 91.936);
+  --chart-1: oklch(0.905 0.182 98.111);
+  --chart-2: oklch(0.795 0.184 86.047);
+  --chart-3: oklch(0.681 0.162 75.834);
+  --chart-4: oklch(0.554 0.135 66.442);
+  --chart-5: oklch(0.476 0.114 61.907);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.141 0.005 285.823);
+  --sidebar-primary: oklch(0.681 0.162 75.834);
+  --sidebar-primary-foreground: oklch(0.987 0.026 102.212);
+  --sidebar-accent: oklch(0.967 0.001 286.375);
+  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
+  --sidebar-border: oklch(0.92 0.004 286.32);
+  --sidebar-ring: oklch(0.852 0.199 91.936);
 }
 
 html {
@@ -111,10 +151,18 @@ html {
   * {
     @apply border-border outline-ring/50;
   }
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
   body {
     @apply bg-background text-foreground font-['Pretendard_Variable'] antialiased;
-    overflow-x: hidden;
   }
+
+  /* 데스크톱: 반응형 (max-width만 제한, 고정 너비 없음) */
 
   body[data-scroll-locked] {
     padding-right: 0 !important;
@@ -135,11 +183,55 @@ html {
     background-color: var(--accent) !important;
     opacity: 1;
   }
-  .custom-container {
-    @apply relative flex flex-1 flex-col gap-4 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 md:px-8;
+
+  /* Swiper 기본 네비게이션 화살표 스타일 */
+  .swiper-button-prev,
+  .swiper-button-next {
+    color: white !important;
+    width: 24px !important;
+    height: 24px !important;
+    top: 55% !important;
+    transition: opacity 0.2s ease !important;
   }
-  .custom-card {
-    @apply mx-auto w-full max-w-7xl overflow-x-auto rounded-2xl border border-gray-200 bg-white/70 p-4 shadow-lg backdrop-blur-xl sm:rounded-3xl sm:p-6 md:p-8;
+
+  .swiper-button-prev:hover,
+  .swiper-button-next:hover {
+    opacity: 0.7 !important;
+  }
+
+  .swiper-button-prev {
+    left: 12px !important;
+  }
+
+  .swiper-button-next {
+    right: 12px !important;
+  }
+
+  .swiper-button-prev::after,
+  .swiper-button-next::after {
+    font-size: 14px !important;
+  }
+
+  /* ========================================
+   * 공통 컨테이너 시스템
+   * - 반응형 여백: 화면 크기에 따라 자동 조정
+   * - clamp(최소값, 선호값, 최대값)
+   * ======================================== */
+
+  /* 페이지/섹션 공통 컨테이너 */
+  .container-responsive {
+    @apply mx-auto w-full max-w-[1448px] px-4 md:px-6;
+  }
+
+  /* 페이지 메인 컨테이너 (max-w-7xl 대체용) */
+  .page-container {
+    @apply mx-auto w-full max-w-[1448px];
+  }
+
+  /* 기존 custom-container 확장 */
+  .custom-container {
+    @apply relative flex flex-1 flex-col gap-4 overflow-x-hidden py-6;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
   }
 
   /* 부트캠프 성장일기 템플릿 스타일 */
@@ -160,7 +252,7 @@ html {
   }
 
   .prose .diary-section > div {
-    @apply text-gray-700 leading-relaxed;
+    @apply leading-relaxed text-gray-700;
   }
 }
 
@@ -171,6 +263,155 @@ html {
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* ========================================
+   * Admin Dashboard - Neo-Brutalist Data Terminal
+   * ======================================== */
+
+  /* Dashboard color tokens */
+  .dashboard-terminal {
+    --dash-lime: oklch(0.84 0.2 128);
+    --dash-cyan: oklch(0.78 0.15 195);
+    --dash-magenta: oklch(0.7 0.22 350);
+    --dash-amber: oklch(0.82 0.16 75);
+    --dash-slate: oklch(0.25 0.02 260);
+    --dash-glow: oklch(0.84 0.2 128 / 0.4);
+  }
+
+  /* Bento card base with glassmorphism */
+  .bento-card {
+    @apply relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/80 to-white/60 shadow-xl backdrop-blur-sm transition-all duration-300;
+    background-image:
+      radial-gradient(circle at 100% 0%, oklch(0.84 0.2 128 / 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, oklch(0.78 0.15 195 / 0.05) 0%, transparent 50%);
+  }
+
+  .bento-card:hover {
+    @apply border-white/20 shadow-2xl;
+    transform: translateY(-2px);
+  }
+
+  /* Grid pattern overlay */
+  .grid-pattern {
+    background-image:
+      linear-gradient(oklch(0.5 0 0 / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(0.5 0 0 / 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Pulse animation for live data */
+  @keyframes data-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.05);
+    }
+  }
+
+  .animate-data-pulse {
+    animation: data-pulse 2s ease-in-out infinite;
+  }
+
+  /* Glow effect for accents */
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 5px var(--dash-glow),
+        0 0 10px var(--dash-glow);
+    }
+    50% {
+      box-shadow:
+        0 0 10px var(--dash-glow),
+        0 0 20px var(--dash-glow),
+        0 0 30px var(--dash-glow);
+    }
+  }
+
+  .animate-glow {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  /* Trend indicator animations */
+  @keyframes trend-up {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
+  }
+
+  @keyframes trend-down {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(3px);
+    }
+  }
+
+  .animate-trend-up {
+    animation: trend-up 1.5s ease-in-out infinite;
+  }
+
+  .animate-trend-down {
+    animation: trend-down 1.5s ease-in-out infinite;
+  }
+
+  /* Number counter animation */
+  @keyframes count-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-count {
+    animation: count-up 0.5s ease-out forwards;
+  }
+
+  /* Stagger animation delays */
+  .stagger-1 {
+    animation-delay: 0.1s;
+  }
+  .stagger-2 {
+    animation-delay: 0.2s;
+  }
+  .stagger-3 {
+    animation-delay: 0.3s;
+  }
+  .stagger-4 {
+    animation-delay: 0.4s;
+  }
+  .stagger-5 {
+    animation-delay: 0.5s;
+  }
+
+  /* Tabular numbers for data display */
+  .font-mono-data {
+    font-family:
+      'Pretendard Variable',
+      Pretendard,
+      -apple-system,
+      BlinkMacSystemFont,
+      system-ui,
+      sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings:
+      'tnum' on,
+      'lnum' on;
   }
 
   /* 스켈레톤 shimmer 애니메이션 */
@@ -196,12 +437,16 @@ html {
     }
     10% {
       background-color: oklch(0.95 0.08 70);
-      box-shadow: 0 0 0 4px oklch(0.9 0.12 70 / 0.4), 0 4px 24px oklch(0.8 0.15 70 / 0.25);
+      box-shadow:
+        0 0 0 4px oklch(0.9 0.12 70 / 0.4),
+        0 4px 24px oklch(0.8 0.15 70 / 0.25);
       transform: scale(1.005);
     }
     30% {
       background-color: oklch(0.97 0.04 70);
-      box-shadow: 0 0 0 2px oklch(0.9 0.08 70 / 0.2), 0 2px 12px oklch(0.8 0.1 70 / 0.15);
+      box-shadow:
+        0 0 0 2px oklch(0.9 0.08 70 / 0.2),
+        0 2px 12px oklch(0.8 0.1 70 / 0.15);
       transform: scale(1);
     }
     100% {

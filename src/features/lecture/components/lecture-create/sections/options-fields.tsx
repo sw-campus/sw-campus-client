@@ -24,7 +24,7 @@ export function LectureCreateOptionsFields() {
       <Field>
         <FieldLabel>제공 항목</FieldLabel>
         <FieldContent>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <Controller
               control={control}
               name="books"

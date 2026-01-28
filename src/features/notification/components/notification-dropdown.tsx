@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FiBell, FiCheckCircle, FiMessageSquare, FiCornerDownRight, FiInbox, FiChevronDown, FiTrash2 } from 'react-icons/fi'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -58,6 +59,10 @@ function NotificationItem({
 
       if (currentPath === `/community/${notification.postId}`) {
         setTimeout(() => {
+          // 게시글이 삭제되어 에러 페이지가 표시된 경우 토스트 생략
+          const postArticle = document.querySelector('article')
+          if (!postArticle) return
+
           const element = document.getElementById(`comment-${notification.targetId}`)
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -65,6 +70,8 @@ function NotificationItem({
             setTimeout(() => {
               element.classList.remove('animate-highlight')
             }, 2500)
+          } else {
+            toast.info('삭제된 댓글입니다.')
           }
         }, 150)
       } else {
@@ -138,7 +145,11 @@ function NotificationItem({
 
 const NOTIFICATIONS_PER_PAGE = 10
 
-export function NotificationDropdown() {
+interface NotificationDropdownProps {
+  isMobile?: boolean
+}
+
+export function NotificationDropdown({ isMobile = false }: NotificationDropdownProps) {
   useSSE()
 
   const [displayCount, setDisplayCount] = useState(NOTIFICATIONS_PER_PAGE)
@@ -158,29 +169,37 @@ export function NotificationDropdown() {
     }
   }
 
+  const triggerButton = (
+    <button
+      type="button"
+      className={cn(
+        'relative rounded-full p-1.5 transition hover:opacity-80'
+      )}
+      aria-label="알림"
+    >
+      <FiBell className="size-5" />
+      {unreadCount > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white ring-2 ring-background">
+          {unreadCount > 9 ? '9+' : unreadCount}
+        </span>
+      )}
+    </button>
+  )
+
   return (
     <DropdownMenu onOpenChange={handleOpenChange}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="relative rounded-full p-1.5 transition-colors hover:bg-muted"
-              aria-label="알림"
-            >
-              <FiBell className="size-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white ring-2 ring-background">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </button>
-          </DropdownMenuTrigger>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p className="font-semibold">알림</p>
-        </TooltipContent>
-      </Tooltip>
+      {isMobile ? (
+        <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
+      ) : (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="font-semibold">알림</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
 
       <DropdownMenuContent align="end" className="w-80 p-0">
         <DropdownMenuLabel className="flex items-center justify-between border-b px-4 py-3">

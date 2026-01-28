@@ -72,8 +72,8 @@ export function MemberFilter({
   return (
     <div className="flex flex-col gap-4">
       {/* Role Filter Tabs - Horizontal Scroll on Mobile */}
-      <div className="-mx-4 overflow-x-auto px-4 scrollbar-hide sm:mx-0 sm:px-0">
-        <div className="flex gap-1.5 whitespace-nowrap sm:gap-2">
+      <div className="-mx-4 overflow-x-auto px-4 scrollbar-hide md:mx-0 md:px-0">
+        <div className="flex gap-1.5 whitespace-nowrap md:gap-2">
           {ROLE_OPTIONS.map(option => {
             const isActive = currentRole === option.value
             const Icon = option.icon
@@ -83,13 +83,13 @@ export function MemberFilter({
                 key={option.value}
                 onClick={() => onRoleChange(option.value)}
                 className={cn(
-                  'flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all duration-200 sm:gap-2 sm:px-4 sm:text-sm',
+                  'flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all duration-200 md:gap-2 md:px-4 md:text-sm',
                   isActive
                     ? option.activeClass
                     : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
-                <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
                 {option.label}
               </button>
             )
@@ -99,7 +99,7 @@ export function MemberFilter({
 
       {/* Search Input */}
       {searchPlaceholder && (
-        <div className="relative w-full sm:w-72">
+        <div className="relative w-full md:w-72">
           <LuSearch className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             type="text"

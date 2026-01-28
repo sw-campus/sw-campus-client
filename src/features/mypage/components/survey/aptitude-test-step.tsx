@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { AxiosError } from 'axios'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -18,6 +18,68 @@ import { APTITUDE_TEST_STORAGE_KEY, mapQuestionSetToAptitudeQuestions } from '..
 
 /** 다음 문항으로 자동 이동하는 딜레이 (ms) */
 const AUTO_ADVANCE_DELAY_MS = 300
+
+/** 문제 텍스트에서 번호 목록 또는 쉼표 구분 항목을 감지하여 별도 박스로 렌더링 */
+function renderQuestionWithList(text: string) {
+  // 다양한 줄바꿈 형식 처리: \n, \\n, <br>, <br/>
+  const normalizedText = text
+    .replace(/\\n/g, '\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+
+  const lines = normalizedText.split('\n')
+  const result: React.ReactNode[] = []
+  let listBuffer: string[] = []
+  let keyIndex = 0
+
+  const flushList = () => {
+    if (listBuffer.length > 0) {
+      result.push(
+        <div key={`list-${keyIndex++}`} className="my-3 rounded-lg bg-gray-100 px-4 py-3 text-base">
+          {listBuffer.map((item, i) => (
+            <div key={i} className="py-0.5">{item}</div>
+          ))}
+        </div>
+      )
+      listBuffer = []
+    }
+  }
+
+  // 쉼표로 구분된 항목인지 확인 (쉼표가 2개 이상)
+  // 수열("2, 6, 12, 20, 30, ?")도 포함하기 위해 물음표 조건 완화
+  const isCommaList = (line: string) => {
+    const trimmed = line.trim()
+    const commaCount = (trimmed.match(/,/g) || []).length
+    // 쉼표가 3개 이상이면 목록으로 처리 (수열 포함)
+    // 쉼표가 2개이고 물음표로 끝나지 않으면 목록으로 처리
+    return commaCount >= 3 || (commaCount >= 2 && !trimmed.endsWith('?'))
+  }
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    // 숫자. 으로 시작하는 줄을 목록으로 감지
+    if (/^\d+\.\s/.test(trimmed)) {
+      listBuffer.push(line)
+    } else if (isCommaList(line)) {
+      // 쉼표로 구분된 항목 (예: "2, 6, 12, 20, 30, ?" 또는 "사과, 바나나, 딸기, 과일, 포도")
+      flushList()
+      result.push(
+        <div key={`comma-${keyIndex++}`} className="my-3 rounded-lg bg-gray-100 px-4 py-3 text-base text-center">
+          {trimmed}
+        </div>
+      )
+    } else {
+      flushList()
+      if (trimmed) {
+        result.push(<span key={`text-${keyIndex++}`}>{line}</span>)
+      } else {
+        result.push(<br key={`br-${keyIndex++}`} />)
+      }
+    }
+  }
+  flushList()
+
+  return result
+}
 
 interface AptitudeTestStepProps {
   onComplete: () => void
@@ -50,31 +112,27 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
   const isInitializedRef = useRef(false)
   const versionCheckedRef = useRef(false) // 버전 체크 완료 여부
 
-  // 서버에서 가져온 문항 또는 fallback 사용
-  const allQuestions = useMemo<AptitudeQuestion[]>(() => {
+  // 서버에서 가져온 문항 또는 fallback 사용 (React Compiler가 자동 최적화)
+  const allQuestions: AptitudeQuestion[] = (() => {
     const dynamicQuestions = mapQuestionSetToAptitudeQuestions(questionSet ?? null)
     return dynamicQuestions ?? FALLBACK_QUESTIONS
-  }, [questionSet])
+  })()
 
   // Part별 문항 분류 (isAllAnswered에서 사용)
-  const { part1Questions, part2Questions, part3Questions } = useMemo(() => {
-    return {
-      part1Questions: allQuestions.filter((q) => q.part === 1),
-      part2Questions: allQuestions.filter((q) => q.part === 2),
-      part3Questions: allQuestions.filter((q) => q.part === 3),
-    }
-  }, [allQuestions])
+  const part1Questions = allQuestions.filter((q) => q.part === 1)
+  const part2Questions = allQuestions.filter((q) => q.part === 2)
+  const part3Questions = allQuestions.filter((q) => q.part === 3)
 
   const totalQuestions = allQuestions.length
 
-  // localStorage에 저장하는 헬퍼 함수
-  const saveToLocalStorage = useCallback((data: DraftAnswers) => {
+  // localStorage에 저장하는 헬퍼 함수 (React Compiler가 자동 최적화)
+  const saveToLocalStorage = (data: DraftAnswers) => {
     try {
       localStorage.setItem(APTITUDE_TEST_STORAGE_KEY, JSON.stringify(data))
     } catch {
       // 저장 실패 무시
     }
-  }, [])
+  }
 
   // localStorage에서 임시 저장 데이터 로드
   useEffect(() => {
@@ -132,71 +190,68 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
   const currentQuestion = allQuestions[currentIndex]
   const progress = totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0
 
-  const getCurrentAnswer = useCallback(() => {
+  const getCurrentAnswer = () => {
     if (!currentQuestion) return undefined
     const { id, part } = currentQuestion
     if (part === 1) return answers.part1[id]
     if (part === 2) return answers.part2[id]
     if (part === 3) return answers.part3[id]
     return undefined
-  }, [currentQuestion, answers])
+  }
 
-  const handleSelectAnswer = useCallback(
-    (value: number | JobTypeCode) => {
-      if (!currentQuestion || isTransitioning) return
+  const handleSelectAnswer = (value: number | JobTypeCode) => {
+    if (!currentQuestion || isTransitioning) return
 
-      const { id, part } = currentQuestion
+    const { id, part } = currentQuestion
 
-      setAnswers((prev) => {
-        const newAnswers = { ...prev, currentQuestionIndex: currentIndex }
-        if (part === 1) {
-          newAnswers.part1 = { ...prev.part1, [id]: value as number }
-        } else if (part === 2) {
-          newAnswers.part2 = { ...prev.part2, [id]: value as number }
-        } else {
-          newAnswers.part3 = { ...prev.part3, [id]: value as JobTypeCode }
-        }
-        // 답변과 함께 즉시 localStorage에 저장 (race condition 방지)
-        saveToLocalStorage(newAnswers)
-        return newAnswers
-      })
-
-      // 자동으로 다음 문항으로 이동 (마지막 문항 제외)
-      if (currentIndex < totalQuestions - 1) {
-        setIsTransitioning(true)
-        setTimeout(() => {
-          setCurrentIndex((prev) => {
-            const nextIndex = prev + 1
-            // currentIndex도 localStorage에 업데이트
-            setAnswers((currentAnswers) => {
-              const updated = { ...currentAnswers, currentQuestionIndex: nextIndex }
-              saveToLocalStorage(updated)
-              return updated
-            })
-            return nextIndex
-          })
-          // 애니메이션 완료 후 클릭 허용 (애니메이션 200ms + 여유 100ms)
-          setTimeout(() => {
-            setIsTransitioning(false)
-          }, 300)
-        }, AUTO_ADVANCE_DELAY_MS)
+    setAnswers((prev) => {
+      const newAnswers = { ...prev, currentQuestionIndex: currentIndex }
+      if (part === 1) {
+        newAnswers.part1 = { ...prev.part1, [id]: value as number }
+      } else if (part === 2) {
+        newAnswers.part2 = { ...prev.part2, [id]: value as number }
+      } else {
+        newAnswers.part3 = { ...prev.part3, [id]: value as JobTypeCode }
       }
-    },
-    [currentQuestion, currentIndex, isTransitioning, saveToLocalStorage, totalQuestions]
-  )
+      // 답변과 함께 즉시 localStorage에 저장 (race condition 방지)
+      saveToLocalStorage(newAnswers)
+      return newAnswers
+    })
 
-  const handlePrev = useCallback(() => {
+    // 자동으로 다음 문항으로 이동 (마지막 문항 제외)
+    if (currentIndex < totalQuestions - 1) {
+      setIsTransitioning(true)
+      setTimeout(() => {
+        setCurrentIndex((prev) => {
+          const nextIndex = prev + 1
+          // currentIndex도 localStorage에 업데이트
+          setAnswers((currentAnswers) => {
+            const updated = { ...currentAnswers, currentQuestionIndex: nextIndex }
+            saveToLocalStorage(updated)
+            return updated
+          })
+          return nextIndex
+        })
+        // 애니메이션 완료 후 클릭 허용 (애니메이션 200ms + 여유 100ms)
+        setTimeout(() => {
+          setIsTransitioning(false)
+        }, 300)
+      }, AUTO_ADVANCE_DELAY_MS)
+    }
+  }
+
+  const handlePrev = () => {
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1)
     }
-  }, [currentIndex])
+  }
 
-  const isAllAnswered = useCallback(() => {
+  const isAllAnswered = () => {
     const part1Complete = part1Questions.every((q) => answers.part1[q.id] !== undefined)
     const part2Complete = part2Questions.every((q) => answers.part2[q.id] !== undefined)
     const part3Complete = part3Questions.every((q) => answers.part3[q.id] !== undefined)
     return part1Complete && part2Complete && part3Complete
-  }, [answers, part1Questions, part2Questions, part3Questions])
+  }
 
   const handleSubmit = async () => {
     if (!isAllAnswered()) {
@@ -309,9 +364,12 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
             className="space-y-4"
           >
             <div className="rounded-xl bg-gray-50 p-6">
-              <p className="whitespace-pre-line text-lg font-medium text-gray-900">
-                Q{currentIndex + 1}. {currentQuestion.question}
-              </p>
+              <div className="flex items-start gap-2">
+                <span className="shrink-0 text-base md:text-lg font-bold text-warning">Q{currentIndex + 1}.</span>
+                <div className="text-base md:text-lg font-medium text-gray-900">
+                  {renderQuestionWithList(currentQuestion.question)}
+                </div>
+              </div>
             </div>
 
             <div className="space-y-3" role="listbox" aria-label="선택지">
@@ -341,7 +399,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
                       >
                         {index + 1}
                       </div>
-                      <span className={isSelected ? 'text-amber-900' : 'text-gray-700'}>
+                      <span className={`text-[15px] ${isSelected ? 'text-amber-900' : 'text-gray-700'}`}>
                         {option.label}
                       </span>
                     </div>

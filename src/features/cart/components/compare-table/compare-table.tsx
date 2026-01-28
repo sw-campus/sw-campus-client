@@ -1,33 +1,77 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useState } from 'react'
+import { FiChevronDown } from 'react-icons/fi'
 
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
-import { AiCommentRow } from '@/features/cart/components/ai-comment-row'
+import { cn } from '@/lib/utils'
 import {
   COMPARE_SECTIONS,
-  dataRow,
   getCurriculumNames,
   getStepTypes,
   hasStep,
-  renderRow,
   valueOrUnselected,
 } from '@/features/cart/types/table.defs'
-import type { ComparisonResult } from '@/features/lecture/actions/gemini'
+import type { ComparisonResult, SectionComment } from '@/features/lecture/actions/gemini'
 import type { LectureDetail } from '@/features/lecture/api/lecture-api.types'
 
-function sectionRow(label: string, rowKey: string) {
+const AI_BADGE_GRADIENT = 'linear-gradient(135deg, #FFEEBF 0%, #FEB706 100%)'
+
+function AiCommentRow({
+  sectionTitle,
+  aiComment,
+  leftTitle,
+  rightTitle,
+}: {
+  sectionTitle: string
+  aiComment: SectionComment
+  leftTitle?: string | null
+  rightTitle?: string | null
+}) {
+  const [isOpen, setIsOpen] = useState(true)
+
+  const getAdvantageLabel = () => {
+    if (aiComment.advantage === 'equal') return '비슷함'
+    if (aiComment.advantage === 'left') return `${leftTitle ?? '왼쪽 강의'} 유리`
+    return `${rightTitle ?? '오른쪽 강의'} 유리`
+  }
+
   return (
-    <TableRow key={rowKey}>
-      <TableCell colSpan={4} className="bg-accent/10 text-accent-foreground px-2 py-2 text-xs font-semibold md:px-6 md:py-3 md:text-sm">
-        {label}
-      </TableCell>
-    </TableRow>
+    <div
+      onClick={() => setIsOpen(prev => !prev)}
+      className="cursor-pointer bg-brand-gold-light p-3"
+    >
+      <div className="flex items-start gap-2">
+        {/* AI 그라디언트 뱃지 */}
+        <div
+          className="flex size-6 shrink-0 items-center justify-center rounded-full"
+          style={{ backgroundImage: AI_BADGE_GRADIENT }}
+        >
+          <span className="text-xs text-white">AI</span>
+        </div>
+        {/* 코멘트 내용 (제목 + 코멘트 텍스트) */}
+        <div className="flex min-w-0 flex-1 flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-brand-gold">{sectionTitle} 분석</span>
+            <span className="inline-flex items-center justify-center rounded border-[0.5px] border-foreground bg-[#f9f9f9] px-3 py-1 text-xs leading-none text-foreground">
+              {getAdvantageLabel()}
+            </span>
+          </div>
+          {isOpen && (
+            <p className="whitespace-pre-wrap break-words text-xs text-foreground md:text-sm">
+              {aiComment.comment}
+            </p>
+          )}
+        </div>
+        {/* chevron 아이콘 */}
+        <FiChevronDown
+          className={`size-5 shrink-0 text-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`}
+        />
+      </div>
+    </div>
   )
 }
-
 
 function curriculumLevel(detail: LectureDetail | null | undefined, name: string) {
   const found = detail?.curriculum?.find(c => c?.name === name)
@@ -115,22 +159,18 @@ export function CompareTable({
   rightTitle,
   leftDetail,
   rightDetail,
-  labelColClassName = 'w-[13.75rem]',
   aiResult,
 }: {
   leftTitle?: string | null
   rightTitle?: string | null
   leftDetail?: LectureDetail | null
   rightDetail?: LectureDetail | null
-  labelColClassName?: string
   aiResult?: ComparisonResult | null
 }) {
   const curriculumNames = getCurriculumNames(leftDetail, rightDetail)
   const stepTypes = getStepTypes(leftDetail, rightDetail)
   const leftSpecialCurriculums = getSortedSpecialCurriculums(leftDetail)
   const rightSpecialCurriculums = getSortedSpecialCurriculums(rightDetail)
-  const isLeftSelected = Boolean(leftDetail)
-  const isRightSelected = Boolean(rightDetail)
 
   // AI 코멘트 찾기 - sectionKey로 직접 매칭 (매핑 테이블 불필요)
   const getAiComment = (sectionKey: string) => {
@@ -155,169 +195,130 @@ export function CompareTable({
     }
   }
 
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const [showScrollHint, setShowScrollHint] = useState(true)
+  // 섹션 헤더 렌더링 (통합: 모바일 + 데스크톱)
+  const sectionHeader = (title: string, key: string, isFirst: boolean) => (
+    <div
+      key={`${key}-header`}
+      className={cn(
+        'grid bg-brand-gold-light p-3 md:bg-[#f0f0f0] md:p-4',
+        isFirst ? 'md:grid-cols-3' : 'md:grid-cols-1',
+      )}
+    >
+      {isFirst && (
+        <span className="hidden text-center text-sm font-semibold text-foreground md:block">
+          첫 번째 선택 강의
+        </span>
+      )}
+      <span className={cn(
+        'text-center text-xs font-semibold text-foreground md:text-sm',
+        !isFirst && 'md:col-span-1',
+      )}>
+        {title}
+      </span>
+      {isFirst && (
+        <span className="hidden text-center text-sm font-semibold text-foreground md:block">
+          두 번째 선택 강의
+        </span>
+      )}
+    </div>
+  )
 
-  // 스크롤 힐트 숨기기 - 스크롤 시
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
+  // 데이터 행 렌더링 (통합: 모바일 + 데스크톱)
+  const dataRow = (
+    key: string,
+    label: string,
+    leftValue: React.ReactNode,
+    rightValue: React.ReactNode,
+  ) => (
+    <div key={key} className="bg-white px-4 py-2 md:px-0 md:py-0">
+      <div className="grid grid-cols-2 overflow-hidden rounded-[8px] shadow-[2px_2px_10px_0px_rgba(161,161,170,0.25)] md:grid-cols-3 md:rounded-none md:border-b md:border-[#eee] md:shadow-none">
+        {/* 라벨 */}
+        <div className="order-first col-span-2 flex h-8 items-center justify-center bg-[#f9f9f9] px-3 md:order-none md:col-span-1 md:h-auto md:border-x md:border-[#eee] md:px-4 md:py-5">
+          <span className="text-xs font-semibold text-foreground md:text-sm">{label}</span>
+        </div>
+        {/* 왼쪽값 */}
+        <div className="min-w-0 break-words border-r-[0.5px] border-[#eee] bg-white p-3 text-center text-[10px] text-foreground md:order-first md:border-r-0 md:p-5 md:text-base">
+          {leftValue}
+        </div>
+        {/* 오른쪽값 */}
+        <div className="min-w-0 break-words bg-white p-3 text-center text-[10px] text-foreground md:p-5 md:text-base">
+          {rightValue}
+        </div>
+      </div>
+    </div>
+  )
 
-    const handleScroll = () => {
-      if (el.scrollLeft > 20) {
-        setShowScrollHint(false)
-      }
-    }
+  // AI 코멘트 렌더링은 AiCommentRow 컴포넌트로 분리 (아코디언 토글용 독립 state 필요)
+  const renderAiCommentRow = (sectionKey: string, sectionTitle: string) => {
+    if (!hasSectionData(sectionKey)) return null
+    const aiComment = getAiComment(sectionKey)
+    if (!aiComment) return null
 
-    el.addEventListener('scroll', handleScroll)
-    return () => el.removeEventListener('scroll', handleScroll)
-  }, [])
+    return (
+      <AiCommentRow
+        key={`${sectionKey}-ai`}
+        sectionTitle={sectionTitle}
+        aiComment={aiComment}
+        leftTitle={leftTitle}
+        rightTitle={rightTitle}
+      />
+    )
+  }
 
   return (
-    <div className="relative">
-      {/* 모바일 스크롤 힐트 */}
-      {showScrollHint && (
-        <div className="pointer-events-none absolute right-0 top-0 z-10 flex h-full items-center md:hidden">
-          <div className="flex h-full w-8 items-center justify-center bg-gradient-to-l from-white/90 to-transparent">
-            <span className="animate-pulse text-xs text-gray-400">←</span>
-          </div>
-        </div>
-      )}
-      <div
-        ref={scrollRef}
-        className="scrollbar-hide overflow-x-auto rounded-md border border-border"
-      >
-        <Table className="table-fixed break-keep min-w-[500px] md:min-w-0">
-        <colgroup>
-          <col className={labelColClassName} />
-          <col className="min-w-[140px]" />
-          <col className="w-px" />
-          <col className="min-w-[140px]" />
-        </colgroup>
-        <TableBody className="[&_tr:nth-child(even)]:bg-muted/30 [&_td]:leading-relaxed [&_tr:nth-child(odd)]:bg-white">
-          {COMPARE_SECTIONS.flatMap(section => [
-            sectionRow(section.title, `${section.key}-title`),
-            ...section.rows.map(row =>
-              renderRow({
-                rowKey: `${section.key}-${row.key}`,
-                row,
-                leftDetail,
-                rightDetail,
-                labelColClassName,
-                isLeftSelected,
-                isRightSelected,
-              }),
+    <div className="flex w-full flex-col overflow-hidden rounded-[12px] bg-white shadow-[4px_4px_20px_0px_rgba(161,161,170,0.25)] md:rounded-none md:shadow-none">
+      {COMPARE_SECTIONS.flatMap((section, index) => [
+        sectionHeader(section.title, section.key, index === 0),
+        ...section.rows.map(row =>
+          dataRow(
+            `${section.key}-${row.key}`,
+            row.label,
+            valueOrUnselected(leftDetail, row.value(leftDetail)),
+            valueOrUnselected(rightDetail, row.value(rightDetail)),
+          ),
+        ),
+        // 섹션별 AI 코멘트 추가
+        renderAiCommentRow(section.key, section.title),
+      ])}
+
+      {/* 선발절차 */}
+      {sectionHeader('선발절차', 'steps', false)}
+      {stepTypes.length === 0
+        ? dataRow('steps-empty', '절차', '-', '-')
+        : stepTypes.map(stepType =>
+            dataRow(
+              `steps-${stepType}`,
+              stepType,
+              valueOrUnselected(leftDetail, hasStep(leftDetail, stepType) ? 'O' : 'X'),
+              valueOrUnselected(rightDetail, hasStep(rightDetail, stepType) ? 'O' : 'X'),
             ),
-            // AI 코멘트 렌더링 (비교할 데이터가 있을 때만)
-            (() => {
-              if (!hasSectionData(section.key)) return null
-              const aiComment = getAiComment(section.key)
-              if (!aiComment) return null
-              return (
-                <AiCommentRow
-                  key={`${section.key}-ai-comment`}
-                  sectionTitle={section.title}
-                  comment={aiComment.comment}
-                  advantage={aiComment.advantage}
-                  leftTitle={leftTitle ?? '왼쪽 강의'}
-                  rightTitle={rightTitle ?? '오른쪽 강의'}
-                />
-              )
-            })(),
-          ])}
+          )}
+      {/* 선발절차 AI 코멘트 */}
+      {renderAiCommentRow('steps', '선발절차')}
 
-          {sectionRow('선발절차', 'steps-title')}
-          {stepTypes.length === 0
-            ? dataRow({
-                rowKey: 'steps-empty',
-                label: '절차',
-                leftValue: '-',
-                rightValue: '-',
-                labelColClassName,
-                valueAlign: 'center',
-                isLeftSelected,
-                isRightSelected,
-              })
-            : stepTypes.map(stepType =>
-                dataRow({
-                  rowKey: `steps-${stepType}`,
-                  label: stepType,
-                  leftValue: valueOrUnselected(leftDetail, hasStep(leftDetail, stepType) ? 'O' : 'X'),
-                  rightValue: valueOrUnselected(rightDetail, hasStep(rightDetail, stepType) ? 'O' : 'X'),
-                  labelColClassName,
-                  valueAlign: 'center',
-                  isLeftSelected,
-                  isRightSelected,
-                }),
-              )}
-          {/* 선발절차 AI 코멘트 */}
-          {(() => {
-            const aiComment = getAiComment('steps')
-            if (!aiComment) return null
-            return (
-              <AiCommentRow
-                sectionTitle="선발절차"
-                comment={aiComment.comment}
-                advantage={aiComment.advantage}
-                leftTitle={leftTitle ?? '왼쪽 강의'}
-                rightTitle={rightTitle ?? '오른쪽 강의'}
-              />
-            )
-          })()}
+      {/* 메인 커리큘럼 */}
+      {sectionHeader('메인 커리큘럼', 'curriculum', false)}
+      {curriculumNames.length === 0
+        ? dataRow('curriculum-empty', '커리큘럼', '-', '-')
+        : curriculumNames.map(name =>
+            dataRow(
+              `curriculum-${name}`,
+              name,
+              valueOrUnselected(leftDetail, renderCurriculumLevel(curriculumLevel(leftDetail, name))),
+              valueOrUnselected(rightDetail, renderCurriculumLevel(curriculumLevel(rightDetail, name))),
+            ),
+          )}
 
-          {sectionRow('메인 커리큘럼', 'curriculum-title')}
-          {curriculumNames.length === 0
-            ? dataRow({
-                rowKey: 'curriculum-empty',
-                label: '커리큘럼',
-                leftValue: '-',
-                rightValue: '-',
-                labelColClassName,
-                valueAlign: 'center',
-                isLeftSelected,
-                isRightSelected,
-              })
-            : curriculumNames.map(name =>
-                dataRow({
-                  rowKey: `curriculum-${name}`,
-                  label: name,
-                  leftValue: valueOrUnselected(leftDetail, renderCurriculumLevel(curriculumLevel(leftDetail, name))),
-                  rightValue: valueOrUnselected(rightDetail, renderCurriculumLevel(curriculumLevel(rightDetail, name))),
-                  labelColClassName,
-                  valueAlign: 'center',
-                  isLeftSelected,
-                  isRightSelected,
-                }),
-              )}
-          {/* 특화 커리큘럼 */}
-          {sectionRow('특화 커리큘럼', 'special-curriculum-title')}
-          {dataRow({
-            rowKey: 'special-curriculum-content',
-            label: '내용',
-            leftValue: valueOrUnselected(leftDetail, renderSpecialCurriculumList(leftSpecialCurriculums)),
-            rightValue: valueOrUnselected(rightDetail, renderSpecialCurriculumList(rightSpecialCurriculums)),
-            labelColClassName,
-            valueAlign: 'center',
-            isLeftSelected,
-            isRightSelected,
-          })}
-          {/* 커리큘럼 AI 코멘트 (메인 + 특화 통합) */}
-          {(() => {
-            const aiComment = getAiComment('curriculum')
-            if (!aiComment) return null
-            return (
-              <AiCommentRow
-                sectionTitle="커리큘럼"
-                comment={aiComment.comment}
-                advantage={aiComment.advantage}
-                leftTitle={leftTitle ?? '왼쪽 강의'}
-                rightTitle={rightTitle ?? '오른쪽 강의'}
-              />
-            )
-          })()}
-        </TableBody>
-      </Table>
+      {/* 특화 커리큘럼 */}
+      {sectionHeader('특화 커리큘럼', 'special-curriculum', false)}
+      {dataRow(
+        'special-curriculum-content',
+        '내용',
+        valueOrUnselected(leftDetail, renderSpecialCurriculumList(leftSpecialCurriculums)),
+        valueOrUnselected(rightDetail, renderSpecialCurriculumList(rightSpecialCurriculums)),
+      )}
+      {/* 커리큘럼 AI 코멘트 (메인 + 특화 통합) */}
+      {renderAiCommentRow('curriculum', '커리큘럼')}
     </div>
-  </div>
   )
 }

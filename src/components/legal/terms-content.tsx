@@ -6,8 +6,9 @@ export default function TermsContent() {
       <section>
         <h4 className="mb-2 text-base font-bold text-neutral-900">제1조 (목적)</h4>
         <p className="leading-relaxed">
-          본 약관은 Software Campus(이하 &quot;회사&quot;)가 제공하는 교육 및 관련 제반 서비스(이하 &quot;서비스&quot;)를 이용함에 있어,
-          회사와 회원 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+          본 약관은 소프트웨어캠퍼스(이하 &quot;회사&quot;)가 제공하는 교육 및 관련 제반 서비스(이하
+          &quot;서비스&quot;)를 이용함에 있어, 회사와 회원 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을
+          목적으로 합니다.
         </p>
       </section>
 
@@ -15,12 +16,12 @@ export default function TermsContent() {
         <h4 className="mb-2 text-base font-bold text-neutral-900">제2조 (용어의 정의)</h4>
         <ul className="list-disc space-y-1 pl-5 leading-relaxed">
           <li>
-            &quot;서비스&quot;라 함은 단말기(PC, 휴대형단말기 등)에 상관없이 회원이 이용할 수 있는 Software Campus 및 관련 제반
-            서비스를 의미합니다.
+            &quot;서비스&quot;라 함은 단말기(PC, 휴대형단말기 등)에 상관없이 회원이 이용할 수 있는 Software Campus 및
+            관련 제반 서비스를 의미합니다.
           </li>
           <li>
-            &quot;회원&quot;이라 함은 회사의 서비스에 접속하여 본 약관에 따라 회사와 이용계약을 체결하고 회사가 제공하는 서비스를
-            이용하는 고객을 말합니다.
+            &quot;회원&quot;이라 함은 회사의 서비스에 접속하여 본 약관에 따라 회사와 이용계약을 체결하고 회사가 제공하는
+            서비스를 이용하는 고객을 말합니다.
           </li>
         </ul>
       </section>
@@ -37,8 +38,8 @@ export default function TermsContent() {
         <h4 className="mb-2 text-base font-bold text-neutral-900">제4조 (이용계약 체결)</h4>
         <ul className="list-disc space-y-1 pl-5 leading-relaxed">
           <li>
-            이용계약은 회원이 되고자 하는 자(이하 &quot;가입신청자&quot;)가 약관의 내용에 동의를 한 다음 회원가입 신청을 하고
-            회사가 이러한 신청에 대하여 승낙함으로써 체결됩니다.
+            이용계약은 회원이 되고자 하는 자(이하 &quot;가입신청자&quot;)가 약관의 내용에 동의를 한 다음 회원가입 신청을
+            하고 회사가 이러한 신청에 대하여 승낙함으로써 체결됩니다.
           </li>
           <li>
             회사는 가입신청자의 신청에 대하여 서비스 이용을 승낙함을 원칙으로 합니다. 단, 실명이 아니거나 타인의 명의를

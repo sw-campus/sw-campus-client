@@ -153,7 +153,7 @@ export default function OrganizationMain({ activeTab, openInfoModal, onOpenProdu
       <div className="flex flex-1 flex-col gap-6">
         <ProfileCard onEditClick={() => setMyInfoEditOpen(true)} />
         <Dialog open={myInfoEditOpen} onOpenChange={setMyInfoEditOpen}>
-          <DialogContent className="sm:max-w-[calc(100%-2rem)] md:max-w-175">
+          <DialogContent className="md:max-w-[calc(100%-2rem)] md:max-w-175">
             <DialogHeader>
               <DialogTitle>내 정보 수정</DialogTitle>
             </DialogHeader>
@@ -176,7 +176,7 @@ export default function OrganizationMain({ activeTab, openInfoModal, onOpenProdu
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {stats.map(stat => (
           <ColorfulStatCard
             key={stat.title}

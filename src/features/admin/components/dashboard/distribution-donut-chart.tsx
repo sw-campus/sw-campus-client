@@ -1,8 +1,9 @@
 'use client'
 
+import { LuUsers } from 'react-icons/lu'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 export interface DonutChartDataItem {
   name: string
@@ -16,57 +17,140 @@ interface DistributionDonutChartProps {
   isLoading?: boolean
 }
 
+const MEMBER_ICONS: Record<string, { bg: string; text: string }> = {
+  '일반 회원': { bg: 'bg-blue-500/10', text: 'text-blue-600' },
+  '기관 회원': { bg: 'bg-emerald-500/10', text: 'text-emerald-600' },
+  관리자: { bg: 'bg-amber-500/10', text: 'text-amber-600' },
+}
+
 export function DistributionDonutChart({ data, isLoading }: DistributionDonutChartProps) {
   const totalValue = data.reduce((sum, item) => sum + item.value, 0)
 
   if (isLoading || totalValue === 0) {
     return (
-      <Card className="bg-card h-full">
-        <CardHeader>
-          <CardTitle className="text-foreground">회원 분포</CardTitle>
-        </CardHeader>
-        <CardContent className="flex h-[200px] items-center justify-center">
-          <span className="text-muted-foreground text-sm">{isLoading ? '로딩 중...' : '데이터가 없습니다'}</span>
-        </CardContent>
-      </Card>
+      <div className="bento-card relative h-full overflow-hidden p-3 md:p-5">
+        <div className="grid-pattern absolute inset-0 opacity-30" />
+        <div className="relative z-10 flex h-full flex-col">
+          <div className="bg-muted mb-3 h-4 w-20 animate-pulse rounded md:mb-4 md:h-5 md:w-24" />
+          <div className="flex flex-1 items-center justify-center">
+            {isLoading ? (
+              <div className="bg-muted h-28 w-28 animate-pulse rounded-full md:h-36 md:w-36" />
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                <div className="bg-muted rounded-full p-2 md:p-3">
+                  <LuUsers className="text-muted-foreground h-5 w-5 md:h-6 md:w-6" />
+                </div>
+                <span className="text-muted-foreground text-xs md:text-sm">데이터가 없습니다</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     )
   }
 
   return (
-    <Card className="bg-card flex h-full flex-col">
-      <CardHeader>
-        <CardTitle className="text-foreground">회원 분포</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center gap-4">
-        <div className="h-[200px] w-[200px] shrink-0">
-          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-            <PieChart>
-              <Pie data={data} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={2} dataKey="value">
-                {data.map(entry => (
-                  <Cell key={entry.name} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+    <div className="bento-card group relative h-full overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 via-transparent to-cyan-500/5" />
+      <div className="grid-pattern absolute inset-0 opacity-30" />
+
+      <div className="absolute top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-teal-500/5 blur-2xl md:h-32 md:w-32" />
+
+      <div className="relative z-10 flex h-full flex-col p-3 md:p-5">
+        <div className="mb-2 flex items-center gap-2 md:mb-3 lg:mb-4">
+          <div className="rounded-lg bg-teal-500/10 p-1.5 md:p-2">
+            <LuUsers className="h-3.5 w-3.5 text-teal-600 md:h-4 md:w-4" />
+          </div>
+          <h3 className="text-foreground text-xs font-bold md:text-sm lg:text-base">회원 분포</h3>
         </div>
-        <div className="flex flex-col gap-2">
-          {data.map(item => (
-            <div key={item.name} className="flex items-center gap-2">
-              <div className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
-              <span className="text-muted-foreground text-sm whitespace-nowrap">
-                {item.name}: {item.value.toLocaleString()}
-              </span>
+
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 md:gap-4">
+          <div className="relative h-28 w-28 md:h-36 md:w-36 lg:h-44 lg:w-44">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <defs>
+                  {data.map((entry, index) => (
+                    <linearGradient key={index} id={`memberGrad-${index}`} x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor={entry.color} stopOpacity={1} />
+                      <stop offset="100%" stopColor={entry.color} stopOpacity={0.6} />
+                    </linearGradient>
+                  ))}
+                  <filter id="member-shadow">
+                    <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.15" />
+                  </filter>
+                </defs>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius="60%"
+                  outerRadius="85%"
+                  paddingAngle={3}
+                  dataKey="value"
+                  strokeWidth={0}
+                  filter="url(#member-shadow)"
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={entry.name} fill={`url(#memberGrad-${index})`} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload
+                      const percentage = totalValue > 0 ? ((data.value / totalValue) * 100).toFixed(1) : 0
+                      return (
+                        <div className="rounded-lg border border-white/20 bg-popover/95 px-2 py-1.5 shadow-xl backdrop-blur-sm md:rounded-xl md:px-3 md:py-2">
+                          <div className="flex items-center gap-1.5 md:gap-2">
+                            <div className="h-2 w-2 rounded-full md:h-2.5 md:w-2.5" style={{ backgroundColor: data.color }} />
+                            <span className="text-foreground text-xs font-medium md:text-sm">{data.name}</span>
+                          </div>
+                          <p className="font-mono-data text-foreground mt-0.5 text-base font-bold md:mt-1 md:text-lg">
+                            {data.value.toLocaleString()}
+                            <span className="text-muted-foreground ml-1 text-[10px] font-normal md:text-xs">명 ({percentage}%)</span>
+                          </p>
+                        </div>
+                      )
+                    }
+                    return null
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+              <span className="font-mono-data text-foreground text-lg font-bold md:text-2xl lg:text-3xl">{totalValue.toLocaleString()}</span>
+              <span className="text-muted-foreground text-[9px] md:text-[10px] lg:text-xs">총 회원</span>
             </div>
-          ))}
+          </div>
+
+          <div className="flex w-full flex-col gap-1 md:gap-1.5 lg:gap-2">
+            {data.map(item => {
+              const percentage = totalValue > 0 ? ((item.value / totalValue) * 100).toFixed(1) : '0'
+              const style = MEMBER_ICONS[item.name] || { bg: 'bg-gray-100', text: 'text-gray-600' }
+              return (
+                <div
+                  key={item.name}
+                  className="group/item flex items-center justify-between rounded-md bg-card/50 px-2 py-1.5 transition-all hover:bg-card/80 md:rounded-lg md:px-3 md:py-2"
+                >
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <div className={cn('rounded p-1 md:rounded-md md:p-1.5', style.bg)}>
+                      <div className="h-1.5 w-1.5 rounded-full md:h-2 md:w-2 lg:h-2.5 lg:w-2.5" style={{ backgroundColor: item.color }} />
+                    </div>
+                    <span className="text-foreground text-[10px] font-medium md:text-xs lg:text-sm">{item.name}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <span className="font-mono-data text-foreground text-xs font-bold md:text-sm lg:text-base">
+                      {item.value.toLocaleString()}
+                    </span>
+                    <span className="text-muted-foreground text-[9px] md:text-[10px] lg:text-xs">({percentage}%)</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

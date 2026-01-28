@@ -96,7 +96,7 @@ export function LectureApprovalPage() {
         <Button onClick={() => setIsRegisterModalOpen(true)}>강의 등록</Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {stats.map(stat => (
           <ColorfulStatCard
             key={stat.title}

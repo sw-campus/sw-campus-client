@@ -59,12 +59,12 @@ export default function LectureIntro({ lecture }: Props) {
                 return (
                   <div
                     key={idx}
-                    className="flex items-start gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:ring-orange-100 sm:gap-4 sm:px-5 sm:py-4"
+                    className="flex items-start gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:ring-orange-100 md:gap-4 md:px-5 md:py-4"
                   >
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xs font-bold text-orange-600 sm:h-7 sm:w-7 sm:text-sm">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xs font-bold text-orange-600 md:h-7 md:w-7 md:text-sm">
                       {idx + 1}
                     </div>
-                    <p className="text-sm leading-relaxed text-gray-900 sm:text-base">{cleanLine}</p>
+                    <p className="text-sm leading-relaxed text-gray-900 md:text-base">{cleanLine}</p>
                   </div>
                 )
               })}
@@ -74,7 +74,7 @@ export default function LectureIntro({ lecture }: Props) {
 
       <Section title="강사진 소개">
         {lecture.teachers && lecture.teachers.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {lecture.teachers.map((teacher, idx) => (
               <div
                 key={idx}
@@ -115,7 +115,7 @@ export default function LectureIntro({ lecture }: Props) {
 
       {/* 지원 서비스 */}
       <Section title="지원 서비스">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:grid-cols-5">
           {(Object.entries(lecture.services) as [keyof LectureDetail['services'], boolean][]).map(([key, value]) => (
             <div
               key={key}

@@ -12,7 +12,7 @@ interface QuestionSetFilterProps {
 export function QuestionSetFilter({ keyword, onKeywordChange }: QuestionSetFilterProps) {
   return (
     <div className="flex items-center justify-end">
-      <div className="relative w-full sm:w-64">
+      <div className="relative w-full md:w-64">
         <LuSearch className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           type="text"

@@ -490,7 +490,7 @@ export function QuestionSetDetailModal({ questionSet, isOpen, onClose }: Questio
           </div>
         </div>
 
-        <DialogFooter className="flex-col gap-2 sm:flex-row">
+        <DialogFooter className="flex-col gap-2 md:flex-row">
           <div className="flex flex-1 gap-2">
             <Button variant="outline" onClick={handleClone} disabled={cloneMutation.isPending}>
               <LuCopy className="mr-1 h-4 w-4" />

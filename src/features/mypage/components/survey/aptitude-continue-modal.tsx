@@ -24,7 +24,7 @@ export function AptitudeContinueModal({
 }: AptitudeContinueModalProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onLater()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="md:max-w-md">
         <DialogHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success/15">
             <CheckCircle2 className="h-8 w-8 text-success" />

@@ -84,7 +84,7 @@ export function SearchBar({
       {/* 포커스 시 글로우 효과 */}
       <div
         className={cn(
-          'pointer-events-none absolute -inset-0.5 rounded-xl bg-gradient-to-r from-orange-400 to-amber-400 opacity-0 blur transition-opacity duration-300',
+          'pointer-events-none absolute -inset-0.5 rounded-xl bg-primary opacity-0 blur transition-opacity duration-300',
           isFocused && 'opacity-20'
         )}
       />
@@ -93,8 +93,8 @@ export function SearchBar({
         className={cn(
           'group relative flex items-center overflow-hidden rounded-xl border bg-white/80 backdrop-blur-sm transition-all duration-200',
           isFocused
-            ? 'border-orange-300 shadow-lg shadow-orange-100/50'
-            : 'border-gray-200/80 hover:border-orange-200 hover:bg-white hover:shadow-md hover:shadow-orange-50/30'
+            ? 'border-primary/50 shadow-lg shadow-primary/20'
+            : 'border-gray-200/80 hover:border-primary/30 hover:bg-white hover:shadow-md hover:shadow-primary/10'
         )}
       >
         {/* 검색 아이콘 */}
@@ -102,7 +102,7 @@ export function SearchBar({
           <FiSearch
             className={cn(
               'h-4 w-4 transition-colors duration-200',
-              isFocused ? 'text-orange-500' : 'text-gray-400 group-hover:text-orange-400'
+              isFocused ? 'text-primary' : 'text-gray-400 group-hover:text-primary'
             )}
           />
         </div>
@@ -139,7 +139,7 @@ export function SearchBar({
             <Badge
               key={tag}
               variant="secondary"
-              className="cursor-pointer gap-1 bg-orange-100 text-orange-700 hover:bg-orange-200"
+              className="cursor-pointer gap-1 bg-primary/10 text-primary hover:bg-primary/20"
               onClick={() => handleRemoveTag(tag)}
             >
               #{tag}

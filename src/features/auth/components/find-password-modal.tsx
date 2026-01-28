@@ -79,48 +79,61 @@ export function FindPasswordModal({ isOpen, onClose }: FindPasswordModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle className="text-foreground text-lg font-semibold">비밀번호 찾기</DialogTitle>
+      <DialogContent className="w-[calc(100%-2rem)] max-w-sm gap-0 rounded-2xl p-8">
+        <DialogHeader className="mb-6">
+          <DialogTitle className="text-foreground text-xl font-semibold">비밀번호 찾기</DialogTitle>
+          <p className="text-muted-foreground mt-2 text-sm">가입 정보를 입력하시면 임시 비밀번호를 보내드려요</p>
         </DialogHeader>
-        <p className="text-muted-foreground text-sm">
-          가입 시 입력한 이름, 전화번호, 이메일을 입력하세요.
-          <br />
-          일치하면 임시 비밀번호를 이메일로 발송합니다.
-        </p>
-        <div className="space-y-4 pt-2">
-          <div>
-            <label className="text-foreground mb-1 block text-sm font-medium">이름</label>
+
+        <div className="space-y-4">
+          {/* 이름 */}
+          <div className="group relative">
             <input
               type="text"
-              placeholder="홍길동"
-              className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:ring-ring h-10 w-full rounded-md border px-3 text-sm focus:ring-2 focus:outline-none"
+              id="find-name"
+              placeholder=" "
               value={name}
               onChange={e => {
                 setName(e.target.value)
                 if (error) setError(null)
               }}
+              className="peer border-border text-foreground focus:border-brand-gold w-full border-b-2 bg-transparent py-2.5 transition-colors duration-200 outline-none placeholder:text-transparent"
             />
+            <label
+              htmlFor="find-name"
+              className="text-muted-foreground peer-focus:text-brand-gold pointer-events-none absolute top-2.5 left-0 text-sm transition-all duration-200 peer-focus:-top-2 peer-focus:text-xs peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs"
+            >
+              이름
+            </label>
           </div>
-          <div>
-            <label className="text-foreground mb-1 block text-sm font-medium">전화번호</label>
+
+          {/* 전화번호 */}
+          <div className="group relative">
             <input
               type="tel"
-              placeholder="01012345678"
-              className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:ring-ring h-10 w-full rounded-md border px-3 text-sm focus:ring-2 focus:outline-none"
+              id="find-phone"
+              placeholder=" "
               value={phone}
               onChange={e => {
                 setPhone(e.target.value)
                 if (error) setError(null)
               }}
+              className="peer border-border text-foreground focus:border-brand-gold w-full border-b-2 bg-transparent py-2.5 transition-colors duration-200 outline-none placeholder:text-transparent"
             />
+            <label
+              htmlFor="find-phone"
+              className="text-muted-foreground peer-focus:text-brand-gold pointer-events-none absolute top-2.5 left-0 text-sm transition-all duration-200 peer-focus:-top-2 peer-focus:text-xs peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs"
+            >
+              전화번호 (숫자만)
+            </label>
           </div>
-          <div>
-            <label className="text-foreground mb-1 block text-sm font-medium">이메일</label>
+
+          {/* 이메일 */}
+          <div className="group relative">
             <input
               type="email"
-              placeholder="email@example.com"
-              className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:ring-ring h-10 w-full rounded-md border px-3 text-sm focus:ring-2 focus:outline-none"
+              id="find-email"
+              placeholder=" "
               value={email}
               onChange={e => {
                 setEmail(e.target.value)
@@ -132,15 +145,40 @@ export function FindPasswordModal({ isOpen, onClose }: FindPasswordModalProps) {
                   void handleSubmit()
                 }
               }}
+              className="peer border-border text-foreground focus:border-brand-gold w-full border-b-2 bg-transparent py-2.5 transition-colors duration-200 outline-none placeholder:text-transparent"
             />
+            <label
+              htmlFor="find-email"
+              className="text-muted-foreground peer-focus:text-brand-gold pointer-events-none absolute top-2.5 left-0 text-sm transition-all duration-200 peer-focus:-top-2 peer-focus:text-xs peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs"
+            >
+              이메일
+            </label>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+
+          {/* 에러 메시지 */}
+          {error && <p className="text-destructive text-sm">{error}</p>}
+
+          {/* 제출 버튼 */}
           <Button
             onClick={() => void handleSubmit()}
             disabled={isLoading || !name || !phone || !email}
-            className="w-full"
+            className="mt-3 h-11 w-full rounded-xl"
           >
-            {isLoading ? '발송 중...' : '임시 비밀번호 발송'}
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                발송 중
+              </span>
+            ) : (
+              '임시 비밀번호 발송'
+            )}
           </Button>
         </div>
       </DialogContent>

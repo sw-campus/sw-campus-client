@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 
 import { LuArchive, LuFilePenLine, LuList, LuSend } from 'react-icons/lu'
 
@@ -20,8 +20,8 @@ export function SurveyManagementPage() {
   // Fetch all question sets (APTITUDE only since BASIC is code-managed)
   const { data: questionSets, isLoading } = useQuestionSetsQuery()
 
-  // Filter by keyword on client side
-  const filteredQuestionSets = useMemo(() => {
+  // Filter by keyword on client side (React Compiler가 자동 최적화)
+  const filteredQuestionSets = (() => {
     if (!questionSets) return []
     if (!keyword.trim()) return questionSets
 
@@ -31,10 +31,10 @@ export function SurveyManagementPage() {
         qs.name.toLowerCase().includes(lowerKeyword) ||
         (qs.description && qs.description.toLowerCase().includes(lowerKeyword)),
     )
-  }, [questionSets, keyword])
+  })()
 
-  // Calculate stats
-  const stats = useMemo(() => {
+  // Calculate stats (React Compiler가 자동 최적화)
+  const stats = (() => {
     const all = questionSets || []
     return {
       total: all.length,
@@ -42,7 +42,7 @@ export function SurveyManagementPage() {
       published: all.filter(qs => qs.status === 'PUBLISHED').length,
       archived: all.filter(qs => qs.status === 'ARCHIVED').length,
     }
-  }, [questionSets])
+  })()
 
   const handleViewDetail = (questionSet: AdminQuestionSet) => {
     setSelectedQuestionSet(questionSet)
@@ -74,7 +74,7 @@ export function SurveyManagementPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {statCards.map(stat => (
           <ColorfulStatCard
             key={stat.title}

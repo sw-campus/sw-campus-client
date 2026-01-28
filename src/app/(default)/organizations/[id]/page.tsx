@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+
 import { notFound } from 'next/navigation'
 
 import { JsonLd, createOrganizationJsonLd } from '@/components/seo/json-ld'
@@ -75,8 +76,8 @@ export default async function OrganizationDetailPage({ params }: OrganizationDet
   return (
     <>
       {orgJsonLd && <JsonLd data={orgJsonLd} />}
-      <div className="custom-container">
-        <div className="custom-card">
+      <div className="w-full min-h-screen bg-white flex flex-col items-center overflow-x-hidden">
+        <div className="w-full max-w-[1448px] mx-auto px-4 md:px-6 py-6">
           <OrganizationDetailPageClient organizationId={orgId} initialData={organization ?? undefined} />
         </div>
       </div>

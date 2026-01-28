@@ -84,7 +84,7 @@ export function PasswordChangeModal({ open, onOpenChange }: PasswordChangeModalP
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[calc(100%-32px)] max-w-sm sm:w-auto">
         <DialogHeader>
           <DialogTitle className="text-foreground text-lg font-semibold">비밀번호 변경</DialogTitle>
         </DialogHeader>

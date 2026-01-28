@@ -79,17 +79,17 @@ export default function LectureOverview({
       {(org || isOrgLoading) && (
         <Section title="교육기관 정보">
           {isOrgLoading ? (
-            <div className="flex animate-pulse flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:gap-5 sm:p-6">
-              <div className="h-14 w-14 shrink-0 rounded-full bg-gray-200 sm:h-16 sm:w-16" />
+            <div className="flex animate-pulse flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:flex-row md:items-center md:gap-5 md:p-6">
+              <div className="h-14 w-14 shrink-0 rounded-full bg-gray-200 md:h-16 md:w-16" />
               <div className="flex-1 space-y-2">
                 <div className="h-5 w-32 rounded bg-gray-200" />
                 <div className="h-4 w-48 rounded bg-gray-200" />
               </div>
             </div>
           ) : org ? (
-            <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:gap-5 sm:p-6">
-              <div className="flex items-center gap-4 sm:contents">
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-white sm:h-16 sm:w-16">
+            <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:flex-row md:items-center md:gap-5 md:p-6">
+              <div className="flex items-center gap-4 md:contents">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-white md:h-16 md:w-16">
                   {org.logoUrl ? (
                     <Image src={org.logoUrl} alt={org.name} fill sizes="64px" className="object-contain p-1" />
                   ) : (
@@ -98,9 +98,9 @@ export default function LectureOverview({
                     </div>
                   )}
                 </div>
-                <div className="flex-1 sm:flex-1">
-                  <h4 className="text-base font-bold text-gray-900 sm:text-lg">{org.name}</h4>
-                  <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-gray-600 sm:mt-1 sm:text-sm">
+                <div className="flex-1 md:flex-1">
+                  <h4 className="text-base font-bold text-gray-900 md:text-lg">{org.name}</h4>
+                  <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-gray-600 md:mt-1 md:text-sm">
                     {org.description || '기관 소개가 없습니다.'}
                   </p>
                 </div>
@@ -108,7 +108,7 @@ export default function LectureOverview({
               <Button
                 asChild
                 variant="outline"
-                className="w-full shrink-0 rounded-lg border-gray-200 text-gray-700 hover:bg-gray-50 sm:w-auto"
+                className="w-full shrink-0 rounded-lg border-gray-200 text-gray-700 hover:bg-gray-50 md:w-auto"
               >
                 <Link href={`/organizations/${org.id}`}>자세히 보기</Link>
               </Button>
@@ -196,7 +196,7 @@ export default function LectureOverview({
           return (
             <>
               {/* 모바일: 수직 레이아웃 */}
-              <div className="flex flex-col gap-3 sm:hidden">
+              <div className="flex flex-col gap-3 md:hidden">
                 {applicationSteps.length > 0 ? (
                   applicationSteps.map((step, idx) => (
                     <div
@@ -215,7 +215,7 @@ export default function LectureOverview({
               </div>
 
               {/* 태블릿/데스크톱: 가로 스크롤 레이아웃 */}
-              <div className="scrollbar-hide hidden overflow-x-auto pb-4 sm:block">
+              <div className="scrollbar-hide hidden overflow-x-auto pb-4 md:block">
                 <div className="flex min-w-max items-center gap-4">
                   {applicationSteps.length > 0 ? (
                     applicationSteps.map((step, idx) => (
@@ -256,11 +256,11 @@ export default function LectureOverview({
 
               {/* 합격 후 사전과제 안내 */}
               {hasPreTask && (
-                <div className="mt-3 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 sm:mt-4 sm:px-5 sm:py-4">
+                <div className="mt-3 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 md:mt-4 md:px-5 md:py-4">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
                     ✓
                   </div>
-                  <span className="text-sm font-bold text-blue-700 sm:text-base">합격 후: 사전과제 진행</span>
+                  <span className="text-sm font-bold text-blue-700 md:text-base">합격 후: 사전과제 진행</span>
                 </div>
               )}
             </>

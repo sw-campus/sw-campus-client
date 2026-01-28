@@ -250,7 +250,7 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
           name="desiredJobs"
           control={control}
           render={({ field }) => (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
               {desiredJobOptions.map((job) => (
                 <label
                   key={job}
@@ -310,14 +310,14 @@ export function BasicSurveyStep({ existingData, onComplete }: BasicSurveyStepPro
               {budgetRanges.map((range) => (
                 <label
                   key={range}
-                  className={`flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-3 transition-colors ${
+                  className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-3 transition-colors ${
                     field.value === range
                       ? 'border-primary bg-primary/10'
                       : 'border-border hover:border-muted-foreground/50'
                   }`}
                 >
                   <RadioGroupItem value={range} />
-                  <span>{BUDGET_RANGE_LABELS[range]}</span>
+                  <span className="whitespace-nowrap">{BUDGET_RANGE_LABELS[range]}</span>
                 </label>
               ))}
             </RadioGroup>

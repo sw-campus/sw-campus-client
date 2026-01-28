@@ -1,6 +1,32 @@
 import { api } from '@/lib/axios'
 
-import type { ReviewBlindStatus, ReviewListResponse, ReviewPageResponse, ReviewSortType } from './review-api.types'
+import type { Review, ReviewBlindStatus, ReviewCategory, ReviewListResponse, ReviewSortType } from './review-api.types'
+
+/**
+ * 리뷰 상세 조회 API
+ */
+export async function getReviewDetail(reviewId: number): Promise<Review> {
+  const { data } = await api.get<Review>(`/reviews/${reviewId}`)
+  return data
+}
+
+/**
+ * 리뷰 수정 API
+ */
+export interface UpdateReviewPayload {
+  score: number
+  comment: string
+  detailScores: Array<{ category: ReviewCategory; score: number; comment?: string }>
+}
+
+export async function updateReview(reviewId: number, payload: UpdateReviewPayload): Promise<void> {
+  try {
+    await api.put(`/reviews/${reviewId}`, payload)
+  } catch {
+    // PUT 실패 시 PATCH 시도
+    await api.patch(`/reviews/${reviewId}`, payload)
+  }
+}
 
 /**
  * 강의별 승인된 후기 조회 API (블라인드 필터링 적용)
@@ -19,15 +45,16 @@ export async function getBlindStatus(): Promise<ReviewBlindStatus> {
 }
 
 /**
- * 기관별 승인된 후기 조회 API (페이지네이션, 정렬 지원)
+ * 기관별 승인된 후기 조회 API (블라인드 필터링 적용)
+ * 블라인드 미해제 사용자는 1개만 조회됩니다.
  */
 export async function getOrganizationReviews(
   organizationId: string | number,
   page: number = 0,
   size: number = 6,
   sort: ReviewSortType = 'LATEST',
-): Promise<ReviewPageResponse> {
-  const { data } = await api.get<ReviewPageResponse>(`/organizations/${organizationId}/reviews`, {
+): Promise<ReviewListResponse> {
+  const { data } = await api.get<ReviewListResponse>(`/organizations/${organizationId}/reviews`, {
     params: { page, size, sort },
   })
   return data
