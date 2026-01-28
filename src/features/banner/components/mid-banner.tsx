@@ -1,10 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
-
 import Image from 'next/image'
 import Link from 'next/link'
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import { Autoplay, Navigation } from 'swiper/modules'
@@ -31,8 +28,6 @@ function isExternalLink(url: string): boolean {
 }
 
 export default function MidBanner() {
-  const prevRef = useRef<HTMLButtonElement>(null)
-  const nextRef = useRef<HTMLButtonElement>(null)
   const { data: middleBanners, isLoading: isMiddleLoading } = useBannersByTypeQuery('MIDDLE')
   const { data: smallBanners, isLoading: isSmallLoading } = useBannersByTypeQuery('SMALL')
 
@@ -79,18 +74,10 @@ export default function MidBanner() {
             <Swiper
               modules={[Autoplay, Navigation]}
               rewind={true}
+              navigation={true}
               autoplay={{
                 delay: 5000,
                 disableOnInteraction: false,
-              }}
-              navigation={true}
-              onSwiper={(swiper) => {
-                if (swiper.params.navigation && typeof swiper.params.navigation !== 'boolean') {
-                  swiper.params.navigation.prevEl = prevRef.current
-                  swiper.params.navigation.nextEl = nextRef.current
-                  swiper.navigation.init()
-                  swiper.navigation.update()
-                }
               }}
               spaceBetween={8}
               slidesPerView={1.5}
@@ -141,22 +128,6 @@ export default function MidBanner() {
                 )
               })}
             </Swiper>
-
-            {/* 커스텀 네비게이션 버튼 */}
-            <button
-              ref={prevRef}
-              className="absolute top-1/2 left-0 z-10 -translate-x-4 -translate-y-1/2 rounded-full bg-white/80 p-2.5 shadow-lg transition-all hover:scale-110 hover:text-orange-400 active:scale-95"
-              aria-label="이전 슬라이드"
-            >
-              <FiChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              ref={nextRef}
-              className="absolute top-1/2 right-0 z-10 translate-x-4 -translate-y-1/2 rounded-full bg-white/80 p-2.5 shadow-lg transition-all hover:scale-110 hover:text-orange-400 active:scale-95"
-              aria-label="다음 슬라이드"
-            >
-              <FiChevronRight className="h-5 w-5" />
-            </button>
         </div>
       )}
 
