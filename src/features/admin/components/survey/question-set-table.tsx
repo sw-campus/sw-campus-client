@@ -56,20 +56,20 @@ export function QuestionSetTable({ questionSets, isLoading, onViewDetail }: Ques
 
   return (
     <Card className="bg-card">
-      <CardHeader className="pb-3 sm:pb-6">
-        <CardTitle className="text-foreground text-base sm:text-lg">문항 세트 목록</CardTitle>
+      <CardHeader className="pb-3 md:pb-6">
+        <CardTitle className="text-foreground text-base md:text-lg">문항 세트 목록</CardTitle>
       </CardHeader>
-      <CardContent className="px-3 pb-3 sm:px-6 sm:pb-6">
-        <div className="-mx-3 overflow-x-auto sm:mx-0">
+      <CardContent className="px-3 pb-3 md:px-6 md:pb-6">
+        <div className="-mx-3 overflow-x-auto md:mx-0">
           <Table className="min-w-[500px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[40px] text-xs sm:w-[60px] sm:text-sm">NO</TableHead>
-                <TableHead className="min-w-[120px] text-xs sm:text-sm">세트명</TableHead>
-                <TableHead className="w-[60px] text-center text-xs sm:w-[80px] sm:text-sm">버전</TableHead>
-                <TableHead className="w-[70px] text-center text-xs sm:w-[90px] sm:text-sm">상태</TableHead>
-                <TableHead className="w-[60px] text-center text-xs sm:w-[80px] sm:text-sm">문항 수</TableHead>
-                <TableHead className="w-[100px] text-xs sm:w-[120px] sm:text-sm">생성일</TableHead>
+                <TableHead className="w-[40px] text-xs md:w-[60px] md:text-sm">NO</TableHead>
+                <TableHead className="min-w-[120px] text-xs md:text-sm">세트명</TableHead>
+                <TableHead className="w-[60px] text-center text-xs md:w-[80px] md:text-sm">버전</TableHead>
+                <TableHead className="w-[70px] text-center text-xs md:w-[90px] md:text-sm">상태</TableHead>
+                <TableHead className="w-[60px] text-center text-xs md:w-[80px] md:text-sm">문항 수</TableHead>
+                <TableHead className="w-[100px] text-xs md:w-[120px] md:text-sm">생성일</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -79,19 +79,19 @@ export function QuestionSetTable({ questionSets, isLoading, onViewDetail }: Ques
                   onClick={() => onViewDetail(questionSet)}
                   className="hover:bg-muted/50 cursor-pointer transition-colors"
                 >
-                  <TableCell className="text-muted-foreground text-xs sm:text-sm">{index + 1}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs md:text-sm">{index + 1}</TableCell>
                   <TableCell
-                    className="text-foreground max-w-[150px] truncate text-xs font-medium sm:max-w-none sm:text-sm"
+                    className="text-foreground max-w-[150px] truncate text-xs font-medium md:max-w-none md:text-sm"
                     title={questionSet.name}
                   >
                     {questionSet.name}
                   </TableCell>
-                  <TableCell className="text-center text-xs sm:text-sm">v{questionSet.version}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">v{questionSet.version}</TableCell>
                   <TableCell className="text-center">
                     <StatusBadge status={questionSet.status} />
                   </TableCell>
-                  <TableCell className="text-center text-xs sm:text-sm">{questionSet.questionCount}</TableCell>
-                  <TableCell className="text-muted-foreground text-xs sm:text-sm">
+                  <TableCell className="text-center text-xs md:text-sm">{questionSet.questionCount}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs md:text-sm">
                     {formatDate(questionSet.createdAt)}
                   </TableCell>
                 </TableRow>

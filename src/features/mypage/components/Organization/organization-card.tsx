@@ -108,7 +108,7 @@ export function OrganizationCard({ onEditClick }: OrganizationCardProps) {
               onClick={handleEditAttempt}
             >
               <LuPencil className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">수정</span>
+              <span className="hidden md:inline">수정</span>
             </Button>
           </div>
         </CardHeader>
@@ -147,19 +147,19 @@ export function OrganizationCard({ onEditClick }: OrganizationCardProps) {
                 </div>
 
                 <div className="grid gap-3 border-t pt-4">
-                  <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
+                  <div className="flex flex-col gap-1 md:flex-row md:gap-4">
                     <span className="w-20 shrink-0 text-sm font-medium text-gray-500">대표자</span>
                     <span className="text-sm text-gray-900">{org.representativeName}</span>
                   </div>
-                  <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
+                  <div className="flex flex-col gap-1 md:flex-row md:gap-4">
                     <span className="w-20 shrink-0 text-sm font-medium text-gray-500">연락처</span>
                     <span className="text-sm text-gray-900">{org.phone || '-'}</span>
                   </div>
-                  <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
+                  <div className="flex flex-col gap-1 md:flex-row md:gap-4">
                     <span className="w-20 shrink-0 text-sm font-medium text-gray-500">주소</span>
                     <span className="text-sm text-gray-900">{org.location || '-'}</span>
                   </div>
-                  <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
+                  <div className="flex flex-col gap-1 md:flex-row md:gap-4">
                     <span className="w-20 shrink-0 text-sm font-medium text-gray-500">홈페이지</span>
                     <span className="text-sm text-gray-900">
                       {org.homepage ? (

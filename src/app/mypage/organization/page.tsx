@@ -59,8 +59,7 @@ export default function MyPage() {
 
     return (
       <div className="custom-container">
-        <div className="custom-card">
-          <div className="relative z-10 flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
+        <div className="relative z-10 flex w-full flex-col gap-4 md:flex-row md:gap-6">
             <OrganizationAside
               active={activeTab}
               onClickOrgInfo={handleOpenOrgInfo}
@@ -73,7 +72,6 @@ export default function MyPage() {
               openInfoModal={openInfoModal}
               onOpenProductModal={openProductModal}
             />
-          </div>
         </div>
       </div>
     )

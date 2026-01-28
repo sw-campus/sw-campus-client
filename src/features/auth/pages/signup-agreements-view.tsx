@@ -15,7 +15,7 @@ function SectionBox({ title, children }: { title: string; children: React.ReactN
     <div className="flex flex-col gap-2">
       <h3 className="text-xs font-semibold text-gray-700">{title}</h3>
       <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-600 shadow-sm">
-        <div className="max-h-24 overflow-y-auto pr-2 sm:max-h-28">{children}</div>
+        <div className="max-h-24 overflow-y-auto pr-2 md:max-h-28">{children}</div>
       </div>
     </div>
   )

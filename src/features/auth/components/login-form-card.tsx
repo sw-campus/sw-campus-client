@@ -37,7 +37,7 @@ export function LoginFormCard({
   return (
     <form
       onSubmit={onSubmit}
-      className="w-full max-w-md rounded-2xl border border-gray-200 bg-white/90 p-6 text-gray-900 shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-10"
+      className="w-full max-w-md rounded-2xl border border-gray-200 bg-white/90 p-6 text-gray-900 shadow-xl backdrop-blur-xl md:rounded-3xl md:p-10"
     >
       {/* 로고 */}
       <div className="mb-8 flex flex-col items-center gap-3 text-center">

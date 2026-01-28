@@ -5,7 +5,7 @@ export default function AdminPage() {
   return (
     <>
       <div className="custom-container">
-        <div className="custom-card flex flex-col gap-4 lg:flex-row lg:gap-6">
+        <div className="flex flex-col gap-4 md:flex-row md:gap-6">
           <AdminSidebar />
           <AdminDashboard />
         </div>

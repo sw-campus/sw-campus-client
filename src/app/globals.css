@@ -151,7 +151,13 @@ html {
   }
   body {
     @apply bg-background text-foreground font-['Pretendard_Variable'] antialiased;
-    overflow-x: hidden;
+  }
+
+  /* 데스크톱: 고정 너비 (768px 이상이면 바로 1448px 고정) */
+  @media (min-width: 768px) {
+    html, body {
+      min-width: 1448px;
+    }
   }
 
   body[data-scroll-locked] {
@@ -173,11 +179,27 @@ html {
     background-color: var(--accent) !important;
     opacity: 1;
   }
-  .custom-container {
-    @apply relative flex flex-1 flex-col gap-4 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 md:px-8;
+
+  /* ========================================
+   * 공통 컨테이너 시스템
+   * - 반응형 여백: 화면 크기에 따라 자동 조정
+   * - clamp(최소값, 선호값, 최대값)
+   * ======================================== */
+
+  /* 페이지/섹션 공통 컨테이너 */
+  .container-responsive {
+    @apply mx-auto w-full max-w-[1448px] px-4 md:px-6;
   }
-  .custom-card {
-    @apply mx-auto w-full max-w-7xl overflow-x-auto rounded-2xl border border-gray-200 bg-white/70 p-4 shadow-lg backdrop-blur-xl sm:rounded-3xl sm:p-6 md:p-8;
+
+  /* 페이지 메인 컨테이너 (max-w-7xl 대체용) */
+  .page-container {
+    @apply mx-auto w-full max-w-[1448px];
+  }
+
+  /* 기존 custom-container 확장 */
+  .custom-container {
+    @apply relative flex flex-1 flex-col gap-4 overflow-x-hidden py-6;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
   }
 
   /* 부트캠프 성장일기 템플릿 스타일 */
@@ -186,7 +208,7 @@ html {
   }
 
   .prose .diary-section {
-    @apply rounded-xl border-l-4 border-orange-500 bg-linear-to-br from-orange-50 to-amber-50 p-5;
+    @apply rounded-xl border-l-4 border-orange-500 bg-gradient-to-br from-orange-50 to-amber-50 p-5;
   }
 
   .prose .diary-section h3 {

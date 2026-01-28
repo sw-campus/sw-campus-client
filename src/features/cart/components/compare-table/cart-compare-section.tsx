@@ -3,8 +3,8 @@
 import { useRef, useState } from 'react'
 
 import { AiAuthModal, type AiAuthModalType } from '@/features/cart/components/ai-auth-modal'
-import { AiAnalyzeButton } from '@/features/cart/components/compare-table/ai-analyze-button'
 import { AiAnalysisSummary } from '@/features/cart/components/compare-table/ai-analysis-summary'
+import { AiAnalyzeButton } from '@/features/cart/components/compare-table/ai-analyze-button'
 import { CartItemSidebar } from '@/features/cart/components/compare-table/cart-item-sidebar'
 import { CompareHeroBanner } from '@/features/cart/components/compare-table/compare-hero-banner'
 import { CompareTable } from '@/features/cart/components/compare-table/compare-table'
@@ -131,7 +131,7 @@ export default function CartCompareSection() {
               <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 md:gap-4">
                 {/* 왼쪽 강의 */}
                 <div
-                  className={cn('rounded-lg transition-colors', isLeftOver && 'ring-2 ring-primary ring-offset-2')}
+                  className={cn('rounded-lg transition-colors', isLeftOver && 'ring-primary ring-2 ring-offset-2')}
                   onDragEnter={e => {
                     e.preventDefault()
                     setIsLeftOver(true)
@@ -156,7 +156,6 @@ export default function CartCompareSection() {
                     thumbnailUrl={leftDetail?.thumbnailUrl}
                     lectureId={leftId}
                     orgName={left?.orgName}
-                    price={leftDetail?.price}
                     onClear={handleClearLeft}
                   />
                 </div>
@@ -166,7 +165,7 @@ export default function CartCompareSection() {
 
                 {/* 오른쪽 강의 */}
                 <div
-                  className={cn('rounded-lg transition-colors', isRightOver && 'ring-2 ring-primary ring-offset-2')}
+                  className={cn('rounded-lg transition-colors', isRightOver && 'ring-primary ring-2 ring-offset-2')}
                   onDragEnter={e => {
                     e.preventDefault()
                     setIsRightOver(true)
@@ -191,7 +190,6 @@ export default function CartCompareSection() {
                     thumbnailUrl={rightDetail?.thumbnailUrl}
                     lectureId={rightId}
                     orgName={right?.orgName}
-                    price={rightDetail?.price}
                     onClear={handleClearRight}
                   />
                 </div>
@@ -245,7 +243,6 @@ export default function CartCompareSection() {
               rightDetail={rightDetailResolved}
               aiResult={aiResult}
             />
-
           </div>
         </div>
       </div>

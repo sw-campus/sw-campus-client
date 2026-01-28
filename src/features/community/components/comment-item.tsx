@@ -3,9 +3,17 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { FiCornerDownRight, FiEdit2, FiHeart, FiLoader, FiMessageCircle, FiMoreVertical, FiSend, FiTrash2, FiX } from 'react-icons/fi'
-
-import { UserAvatar } from '@/components/ui/user-avatar'
+import {
+  FiCornerDownRight,
+  FiEdit2,
+  FiHeart,
+  FiLoader,
+  FiMessageCircle,
+  FiMoreVertical,
+  FiSend,
+  FiTrash2,
+  FiX,
+} from 'react-icons/fi'
 
 import {
   AlertDialog,
@@ -18,12 +26,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import { formatRelativeTime } from '@/lib/format-relative-time'
 import { useAuthStore } from '@/store/auth-store'
 
@@ -55,7 +59,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
 
   // 댓글 요소 및 인라인 답글 입력폼용 ref
   const commentRef = useRef<HTMLDivElement>(null)
-  const replyTextareaRef = useRef<HTMLTextAreaElement>(null)
+  const replyTextareaRef = useRef<HTMLInputElement>(null)
   const isReplyFormVisible = replyFormProps?.replyToId === comment.id
 
   // 답글 폼이 열리면 자동 포커스
@@ -79,7 +83,11 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
         // 하이라이트 애니메이션 후 해시 제거 (히스토리 오염 방지)
         const clearTimer = setTimeout(() => {
           setIsHighlighted(false)
-          window.history.replaceState(null, '', pathname + (searchParams.toString() ? `?${searchParams.toString()}` : ''))
+          window.history.replaceState(
+            null,
+            '',
+            pathname + (searchParams.toString() ? `?${searchParams.toString()}` : ''),
+          )
         }, 2500)
 
         return () => clearTimeout(clearTimer)
@@ -133,7 +141,10 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
 
     // 대댓글이 있으면 "삭제된 댓글입니다" 표시
     return (
-      <div id={`comment-${comment.id}`} className={`${depth > 0 ? 'ml-2 border-l-2 border-gray-100 pl-2 sm:ml-6 sm:pl-5' : ''}`}>
+      <div
+        id={`comment-${comment.id}`}
+        className={`${depth > 0 ? 'ml-2 border-l-2 border-gray-100 pl-2 md:ml-6 md:pl-5' : ''}`}
+      >
         <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 p-4">
           <div className="flex items-center gap-2">
             {depth > 0 && <FiCornerDownRight className="h-4 w-4 text-gray-300" />}
@@ -144,7 +155,14 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
         {/* 대댓글 표시 */}
         <div className="mt-3 space-y-3">
           {comment.replies.map(reply => (
-            <CommentItem key={reply.id} comment={reply} postId={postId} onReply={onReply} depth={depth + 1} replyFormProps={replyFormProps} />
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              postId={postId}
+              onReply={onReply}
+              depth={depth + 1}
+              replyFormProps={replyFormProps}
+            />
           ))}
         </div>
       </div>
@@ -155,23 +173,20 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
     <div
       ref={commentRef}
       id={`comment-${comment.id}`}
-      className={`${depth > 0 ? 'ml-2 border-l-2 border-orange-100 pl-2 sm:ml-6 sm:pl-5' : ''} ${isHighlighted ? 'animate-highlight' : ''}`}
+      className={`${depth > 0 ? 'border-primary/20 ml-2 border-l-2 pl-2 sm:ml-6 sm:pl-5' : ''} ${isHighlighted ? 'animate-highlight' : ''}`}
     >
-      <div className="group rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all duration-200 hover:border-gray-300/80 hover:shadow-md sm:p-5">
+      <div className="group rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all duration-200 hover:border-gray-300/80 hover:shadow-md md:p-5">
         {/* 작성자 정보 */}
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            {depth > 0 && <FiCornerDownRight className="h-4 w-4 text-orange-400" />}
-            <UserProfileLink
-              userId={comment.authorId}
-              className="transition-transform hover:scale-110"
-            >
+            {depth > 0 && <FiCornerDownRight className="text-primary h-4 w-4" />}
+            <UserProfileLink userId={comment.authorId} className="transition-transform hover:scale-110">
               <UserAvatar nickname={comment.authorNickname} size="sm" avatarClassName="ring-2 ring-white" />
             </UserProfileLink>
             <div className="flex items-center gap-2">
               <UserProfileLink
                 userId={comment.authorId}
-                className="font-semibold text-gray-800 transition-colors hover:text-orange-600"
+                className="hover:text-primary font-semibold text-gray-800 transition-colors"
               >
                 {comment.authorNickname}
               </UserProfileLink>
@@ -190,11 +205,13 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             <button
               onClick={handleLike}
               disabled={isLiking}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-sm transition-all hover:bg-rose-50 active:scale-95 sm:px-2.5 sm:py-1 sm:text-xs ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-sm transition-all hover:bg-rose-50 active:scale-95 md:px-2.5 md:py-1 md:text-xs ${
                 comment.isLiked ? 'bg-rose-50 font-semibold text-rose-500' : 'text-gray-500 hover:text-rose-500'
               }`}
             >
-              <FiHeart className={`h-4 w-4 sm:h-3.5 sm:w-3.5 ${comment.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
+              <FiHeart
+                className={`h-4 w-4 md:h-3.5 md:w-3.5 ${comment.isLiked ? 'fill-rose-500 text-rose-500' : ''}`}
+              />
               {comment.likeCount > 0 && <span>{comment.likeCount}</span>}
             </button>
 
@@ -202,7 +219,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             {isLoggedIn && (comment.isAuthor || userType === 'ADMIN') && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex h-11 w-11 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 sm:h-8 sm:w-8">
+                  <button className="flex h-11 w-11 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 md:h-8 md:w-8">
                     <FiMoreVertical className="h-4 w-4" />
                   </button>
                 </DropdownMenuTrigger>
@@ -230,13 +247,13 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             <textarea
               value={editBody}
               onChange={e => setEditBody(e.target.value)}
-              className="w-full resize-none rounded-xl border border-gray-200 p-3 text-sm transition-all focus:border-orange-300 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+              className="focus:border-primary/50 focus:ring-primary/20 w-full resize-none rounded-xl border border-gray-200 p-3 text-sm transition-all focus:ring-2 focus:outline-none"
               rows={3}
             />
             <div className="flex justify-end gap-2">
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon-sm"
                 onClick={() => {
                   setIsEditing(false)
                   setEditBody(comment.body)
@@ -246,10 +263,10 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
                 취소
               </Button>
               <Button
-                size="sm"
+                size="icon-sm"
                 onClick={handleUpdate}
                 disabled={isUpdating || !editBody.trim()}
-                className="gap-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 shadow-sm"
+                className="bg-primary text-primary-foreground gap-1.5 rounded-lg shadow-sm"
               >
                 {isUpdating && <FiLoader className="h-3.5 w-3.5 animate-spin" />}
                 {isUpdating ? '수정 중...' : '수정'}
@@ -269,10 +286,10 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
 
         {/* 답글 버튼 */}
         {isLoggedIn && !isEditing && depth < MAX_DEPTH && onReply && (
-          <div className="mt-3 border-t border-gray-100 pt-2 sm:mt-4 sm:pt-3">
+          <div className="mt-3 border-t border-gray-100 pt-2 md:mt-4 md:pt-3">
             <button
               onClick={() => onReply(comment.id)}
-              className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-gray-400 transition-all hover:bg-orange-50 hover:text-orange-600 active:scale-95 sm:gap-1.5 sm:rounded-lg sm:px-3 sm:text-[13px]"
+              className="hover:bg-primary/5 hover:text-primary flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-gray-400 transition-all active:scale-95 sm:gap-1.5 sm:rounded-lg sm:px-3 sm:text-[13px]"
             >
               <FiMessageCircle className="h-3.5 w-3.5" />
               답글
@@ -281,44 +298,47 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
         )}
       </div>
 
-        {/* 삭제 확인 다이얼로그 */}
-        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <AlertDialogContent className="mx-4 max-w-sm rounded-2xl sm:mx-auto">
-            <AlertDialogHeader>
-              <AlertDialogTitle>댓글 삭제</AlertDialogTitle>
-              <AlertDialogDescription>
-                정말 이 댓글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="gap-2 sm:gap-0">
-              <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDelete}
-                className="gap-1.5 rounded-xl bg-rose-500 hover:bg-rose-600"
-                disabled={isDeleting}
-              >
-                {isDeleting && <FiLoader className="h-3.5 w-3.5 animate-spin" />}
-                {isDeleting ? '삭제 중...' : '삭제'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+      {/* 삭제 확인 다이얼로그 */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="mx-4 max-w-sm rounded-2xl md:mx-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>댓글 삭제</AlertDialogTitle>
+            <AlertDialogDescription>
+              정말 이 댓글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 md:gap-0">
+            <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="gap-1.5 rounded-xl bg-rose-500 hover:bg-rose-600"
+              disabled={isDeleting}
+            >
+              {isDeleting && <FiLoader className="h-3.5 w-3.5 animate-spin" />}
+              {isDeleting ? '삭제 중...' : '삭제'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* 인라인 답글 입력 폼 */}
       {isReplyFormVisible && replyFormProps && (
-        <form onSubmit={replyFormProps.onSubmit} className="mt-2 ml-2 border-l-2 border-orange-200 pl-2 sm:ml-6 sm:pl-4">
+        <form
+          onSubmit={replyFormProps.onSubmit}
+          className="border-primary/30 mt-2 ml-2 border-l-2 pl-2 sm:ml-6 sm:pl-4"
+        >
           {/* 접근성을 위한 시각적으로 숨겨진 라벨 */}
           <label htmlFor={`reply-input-${comment.id}`} className="sr-only">
             {comment.authorNickname}님에게 답글 작성
           </label>
-          <div className="flex items-center gap-2 rounded-lg border border-orange-200 bg-orange-50/50 p-1.5 focus-within:border-orange-300">
-            <FiCornerDownRight className="h-3 w-3 shrink-0 text-orange-400" />
+          <div className="border-primary/30 bg-primary/5 focus-within:border-primary/50 flex items-center gap-2 rounded-lg border p-1.5">
+            <FiCornerDownRight className="text-primary h-3 w-3 shrink-0" />
             <input
               id={`reply-input-${comment.id}`}
-              ref={replyTextareaRef as React.RefObject<HTMLInputElement>}
+              ref={replyTextareaRef}
               type="text"
               value={replyFormProps.body}
-              onChange={(e) => replyFormProps.setBody(e.target.value)}
+              onChange={e => replyFormProps.setBody(e.target.value)}
               placeholder={`@${comment.authorNickname} 답글...`}
               className="min-w-0 flex-1 border-0 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
               aria-label={`${comment.authorNickname}님에게 답글`}
@@ -326,15 +346,15 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             <button
               type="button"
               onClick={replyFormProps.onCancel}
-              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-orange-100 hover:text-orange-600"
+              className="hover:bg-primary/10 hover:text-primary flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-gray-400"
             >
               <FiX className="h-3.5 w-3.5" />
             </button>
             <Button
               type="submit"
               disabled={replyFormProps.isCreating || !replyFormProps.body.trim()}
-              size="sm"
-              className="h-6 shrink-0 rounded-md bg-orange-500 px-2 text-xs font-medium hover:bg-orange-600 disabled:opacity-50"
+              size="icon-sm"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-6 shrink-0 rounded-md px-2 text-xs font-medium disabled:opacity-50"
             >
               <FiSend className="h-3 w-3" />
             </Button>
@@ -346,21 +366,28 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
       {comment.replies.length > 0 && (
         <div className="mt-3 space-y-3">
           {comment.replies.map(reply => (
-            <CommentItem key={reply.id} comment={reply} postId={postId} onReply={onReply} depth={depth + 1} replyFormProps={replyFormProps} />
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              postId={postId}
+              onReply={onReply}
+              depth={depth + 1}
+              replyFormProps={replyFormProps}
+            />
           ))}
         </div>
       )}
 
       {/* 로그인 필요 다이얼로그 */}
       <AlertDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
-        <AlertDialogContent className="mx-4 max-w-sm rounded-2xl sm:mx-auto">
+        <AlertDialogContent className="mx-4 max-w-sm rounded-2xl md:mx-auto">
           <AlertDialogHeader>
             <AlertDialogTitle>로그인 필요</AlertDialogTitle>
             <AlertDialogDescription>
               좋아요를 누르려면 로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="gap-2 sm:gap-0">
+          <AlertDialogFooter className="gap-2 md:gap-0">
             <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
             <AlertDialogAction onClick={handleLoginRedirect} className="rounded-xl">
               로그인하기

@@ -19,10 +19,7 @@ import { useAuthStore } from '@/store/auth-store'
 import { useSignupStore } from '@/store/signup-store'
 
 const profileSchema = z.object({
-  nickname: z
-    .string()
-    .min(1, '닉네임을 입력해주세요.')
-    .max(12, '닉네임은 12자 이내로 입력해주세요.'),
+  nickname: z.string().min(1, '닉네임을 입력해주세요.').max(12, '닉네임은 12자 이내로 입력해주세요.'),
   phone: z
     .string()
     .min(1, '휴대폰 번호를 입력해주세요.')
@@ -220,7 +217,7 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
 
   const formContent = (
     <FormProvider {...methods}>
-      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+      <form onSubmit={e => e.preventDefault()} className="space-y-6">
         <FieldSet>
           <FieldGroup className="grid grid-cols-1 gap-6">
             <div>
@@ -259,7 +256,7 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
                   {isCheckingNickname ? '확인 중...' : '중복확인'}
                 </button>
               </div>
-              {errors.nickname && <p className="mt-1 text-xs text-destructive">{errors.nickname.message}</p>}
+              {errors.nickname && <p className="text-destructive mt-1 text-xs">{errors.nickname.message}</p>}
             </div>
 
             <div>
@@ -274,7 +271,7 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
                 {...register('phone')}
                 className={INPUT_CLASS}
               />
-              {errors.phone && <p className="mt-1 text-xs text-destructive">{errors.phone.message}</p>}
+              {errors.phone && <p className="text-destructive mt-1 text-xs">{errors.phone.message}</p>}
             </div>
 
             <AddressInput variant="light" required error={addressError} />
@@ -308,9 +305,9 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
   // 단독 페이지/컴포넌트로 렌더링될 때의 카드 UI
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <div className="bg-card rounded-2xl border border-border shadow-sm">
+      <div className="bg-card border-border rounded-2xl border shadow-sm">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-4 py-4 sm:px-8 sm:py-6">
+        <div className="border-border flex items-center justify-between border-b px-4 py-4 sm:px-8 sm:py-6">
           <h2 className="text-foreground text-xl font-semibold">개인 정보 수정</h2>
 
           <button
@@ -324,7 +321,7 @@ export function PersonalInfoForm({ embedded = false, onSuccess }: { embedded?: b
         </div>
 
         {/* Body */}
-        <div className="px-4 py-4 sm:px-8 sm:py-6">{formContent}</div>
+        <div className="px-4 py-4 md:px-8 md:py-6">{formContent}</div>
       </div>
     </div>
   )

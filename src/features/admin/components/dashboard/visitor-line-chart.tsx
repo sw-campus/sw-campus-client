@@ -70,7 +70,7 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
   return (
     <div className="bento-card group relative h-full overflow-hidden p-3 sm:p-4 lg:p-6">
       {/* Gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-lime-500/5 to-cyan-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="absolute inset-0 bg-linear-to-br from-lime-500/5 to-cyan-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       <div className="grid-pattern absolute inset-0 opacity-30" />
 
       <div className="relative z-10 flex h-full flex-col">
@@ -82,7 +82,9 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
               <div className="relative h-2 w-2 rounded-full bg-lime-500 sm:h-3 sm:w-3" />
             </div>
             <div>
-              <h3 className="text-foreground text-sm font-bold tracking-tight sm:text-lg lg:text-xl">{periodLabel} 방문자 현황</h3>
+              <h3 className="text-foreground text-sm font-bold tracking-tight sm:text-lg lg:text-xl">
+                {periodLabel} 방문자 현황
+              </h3>
               <p className="text-muted-foreground hidden text-xs sm:block">실시간 트래픽 모니터링</p>
             </div>
           </div>
@@ -159,19 +161,23 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
                   content={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
                       return (
-                        <div className="rounded-lg border border-white/20 bg-popover/95 p-2 shadow-xl backdrop-blur-sm sm:rounded-xl sm:p-3">
-                          <p className="text-muted-foreground mb-1 text-[10px] font-medium sm:mb-2 sm:text-xs">{label}</p>
+                        <div className="bg-popover/95 rounded-lg border border-white/20 p-2 shadow-xl backdrop-blur-sm sm:rounded-xl sm:p-3">
+                          <p className="text-muted-foreground mb-1 text-[10px] font-medium sm:mb-2 sm:text-xs">
+                            {label}
+                          </p>
                           <div className="space-y-0.5 sm:space-y-1">
                             <div className="flex items-center gap-1.5 sm:gap-2">
                               <div className="h-1.5 w-1.5 rounded-full bg-lime-500 sm:h-2 sm:w-2" />
                               <span className="text-foreground text-xs sm:text-sm">
-                                방문자: <span className="font-mono-data font-bold">{payload[0]?.value?.toLocaleString()}</span>
+                                방문자:{' '}
+                                <span className="font-mono-data font-bold">{payload[0]?.value?.toLocaleString()}</span>
                               </span>
                             </div>
                             <div className="flex items-center gap-1.5 sm:gap-2">
                               <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 sm:h-2 sm:w-2" />
                               <span className="text-foreground text-xs sm:text-sm">
-                                신규: <span className="font-mono-data font-bold">{payload[1]?.value?.toLocaleString()}</span>
+                                신규:{' '}
+                                <span className="font-mono-data font-bold">{payload[1]?.value?.toLocaleString()}</span>
                               </span>
                             </div>
                           </div>
@@ -204,8 +210,18 @@ export function VisitorLineChart({ report, isLoading, period }: VisitorLineChart
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center gap-2 sm:gap-3">
             <div className="bg-muted rounded-full p-3 sm:p-4">
-              <svg className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              <svg
+                className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
               </svg>
             </div>
             <span className="text-muted-foreground text-xs sm:text-sm">데이터가 없습니다</span>

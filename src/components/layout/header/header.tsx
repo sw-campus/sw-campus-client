@@ -23,11 +23,13 @@ export default function Header({
   onOpenNav,
   onCategoryEnter,
   onOtherNavEnter,
+  isHome = false,
 }: {
   categories: NavCategoryItem[]
   onOpenNav: () => void
   onCategoryEnter: (id: number) => void
   onOtherNavEnter: () => void
+  isHome?: boolean
 }) {
   const router = useRouter()
   const [logoutOpen, setLogoutOpen] = useState(false)
@@ -79,6 +81,7 @@ export default function Header({
         hasHydrated={hasHydrated}
         mypageHref={mypageHref}
         onOpenNav={onOpenNav}
+        isHome={isHome}
       />
 
       <DesktopHeader
@@ -92,6 +95,7 @@ export default function Header({
         onLogoutClick={() => setLogoutOpen(true)}
         onCategoryEnter={onCategoryEnter}
         onOtherNavEnter={onOtherNavEnter}
+        isHome={isHome}
       />
 
       <LogoutDialog

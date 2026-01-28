@@ -53,7 +53,7 @@ export function LectureCreateCostFields({ selectTriggerClassName }: Props) {
         <FieldLabel>정부 지원금 / 자기부담금 / 훈련수당</FieldLabel>
         <FieldDescription>금액은 원 단위로 입력합니다. (예: 1500000 = 150만원)</FieldDescription>
         <FieldContent>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
             <Controller
               control={control}
               name="subsidy"

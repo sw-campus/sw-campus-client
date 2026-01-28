@@ -67,7 +67,9 @@ export function AdminDashboard() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-foreground text-xl font-bold tracking-tight sm:text-2xl lg:text-3xl">대시보드</h1>
-          <p className="text-muted-foreground mt-0.5 text-xs sm:mt-1 sm:text-sm">SW Campus 운영 현황을 한눈에 확인하세요</p>
+          <p className="text-muted-foreground mt-0.5 text-xs sm:mt-1 sm:text-sm">
+            SW Campus 운영 현황을 한눈에 확인하세요
+          </p>
         </div>
         <PeriodToggle period={period} onPeriodChange={setPeriod} />
       </div>
@@ -76,11 +78,7 @@ export function AdminDashboard() {
       <div className="grid auto-rows-[minmax(100px,auto)] grid-cols-2 gap-3 sm:auto-rows-[minmax(120px,auto)] sm:gap-4 lg:grid-cols-4">
         {/* Row 1: 4 Stat Cards (2x2 on mobile, 4 on desktop) */}
         {statCards.map((stat, index) => (
-          <div
-            key={stat.title}
-            className="stagger-1"
-            style={{ animationDelay: `${index * 0.1}s` }}
-          >
+          <div key={stat.title} className="stagger-1" style={{ animationDelay: `${index * 0.1}s` }}>
             <StatCard
               title={stat.title}
               value={isLoading ? 0 : stat.value}

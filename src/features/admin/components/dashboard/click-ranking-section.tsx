@@ -7,7 +7,6 @@ import { LuChevronRight, LuImage, LuTrendingUp } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
 import { cn } from '@/lib/utils'
 
 import { useTopBannersQuery, useTopLecturesQuery } from '../../hooks/use-analytics'
@@ -24,10 +23,10 @@ function RankBadge({ rank }: { rank: number }) {
     <span
       className={cn(
         'inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold sm:h-6 sm:w-6 sm:text-xs',
-        rank === 1 && 'bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-500/30',
-        rank === 2 && 'bg-gradient-to-br from-gray-300 to-gray-400 text-white',
-        rank === 3 && 'bg-gradient-to-br from-orange-300 to-orange-400 text-white',
-        rank > 3 && 'bg-muted text-muted-foreground'
+        rank === 1 && 'bg-linear-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-500/30',
+        rank === 2 && 'bg-linear-to-br from-gray-300 to-gray-400 text-white',
+        rank === 3 && 'bg-linear-to-br from-orange-300 to-orange-400 text-white',
+        rank > 3 && 'bg-muted text-muted-foreground',
       )}
     >
       {rank}
@@ -98,7 +97,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
       <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
         {/* 배너 클릭 Top 5 */}
         <div className="bento-card group relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5" />
+          <div className="absolute inset-0 bg-linear-to-br from-purple-500/5 via-transparent to-pink-500/5" />
           <div className="grid-pattern absolute inset-0 opacity-30" />
           <div className="absolute -top-8 -right-8 h-20 w-20 rounded-full bg-purple-500/10 blur-2xl sm:-top-10 sm:-right-10 sm:h-28 sm:w-28" />
 
@@ -121,7 +120,9 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="text-muted-foreground w-10 text-[10px] sm:w-12 sm:text-xs">순위</TableHead>
                     <TableHead className="text-muted-foreground w-auto text-[10px] sm:text-xs">배너명</TableHead>
-                    <TableHead className="text-muted-foreground w-14 text-right text-[10px] sm:w-16 sm:text-xs">클릭</TableHead>
+                    <TableHead className="text-muted-foreground w-14 text-right text-[10px] sm:w-16 sm:text-xs">
+                      클릭
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -129,7 +130,10 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                     <SkeletonRows />
                   ) : banners.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-muted-foreground py-6 text-center text-xs sm:py-8 sm:text-sm">
+                      <TableCell
+                        colSpan={3}
+                        className="text-muted-foreground py-6 text-center text-xs sm:py-8 sm:text-sm"
+                      >
                         데이터가 없습니다
                       </TableCell>
                     </TableRow>
@@ -164,7 +168,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
             {banners.length >= 5 && (
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon-sm"
                 className="mt-2 w-full text-xs text-purple-600 hover:bg-purple-50 hover:text-purple-700 sm:mt-3 sm:text-sm"
                 onClick={() => setModalOpen('banners')}
               >
@@ -176,7 +180,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
 
         {/* 강의 클릭 Top 5 */}
         <div className="bento-card group relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5" />
+          <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 via-transparent to-teal-500/5" />
           <div className="grid-pattern absolute inset-0 opacity-30" />
           <div className="absolute -bottom-8 -left-8 h-20 w-20 rounded-full bg-emerald-500/10 blur-2xl sm:-bottom-10 sm:-left-10 sm:h-28 sm:w-28" />
 
@@ -199,7 +203,9 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="text-muted-foreground w-8 text-[10px] sm:w-10 sm:text-xs">순위</TableHead>
                     <TableHead className="text-muted-foreground w-auto text-[10px] sm:text-xs">강의명</TableHead>
-                    <TableHead className="text-muted-foreground hidden w-12 text-right text-xs sm:table-cell">조회</TableHead>
+                    <TableHead className="text-muted-foreground hidden w-12 text-right text-xs sm:table-cell">
+                      조회
+                    </TableHead>
                     <TableHead className="text-muted-foreground w-10 text-right text-[10px] sm:text-xs">신청</TableHead>
                     <TableHead className="text-muted-foreground w-10 text-right text-[10px] sm:text-xs">공유</TableHead>
                   </TableRow>
@@ -209,7 +215,10 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                     <SkeletonRows />
                   ) : lectures.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-muted-foreground py-6 text-center text-xs sm:py-8 sm:text-sm">
+                      <TableCell
+                        colSpan={5}
+                        className="text-muted-foreground py-6 text-center text-xs sm:py-8 sm:text-sm"
+                      >
                         데이터가 없습니다
                       </TableCell>
                     </TableRow>
@@ -249,7 +258,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
             {lectures.length >= 5 && (
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon-sm"
                 className="mt-2 w-full text-xs text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 sm:mt-3 sm:text-sm"
                 onClick={() => setModalOpen('lectures')}
               >

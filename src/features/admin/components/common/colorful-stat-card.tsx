@@ -18,13 +18,13 @@ export interface ColorfulStatCardProps {
 export function ColorfulStatCard({ title, value, icon: Icon, bgColor }: ColorfulStatCardProps) {
   return (
     <Card className={cn('border-0 text-white shadow-lg', bgColor)}>
-      <CardContent className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4">
-        <div className="shrink-0 rounded-xl bg-white/20 p-2 sm:p-3">
-          <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+      <CardContent className="flex items-center gap-3 p-3 md:gap-4 md:p-4">
+        <div className="shrink-0 rounded-xl bg-white/20 p-2 md:p-3">
+          <Icon className="h-5 w-5 md:h-6 md:w-6" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium whitespace-nowrap text-white/80 sm:text-sm">{title}</p>
-          <p className="text-xl font-bold sm:text-2xl">{value.toLocaleString()}</p>
+          <p className="truncate text-xs font-medium whitespace-nowrap text-white/80 md:text-sm">{title}</p>
+          <p className="text-xl font-bold md:text-2xl">{value.toLocaleString()}</p>
         </div>
       </CardContent>
     </Card>

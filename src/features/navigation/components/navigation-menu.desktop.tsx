@@ -8,7 +8,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 
 import type { DesktopNavCategory } from '../types/navigation-menu.types'
@@ -19,33 +18,38 @@ type Props = {
   onMouseEnter?: () => void
   onMouseLeave?: () => void
   onNavigate: (href: string) => void
+  isHome?: boolean
 }
 
 const menuVariants: Variants = {
   open: {
     height: 'auto',
     opacity: 1,
+    overflow: 'visible',
     transition: { duration: 0.25, ease: 'easeOut' },
-    transitionEnd: { overflow: 'visible' },
   },
   closed: {
     height: 0,
-    opacity: 0,
+    opacity: 1,
     overflow: 'hidden',
     transition: { duration: 0.25, ease: 'easeOut' },
   },
 }
 
-export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMouseLeave, onNavigate }: Props) {
+export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMouseLeave, onNavigate, isHome = false }: Props) {
+  const bgColor = isHome ? '#020f2b' : '#ffffff'
+  const textColor = isHome ? 'text-header-text' : 'text-gray-900'
+  const hoverBg = isHome ? 'hover:bg-white/10 hover:text-white' : 'hover:bg-gray-100'
+
   return (
     <motion.div
-      className="hidden lg:block"
+      className="hidden w-full md:block"
       initial="closed"
       animate={showDesktop ? 'open' : 'closed'}
       variants={menuVariants}
-      style={{ pointerEvents: showDesktop ? 'auto' : 'none' }}
+      style={{ pointerEvents: showDesktop ? 'auto' : 'none', backgroundColor: bgColor }}
     >
-      <div className="mx-auto mt-4 flex w-full max-w-7xl items-center justify-center px-8">
+      <div className="page-container flex items-center justify-center px-8 pt-0 pb-4">
         <NavigationMenu
           viewport={false}
           className="w-full"
@@ -54,26 +58,25 @@ export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMous
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
         >
-          <NavigationMenuList className="flex-wrap justify-start gap-y-2">
+          <NavigationMenuList className="flex-wrap justify-start gap-x-6 gap-y-2">
             {items.length > 0 ? (
               items.map((item, key) => (
                 <NavigationMenuItem key={key} className="relative">
                   {item.children.length > 0 ? (
                     <>
-                      <NavigationMenuTrigger onClick={() => onNavigate(item.href)}>{item.title}</NavigationMenuTrigger>
+                      <NavigationMenuTrigger
+                        onClick={() => onNavigate(item.href)}
+                        className={`bg-transparent ${textColor} ${hoverBg}`}
+                      >
+                        {item.title}
+                      </NavigationMenuTrigger>
                       <NavigationMenuContent className="absolute top-8 left-0 z-100 mt-0 w-max min-w-55 rounded-lg bg-white shadow-xl before:absolute before:-top-4 before:-left-10 before:h-10 before:w-[200%] before:bg-transparent">
                         <div className="flex flex-col gap-2 p-4">
-                          <Link
-                            href={item.href}
-                            className="hover:text-accent-foreground mb-2 font-semibold whitespace-nowrap text-gray-900"
-                          >
-                            전체
-                          </Link>
                           {item.children.map(child => (
                             <Link
                               href={child.href}
                               key={child.title}
-                              className="hover:text-accent-foreground text-sm whitespace-nowrap text-gray-700"
+                              className="text-sm whitespace-nowrap text-gray-700 hover:font-bold hover:text-brand-gold"
                             >
                               {child.title}
                             </Link>
@@ -83,14 +86,14 @@ export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMous
                     </>
                   ) : (
                     <Link href={item.href} passHref>
-                      <NavigationMenuLink className={navigationMenuTriggerStyle()}>{item.title}</NavigationMenuLink>
+                      <NavigationMenuLink className={`bg-transparent px-3 py-2 text-sm font-medium ${textColor} ${hoverBg}`}>
+                        {item.title}
+                      </NavigationMenuLink>
                     </Link>
                   )}
                 </NavigationMenuItem>
               ))
-            ) : (
-              <div className="p-4 text-sm text-gray-500">하위 카테고리가 없습니다.</div>
-            )}
+            ) : null}
           </NavigationMenuList>
         </NavigationMenu>
       </div>

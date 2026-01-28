@@ -61,7 +61,7 @@ export function WithdrawModal({ open, onOpenChange, onSuccess, isOrganization, i
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="md:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-destructive flex items-center gap-2">
             <LuTriangleAlert className="h-5 w-5" />
@@ -97,7 +97,7 @@ export function WithdrawModal({ open, onOpenChange, onSuccess, isOrganization, i
 
         {error && <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">{error}</div>}
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="gap-2 md:gap-0">
           <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={loading}>
             취소
           </Button>

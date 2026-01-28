@@ -20,17 +20,11 @@ export default function OrgInfoPage() {
   }
 
   return (
-    <Dialog open onOpenChange={(open) => !open && handleClose()}>
+    <Dialog open onOpenChange={open => !open && handleClose()}>
       {/* 모바일: 전체 화면 시트 / 데스크톱: 중앙 모달 */}
       <DialogContent
-        onOpenAutoFocus={(e) => e.preventDefault()}
-        className="
-          !flex !flex-col
-          !inset-0 !max-h-full !max-w-full !translate-x-0 !translate-y-0 !rounded-none
-          sm:!inset-auto sm:!top-1/2 sm:!left-1/2 sm:!-translate-x-1/2 sm:!-translate-y-1/2
-          sm:!max-h-[85vh] sm:!max-w-[calc(100%-2rem)] sm:!rounded-lg
-          md:!max-w-175
-        "
+        onOpenAutoFocus={e => e.preventDefault()}
+        className="inset-0 flex max-h-full max-w-full translate-x-0 translate-y-0 flex-col rounded-none sm:!inset-auto sm:!top-1/2 sm:!left-1/2 sm:!max-h-[85vh] sm:!max-w-[calc(100%-2rem)] sm:!-translate-x-1/2 sm:!-translate-y-1/2 sm:!rounded-lg md:!max-w-175"
       >
         <DialogHeader className="shrink-0 border-b px-4 py-4 sm:border-none sm:px-6 sm:pt-6 sm:pb-0">
           <DialogTitle>{userType === 'ORGANIZATION' ? '기업 정보 수정' : '개인 정보 수정'}</DialogTitle>
