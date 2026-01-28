@@ -8,9 +8,9 @@ import { FiLoader, FiMessageCircle, FiSend, FiSmile } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/auth-store'
 
+import type { Comment } from '../api/comment-api.types'
 import { useComments, useCreateComment } from '../hooks/use-comments'
 import { CommentItem } from './comment-item'
-import type { Comment } from '../api/comment-api.types'
 
 interface CommentSectionProps {
   postId: number
@@ -51,7 +51,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
           setBody('')
           setReplyTo(null)
         },
-      }
+      },
     )
   }
 
@@ -90,14 +90,14 @@ export function CommentSection({ postId }: CommentSectionProps) {
         <div className="space-y-6">
           {/* 헤더 스켈레톤 */}
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50" />
+            <div className="h-10 w-10 rounded-xl bg-linear-to-br from-gray-100 to-gray-50" />
             <div className="h-6 w-24 rounded-lg bg-gray-100" />
           </div>
           {/* 입력 폼 스켈레톤 */}
-          <div className="h-32 w-full rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100/50" />
+          <div className="h-32 w-full rounded-2xl bg-linear-to-br from-gray-50 to-gray-100/50" />
           {/* 댓글 스켈레톤 */}
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3].map(i => (
               <div key={i} className="flex gap-3">
                 <div className="h-10 w-10 shrink-0 rounded-full bg-gray-100" />
                 <div className="flex-1 space-y-2">
@@ -116,14 +116,14 @@ export function CommentSection({ postId }: CommentSectionProps) {
     <section className="mt-12 border-t border-gray-100 pt-10">
       {/* 헤더 */}
       <div className="mb-8 flex items-center gap-4">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 shadow-sm">
-          <FiMessageCircle className="h-5 w-5 text-primary" />
+        <div className="bg-primary/10 flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm">
+          <FiMessageCircle className="text-primary h-5 w-5" />
         </div>
         <div>
           <h2 className="text-xl font-bold text-gray-900">
             댓글
             {totalCount > 0 && (
-              <span className="ml-2 inline-flex h-7 min-w-7 items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-bold tabular-nums text-primary-foreground shadow-sm">
+              <span className="bg-primary text-primary-foreground ml-2 inline-flex h-7 min-w-7 items-center justify-center rounded-lg px-2.5 text-sm font-bold tabular-nums shadow-sm">
                 {totalCount}
               </span>
             )}
@@ -136,7 +136,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
       {isLoggedIn ? (
         !replyTo && (
           <form onSubmit={handleSubmit} className="mb-10">
-            <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-sm transition-all duration-300 focus-within:border-primary/50 focus-within:shadow-lg focus-within:shadow-primary/10">
+            <div className="focus-within:border-primary/50 focus-within:shadow-primary/10 overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-sm transition-all duration-300 focus-within:shadow-lg">
               {/* 접근성을 위한 시각적으로 숨겨진 라벨 */}
               <label htmlFor="comment-input" className="sr-only">
                 댓글 작성
@@ -144,26 +144,20 @@ export function CommentSection({ postId }: CommentSectionProps) {
               <textarea
                 id="comment-input"
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
+                onChange={e => setBody(e.target.value)}
                 placeholder="따뜻한 댓글은 작성자에게 큰 힘이 됩니다..."
-                className="min-h-[100px] w-full resize-none border-0 bg-transparent p-5 text-sm leading-relaxed text-gray-900 placeholder:text-gray-500 placeholder:font-medium focus:outline-none focus:ring-0 md:min-h-[120px]"
+                className="min-h-[100px] w-full resize-none border-0 bg-transparent p-5 text-sm leading-relaxed text-gray-900 placeholder:font-medium placeholder:text-gray-500 focus:ring-0 focus:outline-none md:min-h-[120px]"
                 rows={4}
                 aria-label="댓글 내용"
               />
               <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50/50 px-4 py-3">
-                <p className="hidden text-xs text-gray-400 md:block">
-                  Ctrl + Enter로 등록
-                </p>
+                <p className="hidden text-xs text-gray-400 md:block">Ctrl + Enter로 등록</p>
                 <Button
                   type="submit"
                   disabled={isCreating || !body.trim()}
-                  className="h-10 gap-2 rounded-xl bg-primary px-5 font-bold text-primary-foreground shadow-md shadow-primary/30 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/40 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                  className="bg-primary text-primary-foreground shadow-primary/30 hover:shadow-primary/40 h-10 gap-2 rounded-xl px-5 font-bold shadow-md transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
                 >
-                  {isCreating ? (
-                    <FiLoader className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <FiSend className="h-4 w-4" />
-                  )}
+                  {isCreating ? <FiLoader className="h-4 w-4 animate-spin" /> : <FiSend className="h-4 w-4" />}
                   {isCreating ? '등록 중...' : '댓글 등록'}
                 </Button>
               </div>
@@ -171,13 +165,16 @@ export function CommentSection({ postId }: CommentSectionProps) {
           </form>
         )
       ) : (
-        <div className="mb-10 rounded-2xl border border-dashed border-gray-200 bg-gradient-to-br from-gray-50/50 to-white p-8 text-center">
-          <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50">
+        <div className="mb-10 rounded-2xl border border-dashed border-gray-200 bg-linear-to-br from-gray-50/50 to-white p-8 text-center">
+          <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-gray-100 to-gray-50">
             <FiMessageCircle className="h-6 w-6 text-gray-400" />
           </div>
           <p className="text-gray-600">
             댓글을 작성하려면{' '}
-            <Link href="/login" className="font-bold text-primary underline-offset-2 transition-colors hover:text-primary/80 hover:underline">
+            <Link
+              href="/login"
+              className="text-primary hover:text-primary/80 font-bold underline-offset-2 transition-colors hover:underline"
+            >
               로그인
             </Link>
             이 필요합니다.
@@ -188,7 +185,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
       {/* 댓글 목록 */}
       {comments.length > 0 ? (
         <div className="space-y-5">
-          {comments.map((comment) => (
+          {comments.map(comment => (
             <CommentItem
               key={comment.id}
               comment={comment}
@@ -199,16 +196,17 @@ export function CommentSection({ postId }: CommentSectionProps) {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/30 to-white py-20">
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-gray-200 bg-linear-to-b from-gray-50/30 to-white py-20">
           <div className="relative mb-5">
-            <div className="absolute -inset-3 rounded-full bg-primary/10 blur-lg" />
-            <div className="relative rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 p-5 shadow-sm">
+            <div className="bg-primary/10 absolute -inset-3 rounded-full blur-lg" />
+            <div className="relative rounded-2xl bg-linear-to-br from-gray-100 to-gray-50 p-5 shadow-sm">
               <FiSmile className="h-10 w-10 text-gray-300" />
             </div>
           </div>
           <h3 className="text-lg font-bold text-gray-600">아직 댓글이 없습니다</h3>
           <p className="mt-2 text-center text-sm text-gray-400">
-            첫 번째 댓글을 남겨주세요!<br />
+            첫 번째 댓글을 남겨주세요!
+            <br />
             작성자에게 큰 힘이 됩니다.
           </p>
         </div>
