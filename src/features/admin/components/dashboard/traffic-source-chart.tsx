@@ -112,12 +112,12 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
 
   if (isLoading) {
     return (
-      <div className="bento-card relative h-full overflow-hidden p-3 sm:p-5">
+      <div className="bento-card relative h-full overflow-hidden p-3 md:p-5">
         <div className="grid-pattern absolute inset-0 opacity-30" />
         <div className="relative z-10 flex h-full flex-col">
-          <div className="bg-muted mb-3 h-4 w-20 animate-pulse rounded sm:mb-4 sm:h-5 sm:w-24" />
+          <div className="bg-muted mb-3 h-4 w-20 animate-pulse rounded md:mb-4 md:h-5 md:w-24" />
           <div className="flex flex-1 items-center justify-center">
-            <div className="bg-muted h-28 w-28 animate-pulse rounded-full sm:h-36 sm:w-36" />
+            <div className="bg-muted h-28 w-28 animate-pulse rounded-full md:h-36 md:w-36" />
           </div>
         </div>
       </div>
@@ -129,19 +129,19 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-violet-500/5" />
       <div className="grid-pattern absolute inset-0 opacity-30" />
 
-      <div className="absolute top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/5 blur-2xl sm:h-32 sm:w-32" />
+      <div className="absolute top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/5 blur-2xl md:h-32 md:w-32" />
 
-      <div className="relative z-10 flex h-full flex-col p-3 sm:p-5">
-        <div className="mb-2 flex items-center gap-2 sm:mb-3 lg:mb-4">
-          <div className="rounded-lg bg-indigo-500/10 p-1.5 sm:p-2">
-            <LuGlobe className="h-3.5 w-3.5 text-indigo-600 sm:h-4 sm:w-4" />
+      <div className="relative z-10 flex h-full flex-col p-3 md:p-5">
+        <div className="mb-2 flex items-center gap-2 md:mb-3 lg:mb-4">
+          <div className="rounded-lg bg-indigo-500/10 p-1.5 md:p-2">
+            <LuGlobe className="h-3.5 w-3.5 text-indigo-600 md:h-4 md:w-4" />
           </div>
-          <h3 className="text-foreground text-xs font-bold sm:text-sm lg:text-base">트래픽 소스</h3>
+          <h3 className="text-foreground text-xs font-bold md:text-sm lg:text-base">트래픽 소스</h3>
         </div>
 
         {chartData.length > 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-3 sm:gap-4">
-            <div className="relative h-28 w-28 sm:h-36 sm:w-36 lg:h-44 lg:w-44">
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 md:gap-4">
+            <div className="relative h-28 w-28 md:h-36 md:w-36 lg:h-44 lg:w-44">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <defs>
@@ -172,17 +172,17 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
                         const data = payload[0].payload
                         const percentage = totalSessions > 0 ? ((data.value / totalSessions) * 100).toFixed(1) : 0
                         return (
-                          <div className="rounded-lg border border-white/20 bg-popover/95 px-2 py-1.5 shadow-xl backdrop-blur-sm sm:rounded-xl sm:px-3 sm:py-2">
-                            <div className="flex items-center gap-1.5 sm:gap-2">
-                              <div className="h-2 w-2 rounded-full sm:h-2.5 sm:w-2.5" style={{ backgroundColor: data.color }} />
-                              <span className="text-foreground text-xs font-medium sm:text-sm">{data.name}</span>
+                          <div className="rounded-lg border border-white/20 bg-popover/95 px-2 py-1.5 shadow-xl backdrop-blur-sm md:rounded-xl md:px-3 md:py-2">
+                            <div className="flex items-center gap-1.5 md:gap-2">
+                              <div className="h-2 w-2 rounded-full md:h-2.5 md:w-2.5" style={{ backgroundColor: data.color }} />
+                              <span className="text-foreground text-xs font-medium md:text-sm">{data.name}</span>
                             </div>
-                            <div className="mt-0.5 space-y-0.5 sm:mt-1">
-                              <p className="font-mono-data text-foreground text-xs sm:text-sm">
+                            <div className="mt-0.5 space-y-0.5 md:mt-1">
+                              <p className="font-mono-data text-foreground text-xs md:text-sm">
                                 {data.value.toLocaleString()}회
-                                <span className="text-muted-foreground ml-1 text-[10px] sm:text-xs">({percentage}%)</span>
+                                <span className="text-muted-foreground ml-1 text-[10px] md:text-xs">({percentage}%)</span>
                               </p>
-                              <p className="text-muted-foreground text-[10px] sm:text-xs">{data.users.toLocaleString()}명</p>
+                              <p className="text-muted-foreground text-[10px] md:text-xs">{data.users.toLocaleString()}명</p>
                             </div>
                           </div>
                         )
@@ -194,8 +194,8 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
               </ResponsiveContainer>
 
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-mono-data text-foreground text-lg font-bold sm:text-2xl lg:text-3xl">{totalSessions.toLocaleString()}</span>
-                <span className="text-muted-foreground text-[9px] sm:text-[10px] lg:text-xs">세션</span>
+                <span className="font-mono-data text-foreground text-lg font-bold md:text-2xl lg:text-3xl">{totalSessions.toLocaleString()}</span>
+                <span className="text-muted-foreground text-[9px] md:text-[10px] lg:text-xs">세션</span>
               </div>
             </div>
 
@@ -205,13 +205,13 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
                 return (
                   <div
                     key={index}
-                    className="flex items-center justify-between rounded-md bg-card/50 px-2 py-1 transition-all hover:bg-card/80 sm:rounded-lg sm:px-2.5 sm:py-1.5"
+                    className="flex items-center justify-between rounded-md bg-card/50 px-2 py-1 transition-all hover:bg-card/80 md:rounded-lg md:px-2.5 md:py-1.5"
                   >
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="h-1.5 w-1.5 rounded-full sm:h-2 sm:w-2 lg:h-2.5 lg:w-2.5" style={{ backgroundColor: item.color }} />
-                      <span className="text-foreground max-w-[80px] truncate text-[10px] sm:max-w-[100px] sm:text-xs lg:max-w-none lg:text-sm">{item.name}</span>
+                    <div className="flex items-center gap-1.5 md:gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full md:h-2 md:w-2 lg:h-2.5 lg:w-2.5" style={{ backgroundColor: item.color }} />
+                      <span className="text-foreground max-w-[80px] truncate text-[10px] md:max-w-[100px] md:text-xs lg:max-w-none lg:text-sm">{item.name}</span>
                     </div>
-                    <span className="text-muted-foreground text-[9px] sm:text-[10px] lg:text-xs">{percentage}%</span>
+                    <span className="text-muted-foreground text-[9px] md:text-[10px] lg:text-xs">{percentage}%</span>
                   </div>
                 )
               })}
@@ -220,15 +220,15 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
                 <button
                   type="button"
                   onClick={() => setExpanded(!expanded)}
-                  className="mt-0.5 flex items-center justify-center gap-1 text-[10px] text-indigo-600 transition-colors hover:text-indigo-700 sm:mt-1 sm:text-xs"
+                  className="mt-0.5 flex items-center justify-center gap-1 text-[10px] text-indigo-600 transition-colors hover:text-indigo-700 md:mt-1 md:text-xs"
                 >
                   {expanded ? (
                     <>
-                      접기 <LuChevronUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                      접기 <LuChevronUp className="h-2.5 w-2.5 md:h-3 md:w-3" />
                     </>
                   ) : (
                     <>
-                      +{chartData.length - 4}개 더보기 <LuChevronDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                      +{chartData.length - 4}개 더보기 <LuChevronDown className="h-2.5 w-2.5 md:h-3 md:w-3" />
                     </>
                   )}
                 </button>
@@ -237,10 +237,10 @@ export function TrafficSourceChart({ period }: TrafficSourceChartProps) {
           </div>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center gap-2">
-            <div className="bg-muted rounded-full p-2 sm:p-3">
-              <LuGlobe className="text-muted-foreground h-5 w-5 sm:h-6 sm:w-6" />
+            <div className="bg-muted rounded-full p-2 md:p-3">
+              <LuGlobe className="text-muted-foreground h-5 w-5 md:h-6 md:w-6" />
             </div>
-            <span className="text-muted-foreground text-xs sm:text-sm">데이터가 없습니다</span>
+            <span className="text-muted-foreground text-xs md:text-sm">데이터가 없습니다</span>
           </div>
         )}
       </div>

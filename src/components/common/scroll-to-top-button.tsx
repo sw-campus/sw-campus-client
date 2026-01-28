@@ -13,7 +13,7 @@ export function ScrollToTopButton() {
   const isMounted = useIsMounted()
   const [isVisible, setIsVisible] = useState(false)
   const [pcLeftPosition, setPcLeftPosition] = useState<number | null>(null)
-  const isFloatingBarOpen = useFloatingBarStore(state => state.isOpen)
+  const isFloatingBarOpen = useFloatingBarStore((state) => state.isOpen)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,14 +53,16 @@ export function ScrollToTopButton() {
 
   if (!isMounted) return null
 
-  // 플로팅 바 열림: 195px, 닫힘: 60px (모바일)
-  const bottomPosition = isFloatingBarOpen ? 'bottom-[195px]' : 'bottom-[60px]'
+  // 모바일: 톡상담 버튼(약 50px) 위에 위치
+  // 플로팅 바 열림: 195 + 50 + 12 = 257px, 닫힘: 60 + 50 + 12 = 122px
+  const mobileBottom = isFloatingBarOpen ? 257 : 122
 
   return createPortal(
     <>
       {/* 모바일 버전 */}
       <div
-        className={`pointer-events-none fixed inset-x-0 ${bottomPosition} z-40 mx-auto w-full max-w-[360px] px-4 transition-all duration-300 xl:hidden`}
+        className="pointer-events-none fixed inset-x-0 z-40 mx-auto w-full max-w-[360px] px-4 transition-all duration-300 xl:hidden"
+        style={{ bottom: mobileBottom }}
       >
         <AnimatePresence>
           {isVisible && (
@@ -82,9 +84,12 @@ export function ScrollToTopButton() {
         </AnimatePresence>
       </div>
 
-      {/* PC 버전 - 장바구니 사이드바와 같은 가로 위치, 하단 고정 */}
+      {/* PC 버전 - 장바구니 사이드바와 같은 가로 위치, 톡상담 버튼 위 */}
       {pcLeftPosition && (
-        <div className="pointer-events-none fixed bottom-10 z-40 hidden xl:block" style={{ left: pcLeftPosition }}>
+        <div
+          className="pointer-events-none fixed z-40 hidden xl:block"
+          style={{ left: pcLeftPosition, bottom: 100 }}
+        >
           <AnimatePresence>
             {isVisible && (
               <motion.button
