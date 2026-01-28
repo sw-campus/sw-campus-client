@@ -25,6 +25,7 @@ import { useBookmarksQuery } from '../hooks/use-bookmarks-query'
 import { useCurrentMemberQuery } from '../hooks/use-current-member-query'
 import { useSurveyStatusQuery, useSurveyResultsQuery } from '../hooks/use-survey'
 import { RECOMMENDED_JOB_LABELS } from '../types/survey.type'
+import { JOB_TYPE_INFO } from './survey/survey-results-step'
 import { BookmarkSection } from './bookmark-section'
 import { ReviewManagementSection } from './management-section'
 import { PROFILE_QUERY_KEY } from './profile-card'
@@ -131,7 +132,7 @@ export function MyPageDashboard() {
       <div className="md:hidden">
         {/* 짙은 회색 헤더 */}
         <div className="bg-[#262626] px-4 py-6 pb-16 relative overflow-visible">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between">
             {/* 프로필 정보 */}
             <div>
               <h1 className="text-xl font-bold text-[#FEB706]">
@@ -142,13 +143,31 @@ export function MyPageDashboard() {
               </p>
             </div>
 
-            {/* 수정 버튼 */}
-            <button
-              className="w-8 h-8 bg-[#FEB706]/20 rounded-full flex items-center justify-center"
-              onClick={handleProfileButtonClick}
-            >
-              <Settings className="w-4 h-4 text-[#FEB706]" />
-            </button>
+            {/* 캐릭터 + 설정 버튼 (헤더 위로 넘어가도록) */}
+            <div className="absolute right-6 -top-8 z-30">
+              {/* 캐릭터 이미지 (성향검사 완료 시) */}
+              {hasAptitudeTest && recommendedJob ? (
+                <div className="relative flex h-28 w-28 items-center justify-center rounded-full border border-[#FEB706]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={JOB_TYPE_INFO[recommendedJob].imagePath}
+                    alt={RECOMMENDED_JOB_LABELS[recommendedJob]}
+                    className="absolute h-36 w-36 object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="flex h-28 w-28 items-center justify-center rounded-full border border-[#FEB706]">
+                  <User className="w-12 h-12 text-[#FEB706]/60" />
+                </div>
+              )}
+              {/* 설정 버튼 (우측 하단) */}
+              <button
+                className="absolute bottom-0 right-0 w-8 h-8 bg-[#FEB706] rounded-full flex items-center justify-center shadow-md"
+                onClick={handleProfileButtonClick}
+              >
+                <Settings className="w-4 h-4 text-[#262626]" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -342,22 +361,21 @@ export function MyPageDashboard() {
               <div>
                 {/* 닉네임 + 정보확인 버튼 */}
                 <div className="flex items-center justify-between">
-                  <h1 className="text-base font-bold text-[#020202]">
+                  <h1 className="text-lg font-bold text-[#020202]">
                     {profile?.nickname || profile?.name || '사용자'}님
                   </h1>
                   <button
-                    className="flex items-center gap-1 bg-gray-100 rounded-full px-2 py-1 hover:bg-gray-200 transition-colors"
+                    className="flex items-center justify-center w-9 h-9 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
                     onClick={handleProfileButtonClick}
                   >
-                    <Settings className="w-3 h-3 text-[#888888]" />
-                    <span className="text-xs text-[#888888]">정보확인</span>
+                    <Settings className="w-5 h-5 text-[#888888]" />
                   </button>
                 </div>
-                <p className="text-[#888888] text-sm mt-1">
+                <p className="text-[#888888] text-base mt-1">
                   {profile?.email || ''}
                 </p>
                 {profile?.phone && (
-                  <p className="text-[#888888]/70 text-xs mt-1">
+                  <p className="text-[#888888]/70 text-sm mt-1">
                     {profile.phone}
                   </p>
                 )}
@@ -367,18 +385,45 @@ export function MyPageDashboard() {
               <div className="border-t border-gray-200 my-6" />
 
               {/* 성향검사 영역 */}
-              <div className="text-center">
-                <h3 className="text-sm text-[#888888] mb-2">맞춤 강의 추천을 위한 성향 검사</h3>
-
+              <div>
                 {hasAptitudeTest && recommendedJob ? (
-                  // 성향검사 완료 - 결과 표시
-                  <div>
-                    <p className="text-xs text-[#888888] mb-1">나의 추천 직무</p>
-                    <p className="text-lg font-bold text-[#FF9500]">
-                      {RECOMMENDED_JOB_LABELS[recommendedJob]}
-                    </p>
+                  // 성향검사 완료 - 결과 표시 (심플 스타일)
+                  <div className="text-center">
+                    {/* 캐릭터 영역 */}
+                    <div className="mb-4 flex justify-center">
+                      <div className={`relative flex h-32 w-32 items-center justify-center rounded-full ${JOB_TYPE_INFO[recommendedJob].bgColor}`}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={JOB_TYPE_INFO[recommendedJob].imagePath}
+                          alt={RECOMMENDED_JOB_LABELS[recommendedJob]}
+                          className="absolute h-44 w-44 object-contain"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 직무명 */}
+                    <div className="mb-3">
+                      <p className="text-base text-gray-500 mb-1">나의 추천 직무</p>
+                      <h3 className={`text-xl font-bold ${JOB_TYPE_INFO[recommendedJob].color}`}>
+                        {RECOMMENDED_JOB_LABELS[recommendedJob]}
+                      </h3>
+                    </div>
+
+                    {/* 특성 태그 */}
+                    <div className="mb-4 flex flex-wrap justify-center gap-1.5">
+                      {JOB_TYPE_INFO[recommendedJob].traits.map((trait) => (
+                        <span
+                          key={trait}
+                          className={`rounded-full px-3 py-1 text-sm font-medium ${JOB_TYPE_INFO[recommendedJob].bgColor} text-white`}
+                        >
+                          {trait}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* 다시 검사하기 버튼 */}
                     <button
-                      className="text-xs text-[#888888] mt-2 underline hover:text-[#555555]"
+                      className="text-base text-gray-500 underline hover:text-gray-700"
                       onClick={handleEditSurvey}
                     >
                       다시 검사하기
@@ -447,15 +492,15 @@ export function MyPageDashboard() {
           {/* ==================== 오른쪽: 섹션들 (하나의 카드) ==================== */}
           <div className="flex-1 min-w-0 bg-white border border-gray-200 rounded-2xl p-6 flex flex-col gap-8">
             {/* ==================== 섹션 1: 나의 강의 ==================== */}
-            <div className="min-h-[320px]">
+            <div className="h-[380px] overflow-hidden">
             {/* 섹션 헤더 */}
-            <h3 className="text-base font-bold text-[#020202] pb-3 border-b border-[#020202]">나의 강의</h3>
+            <h3 className="text-lg font-bold text-[#020202] pb-3 border-b border-[#020202]">나의 강의</h3>
 
             {/* 탭 버튼 */}
             <div className="flex gap-6 border-b border-gray-200 mt-2">
               <button
                 onClick={() => setLectureTab('all')}
-                className={`py-3 text-sm font-medium transition-colors relative ${
+                className={`py-3 text-base font-medium transition-colors relative ${
                   lectureTab === 'all'
                     ? 'text-[#FF9500]'
                     : 'text-[#888888] hover:text-[#555555]'
@@ -468,7 +513,7 @@ export function MyPageDashboard() {
               </button>
               <button
                 onClick={() => setLectureTab('reviews')}
-                className={`py-3 text-sm font-medium transition-colors relative ${
+                className={`py-3 text-base font-medium transition-colors relative ${
                   lectureTab === 'reviews'
                     ? 'text-[#FF9500]'
                     : 'text-[#888888] hover:text-[#555555]'
@@ -481,7 +526,7 @@ export function MyPageDashboard() {
               </button>
               <button
                 onClick={() => setLectureTab('interest')}
-                className={`py-3 text-sm font-medium transition-colors relative ${
+                className={`py-3 text-base font-medium transition-colors relative ${
                   lectureTab === 'interest'
                     ? 'text-[#FF9500]'
                     : 'text-[#888888] hover:text-[#555555]'
@@ -507,13 +552,13 @@ export function MyPageDashboard() {
             {/* ==================== 섹션 2: 커뮤니티 활동 ==================== */}
             <div className="flex-1 min-h-[600px]">
             {/* 섹션 헤더 */}
-            <h3 className="text-base font-bold text-[#020202] pb-3 border-b border-[#020202]">커뮤니티 활동</h3>
+            <h3 className="text-lg font-bold text-[#020202] pb-3 border-b border-[#020202]">커뮤니티 활동</h3>
 
             {/* 탭 버튼 */}
             <div className="flex gap-6 border-b border-gray-200 mt-2">
               <button
                 onClick={() => setCommunityTab('posts')}
-                className={`py-3 text-sm font-medium transition-colors relative ${
+                className={`py-3 text-base font-medium transition-colors relative ${
                   communityTab === 'posts'
                     ? 'text-[#FF9500]'
                     : 'text-[#888888] hover:text-[#555555]'
@@ -526,7 +571,7 @@ export function MyPageDashboard() {
               </button>
               <button
                 onClick={() => setCommunityTab('commented')}
-                className={`py-3 text-sm font-medium transition-colors relative ${
+                className={`py-3 text-base font-medium transition-colors relative ${
                   communityTab === 'commented'
                     ? 'text-[#FF9500]'
                     : 'text-[#888888] hover:text-[#555555]'
@@ -539,7 +584,7 @@ export function MyPageDashboard() {
               </button>
               <button
                 onClick={() => setCommunityTab('bookmarks')}
-                className={`py-3 text-sm font-medium transition-colors relative ${
+                className={`py-3 text-base font-medium transition-colors relative ${
                   communityTab === 'bookmarks'
                     ? 'text-[#FF9500]'
                     : 'text-[#888888] hover:text-[#555555]'
@@ -920,7 +965,7 @@ function InterestLectureSection({ lectures }: InterestLectureSectionProps) {
 
   if (lectures.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 py-16">
+      <div className="flex flex-col items-center justify-center gap-3 py-16">
         <Heart className="w-12 h-12 text-gray-200" />
         <span className="text-sm text-[#888888]">관심등록한 강의가 없습니다.</span>
         <button

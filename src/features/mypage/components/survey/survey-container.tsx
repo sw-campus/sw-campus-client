@@ -159,7 +159,7 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
             {Math.round(calculateOverallProgress())}%
           </span>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center max-w-xl mx-auto w-full">
           {steps.map((step, index) => {
             const Icon = step.icon
             const isActive = index === currentStepIndex
@@ -175,8 +175,10 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
               }
             }
 
+            const isLast = index === steps.length - 1
+
             return (
-              <div key={step.id} className="flex flex-1 items-center justify-center">
+              <div key={step.id} className={`flex items-center ${isLast ? '' : 'flex-1'}`}>
                 <div className="flex flex-col items-center">
                   <button
                     type="button"
@@ -194,16 +196,16 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
                     <Icon className="h-5 w-5" />
                   </button>
                   <span
-                    className={`mt-2 text-xs font-medium ${
+                    className={`mt-2 text-xs font-medium whitespace-nowrap ${
                       isActive ? 'text-warning' : isCompleted ? 'text-success' : 'text-gray-400'
                     }`}
                   >
                     {step.label}
                   </span>
                 </div>
-                {index < steps.length - 1 && (
+                {!isLast && (
                   <div
-                    className={`mx-4 h-0.5 flex-1 transition-colors ${
+                    className={`mx-2 md:mx-4 h-0.5 flex-1 transition-colors ${
                       isCompleted ? 'bg-success' : 'bg-gray-200'
                     }`}
                   />

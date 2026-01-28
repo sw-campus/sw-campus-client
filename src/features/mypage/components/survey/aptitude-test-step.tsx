@@ -19,6 +19,68 @@ import { APTITUDE_TEST_STORAGE_KEY, mapQuestionSetToAptitudeQuestions } from '..
 /** 다음 문항으로 자동 이동하는 딜레이 (ms) */
 const AUTO_ADVANCE_DELAY_MS = 300
 
+/** 문제 텍스트에서 번호 목록 또는 쉼표 구분 항목을 감지하여 별도 박스로 렌더링 */
+function renderQuestionWithList(text: string) {
+  // 다양한 줄바꿈 형식 처리: \n, \\n, <br>, <br/>
+  const normalizedText = text
+    .replace(/\\n/g, '\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+
+  const lines = normalizedText.split('\n')
+  const result: React.ReactNode[] = []
+  let listBuffer: string[] = []
+  let keyIndex = 0
+
+  const flushList = () => {
+    if (listBuffer.length > 0) {
+      result.push(
+        <div key={`list-${keyIndex++}`} className="my-3 rounded-lg bg-gray-100 px-4 py-3 text-base">
+          {listBuffer.map((item, i) => (
+            <div key={i} className="py-0.5">{item}</div>
+          ))}
+        </div>
+      )
+      listBuffer = []
+    }
+  }
+
+  // 쉼표로 구분된 항목인지 확인 (쉼표가 2개 이상)
+  // 수열("2, 6, 12, 20, 30, ?")도 포함하기 위해 물음표 조건 완화
+  const isCommaList = (line: string) => {
+    const trimmed = line.trim()
+    const commaCount = (trimmed.match(/,/g) || []).length
+    // 쉼표가 3개 이상이면 목록으로 처리 (수열 포함)
+    // 쉼표가 2개이고 물음표로 끝나지 않으면 목록으로 처리
+    return commaCount >= 3 || (commaCount >= 2 && !trimmed.endsWith('?'))
+  }
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    // 숫자. 으로 시작하는 줄을 목록으로 감지
+    if (/^\d+\.\s/.test(trimmed)) {
+      listBuffer.push(line)
+    } else if (isCommaList(line)) {
+      // 쉼표로 구분된 항목 (예: "2, 6, 12, 20, 30, ?" 또는 "사과, 바나나, 딸기, 과일, 포도")
+      flushList()
+      result.push(
+        <div key={`comma-${keyIndex++}`} className="my-3 rounded-lg bg-gray-100 px-4 py-3 text-base text-center">
+          {trimmed}
+        </div>
+      )
+    } else {
+      flushList()
+      if (trimmed) {
+        result.push(<span key={`text-${keyIndex++}`}>{line}</span>)
+      } else {
+        result.push(<br key={`br-${keyIndex++}`} />)
+      }
+    }
+  }
+  flushList()
+
+  return result
+}
+
 interface AptitudeTestStepProps {
   onComplete: () => void
   onSkip: () => void
@@ -302,9 +364,12 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
             className="space-y-4"
           >
             <div className="rounded-xl bg-gray-50 p-6">
-              <p className="whitespace-pre-line text-lg font-medium text-gray-900">
-                Q{currentIndex + 1}. {currentQuestion.question}
-              </p>
+              <div className="flex items-start gap-2">
+                <span className="shrink-0 text-base md:text-lg font-bold text-warning">Q{currentIndex + 1}.</span>
+                <div className="text-base md:text-lg font-medium text-gray-900">
+                  {renderQuestionWithList(currentQuestion.question)}
+                </div>
+              </div>
             </div>
 
             <div className="space-y-3" role="listbox" aria-label="선택지">
@@ -334,7 +399,7 @@ export function AptitudeTestStep({ onComplete, onSkip, onProgressChange }: Aptit
                       >
                         {index + 1}
                       </div>
-                      <span className={isSelected ? 'text-amber-900' : 'text-gray-700'}>
+                      <span className={`text-[15px] ${isSelected ? 'text-amber-900' : 'text-gray-700'}`}>
                         {option.label}
                       </span>
                     </div>

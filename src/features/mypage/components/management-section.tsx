@@ -142,6 +142,8 @@ export function ReviewManagementSection({ filterStatus = 'all' }: ReviewManageme
           <span className="text-sm text-[#888888]">
             {filterStatus === 'all' ? '수료한 강의가 없습니다.' : '작성한 후기가 없습니다.'}
           </span>
+          {/* 높이 맞춤용 빈 요소 (관심 등록 강의 탭과 동일한 높이 유지) */}
+          <span className="text-sm invisible">placeholder</span>
         </div>
       )
     }
@@ -257,6 +259,8 @@ export function ReviewManagementSection({ filterStatus = 'all' }: ReviewManageme
               <span className="text-sm text-[#888888]">
                 {filterStatus === 'all' ? '수료한 강의가 없습니다.' : '작성한 후기가 없습니다.'}
               </span>
+              {/* 높이 맞춤용 빈 요소 (관심 등록 강의 탭과 동일한 높이 유지) */}
+              <span className="text-sm invisible">placeholder</span>
             </div>
           ) : (
             <TooltipProvider>
@@ -279,12 +283,12 @@ export function ReviewManagementSection({ filterStatus = 'all' }: ReviewManageme
                           {l.lectureName}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={`text-[10px] ${getApprovalStatusColor(l.certificateStatus)}`}>
+                          <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
                             {getApprovalStatusLabel(l.certificateStatus)}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={`text-[10px] ${getStatusBadgeClass(l)}`}>
+                          <Badge variant="secondary" className={`text-xs ${getStatusBadgeClass(l)}`}>
                             {getStatusLabel(l)}
                           </Badge>
                         </TableCell>
