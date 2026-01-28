@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { User } from 'lucide-react'
+import { LogIn, LogOut, User } from 'lucide-react'
 
 import { HeaderIconAction } from '@/components/layout/header/header-icon-action'
 import type { UserType } from '@/store/auth-store'
@@ -31,7 +31,7 @@ export function DesktopHeader({
   hasHydrated,
   mypageHref,
   isPending: _isPending,
-  onLogoutClick: _onLogoutClick,
+  onLogoutClick,
   onCategoryEnter,
   onOtherNavEnter,
   isHome = false,
@@ -127,13 +127,16 @@ export function DesktopHeader({
             <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href={mypageHref}>
               <User size={28} />
             </HeaderIconAction>
+
+            <HeaderIconAction kind="button" ariaLabel="로그아웃" tooltip="로그아웃" onClick={onLogoutClick}>
+              <LogOut size={24} />
+            </HeaderIconAction>
           </>
         ) : (
-          <>
-            <Link href="/login" className="flex items-center text-sm font-medium leading-none">
-              로그인을 해주세요.
-            </Link>
-          </>
+          <Link href="/login" className="flex items-center gap-2 text-sm font-medium leading-none">
+            로그인을 해주세요.
+            <LogIn size={18} />
+          </Link>
         )}
       </div>
       </div>
