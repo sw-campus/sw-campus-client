@@ -230,7 +230,7 @@ function SearchContentInner() {
       </div>
 
       {/* ========== MOBILE LAYOUT ========== */}
-      <main className="flex w-full max-w-[360px] flex-col items-center gap-6 bg-white px-4 pb-[100px] lg:hidden">
+      <main className="flex w-full max-w-[360px] flex-col items-center gap-6 bg-white px-4 pb-[100px] md:hidden">
         {/* Section Title */}
         <SectionTitle title="강의 검색" />
 
@@ -328,7 +328,7 @@ function SearchContentInner() {
       </main>
 
       {/* ========== DESKTOP LAYOUT ========== */}
-      <div className="hidden w-full lg:block">
+      <div className="hidden w-full md:block">
         {/* Section Title */}
         <div className="mx-auto w-full max-w-[1448px] px-6 pt-6">
           <SectionTitle title="강의 검색" />
@@ -476,7 +476,7 @@ function SearchContentInner() {
       <PCCartSidebar items={cartItems ?? []} onRemove={handleRemoveFromCart} onCompare={handleGoToCompare} />
 
       {/* Filter Modal - Mobile only */}
-      <div className="lg:hidden">
+      <div className="md:hidden">
         <FilterModal
           isOpen={isFilterModalOpen}
           onClose={() => setIsFilterModalOpen(false)}
@@ -487,7 +487,7 @@ function SearchContentInner() {
       </div>
 
       {/* 하단 플로팅 관심 항목 바 - Mobile only */}
-      <div className="lg:hidden">
+      <div className="md:hidden">
         <FloatingInterestBar
           items={cartItems ?? []}
           onRemove={handleRemoveFromCart}

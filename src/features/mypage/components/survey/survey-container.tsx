@@ -179,7 +179,7 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
             }
 
             return (
-              <div key={step.id} className="flex flex-1 items-center">
+              <div key={step.id} className="flex flex-1 items-center justify-center">
                 <div className="flex flex-col items-center">
                   <button
                     type="button"

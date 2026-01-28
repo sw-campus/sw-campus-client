@@ -28,8 +28,8 @@ export default function FloatingCart() {
   // 아이템이 없으면 표시하지 않음
   if (items.length === 0) return null
 
-  // 최대 5개까지만 표시
-  const displayItems = items.slice(0, 5)
+  // 최대 10개까지만 표시
+  const displayItems = items.slice(0, 10)
 
   return (
     <div className="fixed -bottom-48 left-0 right-0 z-40 max-w-[360px] mx-auto pb-48 bg-[#FFFCF4] lg:hidden">
@@ -66,12 +66,12 @@ export default function FloatingCart() {
         {/* 펼쳐진 상태에서만 내용 표시 */}
         {isOpen && (
           <>
-            {/* 썸네일 리스트 */}
-            <div className="flex items-center gap-1">
+            {/* 썸네일 리스트 - 가로 스크롤 */}
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
               {displayItems.map((item) => (
                 <div
                   key={item.lectureId}
-                  className="relative flex-1 h-16 rounded-lg overflow-hidden"
+                  className="relative w-14 h-14 shrink-0 rounded-lg overflow-hidden"
                   style={{
                     background: item.thumbnailUrl
                       ? `url(${item.thumbnailUrl}) center/cover`
@@ -90,19 +90,19 @@ export default function FloatingCart() {
                   {/* 썸네일이 없을 때 플레이스홀더 */}
                   {!item.thumbnailUrl && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xs text-[#888888] text-center px-1 line-clamp-2">
-                        {item.title?.slice(0, 10)}
+                      <span className="text-[10px] text-[#888888] text-center px-1 line-clamp-2">
+                        {item.title?.slice(0, 6)}
                       </span>
                     </div>
                   )}
                 </div>
               ))}
 
-              {/* 빈 슬롯 (5개 미만일 때) */}
+              {/* 빈 슬롯 (최소 5개까지만 표시) */}
               {Array.from({ length: Math.max(0, 5 - displayItems.length) }).map((_, i) => (
                 <div
                   key={`empty-${i}`}
-                  className="flex-1 h-16 rounded-lg bg-[#F0F0F0]"
+                  className="w-14 h-14 shrink-0 rounded-lg bg-[#F0F0F0]"
                 />
               ))}
             </div>

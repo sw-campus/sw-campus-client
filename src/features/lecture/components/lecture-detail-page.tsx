@@ -217,7 +217,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
   useEffect(() => {
     const handleScroll = () => {
       // lg 이상에서는 헤더 고정 안 함
-      if (window.innerWidth >= 1024) {
+      if (window.innerWidth >= 768) {
         setIsHeaderFixed(false)
         return
       }
@@ -243,10 +243,10 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
       // 프로그래매틱 스크롤 중에는 자동 탭 변경 방지
       if (isScrolling) return
 
-      const isMobile = window.innerWidth < 1024
+      const isMobile = window.innerWidth < 768
       const prefix = isMobile ? 'mobile-' : ''
       // PC: 헤더(80px) + 탭(56px) + 여유 = 200px, 모바일: 200px
-      const headerOffset = isMobile ? 200 : 200
+      const headerOffset = isMobile ? 200 : 70
       const scrollPosition = window.scrollY + headerOffset
 
       // 각 섹션의 절대 위치 계산
@@ -291,12 +291,12 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
   const scrollToSection = (tabId: TabType) => {
     setIsScrolling(true)
     setActiveTab(tabId)
-    const isMobile = window.innerWidth < 1024
+    const isMobile = window.innerWidth < 768
     const prefix = isMobile ? 'mobile-' : ''
     const element = document.getElementById(prefix + tabId)
     if (element) {
       // PC: 헤더(80px) + 탭(56px) + 여백 = 150px, 모바일: 160px
-      const offset = isMobile ? 160 : 150
+      const offset = isMobile ? 160 : 70
       const elementPosition = element.getBoundingClientRect().top + window.scrollY
       window.scrollTo({
         top: elementPosition - offset,
@@ -335,8 +335,8 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
 
   return (
     <>
-      {/* ==================== PC 레이아웃 (lg 이상) ==================== */}
-      <div className="hidden min-h-screen w-full bg-[#F5F5F5] lg:block">
+      {/* ==================== PC 레이아웃 (md 이상) ==================== */}
+      <div className="hidden min-h-screen w-full bg-[#F5F5F5] md:block">
         {/* Hero Section */}
         <div ref={heroRef} className="w-full">
           <div className="mx-auto max-w-[1448px] px-6 pt-6">
@@ -371,7 +371,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
             {/* Left Column - Main Content */}
             <div className="min-w-0 flex-1">
               {/* Sticky Tab Navigation */}
-              <div className="sticky top-[80px] z-40">
+              <div className="sticky top-0 z-40">
                 <div className="rounded-t-2xl border-x border-t border-gray-200 bg-white">
                   <div className="flex border-b border-gray-200 px-4">
                     {tabs.map(tab => (
@@ -399,7 +399,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
                 {/* Sections Content */}
                 <div className="p-8">
                   {/* Section: 프로그램 요약 (AI) */}
-                  <section id="overview" className="mb-8 scroll-mt-[200px] border-b border-gray-200 pb-8">
+                  <section id="overview" className="mb-8 scroll-mt-[70px] border-b border-gray-200 pb-8">
                     <div className="mb-6 flex items-center gap-3">
                       <FileText className="h-6 w-6 text-[#FEB706]" />
                       <span className="text-lg font-semibold text-[#020202]">프로그램 요약</span>
@@ -429,7 +429,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
                   </section>
 
                   {/* Section: 교육기관 정보 */}
-                  <section id="intro" className="mb-8 scroll-mt-[200px] border-b border-gray-200 pb-8">
+                  <section id="intro" className="mb-8 scroll-mt-[70px] border-b border-gray-200 pb-8">
                     <SectionHeader icon={<Building2 />} title="교육기관 정보" />
                     <InfoCard
                       icon={<Building2 />}
@@ -688,7 +688,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
                   </section>
 
                   {/* Section: 커리큘럼 */}
-                  <section id="curriculum" className="mb-8 scroll-mt-[200px] border-b border-gray-200 pb-8">
+                  <section id="curriculum" className="mb-8 scroll-mt-[70px] border-b border-gray-200 pb-8">
                     <button
                       onClick={() => setIsCurriculumOpen(!isCurriculumOpen)}
                       className="mb-3 flex w-full items-center justify-between"
@@ -716,7 +716,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
                   </section>
 
                   {/* Section: 후기 */}
-                  <section id="review" className="min-h-[400px] scroll-mt-[200px]">
+                  <section id="review" className="min-h-[400px] scroll-mt-[70px]">
                     <LectureReviews lectureId={lecture.id} />
                   </section>
                 </div>
@@ -725,7 +725,7 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
 
             {/* Right Column - Sticky Sidebar */}
             <div className="w-[280px] shrink-0 xl:w-[320px]">
-              <div className="sticky top-[110px]">
+              <div className="sticky top-[70px]">
                 {/* Info Card */}
                 <div className="rounded-2xl bg-white p-5 shadow-lg">
                   {/* 기관명 + 모집중 뱃지 */}
@@ -822,8 +822,8 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
       {/* PC Cart Sidebar - 컴포넌트 자체에서 위치 계산 */}
       <PCCartSidebar items={cartItems} onRemove={id => removeFromCart(id)} onCompare={handleGoToCompare} />
 
-      {/* ==================== 모바일 레이아웃 (lg 미만) ==================== */}
-      <div className="flex min-h-screen w-full flex-col bg-white lg:hidden">
+      {/* ==================== 모바일 레이아웃 (md 미만) ==================== */}
+      <div className="flex min-h-screen w-full flex-col bg-white md:hidden">
         {/* Hero Image */}
         <div className="relative h-[250px] w-full">
           {lecture.thumbnailUrl ? (

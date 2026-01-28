@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, ClipboardList, Image as ImageIcon, Pencil, Star, Upload } from 'lucide-react'
+import { ChevronDown, ClipboardList, GraduationCap, Image as ImageIcon, Pencil, Star, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
@@ -19,13 +19,25 @@ import {
 import type { CompletedLecture } from '@/features/mypage/api/completed-lectures.api'
 import { ReviewForm } from '@/features/mypage/components/review/review-form'
 import { completedLecturesQueryKey, useCompletedLecturesQuery } from '@/features/mypage/hooks/use-completed-lectures-query'
+type FilterStatus = 'all' | 'reviews'
 
-export function ReviewManagementSection() {
+interface ReviewManagementSectionProps {
+  filterStatus?: FilterStatus
+}
+
+export function ReviewManagementSection({ filterStatus = 'all' }: ReviewManagementSectionProps) {
   const queryClient = useQueryClient()
 
   // React Query hooks - 캐싱으로 중복 호출 방지
   // reviewStatus가 응답에 포함되어 별도 API 호출 불필요
-  const { data: lectures, isLoading } = useCompletedLecturesQuery()
+  const { data: allLectures, isLoading } = useCompletedLecturesQuery()
+
+  // 탭에 따라 필터링된 강의 목록
+  const lectures = allLectures?.filter(l => {
+    if (filterStatus === 'all') return true
+    if (filterStatus === 'reviews') return !l.canWriteReview // 후기가 작성된 강의만
+    return true
+  })
 
   // Edit review modal
   const [editOpen, setEditOpen] = useState(false)
@@ -121,8 +133,15 @@ export function ReviewManagementSection() {
 
     if ((lectures?.length ?? 0) === 0) {
       return (
-        <div className="flex h-32 items-center justify-center">
-          <span className="text-sm text-[#888888]">수료한 강의가 없습니다.</span>
+        <div className="flex flex-col items-center gap-3 py-16">
+          {filterStatus === 'all' ? (
+            <GraduationCap className="w-12 h-12 text-gray-200" />
+          ) : (
+            <Star className="w-12 h-12 text-gray-200" />
+          )}
+          <span className="text-sm text-[#888888]">
+            {filterStatus === 'all' ? '수료한 강의가 없습니다.' : '작성한 후기가 없습니다.'}
+          </span>
         </div>
       )
     }
@@ -216,16 +235,7 @@ export function ReviewManagementSection() {
   return (
     <>
       {/* 공통 레이아웃 */}
-      <div className="p-4 sm:p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
-          <div className="flex items-center gap-2">
-            <ClipboardList className="w-5 h-5 text-[#FEB706]" />
-            <span className="text-base font-semibold text-[#020202]">내 후기 관리</span>
-          </div>
-          <span className="text-xs text-[#888888]">총 {lectures?.length ?? 0}건</span>
-        </div>
-
+      <div>
         {/* Content - Mobile */}
         <div className="sm:hidden">
           {renderMobileAccordion()}
@@ -238,9 +248,15 @@ export function ReviewManagementSection() {
               <span className="text-sm text-[#888888]">불러오는 중...</span>
             </div>
           ) : (lectures?.length ?? 0) === 0 ? (
-            <div className="flex h-24 flex-col items-center justify-center gap-2">
-              <ClipboardList className="w-8 h-8 text-gray-300" />
-              <span className="text-sm text-[#888888]">수료한 강의가 없습니다.</span>
+            <div className="flex flex-col items-center gap-3 py-16">
+              {filterStatus === 'all' ? (
+                <GraduationCap className="w-12 h-12 text-gray-200" />
+              ) : (
+                <Star className="w-12 h-12 text-gray-200" />
+              )}
+              <span className="text-sm text-[#888888]">
+                {filterStatus === 'all' ? '수료한 강의가 없습니다.' : '작성한 후기가 없습니다.'}
+              </span>
             </div>
           ) : (
             <TooltipProvider>
