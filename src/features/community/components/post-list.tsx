@@ -71,16 +71,16 @@ export function PostList({ posts, isLoading = false }: PostListProps) {
       <div className="relative overflow-hidden rounded-2xl border border-dashed border-gray-200 bg-linear-to-b from-gray-50/80 to-white px-6 py-16 md:rounded-3xl md:px-8 md:py-20">
         {/* 배경 데코레이션 */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="bg-primary/10 absolute -top-24 -right-24 h-48 w-48 rounded-full blur-3xl" />
-          <div className="bg-primary/10 absolute -bottom-24 -left-24 h-48 w-48 rounded-full blur-3xl" />
+          <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
         </div>
 
         <div className="relative flex flex-col items-center">
           {/* 아이콘 영역 */}
-          <div className="relative mb-5 sm:mb-6">
-            <div className="bg-primary/20 absolute -inset-3 rounded-full blur-xl" />
-            <div className="bg-primary/10 shadow-primary/20 relative flex h-16 w-16 items-center justify-center rounded-2xl shadow-lg sm:h-20 sm:w-20 sm:rounded-3xl">
-              <FiFileText className="text-primary h-7 w-7 sm:h-9 sm:w-9" />
+          <div className="relative mb-5 md:mb-6">
+            <div className="absolute -inset-3 rounded-full bg-primary/20 blur-xl" />
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 shadow-lg shadow-primary/20 md:h-20 md:w-20 md:rounded-3xl">
+              <FiFileText className="h-7 w-7 text-primary md:h-9 md:w-9" />
             </div>
             {/* 플로팅 아이콘 */}
             <div className="absolute -top-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-gray-100 md:-top-2 md:-right-2 md:h-8 md:w-8">
@@ -93,20 +93,23 @@ export function PostList({ posts, isLoading = false }: PostListProps) {
           <p className="mb-6 text-center text-sm text-gray-500 md:text-base">
             아직 작성된 글이 없어요.
             <br className="md:hidden" />
-            <span className="hidden md:inline"> </span>첫 번째 이야기를 나눠보세요!
+            <span className="hidden md:inline"> </span>
+            첫 번째 이야기를 나눠보세요!
           </p>
 
           {/* CTA 버튼 */}
           <Link
             href="/community/write"
-            className="group bg-primary text-primary-foreground shadow-primary/30 hover:shadow-primary/40 inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl active:scale-95"
+            className="group inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/40 active:scale-95"
           >
             <FiEdit3 className="h-4 w-4 transition-transform duration-200 group-hover:rotate-12" />
             <span>첫 글 작성하기</span>
           </Link>
 
           {/* 힌트 텍스트 */}
-          <p className="mt-4 text-xs text-gray-400">나의 성장 이야기를 공유해보세요</p>
+          <p className="mt-4 text-xs text-gray-400">
+            나의 성장 이야기를 공유해보세요
+          </p>
         </div>
       </div>
     )

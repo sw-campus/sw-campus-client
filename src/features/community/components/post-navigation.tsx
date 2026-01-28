@@ -1,7 +1,7 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
 import { getAdjacentPosts } from '../api/post-api.client'
@@ -36,14 +36,14 @@ export function PostNavigation({ postId }: PostNavigationProps) {
       {data.previous ? (
         <Link
           href={`/community/${data.previous.id}`}
-          className="group hover:border-primary/30 flex flex-1 items-center gap-3 rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all hover:shadow-md active:scale-[0.98] sm:active:scale-100"
+          className="group flex flex-1 items-center gap-3 rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all active:scale-[0.98] hover:border-primary/30 hover:shadow-md md:active:scale-100"
         >
-          <div className="group-hover:bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 transition-colors">
-            <FiChevronLeft className="group-hover:text-primary h-5 w-5 text-gray-400 transition-all group-hover:-translate-x-0.5" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 transition-colors group-hover:bg-primary/10">
+            <FiChevronLeft className="h-5 w-5 text-gray-400 transition-all group-hover:-translate-x-0.5 group-hover:text-primary" />
           </div>
           <div className="min-w-0 text-left">
             <span className="text-xs font-medium text-gray-400">이전 글</span>
-            <p className="group-hover:text-primary truncate text-sm font-semibold text-gray-700 transition-colors">
+            <p className="truncate text-sm font-semibold text-gray-700 transition-colors group-hover:text-primary">
               {data.previous.title}
             </p>
           </div>
@@ -56,16 +56,16 @@ export function PostNavigation({ postId }: PostNavigationProps) {
       {data.next ? (
         <Link
           href={`/community/${data.next.id}`}
-          className="group hover:border-primary/30 flex flex-1 items-center justify-end gap-3 rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all hover:shadow-md active:scale-[0.98] sm:active:scale-100"
+          className="group flex flex-1 items-center justify-end gap-3 rounded-2xl border border-gray-200/60 bg-white p-4 shadow-sm transition-all active:scale-[0.98] hover:border-primary/30 hover:shadow-md md:active:scale-100"
         >
           <div className="min-w-0 text-right">
             <span className="text-xs font-medium text-gray-400">다음 글</span>
-            <p className="group-hover:text-primary truncate text-sm font-semibold text-gray-700 transition-colors">
+            <p className="truncate text-sm font-semibold text-gray-700 transition-colors group-hover:text-primary">
               {data.next.title}
             </p>
           </div>
-          <div className="group-hover:bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 transition-colors">
-            <FiChevronRight className="group-hover:text-primary h-5 w-5 text-gray-400 transition-all group-hover:translate-x-0.5" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 transition-colors group-hover:bg-primary/10">
+            <FiChevronRight className="h-5 w-5 text-gray-400 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
           </div>
         </Link>
       ) : (

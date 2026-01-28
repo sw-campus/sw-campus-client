@@ -2,6 +2,9 @@
 
 import Script from 'next/script'
 
+import { useFloatingBarStore } from '@/store/floating-bar.store'
+import { useMediaQuery } from '@/hooks/use-media-query'
+
 declare global {
   interface Window {
     Kakao: {
@@ -18,6 +21,9 @@ const KAKAO_JAVASCRIPT_KEY = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY
 const KAKAO_CHANNEL_ID = process.env.NEXT_PUBLIC_KAKAO_CHANNEL_ID
 
 export default function KakaoChannelButton() {
+  const isFloatingBarOpen = useFloatingBarStore((state) => state.isOpen)
+  const isDesktop = useMediaQuery('(min-width: 1280px)')
+
   const handleKakaoLoad = () => {
     if (window.Kakao && !window.Kakao.isInitialized() && KAKAO_JAVASCRIPT_KEY) {
       window.Kakao.init(KAKAO_JAVASCRIPT_KEY)
@@ -32,6 +38,18 @@ export default function KakaoChannelButton() {
     }
   }
 
+  // 데스크탑: 고정 위치
+  // 모바일: 플로팅 바 바로 위 (위로가기 버튼 아래)
+  const getBottomPosition = () => {
+    if (isDesktop) return 40 // 데스크탑: 아래쪽
+    return isFloatingBarOpen ? 195 : 60
+  }
+
+  const getRightPosition = () => {
+    if (isDesktop) return 32 // xl:right-8 = 32px
+    return 16 // right-4 = 16px
+  }
+
   return (
     <>
       <Script
@@ -41,7 +59,11 @@ export default function KakaoChannelButton() {
         onLoad={handleKakaoLoad}
         strategy="afterInteractive"
       />
-      <div id="kakao-chat-channel-button" className="fixed right-4 bottom-6 z-50 md:right-[max(48px,calc((100vw-1280px)/2+48px))]" />
+      <div
+        id="kakao-chat-channel-button"
+        className="fixed z-50 transition-all duration-300"
+        style={{ bottom: getBottomPosition(), right: getRightPosition() }}
+      />
     </>
   )
 }

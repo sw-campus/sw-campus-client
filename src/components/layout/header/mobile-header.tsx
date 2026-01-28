@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Bot, Menu, User } from 'lucide-react'
 
 import { HeaderIconAction } from '@/components/layout/header/header-icon-action'
+import { NotificationDropdown } from '@/features/notification'
 import type { UserType } from '@/store/auth-store'
 
 interface MobileHeaderProps {
@@ -62,6 +63,7 @@ export function MobileHeader({
             <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href={mypageHref}>
               <User size={28} />
             </HeaderIconAction>
+            <NotificationDropdown />
             {userType !== 'ADMIN' && userType !== 'ORGANIZATION' && (
               <HeaderIconAction kind="link" ariaLabel="AI 비교" tooltip="AI 비교" href="/cart/compare">
                 <Bot size={28} />

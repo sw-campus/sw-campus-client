@@ -123,16 +123,16 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'bento-card group relative overflow-hidden p-4 sm:p-5',
-        size === 'large' && 'sm:p-6',
-        `hover:${colors.glow}`,
+        'bento-card group relative overflow-hidden p-4 md:p-5',
+        size === 'large' && 'md:p-6',
+        `hover:${colors.glow}`
       )}
     >
       {/* Background gradient accent */}
       <div
         className={cn(
           'absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100',
-          colors.gradient,
+          colors.gradient
         )}
       />
 
@@ -146,10 +146,10 @@ export function StatCard({
           <div className="flex items-center gap-2">
             {Icon && (
               <div className={cn('rounded-lg p-2 transition-colors', colors.bg, 'group-hover:' + colors.bg)}>
-                <Icon className={cn('h-4 w-4 sm:h-5 sm:w-5', colors.text)} />
+                <Icon className={cn('h-4 w-4 md:h-5 md:w-5', colors.text)} />
               </div>
             )}
-            <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase sm:text-sm">
+            <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase md:text-sm">
               {title}
             </span>
           </div>
@@ -159,18 +159,14 @@ export function StatCard({
             <div
               className={cn(
                 'flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold',
-                trend.isPositive
-                  ? 'bg-emerald-100 text-emerald-700'
-                  : trend.value === 0
-                    ? 'bg-gray-100 text-gray-600'
-                    : 'bg-rose-100 text-rose-700',
+                trend.isPositive ? 'bg-emerald-100 text-emerald-700' : trend.value === 0 ? 'bg-gray-100 text-gray-600' : 'bg-rose-100 text-rose-700'
               )}
             >
               <TrendIcon
                 className={cn(
                   'h-3 w-3',
                   trend.isPositive && 'animate-trend-up',
-                  !trend.isPositive && trend.value !== 0 && 'animate-trend-down',
+                  !trend.isPositive && trend.value !== 0 && 'animate-trend-down'
                 )}
               />
               <span>{Math.abs(trend.value)}%</span>
@@ -183,19 +179,23 @@ export function StatCard({
           <div className="flex flex-col">
             <span
               className={cn(
-                'font-mono-data text-foreground text-3xl font-bold tracking-tight sm:text-4xl',
-                size === 'large' && 'text-4xl sm:text-5xl',
-                effectiveIsAnimating && 'animate-count',
+                'font-mono-data text-foreground text-3xl font-bold tracking-tight md:text-4xl',
+                size === 'large' && 'text-4xl md:text-5xl',
+                effectiveIsAnimating && 'animate-count'
               )}
             >
               {customFormatter ? customFormatter(effectiveDisplayValue) : effectiveDisplayValue.toLocaleString()}
             </span>
-            {subtext && <span className={cn('mt-1 text-xs font-medium', colors.text)}>{subtext}</span>}
+            {subtext && (
+              <span className={cn('mt-1 text-xs font-medium', colors.text)}>
+                {subtext}
+              </span>
+            )}
           </div>
 
           {/* Sparkline */}
           {chartData.length > 0 && (
-            <div className="h-12 w-20 opacity-60 transition-opacity group-hover:opacity-100 sm:w-24">
+            <div className="h-12 w-20 opacity-60 transition-opacity group-hover:opacity-100 md:w-24">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
                   <defs>
