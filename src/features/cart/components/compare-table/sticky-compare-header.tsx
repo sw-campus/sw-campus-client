@@ -6,16 +6,16 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { createPortal } from 'react-dom'
 import { FiLoader } from 'react-icons/fi'
-import { PiRobotDuotone } from 'react-icons/pi'
 
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { cn } from '@/lib/utils'
 
+const AI_BUTTON_GRADIENT =
+  'radial-gradient(ellipse at center, #fefdf6 0%, #ffe8b0 50%, #ffe494 75%, #ffdc74 87.5%, #ffd453 100%)'
+
 interface StickyCompareHeaderProps {
   leftTitle: string
-  leftThumbnail: string | null
   rightTitle: string
-  rightThumbnail: string | null
   leftId?: string | null
   rightId?: string | null
   canAnalyze: boolean
@@ -26,11 +26,11 @@ interface StickyCompareHeaderProps {
   onStickyChange: (isSticky: boolean) => void
 }
 
-// 모바일용 미니 카드 (Figma 스타일) - 외부 컴포넌트로 분리
+// ── 모바일용 미니 카드 ──
 function MobileMiniCard({ title, lectureId }: { title: string; lectureId?: string | null }) {
   const hasSelection = Boolean(title)
   return (
-    <div className="flex flex-1 flex-col gap-3 overflow-hidden rounded-[12px] bg-card p-3 shadow-card">
+    <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-clip rounded-xl bg-white p-3 shadow-[4px_4px_20px_0px_rgba(161,161,170,0.25)]">
       <p
         className={cn(
           'truncate text-center text-sm font-bold text-foreground',
@@ -42,12 +42,12 @@ function MobileMiniCard({ title, lectureId }: { title: string; lectureId?: strin
       {hasSelection && lectureId ? (
         <Link
           href={`/lectures/${lectureId}`}
-          className="flex h-8 w-full items-center justify-center rounded-[8px] bg-muted text-xs text-foreground hover:bg-muted/80"
+          className="flex h-8 w-full items-center justify-center rounded-lg bg-[#f9f9f9] text-xs text-foreground hover:bg-[#f0f0f0]"
         >
           자세히 보기
         </Link>
       ) : (
-        <div className="flex h-8 w-full items-center justify-center rounded-[8px] bg-muted text-xs text-muted-foreground">
+        <div className="flex h-8 w-full items-center justify-center rounded-lg bg-[#f9f9f9] text-xs text-muted-foreground">
           자세히 보기
         </div>
       )}
@@ -55,73 +55,17 @@ function MobileMiniCard({ title, lectureId }: { title: string; lectureId?: strin
   )
 }
 
-// 공용 AI 버튼 - 모바일/데스크톱 공유 (Figma 스타일)
-function StickyAiButton({
-  canAnalyze,
-  isLoading,
-  hasResult,
-  onAnalyze,
-  className,
+// ── 데스크톱용 미니 카드 ──
+function DesktopMiniCard({
+  title,
+  lectureId,
 }: {
-  canAnalyze: boolean
-  isLoading: boolean
-  hasResult: boolean
-  onAnalyze: () => void
-  className?: string
+  title: string
+  lectureId?: string | null
 }) {
-  if (hasResult) return null
-
-  const isDisabled = !canAnalyze || isLoading
-
-  const getButtonText = () => {
-    if (isLoading) return 'AI가 분석하고 있어요...'
-    if (!canAnalyze) return '두 강의를 선택해주세요'
-    return 'AI에게 물어보고, 최적의 답을 발견하세요'
-  }
-
-  return (
-    <motion.button
-      type="button"
-      onClick={onAnalyze}
-      disabled={isDisabled}
-      whileHover={canAnalyze ? { scale: 1.01 } : undefined}
-      whileTap={canAnalyze ? { scale: 0.99 } : undefined}
-      className={cn(
-        'relative flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-brand-gold transition-all',
-        'h-[65px] text-sm md:h-[95px] md:text-xl',
-        // Enabled state - yellow (desktop AiAnalyzeButton과 동일)
-        canAnalyze && !isLoading && 'bg-yellow-400 text-gray-900 hover:bg-yellow-500 active:bg-yellow-600',
-        // Loading state
-        isLoading && 'bg-yellow-300 text-gray-900',
-        // Disabled state
-        !canAnalyze && !isLoading && 'cursor-not-allowed border-border bg-gray-200 text-gray-400',
-        className,
-      )}
-    >
-      {/* Icon - 모바일만 표시 */}
-      {isLoading ? (
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-          className="md:hidden"
-        >
-          <FiLoader className="size-5" />
-        </motion.div>
-      ) : (
-        <PiRobotDuotone className="size-6 md:hidden" />
-      )}
-
-      {/* Text */}
-      <span className="font-semibold">{getButtonText()}</span>
-    </motion.button>
-  )
-}
-
-// 데스크톱용 미니 카드 (Figma 스타일: 제목 + 자세히 보기 버튼)
-function DesktopMiniCard({ title, lectureId }: { title: string; lectureId?: string | null }) {
   const hasSelection = Boolean(title)
   return (
-    <div className="flex flex-1 flex-col gap-3 overflow-hidden rounded-[12px] bg-card p-6 shadow-card">
+    <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-clip rounded-xl bg-white p-6 shadow-[4px_4px_20px_0px_rgba(161,161,170,0.25)]">
       <p
         className={cn(
           'truncate text-center text-xl font-bold text-foreground',
@@ -133,12 +77,12 @@ function DesktopMiniCard({ title, lectureId }: { title: string; lectureId?: stri
       {hasSelection && lectureId ? (
         <Link
           href={`/lectures/${lectureId}`}
-          className="flex h-12 w-full items-center justify-center rounded-[8px] bg-muted text-base text-foreground hover:bg-muted/80"
+          className="flex h-12 w-full items-center justify-center rounded-lg bg-[#f9f9f9] text-base text-foreground hover:bg-[#f0f0f0]"
         >
           자세히 보기
         </Link>
       ) : (
-        <div className="flex h-12 w-full items-center justify-center rounded-[8px] bg-muted text-base text-muted-foreground">
+        <div className="flex h-12 w-full items-center justify-center rounded-lg bg-[#f9f9f9] text-base text-muted-foreground">
           자세히 보기
         </div>
       )}
@@ -146,18 +90,65 @@ function DesktopMiniCard({ title, lectureId }: { title: string; lectureId?: stri
   )
 }
 
+// ── AI 분석 버튼 (gold gradient) ──
+function StickyAiButton({
+  canAnalyze,
+  isLoading,
+  hasResult,
+  onAnalyze,
+}: {
+  canAnalyze: boolean
+  isLoading: boolean
+  hasResult: boolean
+  onAnalyze: () => void
+}) {
+  if (hasResult) return null
+
+  const isDisabled = !canAnalyze || isLoading
+
+  const getButtonText = () => {
+    if (isLoading) return 'AI가 분석하고 있어요...'
+    if (!canAnalyze) return '두 강의를 선택해주세요'
+    return 'AI에게 물어보고, 최적의 답을 발견하세요.'
+  }
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onAnalyze}
+      disabled={isDisabled}
+      whileHover={canAnalyze ? { scale: 1.01 } : undefined}
+      whileTap={canAnalyze ? { scale: 0.99 } : undefined}
+      className={cn(
+        'relative flex w-full items-center justify-center gap-2 rounded-lg border-2 border-brand-gold transition-all',
+        'h-[65px] text-sm font-semibold md:h-[95px] md:text-xl',
+        (canAnalyze || isLoading) && 'text-foreground',
+        !canAnalyze && !isLoading && 'cursor-not-allowed border-border bg-gray-200 text-gray-400',
+      )}
+      style={(canAnalyze || isLoading) ? { background: AI_BUTTON_GRADIENT } : undefined}
+    >
+      {isLoading && (
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+        >
+          <FiLoader className="size-5" />
+        </motion.div>
+      )}
+      <span>{getButtonText()}</span>
+    </motion.button>
+  )
+}
+
 /**
  * 비교 테이블 Sticky 헤더
  *
- * 모바일/데스크톱 통일된 Figma 스타일:
- * - VS 뱃지: 검정 배경 + 노란 텍스트
- * - AI 버튼: 노란 배경 + 로봇 아이콘
+ * - AI 결과 없음: 카드(제목+버튼) + VS + AI 버튼(gold gradient)
+ * - AI 결과 있음: 카드(제목+버튼) + VS (AI 버튼 숨김)
  */
 export function StickyCompareHeader({
   leftTitle,
-  leftThumbnail: _leftThumbnail,
   rightTitle,
-  rightThumbnail: _rightThumbnail,
   leftId,
   rightId,
   canAnalyze,
@@ -228,19 +219,21 @@ export function StickyCompareHeader({
     }
   }, [triggerRef, isSticky])
 
-  // 모바일 Sticky 헤더 콘텐츠 (Figma 스타일)
+  // ── 모바일 Sticky 헤더 ──
   const mobileHeaderContent = (
     <div className="flex flex-col gap-4 p-4">
       {/* 카드 영역 */}
       <div className="relative flex items-center gap-4">
         <MobileMiniCard title={leftTitle} lectureId={leftId} />
         <MobileMiniCard title={rightTitle} lectureId={rightId} />
-        {/* VS 뱃지 - 중앙 (45px) */}
-        <div className="absolute left-1/2 top-1/2 flex size-[45px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-footer-bg">
-          <span className="text-base font-bold text-brand-gold">VS</span>
+        {/* VS 뱃지 */}
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
+          <div className="flex size-[45px] items-center justify-center rounded-full bg-foreground text-base font-bold text-brand-gold">
+            VS
+          </div>
         </div>
       </div>
-      {/* AI 버튼 */}
+      {/* AI 버튼 (결과 없을 때만) */}
       <StickyAiButton
         canAnalyze={canAnalyze}
         isLoading={isAiLoading}
@@ -250,19 +243,22 @@ export function StickyCompareHeader({
     </div>
   )
 
-  // 데스크톱 Sticky 헤더 콘텐츠 (Figma 스타일)
+  // ── 데스크톱 Sticky 헤더 ──
   const desktopHeaderContent = (
     <div className="flex flex-col gap-6 p-6">
       {/* 카드 영역 */}
       <div className="relative flex items-center gap-6">
         <DesktopMiniCard title={leftTitle} lectureId={leftId} />
         <DesktopMiniCard title={rightTitle} lectureId={rightId} />
-        {/* VS 뱃지 - 중앙 (80px) */}
-        <div className="absolute left-1/2 top-1/2 flex size-[80px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-footer-bg">
-          <span className="text-2xl font-bold text-brand-gold">VS</span>
+        {/* VS 뱃지 */}
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
+          <div className="flex size-[80px] items-center justify-center rounded-full bg-foreground text-2xl font-bold text-brand-gold">
+            VS
+          </div>
         </div>
       </div>
-      {/* AI 버튼 */}
+
+      {/* AI 버튼 (결과 없을 때만) */}
       <StickyAiButton
         canAnalyze={canAnalyze}
         isLoading={isAiLoading}
@@ -280,7 +276,7 @@ export function StickyCompareHeader({
       <>
         {/* 모바일 Sticky 헤더 */}
         <div
-          className="fixed top-0 z-[var(--z-fixed)] bg-muted shadow-lg md:hidden"
+          className="fixed top-0 z-[var(--z-fixed)] bg-white shadow-lg md:hidden"
           style={{
             left: 0,
             right: 0,
@@ -291,7 +287,7 @@ export function StickyCompareHeader({
         </div>
         {/* 데스크톱 Sticky 헤더 */}
         <div
-          className="fixed top-0 z-[var(--z-fixed)] hidden rounded-b-2xl border-b border-gray-200/50 bg-white/95 shadow-lg backdrop-blur-xl md:block"
+          className="fixed top-0 z-[var(--z-fixed)] hidden rounded-b-2xl bg-white shadow-lg md:block"
           style={{
             left: `${headerPosition.left}px`,
             width: `${headerPosition.width}px`,

@@ -105,14 +105,18 @@ export default function CartCompareSection() {
   return (
     <div className="flex w-full flex-col overflow-x-hidden pb-32 md:overflow-x-visible">
       {/* 히어로 배너 */}
-      <CompareHeroBanner />
+      <div className="page-container px-6">
+        <CompareHeroBanner />
+      </div>
 
       {/* 메인 컨텐츠 */}
-      <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-4 py-6 md:overflow-x-visible md:py-8">
+      <div className="page-container overflow-x-hidden px-4 py-6 md:overflow-x-visible md:px-6 md:py-8">
         {/* 페이지 타이틀 */}
-        <h1 className="mb-6 text-xl font-bold md:text-2xl">과정 비교 페이지</h1>
+        <div className="flex items-center border-b-[0.5px] border-foreground pb-6">
+          <h1 className="flex-1 text-[2rem] font-bold text-foreground">과정 비교 페이지</h1>
+        </div>
 
-        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <div className="grid gap-6 md:grid-cols-[280px_minmax(0,1fr)]">
           {/* 사이드바 - 모바일에서도 표시 (접을 수 있음) */}
           <CartItemSidebar
             items={items}
@@ -124,76 +128,75 @@ export default function CartCompareSection() {
           />
 
           {/* 메인 비교 영역 */}
-          <div className="space-y-4 md:space-y-6">
-            {/* 강의 카드 그리드 with VS badge */}
-            <div className="relative">
-              {/* 모바일 + 데스크탑: 가로 배치 with VS in center */}
-              <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 md:gap-4">
-                {/* 왼쪽 강의 */}
-                <div
-                  className={cn('rounded-lg transition-colors', isLeftOver && 'ring-primary ring-2 ring-offset-2')}
-                  onDragEnter={e => {
-                    e.preventDefault()
-                    setIsLeftOver(true)
-                  }}
-                  onDragLeave={() => setIsLeftOver(false)}
-                  onDragOver={e => {
-                    e.preventDefault()
-                    e.dataTransfer.dropEffect = 'copy'
-                  }}
-                  onDrop={e => {
-                    e.preventDefault()
-                    setIsLeftOver(false)
-                    const lectureId = getDragLectureId(e)
-                    if (!lectureId) return
-                    handleDropLecture('left', lectureId)
-                  }}
-                  aria-label="왼쪽 드롭 영역"
-                >
-                  <LectureSummaryCard
-                    side="left"
-                    title={left?.title ?? ''}
-                    thumbnailUrl={leftDetail?.thumbnailUrl}
-                    lectureId={leftId}
-                    orgName={left?.orgName}
-                    onClear={handleClearLeft}
-                  />
-                </div>
-
-                {/* VS Badge (데스크탑) */}
-                <VsBadge />
-
-                {/* 오른쪽 강의 */}
-                <div
-                  className={cn('rounded-lg transition-colors', isRightOver && 'ring-primary ring-2 ring-offset-2')}
-                  onDragEnter={e => {
-                    e.preventDefault()
-                    setIsRightOver(true)
-                  }}
-                  onDragLeave={() => setIsRightOver(false)}
-                  onDragOver={e => {
-                    e.preventDefault()
-                    e.dataTransfer.dropEffect = 'copy'
-                  }}
-                  onDrop={e => {
-                    e.preventDefault()
-                    setIsRightOver(false)
-                    const lectureId = getDragLectureId(e)
-                    if (!lectureId) return
-                    handleDropLecture('right', lectureId)
-                  }}
-                  aria-label="오른쪽 드롭 영역"
-                >
-                  <LectureSummaryCard
-                    side="right"
-                    title={right?.title ?? ''}
-                    thumbnailUrl={rightDetail?.thumbnailUrl}
-                    lectureId={rightId}
-                    orgName={right?.orgName}
-                    onClear={handleClearRight}
-                  />
-                </div>
+          <div className="min-w-0 space-y-4 md:space-y-6">
+            {/* 강의 카드 + VS badge */}
+            <div className="relative flex items-center gap-4 md:gap-6">
+              {/* 왼쪽 강의 */}
+              <div
+                className={cn('min-w-0 flex-1 rounded-xl transition-colors', isLeftOver && 'ring-2 ring-primary ring-offset-2')}
+                onDragEnter={e => {
+                  e.preventDefault()
+                  setIsLeftOver(true)
+                }}
+                onDragLeave={() => setIsLeftOver(false)}
+                onDragOver={e => {
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'copy'
+                }}
+                onDrop={e => {
+                  e.preventDefault()
+                  setIsLeftOver(false)
+                  const lectureId = getDragLectureId(e)
+                  if (!lectureId) return
+                  handleDropLecture('left', lectureId)
+                }}
+                aria-label="왼쪽 드롭 영역"
+              >
+                <LectureSummaryCard
+                  side="left"
+                  title={left?.title ?? ''}
+                  thumbnailUrl={leftDetail?.thumbnailUrl}
+                  lectureId={leftId}
+                  orgName={left?.orgName}
+                  price={leftDetail?.price}
+                  onClear={handleClearLeft}
+                />
               </div>
+
+              {/* 오른쪽 강의 */}
+              <div
+                className={cn('min-w-0 flex-1 rounded-xl transition-colors', isRightOver && 'ring-2 ring-primary ring-offset-2')}
+                onDragEnter={e => {
+                  e.preventDefault()
+                  setIsRightOver(true)
+                }}
+                onDragLeave={() => setIsRightOver(false)}
+                onDragOver={e => {
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'copy'
+                }}
+                onDrop={e => {
+                  e.preventDefault()
+                  setIsRightOver(false)
+                  const lectureId = getDragLectureId(e)
+                  if (!lectureId) return
+                  handleDropLecture('right', lectureId)
+                }}
+                aria-label="오른쪽 드롭 영역"
+              >
+                <LectureSummaryCard
+                  side="right"
+                  title={right?.title ?? ''}
+                  thumbnailUrl={rightDetail?.thumbnailUrl}
+                  lectureId={rightId}
+                  orgName={right?.orgName}
+                  price={rightDetail?.price}
+                  onClear={handleClearRight}
+                />
+              </div>
+
+              {/* VS Badge - 절대 위치 중앙 */}
+              <VsBadge />
             </div>
 
             {/* AI 분석 결과 요약 (결과가 있을 때만 표시) */}
@@ -223,10 +226,8 @@ export default function CartCompareSection() {
             <StickyCompareHeader
               triggerRef={stickyTriggerRef}
               leftTitle={left?.title ?? ''}
-              leftThumbnail={leftDetail?.thumbnailUrl ?? null}
               leftId={leftId}
               rightTitle={right?.title ?? ''}
-              rightThumbnail={rightDetail?.thumbnailUrl ?? null}
               rightId={rightId}
               canAnalyze={canAnalyze}
               isAiLoading={isAiLoading}
