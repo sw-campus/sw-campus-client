@@ -157,7 +157,7 @@ export function LectureCard({
     <div
       onClick={handleCardClick}
       className={`
-        w-full max-w-[328px] p-4 bg-white rounded-xl overflow-hidden flex flex-col gap-4
+        w-full p-4 bg-white rounded-xl overflow-hidden flex flex-col gap-4
         transition-shadow duration-200 cursor-pointer
         ${isHighlighted
           ? 'shadow-[4px_4px_10px_rgba(254,183,6,0.25)] outline outline-1 outline-[#FEB706]'

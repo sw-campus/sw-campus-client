@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 
 import { Search, ChevronDown, Minus, Maximize2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -86,6 +86,16 @@ function SearchContentInner() {
 
   // PC 필터 사이드바 상태
   const [isPCFilterOpen, setIsPCFilterOpen] = useState(true)
+
+  // 필터 사이드바 인라인/플로팅 판별 (기준: --breakpoint-filter-inline in globals.css)
+  const [isFilterInline, setIsFilterInline] = useState(true)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1400px)')
+    setIsFilterInline(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsFilterInline(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   // PC AI 비교 섹션 상태 (기본: 펼쳐짐)
   const [isPCCompareSectionOpen, setIsPCCompareSectionOpen] = useState(true)
@@ -249,7 +259,7 @@ function SearchContentInner() {
       </div>
 
       {/* ========== MOBILE LAYOUT ========== */}
-      <main className="flex w-full max-w-[360px] flex-col items-center gap-6 bg-white px-4 pb-[100px] md:hidden">
+      <main className="flex w-full flex-col items-center gap-6 bg-white px-4 pb-[100px] md:hidden">
         {/* Section Title */}
         <SectionTitle title="강의 검색" />
 
@@ -313,7 +323,7 @@ function SearchContentInner() {
           />
 
           {/* Lecture List */}
-          <div className="flex w-full flex-col gap-4">
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
             {isLectureLoading ? (
               <div className="py-10 text-center text-sm text-gray-500">강의 목록을 불러오는 중...</div>
             ) : lectures.length === 0 ? (
@@ -354,7 +364,7 @@ function SearchContentInner() {
         </div>
 
         {/* Main Layout: Filter | Interest List + AI Banner + Card Grid */}
-        <div ref={mainContentRef} data-main-content className="mx-auto flex w-full max-w-[1448px] gap-6 px-6 py-6">
+        <div ref={mainContentRef} data-main-content className="relative mx-auto flex w-full max-w-[1448px] gap-6 px-6 py-6">
           {/* Left: Filter Sidebar */}
           <PCFilterSidebar
             isOpen={isPCFilterOpen}
@@ -396,7 +406,7 @@ function SearchContentInner() {
 
                   {/* AI Recommendation Banner + VS (3/4) */}
                   <div className="col-span-3 flex min-h-0">
-                    <AiComparePreview selectedItems={selectedCartSlots} compact={isPCFilterOpen} />
+                    <AiComparePreview selectedItems={selectedCartSlots} compact={isPCFilterOpen && isFilterInline} />
                   </div>
                 </div>
               </div>
@@ -457,7 +467,7 @@ function SearchContentInner() {
             </div>
 
             {/* Lecture Grid - 필터 열림: 3열, 닫힘: 4열 */}
-            <div className={`grid w-full gap-6 ${isPCFilterOpen ? 'grid-cols-3' : 'grid-cols-4'} `}>
+            <div className="grid w-full gap-6 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
               {isLectureLoading ? (
                 <div className="col-span-full py-10 text-center text-sm text-gray-500">강의 목록을 불러오는 중...</div>
               ) : lectures.length === 0 ? (
