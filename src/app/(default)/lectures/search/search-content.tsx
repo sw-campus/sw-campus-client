@@ -9,14 +9,13 @@ import {
   HeroBanner,
   SectionTitle,
   InterestLectureSection,
-  FloatingInterestBar,
+  FloatingCartPanel,
   ComparisonCard,
   FilterSection,
   FilterModal,
   LectureCard,
   Pagination,
   PCFilterSidebar,
-  PCCartSidebar,
 } from '@/features/bootcamp-list'
 import { AiComparePreview } from '@/components/common/ai-compare-preview'
 import { InterestLectureList } from '@/components/common/interest-lecture-list'
@@ -494,9 +493,6 @@ function SearchContentInner() {
         </div>
       </div>
 
-      {/* PC Cart Sidebar - 컴포넌트 자체에서 위치 계산 */}
-      <PCCartSidebar items={cartItems ?? []} onRemove={handleRemoveFromCart} onCompare={handleGoToCompare} />
-
       {/* Filter Modal - Mobile only */}
       <div className="md:hidden">
         <FilterModal
@@ -508,16 +504,14 @@ function SearchContentInner() {
         />
       </div>
 
-      {/* 하단 플로팅 관심 항목 바 - Mobile only */}
-      <div className="md:hidden">
-        <FloatingInterestBar
-          items={cartItems ?? []}
-          onRemove={handleRemoveFromCart}
-          onCompare={handleGoToCompare}
-          isOpen={isFloatingBarOpen}
-          onToggleOpen={() => setIsFloatingBarOpen(prev => !prev)}
-        />
-      </div>
+      {/* 플로팅 관심 항목 바 (모바일: 하단, md+: 사이드) */}
+      <FloatingCartPanel
+        items={cartItems ?? []}
+        onRemove={handleRemoveFromCart}
+        onCompare={handleGoToCompare}
+        isOpen={isFloatingBarOpen}
+        onToggleOpen={() => setIsFloatingBarOpen(prev => !prev)}
+      />
     </div>
   )
 }
