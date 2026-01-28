@@ -175,6 +175,34 @@ html {
     opacity: 1;
   }
 
+  /* Swiper 기본 네비게이션 화살표 스타일 */
+  .swiper-button-prev,
+  .swiper-button-next {
+    color: white !important;
+    width: 24px !important;
+    height: 24px !important;
+    top: 55% !important;
+    transition: opacity 0.2s ease !important;
+  }
+
+  .swiper-button-prev:hover,
+  .swiper-button-next:hover {
+    opacity: 0.7 !important;
+  }
+
+  .swiper-button-prev {
+    left: 12px !important;
+  }
+
+  .swiper-button-next {
+    right: 12px !important;
+  }
+
+  .swiper-button-prev::after,
+  .swiper-button-next::after {
+    font-size: 14px !important;
+  }
+
   /* ========================================
    * 공통 컨테이너 시스템
    * - 반응형 여백: 화면 크기에 따라 자동 조정
@@ -329,11 +357,6 @@ html {
     animation: trend-down 1.5s ease-in-out infinite;
   }
 
-  /* Sparkline container */
-  .sparkline-container {
-    @apply absolute right-0 bottom-0 h-12 w-24 opacity-60;
-  }
-
   /* Number counter animation */
   @keyframes count-up {
     from {
@@ -380,30 +403,6 @@ html {
     font-feature-settings:
       'tnum' on,
       'lnum' on;
-  }
-
-  /* Gradient text */
-  .gradient-text-lime {
-    @apply bg-gradient-to-r from-lime-500 to-emerald-500 bg-clip-text text-transparent;
-  }
-
-  .gradient-text-cyan {
-    @apply bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent;
-  }
-
-  .gradient-text-magenta {
-    @apply bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent;
-  }
-
-  /* Chart gradient definitions */
-  .chart-gradient-lime {
-    --chart-start: oklch(0.84 0.2 128);
-    --chart-end: oklch(0.84 0.2 128 / 0.1);
-  }
-
-  .chart-gradient-cyan {
-    --chart-start: oklch(0.78 0.15 195);
-    --chart-end: oklch(0.78 0.15 195 / 0.1);
   }
 
   /* 스켈레톤 shimmer 애니메이션 */

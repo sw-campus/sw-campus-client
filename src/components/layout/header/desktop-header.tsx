@@ -14,7 +14,7 @@ interface DesktopHeaderProps {
   categories: NavCategoryItem[]
   isLoggedIn: boolean
   nickname: string | null
-  userType: UserType
+  userType: UserType | null
   hasHydrated: boolean
   mypageHref: string
   isPending: boolean

@@ -1,15 +1,16 @@
 'use client'
 
 import { useRef, useState } from 'react'
+
 import { FiLoader, FiMessageCircle, FiSend, FiCornerDownRight } from 'react-icons/fi'
 import { HiOutlineSparkles } from 'react-icons/hi2'
 
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/auth-store'
 
+import type { Comment } from '../api/comment-api.types'
 import { useComments, useCreateComment } from '../hooks/use-comments'
 import { CommentItem } from './comment-item'
-import type { Comment } from '../api/comment-api.types'
 
 interface CommentSectionProps {
   postId: number
@@ -54,7 +55,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
           setReplyTo(null)
           setIsFocused(false)
         },
-      }
+      },
     )
   }
 
@@ -101,38 +102,38 @@ export function CommentSection({ postId }: CommentSectionProps) {
     return (
       <section className="mt-14">
         {/* 구분선 with gradient */}
-        <div className="mb-10 h-px bg-linear-to-r from-transparent via-border to-transparent" />
+        <div className="via-border mb-10 h-px bg-linear-to-r from-transparent to-transparent" />
 
         <div className="space-y-8">
           {/* 헤더 스켈레톤 */}
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="h-12 w-12 rounded-2xl bg-linear-to-br from-amber-100 to-orange-50 animate-pulse" />
-              <div className="absolute -right-1 -bottom-1 h-5 w-5 rounded-full bg-gray-100 animate-pulse" />
+              <div className="h-12 w-12 animate-pulse rounded-2xl bg-linear-to-br from-amber-100 to-orange-50" />
+              <div className="absolute -right-1 -bottom-1 h-5 w-5 animate-pulse rounded-full bg-gray-100" />
             </div>
             <div className="space-y-2">
-              <div className="h-6 w-28 rounded-lg bg-gray-100 animate-pulse" />
-              <div className="h-4 w-40 rounded-md bg-gray-50 animate-pulse" />
+              <div className="h-6 w-28 animate-pulse rounded-lg bg-gray-100" />
+              <div className="h-4 w-40 animate-pulse rounded-md bg-gray-50" />
             </div>
           </div>
 
           {/* 입력 폼 스켈레톤 */}
-          <div className="h-14 w-full rounded-2xl bg-linear-to-r from-amber-50/50 to-orange-50/30 animate-pulse" />
+          <div className="h-14 w-full animate-pulse rounded-2xl bg-linear-to-r from-amber-50/50 to-orange-50/30" />
 
           {/* 댓글 스켈레톤 */}
           <div className="space-y-6 pt-4">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3].map(i => (
               <div key={i} className="flex gap-3" style={{ animationDelay: `${i * 0.15}s` }}>
-                <div className="h-10 w-10 shrink-0 rounded-full bg-linear-to-br from-gray-100 to-gray-50 animate-pulse" />
+                <div className="h-10 w-10 shrink-0 animate-pulse rounded-full bg-linear-to-br from-gray-100 to-gray-50" />
                 <div className="flex-1 space-y-3">
                   <div className="flex items-center gap-2">
-                    <div className="h-4 w-20 rounded-md bg-gray-100 animate-pulse" />
-                    <div className="h-3 w-12 rounded-md bg-gray-50 animate-pulse" />
+                    <div className="h-4 w-20 animate-pulse rounded-md bg-gray-100" />
+                    <div className="h-3 w-12 animate-pulse rounded-md bg-gray-50" />
                   </div>
                   <div className="rounded-2xl bg-linear-to-br from-gray-50 to-white p-4 shadow-sm">
                     <div className="space-y-2">
-                      <div className="h-4 w-full rounded bg-gray-100/80 animate-pulse" />
-                      <div className="h-4 w-3/4 rounded bg-gray-100/60 animate-pulse" />
+                      <div className="h-4 w-full animate-pulse rounded bg-gray-100/80" />
+                      <div className="h-4 w-3/4 animate-pulse rounded bg-gray-100/60" />
                     </div>
                   </div>
                 </div>
@@ -147,7 +148,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
   return (
     <section className="mt-14">
       {/* 구분선 with gradient */}
-      <div className="mb-10 h-px bg-linear-to-r from-transparent via-border to-transparent" />
+      <div className="via-border mb-10 h-px bg-linear-to-r from-transparent to-transparent" />
 
       {/* 헤더 */}
       <div className="mb-8 flex items-center gap-4">
@@ -156,19 +157,15 @@ export function CommentSection({ postId }: CommentSectionProps) {
             <FiMessageCircle className="h-5 w-5 text-amber-600" />
           </div>
           {totalCount > 0 && (
-            <span className="absolute -right-1.5 -bottom-1.5 flex h-6 min-w-6 items-center justify-center rounded-full bg-linear-to-r from-amber-500 to-orange-500 px-1.5 text-xs font-bold tabular-nums text-white shadow-md ring-2 ring-white">
+            <span className="absolute -right-1.5 -bottom-1.5 flex h-6 min-w-6 items-center justify-center rounded-full bg-linear-to-r from-amber-500 to-orange-500 px-1.5 text-xs font-bold text-white tabular-nums shadow-md ring-2 ring-white">
               {totalCount > 99 ? '99+' : totalCount}
             </span>
           )}
         </div>
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-gray-900">
-            대화에 참여하기
-          </h2>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            {totalCount > 0
-              ? `${totalCount}개의 댓글이 있습니다`
-              : '첫 번째 댓글을 남겨보세요'}
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">대화에 참여하기</h2>
+          <p className="text-muted-foreground mt-0.5 text-sm">
+            {totalCount > 0 ? `${totalCount}개의 댓글이 있습니다` : '첫 번째 댓글을 남겨보세요'}
           </p>
         </div>
       </div>
@@ -179,22 +176,15 @@ export function CommentSection({ postId }: CommentSectionProps) {
           <div className="mb-10">
             <form onSubmit={handleSubmit}>
               <div
-                className={`
-                  relative overflow-hidden rounded-2xl border-2 bg-white
-                  transition-all duration-300 ease-out
-                  ${isFocused
-                    ? 'border-amber-300 shadow-lg shadow-amber-100/50 ring-4 ring-amber-50'
+                className={`relative overflow-hidden rounded-2xl border-2 bg-white transition-all duration-300 ease-out ${
+                  isFocused
+                    ? 'border-amber-300 shadow-lg ring-4 shadow-amber-100/50 ring-amber-50'
                     : 'border-gray-100 hover:border-amber-200/60 hover:shadow-md'
-                  }
-                `}
+                } `}
               >
                 {/* 포커스 상태 배경 그라디언트 */}
                 <div
-                  className={`
-                    absolute inset-0 bg-linear-to-br from-amber-50/40 via-transparent to-orange-50/30
-                    transition-opacity duration-300
-                    ${isFocused ? 'opacity-100' : 'opacity-0'}
-                  `}
+                  className={`absolute inset-0 bg-linear-to-br from-amber-50/40 via-transparent to-orange-50/30 transition-opacity duration-300 ${isFocused ? 'opacity-100' : 'opacity-0'} `}
                 />
 
                 {/* 접근성을 위한 시각적으로 숨겨진 라벨 */}
@@ -205,33 +195,28 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   ref={textareaRef}
                   id="comment-input"
                   value={body}
-                  onChange={(e) => setBody(e.target.value)}
+                  onChange={e => setBody(e.target.value)}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                   placeholder="따뜻한 댓글은 작성자에게 큰 힘이 됩니다..."
-                  className={`
-                    relative w-full resize-none border-0 bg-transparent px-5 py-4 text-sm leading-relaxed
-                    text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0
-                    transition-all duration-200
-                    ${isFocused ? 'min-h-[100px]' : 'min-h-[56px]'}
-                  `}
+                  className={`relative w-full resize-none border-0 bg-transparent px-5 py-4 text-sm leading-relaxed text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:ring-0 focus:outline-none ${isFocused ? 'min-h-[100px]' : 'min-h-[56px]'} `}
                   rows={isFocused ? 3 : 1}
                   aria-label="댓글 내용"
                 />
 
                 {/* 액션 영역 */}
                 <div
-                  className={`
-                    relative flex items-center justify-between border-t border-gray-100/80 bg-gray-50/50 px-4 py-2.5
-                    transition-all duration-300
-                    ${isFocused ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 h-0 py-0 border-t-0 overflow-hidden'}
-                  `}
+                  className={`relative flex items-center justify-between border-t border-gray-100/80 bg-gray-50/50 px-4 py-2.5 transition-all duration-300 ${isFocused ? 'translate-y-0 opacity-100' : 'h-0 -translate-y-2 overflow-hidden border-t-0 py-0 opacity-0'} `}
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-400">
-                      <kbd className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500">Ctrl</kbd>
+                      <kbd className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500">
+                        Ctrl
+                      </kbd>
                       <span className="mx-0.5">+</span>
-                      <kbd className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500">Enter</kbd>
+                      <kbd className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500">
+                        Enter
+                      </kbd>
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -270,9 +255,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
             <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-amber-100 to-orange-50 shadow-inner">
               <FiCornerDownRight className="h-7 w-7 text-amber-500" />
             </div>
-            <p className="text-base font-medium text-gray-700">
-              대화에 참여하고 싶으신가요?
-            </p>
+            <p className="text-base font-medium text-gray-700">대화에 참여하고 싶으신가요?</p>
             <p className="mt-2 text-sm text-gray-500">
               댓글을 작성하려면{' '}
               <a
@@ -312,7 +295,8 @@ export function CommentSection({ postId }: CommentSectionProps) {
           </div>
           <h3 className="text-lg font-bold text-gray-700">아직 대화가 시작되지 않았어요</h3>
           <p className="mt-2 max-w-xs text-center text-sm leading-relaxed text-gray-500">
-            첫 번째 댓글을 남겨 대화를 시작해보세요.<br />
+            첫 번째 댓글을 남겨 대화를 시작해보세요.
+            <br />
             작성자에게 큰 힘이 됩니다.
           </p>
         </div>

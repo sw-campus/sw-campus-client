@@ -3,9 +3,17 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { FiEdit2, FiHeart, FiLoader, FiMessageCircle, FiMoreHorizontal, FiSend, FiTrash2, FiX, FiCornerDownRight } from 'react-icons/fi'
-
-import { UserAvatar } from '@/components/ui/user-avatar'
+import {
+  FiEdit2,
+  FiHeart,
+  FiLoader,
+  FiMessageCircle,
+  FiMoreHorizontal,
+  FiSend,
+  FiTrash2,
+  FiX,
+  FiCornerDownRight,
+} from 'react-icons/fi'
 
 import {
   AlertDialog,
@@ -18,12 +26,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import { formatRelativeTime } from '@/lib/format-relative-time'
 import { useAuthStore } from '@/store/auth-store'
 
@@ -81,7 +85,11 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
         // 하이라이트 애니메이션 후 해시 제거 (히스토리 오염 방지)
         const clearTimer = setTimeout(() => {
           setIsHighlighted(false)
-          window.history.replaceState(null, '', pathname + (searchParams.toString() ? `?${searchParams.toString()}` : ''))
+          window.history.replaceState(
+            null,
+            '',
+            pathname + (searchParams.toString() ? `?${searchParams.toString()}` : ''),
+          )
         }, 2500)
 
         return () => clearTimeout(clearTimer)
@@ -139,13 +147,11 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
     return (
       <div
         id={`comment-${comment.id}`}
-        className={`
-          ${depth > 0 ? 'ml-4 border-l-2 border-l-gray-200 pl-4 py-3 md:ml-6 md:pl-5' : `py-4 ${!isFirst ? 'border-t border-gray-100' : ''}`}
-        `}
+        className={` ${depth > 0 ? 'ml-4 border-l-2 border-l-gray-200 py-3 pl-4 md:ml-6 md:pl-5' : `py-4 ${!isFirst ? 'border-t border-gray-100' : ''}`} `}
       >
         <div className="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3">
           <div className="h-8 w-8 rounded-full bg-gray-200/80" />
-          <p className="text-sm italic text-gray-400">삭제된 댓글입니다</p>
+          <p className="text-sm text-gray-400 italic">삭제된 댓글입니다</p>
         </div>
 
         {/* 대댓글 표시 */}
@@ -172,14 +178,11 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
     <div
       ref={commentRef}
       id={`comment-${comment.id}`}
-      className={`
-        ${depth > 0
-          ? 'ml-4 border-l-2 border-l-gray-200 pl-4 py-3 md:ml-6 md:pl-5'
+      className={` ${
+        depth > 0
+          ? 'ml-4 border-l-2 border-l-gray-200 py-3 pl-4 md:ml-6 md:pl-5'
           : `py-5 ${!isFirst ? 'border-t border-gray-100' : ''}`
-        }
-        ${isHighlighted ? 'animate-highlight' : ''}
-        transition-colors duration-200
-      `}
+      } ${isHighlighted ? 'animate-highlight' : ''} transition-colors duration-200`}
     >
       <div className="group">
         {/* 작성자 정보 + 본문 */}
@@ -189,11 +192,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             userId={comment.authorId}
             className="shrink-0 transition-transform duration-200 hover:scale-105"
           >
-            <UserAvatar
-              nickname={comment.authorNickname}
-              size="sm"
-              className="ring-2 ring-white shadow-md"
-            />
+            <UserAvatar nickname={comment.authorNickname} size="sm" className="shadow-md ring-2 ring-white" />
           </UserProfileLink>
 
           <div className="min-w-0 flex-1">
@@ -206,9 +205,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
                 {comment.authorNickname}
               </UserProfileLink>
               <span className="flex items-center gap-1 text-xs text-gray-400">
-                <span title={comment.createdAt.toLocaleString('ko-KR')}>
-                  {relativeTime}
-                </span>
+                <span title={comment.createdAt.toLocaleString('ko-KR')}>{relativeTime}</span>
                 {comment.createdAt.getTime() !== comment.updatedAt.getTime() && (
                   <span className="text-gray-300">(수정됨)</span>
                 )}
@@ -222,7 +219,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
                   <textarea
                     value={editBody}
                     onChange={e => setEditBody(e.target.value)}
-                    className="w-full resize-none border-0 bg-transparent p-4 text-sm leading-relaxed text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-0"
+                    className="w-full resize-none border-0 bg-transparent p-4 text-sm leading-relaxed text-gray-800 placeholder:text-gray-400 focus:ring-0 focus:outline-none"
                     rows={3}
                     placeholder="댓글을 수정하세요..."
                   />
@@ -251,12 +248,8 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
                 </div>
               </div>
             ) : (
-              <div
-                className="relative rounded-2xl rounded-tl-md bg-linear-to-br from-gray-50/80 to-white border border-gray-100 px-4 py-3 shadow-sm transition-all duration-200 group-hover:shadow-md group-hover:border-gray-200/80"
-              >
-                <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-700">
-                  {comment.body}
-                </p>
+              <div className="relative rounded-2xl rounded-tl-md border border-gray-100 bg-linear-to-br from-gray-50/80 to-white px-4 py-3 shadow-sm transition-all duration-200 group-hover:border-gray-200/80 group-hover:shadow-md">
+                <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-700">{comment.body}</p>
 
                 {/* 이미지 */}
                 {comment.imageUrl && (
@@ -277,25 +270,16 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
                 <button
                   onClick={handleLike}
                   disabled={isLiking}
-                  className={`
-                    group/like flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium
-                    transition-all duration-200 active:scale-95
-                    ${comment.isLiked
+                  className={`group/like flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 active:scale-95 ${
+                    comment.isLiked
                       ? 'bg-rose-50 text-rose-500 hover:bg-rose-100'
                       : 'text-gray-500 hover:bg-gray-100 hover:text-rose-500'
-                    }
-                  `}
+                  } `}
                 >
                   <FiHeart
-                    className={`
-                      h-3.5 w-3.5 transition-all duration-200
-                      ${comment.isLiked ? 'fill-rose-500 text-rose-500' : 'group-hover/like:text-rose-400'}
-                      ${isLikeAnimating ? 'scale-125' : 'scale-100'}
-                    `}
+                    className={`h-3.5 w-3.5 transition-all duration-200 ${comment.isLiked ? 'fill-rose-500 text-rose-500' : 'group-hover/like:text-rose-400'} ${isLikeAnimating ? 'scale-125' : 'scale-100'} `}
                   />
-                  {comment.likeCount > 0 && (
-                    <span className="tabular-nums">{comment.likeCount}</span>
-                  )}
+                  {comment.likeCount > 0 && <span className="tabular-nums">{comment.likeCount}</span>}
                 </button>
 
                 {/* 답글 */}
@@ -318,10 +302,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="min-w-[120px] rounded-xl">
-                      <DropdownMenuItem
-                        onClick={() => setIsEditing(true)}
-                        className="gap-2 rounded-lg text-xs"
-                      >
+                      <DropdownMenuItem onClick={() => setIsEditing(true)} className="gap-2 rounded-lg text-xs">
                         <FiEdit2 className="h-3.5 w-3.5" />
                         수정하기
                       </DropdownMenuItem>
@@ -371,9 +352,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             {/* 답글 대상 표시 */}
             <div className="flex items-center gap-2 border-b border-amber-100/80 bg-amber-50/50 px-4 py-2">
               <FiCornerDownRight className="h-3.5 w-3.5 text-amber-500" />
-              <span className="text-xs font-medium text-amber-700">
-                @{comment.authorNickname}에게 답글
-              </span>
+              <span className="text-xs font-medium text-amber-700">@{comment.authorNickname}에게 답글</span>
             </div>
 
             <label htmlFor={`reply-input-${comment.id}`} className="sr-only">
@@ -383,9 +362,9 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
               id={`reply-input-${comment.id}`}
               ref={replyTextareaRef as React.RefObject<HTMLTextAreaElement>}
               value={replyFormProps.body}
-              onChange={(e) => replyFormProps.setBody(e.target.value)}
+              onChange={e => replyFormProps.setBody(e.target.value)}
               placeholder="답글을 입력하세요..."
-              className="w-full resize-none border-0 bg-transparent px-4 py-3 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0"
+              className="w-full resize-none border-0 bg-transparent px-4 py-3 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:ring-0 focus:outline-none"
               rows={2}
               aria-label={`${comment.authorNickname}님에게 답글`}
             />

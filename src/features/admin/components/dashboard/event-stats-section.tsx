@@ -94,7 +94,7 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
     <>
       {/* 배너 클릭 차트 */}
       <div className="bento-card group relative h-full overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-amber-500/5" />
+        <div className="absolute inset-0 bg-linear-to-br from-orange-500/5 via-transparent to-amber-500/5" />
         <div className="grid-pattern absolute inset-0 opacity-30" />
 
         <div className="absolute -top-6 -right-6 h-20 w-20 rounded-full bg-orange-500/10 blur-2xl md:-top-10 md:-right-10 md:h-28 md:w-28" />
@@ -146,7 +146,7 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
                   <LabelList
                     dataKey="value"
                     position="right"
-                    formatter={(value: number) => value.toLocaleString()}
+                    formatter={value => (typeof value === 'number' ? value.toLocaleString() : String(value))}
                     style={{
                       fill: 'hsl(var(--foreground))',
                       fontSize: 13,
@@ -162,7 +162,7 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
 
       {/* 사용자 액션 통계 */}
       <div className="bento-card group relative h-full overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-emerald-500/5" />
+        <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 via-transparent to-emerald-500/5" />
         <div className="grid-pattern absolute inset-0 opacity-30" />
 
         <div className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full bg-blue-500/10 blur-2xl md:-bottom-8 md:-left-8 md:h-24 md:w-24" />
@@ -186,12 +186,12 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
                 key={stat.title}
                 className={cn(
                   'group/item relative overflow-hidden rounded-lg p-2.5 transition-all md:rounded-xl md:p-4 lg:p-5',
-                  'bg-card/50 hover:bg-card/80 hover:shadow-md'
+                  'bg-card/50 hover:bg-card/80 hover:shadow-md',
                 )}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {/* Gradient overlay */}
-                <div className={cn('absolute inset-0 bg-gradient-to-r opacity-50', stat.gradient)} />
+                <div className={cn('absolute inset-0 bg-linear-to-r opacity-50', stat.gradient)} />
 
                 <div className="relative flex items-center justify-between">
                   <div className="flex items-center gap-2 md:gap-3">

@@ -7,7 +7,6 @@ import { LuChevronRight, LuImage, LuTrendingUp } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
 import { cn } from '@/lib/utils'
 
 import { useTopBannersQuery, useTopLecturesQuery } from '../../hooks/use-analytics'
@@ -27,7 +26,7 @@ function RankBadge({ rank }: { rank: number }) {
         rank === 1 && 'bg-linear-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-500/30',
         rank === 2 && 'bg-linear-to-br from-gray-300 to-gray-400 text-white',
         rank === 3 && 'bg-linear-to-br from-orange-300 to-orange-400 text-white',
-        rank > 3 && 'bg-muted text-muted-foreground'
+        rank > 3 && 'bg-muted text-muted-foreground',
       )}
     >
       {rank}
@@ -121,7 +120,9 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="text-muted-foreground w-10 text-[10px] md:w-12 md:text-xs">순위</TableHead>
                     <TableHead className="text-muted-foreground w-auto text-[10px] md:text-xs">배너명</TableHead>
-                    <TableHead className="text-muted-foreground w-14 text-right text-[10px] md:w-16 md:text-xs">클릭</TableHead>
+                    <TableHead className="text-muted-foreground w-14 text-right text-[10px] md:w-16 md:text-xs">
+                      클릭
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -129,7 +130,10 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                     <SkeletonRows />
                   ) : banners.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-muted-foreground py-6 text-center text-xs md:py-8 md:text-sm">
+                      <TableCell
+                        colSpan={3}
+                        className="text-muted-foreground py-6 text-center text-xs md:py-8 md:text-sm"
+                      >
                         데이터가 없습니다
                       </TableCell>
                     </TableRow>
@@ -199,7 +203,9 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="text-muted-foreground w-8 text-[10px] md:w-10 md:text-xs">순위</TableHead>
                     <TableHead className="text-muted-foreground w-auto text-[10px] md:text-xs">강의명</TableHead>
-                    <TableHead className="text-muted-foreground hidden w-12 text-right text-xs md:table-cell">조회</TableHead>
+                    <TableHead className="text-muted-foreground hidden w-12 text-right text-xs md:table-cell">
+                      조회
+                    </TableHead>
                     <TableHead className="text-muted-foreground w-10 text-right text-[10px] md:text-xs">신청</TableHead>
                     <TableHead className="text-muted-foreground w-10 text-right text-[10px] md:text-xs">공유</TableHead>
                   </TableRow>
@@ -209,7 +215,10 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
                     <SkeletonRows />
                   ) : lectures.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-muted-foreground py-6 text-center text-xs md:py-8 md:text-sm">
+                      <TableCell
+                        colSpan={5}
+                        className="text-muted-foreground py-6 text-center text-xs md:py-8 md:text-sm"
+                      >
                         데이터가 없습니다
                       </TableCell>
                     </TableRow>

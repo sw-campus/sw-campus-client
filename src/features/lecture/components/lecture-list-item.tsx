@@ -75,7 +75,7 @@ export function LectureListItem({ lecture }: LectureListItemProps) {
           </Button>
         ) : (
           <AddToCartButton
-            item={{ lectureId: lecture.lectureId }}
+            item={{ lectureId: String(lecture.lectureId) }}
             variant="outline"
             size="sm"
             className="h-9 flex-1 border-transparent bg-brand-gold-light text-[#020202] hover:bg-brand-gold-light"
@@ -84,7 +84,7 @@ export function LectureListItem({ lecture }: LectureListItemProps) {
           </AddToCartButton>
         )}
         <AddToCartButton
-          item={{ lectureId: lecture.lectureId }}
+          item={{ lectureId: String(lecture.lectureId) }}
           size="sm"
           className="h-9 flex-1 bg-brand-gold text-neutral-700 hover:bg-brand-gold"
           onClick={() => router.push('/cart/compare')}

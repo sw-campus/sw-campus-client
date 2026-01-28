@@ -2,7 +2,13 @@ import { Suspense } from 'react'
 
 import OAuthCallbackClient from './o-auth-callback-client'
 
-export default function OAuthCallbackPage() {
+interface OAuthCallbackPageProps {
+  params: Promise<{ provider: string }>
+}
+
+export default async function OAuthCallbackPage({ params }: OAuthCallbackPageProps) {
+  const { provider } = await params
+
   return (
     <Suspense
       fallback={
@@ -14,7 +20,7 @@ export default function OAuthCallbackPage() {
         </div>
       }
     >
-      <OAuthCallbackClient />
+      <OAuthCallbackClient provider={provider} />
     </Suspense>
   )
 }
