@@ -14,7 +14,7 @@ declare global {
       init: (key: string) => void
       isInitialized: () => boolean
       Channel: {
-        createChatButton: (options: { container: string; channelPublicId: string }) => void
+        chat: (options: { channelPublicId: string }) => void
       }
     }
   }
@@ -28,23 +28,23 @@ export default function KakaoChannelButton() {
   const isFloatingBarOpen = useFloatingBarStore((state) => state.isOpen)
   const isDesktop = useMediaQuery('(min-width: 1280px)')
   const [pcLeftPosition, setPcLeftPosition] = useState<number | null>(null)
+  const [isReady, setIsReady] = useState(false)
 
   // 로그인/회원가입 페이지에서는 숨김
-  if (pathname === '/login' || pathname?.startsWith('/signup')) {
-    return null
-  }
+  const isHiddenPage = pathname === '/login' || pathname?.startsWith('/signup')
 
   const handleKakaoLoad = () => {
     if (window.Kakao && !window.Kakao.isInitialized() && KAKAO_JAVASCRIPT_KEY) {
       window.Kakao.init(KAKAO_JAVASCRIPT_KEY)
     }
+    if (window.Kakao?.isInitialized()) {
+      setIsReady(true)
+    }
+  }
 
-    // SDK 초기화 후 채팅 버튼 생성
+  const handleClick = () => {
     if (window.Kakao?.isInitialized() && KAKAO_CHANNEL_ID) {
-      window.Kakao.Channel.createChatButton({
-        container: '#kakao-chat-channel-button',
-        channelPublicId: KAKAO_CHANNEL_ID,
-      })
+      window.Kakao.Channel.chat({ channelPublicId: KAKAO_CHANNEL_ID })
     }
   }
 
@@ -70,11 +70,17 @@ export default function KakaoChannelButton() {
     }
   }, [])
 
+  if (isHiddenPage) {
+    return null
+  }
+
   // 위치 스타일 계산
   const getPositionStyle = (): React.CSSProperties => {
-    if (isDesktop && pcLeftPosition) {
-      // PC: 위로가기 버튼과 같은 가로 위치
-      return { left: pcLeftPosition, bottom: 40 }
+    if (isDesktop) {
+      // PC: 동적 위치 또는 오른쪽 고정
+      return pcLeftPosition
+        ? { left: pcLeftPosition, bottom: 40 }
+        : { right: 40, bottom: 40 }
     }
     // 모바일: 오른쪽 고정
     return { right: 16, bottom: isFloatingBarOpen ? 195 : 60 }
@@ -89,11 +95,30 @@ export default function KakaoChannelButton() {
         onLoad={handleKakaoLoad}
         strategy="lazyOnload"
       />
-      <div
-        id="kakao-chat-channel-button"
-        className="fixed z-50 transition-all duration-300"
-        style={getPositionStyle()}
-      />
+      {isReady && (
+        <button
+          type="button"
+          onClick={handleClick}
+          className="fixed z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
+          style={{ ...getPositionStyle(), backgroundColor: '#FEE500' }}
+          aria-label="카카오톡 상담"
+          title="카카오톡 상담"
+        >
+          {/* 카카오톡 말풍선 아이콘 */}
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 3C6.48 3 2 6.58 2 11C2 13.77 3.8 16.19 6.5 17.59L5.5 21L9.5 18.5C10.3 18.67 11.14 18.76 12 18.76C17.52 18.76 22 15.18 22 10.76C22 6.34 17.52 3 12 3Z"
+              fill="#3C1E1E"
+            />
+          </svg>
+        </button>
+      )}
     </>
   )
 }

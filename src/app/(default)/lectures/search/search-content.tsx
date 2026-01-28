@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react'
 
-import { Search, ChevronDown, Minus, Maximize2 } from 'lucide-react'
+import { Search, Minus, Maximize2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import {
@@ -17,6 +17,7 @@ import {
   Pagination,
   PCFilterSidebar,
 } from '@/features/bootcamp-list'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup } from '@/components/ui/select'
 import { AiComparePreview } from '@/components/common/ai-compare-preview'
 import { InterestLectureList } from '@/components/common/interest-lecture-list'
 import type { FilterValues } from '@/features/bootcamp-list'
@@ -325,7 +326,14 @@ function SearchContentInner() {
             onSearchChange={setSearchValue}
             onSearch={handleSearch}
             sortValue={sortValue}
-            onSortChange={setSortValue}
+            onSortChange={value => {
+              setSortValue(value)
+              // 정렬 변경 시 바로 검색 실행
+              const params = new URLSearchParams(searchParams.toString())
+              params.set('sort', value)
+              params.set('page', '1')
+              router.push(`/lectures/search?${params.toString()}`)
+            }}
             onFilterClick={handleFilterClick}
           />
 
@@ -450,27 +458,30 @@ function SearchContentInner() {
               >
                 <span className="text-xs text-white">검색</span>
               </button>
-              <div className="relative min-w-[213px]">
-                <select
-                  value={sortValue}
-                  onChange={e => {
-                    setSortValue(e.target.value)
-                    // 정렬 변경 시 바로 검색 실행
-                    const params = new URLSearchParams(searchParams.toString())
-                    params.set('sort', e.target.value)
-                    params.set('page', '1')
-                    router.push(`/lectures/search?${params.toString()}`)
-                  }}
-                  className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-[#020202] bg-white px-4 py-2 pr-8 text-xs text-[#020202]"
-                >
-                  {SORT_OPTIONS.map(opt => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-black" />
-              </div>
+              <Select
+                value={sortValue}
+                onValueChange={value => {
+                  setSortValue(value)
+                  // 정렬 변경 시 바로 검색 실행
+                  const params = new URLSearchParams(searchParams.toString())
+                  params.set('sort', value)
+                  params.set('page', '1')
+                  router.push(`/lectures/search?${params.toString()}`)
+                }}
+              >
+                <SelectTrigger className="h-10 min-w-[213px] rounded-lg border border-[#020202] bg-white px-4 py-2 text-xs text-[#020202]">
+                  <SelectValue placeholder="정렬 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {SORT_OPTIONS.map(opt => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Lecture Grid - 필터 열림: 3열, 닫힘: 4열 */}

@@ -257,11 +257,12 @@ export function FilterModal({
                       {detailCategories.map((cat) => (
                         <label
                           key={cat.categoryId}
-                          className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-primary/10 cursor-pointer"
+                          className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-[#FEB706]/10 cursor-pointer"
                         >
                           <Checkbox
                             checked={detailCategoryIds.includes(cat.categoryId)}
                             onCheckedChange={() => handleDetailCategoryToggle(cat.categoryId, cat.categoryName)}
+                            className="data-[state=checked]:bg-[#FEB706] data-[state=checked]:border-[#FEB706]"
                           />
                           <span className="text-sm">{cat.categoryName}</span>
                         </label>
@@ -340,11 +341,12 @@ export function FilterModal({
                   {REGION_FILTERS.map((region) => (
                     <label
                       key={region}
-                      className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-primary/10 cursor-pointer"
+                      className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-[#FEB706]/10 cursor-pointer"
                     >
                       <Checkbox
                         checked={regions.includes(region)}
                         onCheckedChange={() => handleRegionToggle(region)}
+                        className="data-[state=checked]:bg-[#FEB706] data-[state=checked]:border-[#FEB706]"
                       />
                       <span className="text-sm">{region}</span>
                     </label>

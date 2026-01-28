@@ -1,13 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { Search, SlidersHorizontal, ChevronDown } from 'lucide-react'
+import { Search, SlidersHorizontal } from 'lucide-react'
 
-const SORT_OPTIONS = [
-  { value: '최신순', label: '최신순' },
-  { value: '평점순', label: '평점순' },
-  { value: '후기순', label: '후기순' },
-]
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup } from '@/components/ui/select'
+import { SORT_OPTIONS } from '@/features/lecture/types/filter.type'
 
 interface FilterSectionProps {
   searchValue: string
@@ -26,25 +22,6 @@ export function FilterSection({
   onSortChange,
   onFilterClick,
 }: FilterSectionProps) {
-  const [isSortOpen, setIsSortOpen] = useState(false)
-  const sortRef = useRef<HTMLDivElement>(null)
-
-  // 외부 클릭 시 드롭다운 닫기
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
-        setIsSortOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
-  const handleSortSelect = (value: string) => {
-    onSortChange(value)
-    setIsSortOpen(false)
-  }
-
   return (
     <div className="w-full flex flex-col gap-2">
       {/* Filter Button */}
@@ -77,30 +54,20 @@ export function FilterSection({
       </div>
 
       {/* Sort Dropdown */}
-      <div ref={sortRef} className="relative">
-        <button
-          onClick={() => setIsSortOpen(!isSortOpen)}
-          className="w-full h-10 px-4 py-2 bg-white rounded-lg outline outline-1 outline-[#020202] flex items-center justify-between"
-        >
-          <span className="text-xs text-[#020202]">{sortValue}</span>
-          <ChevronDown className={`w-4 h-4 text-black transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
-        </button>
-        {isSortOpen && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
-            {SORT_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => handleSortSelect(option.value)}
-                className={`w-full px-4 py-2.5 text-xs text-left hover:bg-gray-50 transition-colors ${
-                  sortValue === option.value ? 'bg-[#FEB706]/10 text-[#FEB706] font-medium' : 'text-[#020202]'
-                }`}
-              >
-                {option.label}
-              </button>
+      <Select value={sortValue} onValueChange={onSortChange}>
+        <SelectTrigger className="w-full h-10 px-4 py-2 bg-white rounded-lg border border-[#020202] text-xs text-[#020202]">
+          <SelectValue placeholder="정렬 선택" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            {SORT_OPTIONS.map(opt => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
             ))}
-          </div>
-        )}
-      </div>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </div>
   )
 }
