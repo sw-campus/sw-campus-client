@@ -147,7 +147,7 @@ function TeacherItem({ control, index, totalCount, onMove, onRemove }: TeacherIt
           <Button
             type="button"
             variant="ghost"
-            size="icon-sm"
+            size="sm"
             onClick={() => onMove(index, index - 1)}
             disabled={index === 0}
             aria-label="위로 이동"
@@ -157,14 +157,14 @@ function TeacherItem({ control, index, totalCount, onMove, onRemove }: TeacherIt
           <Button
             type="button"
             variant="ghost"
-            size="icon-sm"
+            size="sm"
             onClick={() => onMove(index, index + 1)}
             disabled={index === totalCount - 1}
             aria-label="아래로 이동"
           >
             <FiChevronDown className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon-sm" onClick={() => onRemove(index)} aria-label="삭제">
+          <Button type="button" variant="ghost" size="sm" onClick={() => onRemove(index)} aria-label="삭제">
             <FiTrash2 className="size-4" />
           </Button>
         </div>
@@ -279,7 +279,7 @@ function TeacherSearchModal({ onSelect, onClose, existingTeacherIds }: TeacherSe
       <div className="bg-background w-full max-w-md rounded-lg p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold">기존 강사 검색</h3>
-          <Button type="button" variant="ghost" size="icon-sm" onClick={onClose}>
+          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
             <FiX className="size-5" />
           </Button>
         </div>

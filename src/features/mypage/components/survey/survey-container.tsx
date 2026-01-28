@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, FileText, Target } from 'lucide-react'
@@ -44,11 +44,8 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
   const hasBasicSurvey = survey?.status?.hasBasicSurvey ?? false
   const hasAptitudeTest = survey?.status?.hasAptitudeTest ?? false
 
-  // 서버 상태 기반 기본 스텝
-  const serverDefaultStep = useMemo(
-    () => getDefaultStep(hasBasicSurvey, hasAptitudeTest),
-    [hasBasicSurvey, hasAptitudeTest]
-  )
+  // 서버 상태 기반 기본 스텝 (React Compiler가 자동 최적화)
+  const serverDefaultStep = getDefaultStep(hasBasicSurvey, hasAptitudeTest)
 
   // 현재 스텝: 사용자 선택 > 서버 기본값
   const currentStep = userSelectedStep ?? serverDefaultStep
@@ -58,9 +55,8 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
     onStepChange?.(currentStep)
   }, [currentStep, onStepChange])
 
-  // 전체 진행률 계산 (실제 완료 여부 기준, 동적 계산)
-  const calculateOverallProgress = useCallback(() => {
-    // 완료된 문항 수 계산
+  // 전체 진행률 계산 (실제 완료 여부 기준, React Compiler가 자동 최적화)
+  const calculateOverallProgress = () => {
     let completedQuestions = 0
 
     if (hasBasicSurvey) {
@@ -75,46 +71,47 @@ export function SurveyContainer({ embedded = false, onComplete, onStepChange }: 
     }
 
     return (completedQuestions / TOTAL_SURVEY_QUESTIONS) * 100
-  }, [hasBasicSurvey, hasAptitudeTest, currentStep, aptitudeProgress])
+  }
 
-  const handleBasicComplete = useCallback(() => {
+  // 이벤트 핸들러들 (React Compiler가 자동 최적화)
+  const handleBasicComplete = () => {
     refetch()
     setShowContinueModal(true)
-  }, [refetch])
+  }
 
-  const handleContinueToAptitude = useCallback(() => {
+  const handleContinueToAptitude = () => {
     setShowContinueModal(false)
     setUserSelectedStep('aptitude')
-  }, [])
+  }
 
-  const handleSkipToResults = useCallback(() => {
+  const handleSkipToResults = () => {
     setShowContinueModal(false)
     setUserSelectedStep('results')
-  }, [])
+  }
 
-  const handleAptitudeProgressChange = useCallback((answered: number) => {
+  const handleAptitudeProgressChange = (answered: number) => {
     setAptitudeProgress(answered)
-  }, [])
+  }
 
-  const handleAptitudeComplete = useCallback(() => {
+  const handleAptitudeComplete = () => {
     // 임시 저장 데이터 삭제
     localStorage.removeItem(APTITUDE_TEST_STORAGE_KEY)
     refetch()
     setUserSelectedStep('results')
     // 결과 화면을 보여주기 위해 onComplete는 호출하지 않음
-  }, [refetch])
+  }
 
-  const handleSkipAptitude = useCallback(() => {
+  const handleSkipAptitude = () => {
     onComplete?.()
-  }, [onComplete])
+  }
 
-  const handleRetakeAptitude = useCallback(() => {
+  const handleRetakeAptitude = () => {
     setUserSelectedStep('aptitude')
-  }, [])
+  }
 
-  const handleEditBasic = useCallback(() => {
+  const handleEditBasic = () => {
     setUserSelectedStep('basic')
-  }, [])
+  }
 
   // 스텝 인디케이터
   const steps = [

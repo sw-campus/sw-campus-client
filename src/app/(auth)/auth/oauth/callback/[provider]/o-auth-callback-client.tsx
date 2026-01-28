@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { oauthLogin } from '@/features/auth/auth-api'
@@ -12,20 +12,22 @@ import { getProfile } from '@/features/mypage/api/survey.api'
 import { parseUserType, parseUserName, parseNickname, type LoginResponse } from '@/lib/parse-login-response'
 import { useAuthStore } from '@/store/auth-store'
 
-export default function OAuthCallbackClient() {
+interface OAuthCallbackClientProps {
+  provider: string
+}
+
+export default function OAuthCallbackClient({ provider }: OAuthCallbackClientProps) {
   const router = useRouter()
   const search = useSearchParams()
-  const params = useParams<{ provider: string }>()
 
   const { login: setLogin, setUserType, setNickname } = useAuthStore()
   const { migrateGuestCart } = useMigrateGuestCart()
 
   useEffect(() => {
     const run = async () => {
-      const providerParam = (params?.provider ?? '').toString()
-      const provider = (['google', 'github', 'kakao'] as const).find(p => p === providerParam) ?? null
+      const validProvider = (['google', 'github', 'kakao'] as const).find(p => p === provider) ?? null
 
-      if (!provider) {
+      if (!validProvider) {
         toast.error('지원하지 않는 OAuth 제공자입니다.')
         router.replace('/login')
         return
@@ -41,7 +43,7 @@ export default function OAuthCallbackClient() {
 
       // Validate state (CSRF protection)
       try {
-        const key = `oauth_state_${provider}`
+        const key = `oauth_state_${validProvider}`
         const expected = typeof window !== 'undefined' ? sessionStorage.getItem(key) : null
         if (expected && state && expected !== state) {
           toast.error('잘못된 요청입니다. (state 불일치)')
@@ -54,7 +56,7 @@ export default function OAuthCallbackClient() {
       }
 
       try {
-        const data = (await oauthLogin(provider, code)) as LoginResponse | null
+        const data = (await oauthLogin(validProvider, code)) as LoginResponse | null
 
         const userName = parseUserName(data)
         const userType = parseUserType(data)

@@ -12,8 +12,11 @@ export function useSSE() {
   const { isLoggedIn } = useAuthStore()
   const queryClient = useQueryClient()
   const eventSourceRef = useRef<EventSource | null>(null)
+  const isCleaningUpRef = useRef(false)
 
   useEffect(() => {
+    isCleaningUpRef.current = false
+
     if (!isLoggedIn) {
       // 로그아웃 시 연결 종료
       if (eventSourceRef.current) {
@@ -56,6 +59,9 @@ export function useSSE() {
     })
 
     eventSource.onerror = () => {
+      // cleanup으로 인한 종료는 에러 로그 출력하지 않음
+      if (isCleaningUpRef.current) return
+
       console.error('SSE connection error, reconnecting...')
       eventSource.close()
 
@@ -68,6 +74,7 @@ export function useSSE() {
     }
 
     return () => {
+      isCleaningUpRef.current = true
       eventSource.close()
       eventSourceRef.current = null
     }

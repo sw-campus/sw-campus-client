@@ -62,7 +62,7 @@ export function LectureCreateSpecialCurriculumFields() {
                     <Button
                       type="button"
                       variant="ghost"
-                      size="icon-sm"
+                      size="sm"
                       onClick={() => move(idx, idx - 1)}
                       disabled={idx === 0}
                       aria-label="위로 이동"
@@ -72,14 +72,14 @@ export function LectureCreateSpecialCurriculumFields() {
                     <Button
                       type="button"
                       variant="ghost"
-                      size="icon-sm"
+                      size="sm"
                       onClick={() => move(idx, idx + 1)}
                       disabled={idx === fields.length - 1}
                       aria-label="아래로 이동"
                     >
                       <FiChevronDown className="size-4" />
                     </Button>
-                    <Button type="button" variant="ghost" size="icon-sm" onClick={() => remove(idx)} aria-label="삭제">
+                    <Button type="button" variant="ghost" size="sm" onClick={() => remove(idx)} aria-label="삭제">
                       <FiTrash2 className="size-4" />
                     </Button>
                   </div>

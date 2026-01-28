@@ -120,7 +120,7 @@ export function OrganizationReviewsSection({ organizationId }: OrganizationRevie
             <p className="text-muted-foreground mb-4 text-xs">
               리뷰를 작성하거나 설문조사를 완료하면 모든 후기를 확인할 수 있어요
             </p>
-            <Button asChild size="sm" className="w-full sm:w-auto">
+            <Button asChild size="sm" className="w-full md:w-auto">
               <Link href="/login">로그인하고 후기 더 보기</Link>
             </Button>
           </div>

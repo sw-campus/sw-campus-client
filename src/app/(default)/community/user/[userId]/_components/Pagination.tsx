@@ -16,7 +16,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
       <button
         onClick={() => onPageChange(Math.max(0, page - 1))}
         disabled={page === 0}
-        className="hover:border-primary/40 hover:bg-primary/5 hover:text-primary flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gray-200 disabled:hover:bg-white disabled:hover:text-gray-600 sm:h-9 sm:w-9"
+        className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gray-200 disabled:hover:bg-white disabled:hover:text-gray-600 md:h-9 md:w-9"
         aria-label="이전 페이지"
       >
         <FiChevronLeft className="h-4 w-4" />
@@ -40,7 +40,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
               onClick={() => onPageChange(pageNum)}
               className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-all active:scale-95 md:h-9 md:w-9 md:text-sm ${
                 pageNum === page
-                  ? 'bg-primary text-primary-foreground shadow-primary/30 shadow-md'
+                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/30'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
@@ -53,7 +53,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page >= totalPages - 1}
-        className="hover:border-primary/40 hover:bg-primary/5 hover:text-primary flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gray-200 disabled:hover:bg-white disabled:hover:text-gray-600 sm:h-9 sm:w-9"
+        className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gray-200 disabled:hover:bg-white disabled:hover:text-gray-600 md:h-9 md:w-9"
         aria-label="다음 페이지"
       >
         <FiChevronRight className="h-4 w-4" />

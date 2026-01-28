@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -53,20 +53,17 @@ export function AdminLectureRegisterModal({ isOpen, onClose }: AdminLectureRegis
   } = methods
   const categoryId = useWatch({ control, name: 'categoryId' })
 
-  // 모달 닫을 때 상태 초기화
-  const handleClose = useCallback(() => {
+  // 모달 닫을 때 상태 초기화 (React Compiler가 자동 최적화)
+  const handleClose = () => {
     reset(lectureCreateFormDefaultValues)
     setCurrentStep(0)
     onClose()
-  }, [reset, onClose])
+  }
 
   // Dialog의 onOpenChange 핸들러
-  const handleOpenChange = useCallback(
-    (open: boolean) => {
-      if (!open) handleClose()
-    },
-    [handleClose]
-  )
+  const handleOpenChange = (open: boolean) => {
+    if (!open) handleClose()
+  }
 
   // 단계 이동 시 스크롤 최상단으로 이동
   useEffect(() => {
@@ -83,7 +80,7 @@ export function AdminLectureRegisterModal({ isOpen, onClose }: AdminLectureRegis
     }
     // 기존 스텝 인덱스는 1부터 시작하므로 -1 해줌
     const originalStepIndex = currentStep - 1
-    const fields = stepFields[originalStepIndex as keyof typeof stepFields] as FieldPath<LectureFormValues>[]
+    const fields = [...stepFields[originalStepIndex as keyof typeof stepFields]] as FieldPath<LectureFormValues>[]
     const isValid = await trigger(fields)
     return isValid
   }

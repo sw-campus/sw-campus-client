@@ -1,3 +1,5 @@
+import { Suspense } from 'react'
+
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 
@@ -91,7 +93,9 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
   return (
     <>
       {articleJsonLd && <JsonLd data={articleJsonLd} />}
-      <PostDetailContent postId={Number(postId)} initialData={initialData} />
+      <Suspense fallback={null}>
+        <PostDetailContent postId={Number(postId)} initialData={initialData} />
+      </Suspense>
     </>
   )
 }
