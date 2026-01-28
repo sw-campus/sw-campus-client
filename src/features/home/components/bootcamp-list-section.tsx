@@ -210,7 +210,7 @@ function BootcampListItem({ lecture }: BootcampListItemProps) {
         {isInCart ? (
           <Button
             variant="outline"
-            size="icon-sm"
+            size="sm"
             className="text-brand-gold hover:text-brand-gold h-12 flex-1 rounded-lg border-transparent bg-neutral-800 text-base hover:bg-neutral-800"
             onClick={e => {
               e.preventDefault()
@@ -224,7 +224,7 @@ function BootcampListItem({ lecture }: BootcampListItemProps) {
           <AddToCartButton
             item={{ lectureId: String(lecture.lectureId) }}
             variant="outline"
-            size="icon-sm"
+            size="sm"
             className="bg-brand-gold-light hover:bg-brand-gold-light h-12 flex-1 rounded-lg border-transparent text-base text-[#020202]"
           >
             관심등록
@@ -232,7 +232,7 @@ function BootcampListItem({ lecture }: BootcampListItemProps) {
         )}
         <AddToCartButton
           item={{ lectureId: String(lecture.lectureId) }}
-          size="icon-sm"
+          size="sm"
           className="bg-brand-gold hover:bg-brand-gold h-12 flex-1 rounded-lg text-base text-neutral-700"
           onClick={() => router.push('/cart/compare')}
         >

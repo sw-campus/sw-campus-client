@@ -49,13 +49,13 @@ export function ApprovalPagination({ currentPage, totalPages, onPageChange }: Ap
       <div className="-mx-4 w-full overflow-x-auto px-4 md:mx-0 md:w-auto md:overflow-visible md:px-0">
         <div className="flex items-center justify-center gap-0.5 md:gap-1">
           {/* 처음 */}
-          <Button variant="outline" size="icon-sm" onClick={() => onPageChange(0)} disabled={isFirst} className="h-8 w-8 shrink-0 md:h-9 md:w-9">
+          <Button variant="outline" size="sm" onClick={() => onPageChange(0)} disabled={isFirst} className="h-8 w-8 shrink-0 md:h-9 md:w-9">
             <LuChevronsLeft className="h-3.5 w-3.5 md:h-4 md:w-4" />
           </Button>
           {/* 이전 */}
           <Button
             variant="outline"
-            size="icon-sm"
+            size="sm"
             onClick={() => onPageChange(Math.max(0, currentPage - 1))}
             disabled={isFirst}
             className="h-8 w-8 shrink-0 md:h-9 md:w-9"
@@ -73,7 +73,7 @@ export function ApprovalPagination({ currentPage, totalPages, onPageChange }: Ap
               <Button
                 key={page}
                 variant={currentPage === page ? 'default' : 'ghost'}
-                size="icon-sm"
+                size="sm"
                 onClick={() => onPageChange(page)}
                 className={`h-8 w-8 shrink-0 text-xs md:h-9 md:w-9 md:text-sm ${
                   currentPage === page ? 'bg-gray-700 text-white hover:bg-gray-600' : 'text-gray-600 hover:bg-gray-100'
@@ -87,7 +87,7 @@ export function ApprovalPagination({ currentPage, totalPages, onPageChange }: Ap
           {/* 다음 */}
           <Button
             variant="outline"
-            size="icon-sm"
+            size="sm"
             onClick={() => onPageChange(Math.min(displayTotalPages - 1, currentPage + 1))}
             disabled={isLast}
             className="h-8 w-8 shrink-0 md:h-9 md:w-9"
@@ -97,7 +97,7 @@ export function ApprovalPagination({ currentPage, totalPages, onPageChange }: Ap
           {/* 마지막 */}
           <Button
             variant="outline"
-            size="icon-sm"
+            size="sm"
             onClick={() => onPageChange(displayTotalPages - 1)}
             disabled={isLast}
             className="h-8 w-8 shrink-0 md:h-9 md:w-9"

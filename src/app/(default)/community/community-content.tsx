@@ -196,7 +196,7 @@ function CommunityContentInner() {
             {/* 강의 필터 */}
             <Button
               variant="outline"
-              size="icon-sm"
+              size="sm"
               onClick={() => setIsLectureModalOpen(true)}
               className={`h-9 shrink-0 gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition-all duration-200 active:scale-95 md:h-10 md:gap-2 md:rounded-xl md:px-4 md:text-sm ${
                 selectedLecture

@@ -168,7 +168,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
             {banners.length >= 5 && (
               <Button
                 variant="ghost"
-                size="icon-sm"
+                size="sm"
                 className="mt-2 w-full text-xs text-purple-600 hover:bg-purple-50 hover:text-purple-700 sm:mt-3 sm:text-sm"
                 onClick={() => setModalOpen('banners')}
               >
@@ -258,7 +258,7 @@ export function ClickRankingSection({ period = 7 }: ClickRankingSectionProps) {
             {lectures.length >= 5 && (
               <Button
                 variant="ghost"
-                size="icon-sm"
+                size="sm"
                 className="mt-2 w-full text-xs text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 sm:mt-3 sm:text-sm"
                 onClick={() => setModalOpen('lectures')}
               >

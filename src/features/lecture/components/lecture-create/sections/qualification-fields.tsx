@@ -67,7 +67,7 @@ export function LectureCreateQualificationFields({ selectTriggerClassName }: Pro
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon-sm"
+                        size="sm"
                         onClick={() => move(idx, idx - 1)}
                         disabled={idx === 0}
                         aria-label="위로 이동"
@@ -77,7 +77,7 @@ export function LectureCreateQualificationFields({ selectTriggerClassName }: Pro
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon-sm"
+                        size="sm"
                         onClick={() => move(idx, idx + 1)}
                         disabled={idx === fields.length - 1}
                         aria-label="아래로 이동"
@@ -87,7 +87,7 @@ export function LectureCreateQualificationFields({ selectTriggerClassName }: Pro
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon-sm"
+                        size="sm"
                         onClick={() => remove(idx)}
                         aria-label="삭제"
                       >

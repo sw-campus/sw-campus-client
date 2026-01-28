@@ -168,7 +168,7 @@ export function ReviewManagementSection() {
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
-                      size="icon-sm"
+                      size="sm"
                       className="h-8 flex-1 gap-1 text-xs"
                       onClick={() => {
                         setSelectedCertificate(l)
@@ -182,7 +182,7 @@ export function ReviewManagementSection() {
                     {l.canWriteReview ? (
                       <Button
                         variant="outline"
-                        size="icon-sm"
+                        size="sm"
                         className="h-8 flex-1 gap-1 text-xs"
                         onClick={() => {
                           setCreateLectureId(l.lectureId)
@@ -196,7 +196,7 @@ export function ReviewManagementSection() {
                     ) : (
                       <Button
                         variant="outline"
-                        size="icon-sm"
+                        size="sm"
                         className="h-8 flex-1 gap-1 text-xs"
                         onClick={() => {
                           setSelectedReviewId(l.reviewId ?? null)

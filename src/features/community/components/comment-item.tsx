@@ -253,7 +253,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             <div className="flex justify-end gap-2">
               <Button
                 variant="ghost"
-                size="icon-sm"
+                size="sm"
                 onClick={() => {
                   setIsEditing(false)
                   setEditBody(comment.body)
@@ -263,7 +263,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
                 취소
               </Button>
               <Button
-                size="icon-sm"
+                size="sm"
                 onClick={handleUpdate}
                 disabled={isUpdating || !editBody.trim()}
                 className="bg-primary text-primary-foreground gap-1.5 rounded-lg shadow-sm"
@@ -353,7 +353,7 @@ export function CommentItem({ comment, postId, onReply, depth = 0, replyFormProp
             <Button
               type="submit"
               disabled={replyFormProps.isCreating || !replyFormProps.body.trim()}
-              size="icon-sm"
+              size="sm"
               className="bg-primary text-primary-foreground hover:bg-primary/90 h-6 shrink-0 rounded-md px-2 text-xs font-medium disabled:opacity-50"
             >
               <FiSend className="h-3 w-3" />
