@@ -25,8 +25,8 @@ const menuVariants: Variants = {
   open: {
     height: 'auto',
     opacity: 1,
+    overflow: 'visible',
     transition: { duration: 0.25, ease: 'easeOut' },
-    transitionEnd: { overflow: 'visible' },
   },
   closed: {
     height: 0,
