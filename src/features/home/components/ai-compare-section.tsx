@@ -92,7 +92,7 @@ export function AiCompareSection() {
       {/* 섹션 타이틀 */}
       <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
         <span className="text-brand-gold">AI 비교분석</span> 기능으로
-        <br />
+        <br className="md:hidden" />{' '}
         최적의 강의를 한눈에 비교해보세요.
       </h2>
 

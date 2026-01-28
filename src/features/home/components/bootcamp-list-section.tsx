@@ -37,7 +37,7 @@ export function BootcampListSection() {
         <div className="flex flex-col gap-6 md:gap-8">
           <h2 className="text-center text-xl font-bold md:text-[32px]">
             수강생 후기 <span className="text-brand-gold">BEST</span> 부트캠프들을
-            <br className="md:hidden" />
+            <br className="md:hidden" />{' '}
             한눈에 살펴보세요.
           </h2>
 

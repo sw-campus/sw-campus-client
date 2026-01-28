@@ -12,7 +12,9 @@ export function BannerCarousel() {
         <span className="text-brand-gold">별점 4점</span> 이상 강의만 소개합니다.
       </h2>
       <LargeBanner />
-      <MidBanner />
+      <div className="md:mx-auto md:max-w-[1448px] md:px-6">
+        <MidBanner />
+      </div>
     </section>
   )
 }

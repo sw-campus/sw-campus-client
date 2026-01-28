@@ -173,8 +173,7 @@ export function NotificationDropdown({ isMobile = false }: NotificationDropdownP
     <button
       type="button"
       className={cn(
-        'relative rounded-full p-1.5 transition-colors',
-        !isMobile && 'hover:bg-muted'
+        'relative rounded-full p-1.5 transition hover:opacity-80'
       )}
       aria-label="알림"
     >

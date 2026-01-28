@@ -37,7 +37,7 @@ const menuVariants: Variants = {
 }
 
 export function NavigationMenuDesktop({ showDesktop, items, onMouseEnter, onMouseLeave, onNavigate, isHome = false }: Props) {
-  const bgColor = isHome ? '#020f2b' : '#ffffff'
+  const bgColor = isHome ? '#041032' : '#ffffff'
   const textColor = isHome ? 'text-header-text' : 'text-gray-900'
   const hoverBg = isHome ? 'hover:bg-white/10 hover:text-white' : 'hover:bg-gray-100'
 
