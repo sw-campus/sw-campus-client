@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, Pencil, Star } from 'lucide-react'
@@ -109,8 +109,8 @@ export default function LectureReviews({ lectureId }: Props) {
   const [verifyStep, setVerifyStep] = useState<'select' | 'processing'>('select')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
-  // 리뷰 작성 상태
-  const categories: ReviewCategory[] = useMemo(() => ['TEACHER', 'CURRICULUM', 'MANAGEMENT', 'FACILITY', 'PROJECT'], [])
+  // 리뷰 작성 상태 (상수는 컴포넌트 외부에 정의하는 것이 더 좋지만, 기존 구조 유지)
+  const categories: ReviewCategory[] = ['TEACHER', 'CURRICULUM', 'MANAGEMENT', 'FACILITY', 'PROJECT']
   const [detailScores, setDetailScores] = useState<Record<ReviewCategory, { score: number; comment: string }>>({
     TEACHER: { score: 0, comment: '' },
     PROJECT: { score: 0, comment: '' },
