@@ -25,7 +25,9 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
   const reduceMotion = useReducedMotion()
   const [isExpanded, setIsExpanded] = useState(true) // 데스크톱/모바일 공통 - 기본: 펼침
 
-  const availableCount = items.filter(item => canUseItem(item.categoryName) && !isAlreadySelected(item.lectureId)).length
+  const availableCount = items.filter(
+    item => canUseItem(item.categoryName) && !isAlreadySelected(item.lectureId),
+  ).length
 
   const cartItemList = (isMobile: boolean = false) => (
     <>
@@ -41,9 +43,7 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
             key={item.lectureId}
             className="w-full"
             whileHover={!canUseItem(item.categoryName) || isAlreadySelected(item.lectureId) ? undefined : { x: 2 }}
-            whileTap={
-              !canUseItem(item.categoryName) || isAlreadySelected(item.lectureId) ? undefined : { scale: 0.99 }
-            }
+            whileTap={!canUseItem(item.categoryName) || isAlreadySelected(item.lectureId) ? undefined : { scale: 0.99 }}
             transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 26 }}
           >
             <button
@@ -67,13 +67,18 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
               {(!canUseItem(item.categoryName) || isAlreadySelected(item.lectureId)) && (
                 <span aria-hidden className="bg-foreground/5 absolute inset-0" />
               )}
-              <div className={cn("bg-muted relative z-10 overflow-hidden rounded-md", isMobile ? "h-8 w-8 shrink-0" : "h-10 w-10")}>
+              <div
+                className={cn(
+                  'bg-muted relative z-10 overflow-hidden rounded-md',
+                  isMobile ? 'h-8 w-8 shrink-0' : 'h-10 w-10',
+                )}
+              >
                 {item.thumbnailUrl ? (
                   <Image
                     src={item.thumbnailUrl}
                     alt=""
                     fill
-                    sizes={isMobile ? "32px" : "40px"}
+                    sizes={isMobile ? '32px' : '40px'}
                     className="object-cover"
                     unoptimized={item.thumbnailUrl.startsWith('http')}
                   />
@@ -93,7 +98,7 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
   return (
     <>
       {/* 데스크톱: 접이식 */}
-      <Card className="hidden lg:block">
+      <Card className="hidden md:block">
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -110,12 +115,7 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
           </div>
           <div className="flex shrink-0 items-center gap-1 text-sm text-gray-400">
             <span className="whitespace-nowrap">{isExpanded ? '숨기기' : '보기'}</span>
-            <FiChevronDown
-              className={cn(
-                'h-4 w-4 transition-transform duration-200',
-                isExpanded && 'rotate-180'
-              )}
-            />
+            <FiChevronDown className={cn('h-4 w-4 transition-transform duration-200', isExpanded && 'rotate-180')} />
           </div>
         </button>
         <AnimatePresence initial={false}>
@@ -127,11 +127,9 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="border-t px-4 pb-4 pt-2">
-                <div className="text-xs text-gray-400 mb-3">동일한 카테고리의 항목끼리 비교할 수 있습니다.</div>
-                <div className="space-y-2">
-                  {cartItemList(false)}
-                </div>
+              <div className="border-t px-4 pt-2 pb-4">
+                <div className="mb-3 text-xs text-gray-400">동일한 카테고리의 항목끼리 비교할 수 있습니다.</div>
+                <div className="space-y-2">{cartItemList(false)}</div>
               </div>
             </motion.div>
           )}
@@ -139,7 +137,7 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
       </Card>
 
       {/* 모바일: 접이식 */}
-      <Card className="overflow-hidden lg:hidden">
+      <Card className="overflow-hidden md:hidden">
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -156,12 +154,7 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
           </div>
           <div className="flex shrink-0 items-center gap-1 text-sm text-gray-400">
             <span className="whitespace-nowrap">{isExpanded ? '숨기기' : '보기'}</span>
-            <FiChevronDown
-              className={cn(
-                'h-4 w-4 transition-transform duration-200',
-                isExpanded && 'rotate-180'
-              )}
-            />
+            <FiChevronDown className={cn('h-4 w-4 transition-transform duration-200', isExpanded && 'rotate-180')} />
           </div>
         </button>
         <AnimatePresence initial={false}>
@@ -173,11 +166,9 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="border-t px-4 pb-4 pt-2">
-                <div className="text-xs text-gray-400 mb-2">동일한 카테고리의 항목끼리 비교할 수 있습니다.</div>
-                <div className="space-y-2 max-h-60 overflow-y-auto overflow-x-hidden">
-                  {cartItemList(true)}
-                </div>
+              <div className="border-t px-4 pt-2 pb-4">
+                <div className="mb-2 text-xs text-gray-400">동일한 카테고리의 항목끼리 비교할 수 있습니다.</div>
+                <div className="max-h-60 space-y-2 overflow-x-hidden overflow-y-auto">{cartItemList(true)}</div>
               </div>
             </motion.div>
           )}

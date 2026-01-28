@@ -41,7 +41,7 @@ export function CategoryTabs({ categories, selectedCategoryId, onSelect }: Categ
   return (
     <div className="space-y-3">
       {/* 부모 카테고리 (1단계) */}
-      <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
         <div className="flex gap-2">
           <button
             type="button"
@@ -75,7 +75,7 @@ export function CategoryTabs({ categories, selectedCategoryId, onSelect }: Categ
 
       {/* 자식 카테고리 (2단계) */}
       {childCategories.length > 0 && (
-        <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
           <div className="flex gap-2 pl-2">
             <span className="flex shrink-0 items-center text-sm text-gray-400">└</span>
             <button

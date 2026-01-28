@@ -71,7 +71,7 @@ export function TiptapEditor({
     editorProps: {
       attributes: {
         class: cn(
-          'prose prose-sm sm:prose-base max-w-none focus:outline-none min-h-[150px] px-4 py-3',
+          'prose prose-sm md:prose-base max-w-none focus:outline-none min-h-[150px] px-4 py-3',
           'prose-headings:font-bold prose-h2:text-2xl prose-h3:text-xl',
           'prose-p:my-2',
           'prose-ul:list-disc prose-ol:list-decimal',

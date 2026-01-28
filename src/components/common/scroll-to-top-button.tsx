@@ -13,7 +13,7 @@ export function ScrollToTopButton() {
   const isMounted = useIsMounted()
   const [isVisible, setIsVisible] = useState(false)
   const [pcLeftPosition, setPcLeftPosition] = useState<number | null>(null)
-  const isFloatingBarOpen = useFloatingBarStore((state) => state.isOpen)
+  const isFloatingBarOpen = useFloatingBarStore(state => state.isOpen)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,7 +59,9 @@ export function ScrollToTopButton() {
   return createPortal(
     <>
       {/* 모바일 버전 */}
-      <div className={`pointer-events-none fixed inset-x-0 ${bottomPosition} z-40 mx-auto w-full max-w-[360px] px-4 transition-all duration-300 xl:hidden`}>
+      <div
+        className={`pointer-events-none fixed inset-x-0 ${bottomPosition} z-40 mx-auto w-full max-w-[360px] px-4 transition-all duration-300 xl:hidden`}
+      >
         <AnimatePresence>
           {isVisible && (
             <motion.button
@@ -82,10 +84,7 @@ export function ScrollToTopButton() {
 
       {/* PC 버전 - 장바구니 사이드바와 같은 가로 위치, 하단 고정 */}
       {pcLeftPosition && (
-        <div
-          className="pointer-events-none fixed bottom-10 z-40 hidden xl:block"
-          style={{ left: pcLeftPosition }}
-        >
+        <div className="pointer-events-none fixed bottom-10 z-40 hidden xl:block" style={{ left: pcLeftPosition }}>
           <AnimatePresence>
             {isVisible && (
               <motion.button

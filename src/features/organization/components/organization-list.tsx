@@ -37,7 +37,7 @@ export function OrganizationList() {
   return (
     <div className="w-full">
       {/* Hero Banner */}
-      <div className="relative -mx-4 -mt-4 mb-8 h-[250px] overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 md:-mx-6 md:-mt-6">
+      <div className="relative -mx-4 -mt-4 mb-8 h-[250px] overflow-hidden bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 md:-mx-6 md:-mt-6">
         <Image
           src="/images/org/organization_banner.jpg"
           alt="훈련기관 배경"
@@ -46,7 +46,7 @@ export function OrganizationList() {
           className="object-cover opacity-50"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/40 via-black/30 to-black/50" />
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <h1 className="mb-3 text-2xl font-bold text-white md:text-3xl">훈련기관</h1>
           <p className="max-w-md text-sm leading-relaxed text-white/90 md:text-base">

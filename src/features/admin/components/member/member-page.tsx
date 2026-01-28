@@ -72,7 +72,7 @@ export function MemberPage() {
       <h1 className="text-foreground text-2xl font-bold">회원 관리</h1>
 
       {/* 통계 카드 */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {STAT_CARDS.map(card => (
           <ColorfulStatCard
             key={card.key}

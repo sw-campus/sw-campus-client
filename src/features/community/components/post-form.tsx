@@ -158,9 +158,9 @@ export function PostForm({
 
           if (result.content && result.content.length > 0) {
             // 강의명과 훈련기관명이 모두 일치하는 강의를 찾음
-            const matchedLecture = result.content.find(
-              lecture => lecture.lectureName === lectureName && lecture.orgName === orgName
-            ) || result.content[0]
+            const matchedLecture =
+              result.content.find(lecture => lecture.lectureName === lectureName && lecture.orgName === orgName) ||
+              result.content[0]
 
             setSelectedLecture({
               id: matchedLecture.lectureId,
@@ -351,20 +351,20 @@ export function PostForm({
 
   return (
     <>
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5 sm:space-y-6">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5 md:space-y-6">
         {/* 카테고리 선택 - Step 1 */}
-        <div className="relative rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-white p-4 shadow-sm transition-all hover:border-primary/40 hover:shadow-md sm:p-5">
+        <div className="border-primary/30 from-primary/5 hover:border-primary/40 relative rounded-2xl border-2 bg-linear-to-br to-white p-4 shadow-sm transition-all hover:shadow-md sm:p-5">
           {/* 단계 표시 */}
-          <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-primary-foreground shadow-sm">
+          <div className="bg-primary text-primary-foreground absolute -top-3 left-4 flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">
             <span>STEP 1</span>
           </div>
-          <label className="mb-3 mt-1 flex items-center gap-2 text-sm font-semibold text-gray-800">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 shadow-sm">
-              <FiFolder className="h-3.5 w-3.5 text-primary" />
+          <label className="mt-1 mb-3 flex items-center gap-2 text-sm font-semibold text-gray-800">
+            <div className="bg-primary/10 flex h-7 w-7 items-center justify-center rounded-lg shadow-sm">
+              <FiFolder className="text-primary h-3.5 w-3.5" />
             </div>
             카테고리 선택 <span className="text-primary">*</span>
           </label>
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">{renderCategorySelects()}</div>
+          <div className="flex flex-col gap-2 md:flex-row md:flex-wrap">{renderCategorySelects()}</div>
           <input
             type="hidden"
             {...register('boardCategoryId', {
@@ -379,9 +379,9 @@ export function PostForm({
 
         {/* 부트캠프 성장일기 - 강의 선택 */}
         {isBootcampDiaryCategory && (
-          <div className="relative rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-white p-4 shadow-sm transition-all hover:border-primary/40 hover:shadow-md sm:p-5">
+          <div className="border-primary/30 from-primary/5 hover:border-primary/40 relative rounded-2xl border-2 bg-linear-to-br to-white p-4 shadow-sm transition-all hover:shadow-md sm:p-5">
             {/* 단계 표시 */}
-            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-primary-foreground shadow-sm">
+            <div className="bg-primary text-primary-foreground absolute -top-3 left-4 flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">
               <span>STEP 1-2</span>
             </div>
             <div className="mt-1">
@@ -397,9 +397,9 @@ export function PostForm({
 
         {/* 제목 */}
         {isBootcampDiaryCategory ? (
-          <div className="relative rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-white p-4 shadow-sm transition-all hover:border-primary/40 hover:shadow-md sm:p-5">
+          <div className="border-primary/30 from-primary/5 hover:border-primary/40 relative rounded-2xl border-2 bg-linear-to-br to-white p-4 shadow-sm transition-all hover:shadow-md sm:p-5">
             {/* 단계 표시 */}
-            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-primary-foreground shadow-sm">
+            <div className="bg-primary text-primary-foreground absolute -top-3 left-4 flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">
               <span>STEP 2</span>
             </div>
             <div className="mt-1">
@@ -418,14 +418,14 @@ export function PostForm({
             </div>
           </div>
         ) : (
-          <div className="relative rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-white p-4 shadow-sm transition-all hover:border-primary/40 hover:shadow-md sm:p-5">
+          <div className="border-primary/30 from-primary/5 hover:border-primary/40 relative rounded-2xl border-2 bg-linear-to-br to-white p-4 shadow-sm transition-all hover:shadow-md sm:p-5">
             {/* 단계 표시 */}
-            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-primary-foreground shadow-sm">
+            <div className="bg-primary text-primary-foreground absolute -top-3 left-4 flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">
               <span>STEP 2</span>
             </div>
-            <label htmlFor="title" className="mb-3 mt-1 flex items-center gap-2 text-sm font-semibold text-gray-800">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 shadow-sm">
-                <FiType className="h-3.5 w-3.5 text-primary" />
+            <label htmlFor="title" className="mt-1 mb-3 flex items-center gap-2 text-sm font-semibold text-gray-800">
+              <div className="bg-primary/10 flex h-7 w-7 items-center justify-center rounded-lg shadow-sm">
+                <FiType className="text-primary h-3.5 w-3.5" />
               </div>
               제목 <span className="text-primary">*</span>
             </label>
@@ -437,7 +437,7 @@ export function PostForm({
                 maxLength: { value: 100, message: '제목은 100자 이내로 입력해주세요' },
               })}
               placeholder="제목을 입력해주세요"
-              className="h-11 rounded-xl border-gray-200 bg-gray-50/50 transition-all focus:border-primary/50 focus:bg-white focus:ring-2 focus:ring-primary/20"
+              className="focus:border-primary/50 focus:ring-primary/20 h-11 rounded-xl border-gray-200 bg-gray-50/50 transition-all focus:bg-white focus:ring-2"
             />
             {errors.title && <p className="mt-2 text-sm font-medium text-red-500">{errors.title.message}</p>}
           </div>
@@ -445,9 +445,9 @@ export function PostForm({
 
         {/* 본문 */}
         {isBootcampDiaryCategory ? (
-          <div className="relative rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-white p-4 shadow-sm transition-all hover:border-primary/40 hover:shadow-md sm:p-5">
+          <div className="border-primary/30 from-primary/5 hover:border-primary/40 relative rounded-2xl border-2 bg-linear-to-br to-white p-4 shadow-sm transition-all hover:shadow-md sm:p-5">
             {/* 단계 표시 */}
-            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-primary-foreground shadow-sm">
+            <div className="bg-primary text-primary-foreground absolute -top-3 left-4 flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">
               <span>STEP 3</span>
             </div>
             <div className="mt-1">
@@ -455,14 +455,14 @@ export function PostForm({
             </div>
           </div>
         ) : (
-          <div className="relative rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-white p-4 shadow-sm transition-all hover:border-primary/40 hover:shadow-md sm:p-5">
+          <div className="border-primary/30 from-primary/5 hover:border-primary/40 relative rounded-2xl border-2 bg-linear-to-br to-white p-4 shadow-sm transition-all hover:shadow-md sm:p-5">
             {/* 단계 표시 */}
-            <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-primary-foreground shadow-sm">
+            <div className="bg-primary text-primary-foreground absolute -top-3 left-4 flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">
               <span>STEP 3</span>
             </div>
-            <label htmlFor="body" className="mb-3 mt-1 flex items-center gap-2 text-sm font-semibold text-gray-800">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 shadow-sm">
-                <FiFileText className="h-3.5 w-3.5 text-primary" />
+            <label htmlFor="body" className="mt-1 mb-3 flex items-center gap-2 text-sm font-semibold text-gray-800">
+              <div className="bg-primary/10 flex h-7 w-7 items-center justify-center rounded-lg shadow-sm">
+                <FiFileText className="text-primary h-3.5 w-3.5" />
               </div>
               내용 <span className="text-primary">*</span>
             </label>
@@ -488,19 +488,19 @@ export function PostForm({
         )}
 
         {/* 태그 - Optional */}
-        <div className="relative rounded-2xl border-2 border-dashed border-gray-200/80 bg-gradient-to-br from-gray-50/30 to-white p-4 shadow-sm transition-all hover:border-gray-300/80 hover:bg-white hover:shadow-md sm:p-5">
+        <div className="relative rounded-2xl border-2 border-dashed border-gray-200/80 bg-linear-to-br from-gray-50/30 to-white p-4 shadow-sm transition-all hover:border-gray-300/80 hover:bg-white hover:shadow-md md:p-5">
           {/* 선택 표시 */}
           <div className="absolute -top-3 left-4 flex items-center gap-1.5 rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-xs font-medium text-gray-500 shadow-sm">
             <span>선택사항</span>
           </div>
-          <label htmlFor="tags" className="mb-3 mt-1 flex items-center gap-2 text-sm font-semibold text-gray-800">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 shadow-sm">
+          <label htmlFor="tags" className="mt-1 mb-3 flex items-center gap-2 text-sm font-semibold text-gray-800">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-gray-100 to-gray-50 shadow-sm">
               <FiTag className="h-3.5 w-3.5 text-gray-500" />
             </div>
             <span>태그</span>
             <span className="text-xs font-normal text-gray-500">(쉼표로 구분)</span>
             {selectedLecture && (
-              <span className="ml-1 rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success">
+              <span className="bg-success/15 text-success ml-1 rounded-full px-2 py-0.5 text-xs font-medium">
                 + 강의 정보 자동 추가
               </span>
             )}
@@ -510,15 +510,15 @@ export function PostForm({
             type="text"
             {...register('tags')}
             placeholder="React, TypeScript, Next.js"
-            className="h-11 rounded-xl border-gray-200 bg-gray-50/50 transition-all focus:border-primary/50 focus:bg-white focus:ring-2 focus:ring-primary/20"
+            className="focus:border-primary/50 focus:ring-primary/20 h-11 rounded-xl border-gray-200 bg-gray-50/50 transition-all focus:bg-white focus:ring-2"
           />
           {selectedLecture && (
             <div className="mt-3 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary ring-1 ring-primary/20">
+              <span className="bg-primary/10 text-primary ring-primary/20 inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium ring-1">
                 <FiTag className="h-3 w-3" />
                 {selectedLecture.name}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary ring-1 ring-primary/20">
+              <span className="bg-primary/10 text-primary ring-primary/20 inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium ring-1">
                 <FiTag className="h-3 w-3" />
                 {selectedLecture.orgName}
               </span>
@@ -531,7 +531,7 @@ export function PostForm({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="h-12 w-full rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-md shadow-primary/30 transition-all hover:shadow-lg hover:shadow-primary/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-none disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none sm:h-11 sm:w-auto sm:px-10 sm:text-sm"
+            className="bg-primary text-primary-foreground shadow-primary/30 hover:shadow-primary/40 h-12 w-full rounded-xl text-base font-semibold shadow-md transition-all hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-gray-300 disabled:bg-none disabled:text-gray-500 disabled:shadow-none sm:h-11 sm:w-auto sm:px-10 sm:text-sm"
           >
             {isSubmitting ? '처리 중...' : submitLabel}
           </Button>

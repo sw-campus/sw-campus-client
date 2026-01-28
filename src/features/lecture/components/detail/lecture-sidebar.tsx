@@ -46,7 +46,7 @@ export default function LectureSidebar({ lecture }: Props) {
   return (
     <>
       {/* 모바일: 하단 고정 바 */}
-      <div className="fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur-xl sm:px-6 lg:hidden">
+      <div className="fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur-xl md:px-6 md:hidden">
         <div className="mx-auto flex max-w-lg items-center gap-3">
           <Button
             size="lg"
@@ -60,7 +60,7 @@ export default function LectureSidebar({ lecture }: Props) {
       </div>
 
       {/* 데스크톱: 사이드바 */}
-      <div className="sticky top-20 hidden space-y-6 lg:block">
+      <div className="sticky top-20 hidden space-y-6 md:block">
         <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
           <p className="text-sm font-medium text-gray-500">{lecture.orgName}</p>
           <h2 className="mt-2 text-xl font-bold text-gray-900">{lecture.title}</h2>

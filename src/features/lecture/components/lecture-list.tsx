@@ -18,7 +18,7 @@ export function LectureList({ lectures, maxColumns = 4 }: LectureListProps) {
   return (
     <div 
       className={cn(
-        'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6',
+        'grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 md:grid-cols-3 md:gap-6',
         maxColumns === 4 && 'xl:grid-cols-4'
       )}
     >

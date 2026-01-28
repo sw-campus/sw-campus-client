@@ -20,10 +20,10 @@ export default function WritePostPage() {
   // 로그인 체크
   if (!hasHydrated) {
     return (
-      <main className="custom-container mx-auto w-full max-w-7xl md:!px-10">
+      <main className="custom-container mx-auto w-full max-w-[1448px] md:!px-10">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-32 rounded bg-gray-200" />
-          <div className="custom-card">
+          <div>
             <div className="h-96 w-full rounded bg-gray-200" />
           </div>
         </div>
@@ -33,7 +33,7 @@ export default function WritePostPage() {
 
   if (!isLoggedIn) {
     return (
-      <main className="custom-container mx-auto w-full max-w-7xl md:!px-10">
+      <main className="custom-container mx-auto w-full max-w-[1448px] md:!px-10">
         <div className="py-16 text-center">
           <p className="text-lg text-gray-500">로그인이 필요합니다</p>
           <Link href={`/login?returnUrl=${encodeURIComponent(pathname)}`} className="mt-4 inline-block text-primary hover:underline">
@@ -53,7 +53,7 @@ export default function WritePostPage() {
   }
 
   return (
-    <main className="custom-container mx-auto w-full max-w-7xl md:!px-10">
+    <main className="custom-container mx-auto w-full max-w-[1448px] md:!px-10">
       {/* 뒤로가기 */}
       <Link href="/community" className="mb-6 inline-flex items-center gap-2 text-gray-600 hover:text-gray-900">
         <FiArrowLeft />
@@ -61,7 +61,7 @@ export default function WritePostPage() {
       </Link>
 
       {/* 폼 카드 */}
-      <div className="custom-card">
+      <div>
         <h1 className="mb-6 text-2xl font-bold text-gray-900">게시글 작성</h1>
 
         {isCategoriesLoading ? (

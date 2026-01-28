@@ -7,6 +7,3 @@ export {
   PartnerSection,
   EventSection,
 } from './components'
-
-// Types
-export type { Banner, Course, Bootcamp, Partner, Event } from './types/home.type'

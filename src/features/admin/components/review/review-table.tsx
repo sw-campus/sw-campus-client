@@ -69,20 +69,20 @@ export function ReviewTable({ reviews, isLoading, currentPage, pageSize, onViewD
 
   return (
     <Card className="bg-card">
-      <CardHeader className="pb-3 sm:pb-6">
-        <CardTitle className="text-foreground text-base sm:text-lg">리뷰 목록</CardTitle>
+      <CardHeader className="pb-3 md:pb-6">
+        <CardTitle className="text-foreground text-base md:text-lg">리뷰 목록</CardTitle>
       </CardHeader>
-      <CardContent className="px-3 pb-3 sm:px-6 sm:pb-6">
-        <div className="-mx-3 overflow-x-auto sm:mx-0">
+      <CardContent className="px-3 pb-3 md:px-6 md:pb-6">
+        <div className="-mx-3 overflow-x-auto md:mx-0">
           <Table className="min-w-[550px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[40px] text-xs sm:w-[60px] sm:text-sm">NO</TableHead>
-                <TableHead className="w-[100px] text-xs sm:w-[200px] sm:text-sm">작성자</TableHead>
-                <TableHead className="min-w-[100px] text-xs sm:text-sm">강의명</TableHead>
-                <TableHead className="w-[50px] text-xs sm:w-[80px] sm:text-sm">평점</TableHead>
-                <TableHead className="w-[70px] text-xs sm:w-[110px] sm:text-sm">상태</TableHead>
-                <TableHead className="w-[80px] text-xs sm:w-[120px] sm:text-sm">작성일</TableHead>
+                <TableHead className="w-[40px] text-xs md:w-[60px] md:text-sm">NO</TableHead>
+                <TableHead className="w-[100px] text-xs md:w-[200px] md:text-sm">작성자</TableHead>
+                <TableHead className="min-w-[100px] text-xs md:text-sm">강의명</TableHead>
+                <TableHead className="w-[50px] text-xs md:w-[80px] md:text-sm">평점</TableHead>
+                <TableHead className="w-[70px] text-xs md:w-[110px] md:text-sm">상태</TableHead>
+                <TableHead className="w-[80px] text-xs md:w-[120px] md:text-sm">작성일</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -92,18 +92,18 @@ export function ReviewTable({ reviews, isLoading, currentPage, pageSize, onViewD
                   onClick={() => onViewDetail(review)}
                   className="hover:bg-muted/50 cursor-pointer transition-colors"
                 >
-                  <TableCell className="text-muted-foreground text-xs sm:text-sm">{getRowNumber(index)}</TableCell>
-                  <TableCell className="text-foreground max-w-[100px] truncate text-xs font-medium sm:max-w-[200px] sm:text-sm" title={review.nickname}>
+                  <TableCell className="text-muted-foreground text-xs md:text-sm">{getRowNumber(index)}</TableCell>
+                  <TableCell className="text-foreground max-w-[100px] truncate text-xs font-medium md:max-w-[200px] md:text-sm" title={review.nickname}>
                     {review.nickname}
                   </TableCell>
-                  <TableCell className="text-muted-foreground max-w-[100px] truncate text-xs sm:max-w-none sm:text-sm" title={review.lectureName}>
+                  <TableCell className="text-muted-foreground max-w-[100px] truncate text-xs md:max-w-none md:text-sm" title={review.lectureName}>
                     {review.lectureName}
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-xs sm:text-sm">{`${review.score.toFixed(1)}점`}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs md:text-sm">{`${review.score.toFixed(1)}점`}</TableCell>
                   <TableCell>
                     <StatusBadge status={review.reviewApprovalStatus} />
                   </TableCell>
-                  <TableCell className="text-muted-foreground whitespace-nowrap text-xs sm:text-sm">{formatDate(review.createdAt)}</TableCell>
+                  <TableCell className="text-muted-foreground whitespace-nowrap text-xs md:text-sm">{formatDate(review.createdAt)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

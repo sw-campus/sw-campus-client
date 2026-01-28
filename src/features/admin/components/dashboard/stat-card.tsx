@@ -125,14 +125,14 @@ export function StatCard({
       className={cn(
         'bento-card group relative overflow-hidden p-4 sm:p-5',
         size === 'large' && 'sm:p-6',
-        `hover:${colors.glow}`
+        `hover:${colors.glow}`,
       )}
     >
       {/* Background gradient accent */}
       <div
         className={cn(
-          'absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100',
-          colors.gradient
+          'absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100',
+          colors.gradient,
         )}
       />
 
@@ -159,14 +159,18 @@ export function StatCard({
             <div
               className={cn(
                 'flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold',
-                trend.isPositive ? 'bg-emerald-100 text-emerald-700' : trend.value === 0 ? 'bg-gray-100 text-gray-600' : 'bg-rose-100 text-rose-700'
+                trend.isPositive
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : trend.value === 0
+                    ? 'bg-gray-100 text-gray-600'
+                    : 'bg-rose-100 text-rose-700',
               )}
             >
               <TrendIcon
                 className={cn(
                   'h-3 w-3',
                   trend.isPositive && 'animate-trend-up',
-                  !trend.isPositive && trend.value !== 0 && 'animate-trend-down'
+                  !trend.isPositive && trend.value !== 0 && 'animate-trend-down',
                 )}
               />
               <span>{Math.abs(trend.value)}%</span>
@@ -181,16 +185,12 @@ export function StatCard({
               className={cn(
                 'font-mono-data text-foreground text-3xl font-bold tracking-tight sm:text-4xl',
                 size === 'large' && 'text-4xl sm:text-5xl',
-                effectiveIsAnimating && 'animate-count'
+                effectiveIsAnimating && 'animate-count',
               )}
             >
               {customFormatter ? customFormatter(effectiveDisplayValue) : effectiveDisplayValue.toLocaleString()}
             </span>
-            {subtext && (
-              <span className={cn('mt-1 text-xs font-medium', colors.text)}>
-                {subtext}
-              </span>
-            )}
+            {subtext && <span className={cn('mt-1 text-xs font-medium', colors.text)}>{subtext}</span>}
           </div>
 
           {/* Sparkline */}

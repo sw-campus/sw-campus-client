@@ -69,7 +69,7 @@ export default function LectureSection() {
   return (
     <div className="custom-container">
       <motion.div
-        className="custom-card relative overflow-hidden"
+        className="relative overflow-hidden"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
@@ -81,7 +81,7 @@ export default function LectureSection() {
 
         {/* 제목 */}
         <motion.h2
-          className="relative z-10 mb-4 text-xl font-bold text-gray-900 sm:mb-6 sm:text-2xl"
+          className="relative z-10 mb-4 text-xl font-bold text-gray-900 md:mb-6 md:text-2xl"
           variants={itemVariants}
         >
           {selectedCategoryName || '분야별'} 부트캠프

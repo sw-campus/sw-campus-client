@@ -8,7 +8,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import PhotoSlider from '@/features/lecture/components/detail/photo-slider'
 
 import type { OrganizationDetail as OrganizationDetailType } from '../types/organization.type'
-
 import { OrganizationProgramsSection } from './organization-programs-section'
 import { OrganizationReviewsSection } from './organization-reviews-section'
 
@@ -35,7 +34,7 @@ export function OrganizationDetail({ organization, totalReviews = 0, totalLectur
       {/* ===== HERO BANNER ===== */}
       <div className="relative -mx-4 -mt-4 h-[250px] overflow-hidden md:-mx-6 md:-mt-6">
         <Image src={heroImage} alt={`${organization.name} 시설`} fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/50 via-black/40 to-black/60" />
 
         {/* Text on Image - Glassmorphism */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">

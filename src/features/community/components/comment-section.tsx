@@ -144,12 +144,12 @@ export function CommentSection({ postId }: CommentSectionProps) {
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="따뜻한 댓글은 작성자에게 큰 힘이 됩니다..."
-                className="min-h-[100px] w-full resize-none border-0 bg-transparent p-5 text-sm leading-relaxed text-gray-900 placeholder:text-gray-500 placeholder:font-medium focus:outline-none focus:ring-0 sm:min-h-[120px]"
+                className="min-h-[100px] w-full resize-none border-0 bg-transparent p-5 text-sm leading-relaxed text-gray-900 placeholder:text-gray-500 placeholder:font-medium focus:outline-none focus:ring-0 md:min-h-[120px]"
                 rows={4}
                 aria-label="댓글 내용"
               />
               <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50/50 px-4 py-3">
-                <p className="hidden text-xs text-gray-400 sm:block">
+                <p className="hidden text-xs text-gray-400 md:block">
                   Ctrl + Enter로 등록
                 </p>
                 <Button

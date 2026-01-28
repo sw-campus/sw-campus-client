@@ -12,14 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import {
-  getApprovalStatusLabel,
-  getApprovalStatusColor,
-  canEditByStatus,
-} from '@/features/admin/types/approval.type'
+import { getApprovalStatusLabel, getApprovalStatusColor, canEditByStatus } from '@/features/admin/types/approval.type'
 import type { CompletedLecture } from '@/features/mypage/api/completed-lectures.api'
 import { ReviewForm } from '@/features/mypage/components/review/review-form'
-import { completedLecturesQueryKey, useCompletedLecturesQuery } from '@/features/mypage/hooks/use-completed-lectures-query'
+import {
+  completedLecturesQueryKey,
+  useCompletedLecturesQuery,
+} from '@/features/mypage/hooks/use-completed-lectures-query'
 
 export function ReviewManagementSection() {
   const queryClient = useQueryClient()
@@ -142,17 +141,18 @@ export function ReviewManagementSection() {
               >
                 <div className="w-0 flex-1">
                   {/* 1줄: 강의명 */}
-                  <p className={`text-foreground font-medium ${isExpanded ? '' : 'truncate'}`}>
-                    {l.lectureName}
-                  </p>
+                  <p className={`text-foreground font-medium ${isExpanded ? '' : 'truncate'}`}>{l.lectureName}</p>
                   {/* 2줄: 상태 뱃지 */}
                   <div className="mt-1 flex items-center gap-2 text-xs">
                     <span className="text-muted-foreground">수료증</span>
-                    <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${getApprovalStatusColor(l.certificateStatus)}`}>
+                    <Badge
+                      variant="secondary"
+                      className={`px-1.5 py-0 text-[10px] ${getApprovalStatusColor(l.certificateStatus)}`}
+                    >
                       {getApprovalStatusLabel(l.certificateStatus)}
                     </Badge>
                     <span className="text-muted-foreground">후기</span>
-                    <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${getStatusBadgeClass(l)}`}>
+                    <Badge variant="secondary" className={`px-1.5 py-0 text-[10px] ${getStatusBadgeClass(l)}`}>
                       {getStatusLabel(l)}
                     </Badge>
                   </div>
@@ -168,7 +168,7 @@ export function ReviewManagementSection() {
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="icon-sm"
                       className="h-8 flex-1 gap-1 text-xs"
                       onClick={() => {
                         setSelectedCertificate(l)
@@ -182,7 +182,7 @@ export function ReviewManagementSection() {
                     {l.canWriteReview ? (
                       <Button
                         variant="outline"
-                        size="sm"
+                        size="icon-sm"
                         className="h-8 flex-1 gap-1 text-xs"
                         onClick={() => {
                           setCreateLectureId(l.lectureId)
@@ -196,7 +196,7 @@ export function ReviewManagementSection() {
                     ) : (
                       <Button
                         variant="outline"
-                        size="sm"
+                        size="icon-sm"
                         className="h-8 flex-1 gap-1 text-xs"
                         onClick={() => {
                           setSelectedReviewId(l.reviewId ?? null)
@@ -272,7 +272,10 @@ export function ReviewManagementSection() {
                           {l.lectureName}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}>
+                          <Badge
+                            variant="secondary"
+                            className={`text-xs ${getApprovalStatusColor(l.certificateStatus)}`}
+                          >
                             {getApprovalStatusLabel(l.certificateStatus)}
                           </Badge>
                         </TableCell>
@@ -443,11 +446,7 @@ export function ReviewManagementSection() {
                     onClick={() => setFullImageUrl(previewUrl)}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={previewUrl}
-                      alt="새 수료증 미리보기"
-                      className="h-auto max-h-64 w-full object-contain"
-                    />
+                    <img src={previewUrl} alt="새 수료증 미리보기" className="h-auto max-h-64 w-full object-contain" />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition hover:bg-black/10">
                       <span className="rounded bg-black/50 px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100">
                         클릭하여 원본 보기

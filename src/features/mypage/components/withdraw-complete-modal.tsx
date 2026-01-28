@@ -41,7 +41,7 @@ export function WithdrawCompleteModal({ open, oauthProviders }: WithdrawComplete
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-[480px]" onPointerDownOutside={e => e.preventDefault()}>
+      <DialogContent className="md:max-w-[480px]" onPointerDownOutside={e => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-success">
             <LuBadgeCheck className="h-5 w-5" />

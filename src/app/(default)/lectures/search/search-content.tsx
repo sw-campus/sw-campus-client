@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useRef, Suspense } from 'react'
+
+import { Search, ChevronDown, Minus, Maximize2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
+
 import {
   HeroBanner,
   SectionTitle,
@@ -18,12 +21,10 @@ import {
   PCAIBanner,
 } from '@/features/bootcamp-list'
 import type { FilterValues } from '@/features/bootcamp-list'
-import type { LectureSummary } from '@/features/lecture/types/lecture.type'
-import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedAddToCart } from '@/features/cart/hooks/use-unified-add-to-cart'
+import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 import { useSearchLectureQuery } from '@/features/lecture/hooks/use-search-lecture-query'
-import { mapLectureResponseToSummary } from '@/features/lecture/utils/map-lecture-response-to-summary'
 import {
   COST_QUERY_MAP,
   PROCEDURE_QUERY_MAP,
@@ -33,8 +34,9 @@ import {
   DEFAULT_SORT,
   DEFAULT_PAGE_SIZE,
 } from '@/features/lecture/types/filter.type'
+import type { LectureSummary } from '@/features/lecture/types/lecture.type'
+import { mapLectureResponseToSummary } from '@/features/lecture/utils/map-lecture-response-to-summary'
 import { trackSearch } from '@/lib/analytics'
-import { Search, ChevronDown, Minus, Maximize2 } from 'lucide-react'
 
 const initialFilterValues: FilterValues = {
   mainCategory: '',
@@ -97,9 +99,7 @@ function SearchContentInner() {
 
   // 비교 선택 토글
   const handleToggleSelect = (id: string) => {
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    )
+    setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]))
   }
 
   // 카트에서 제거 시 선택 목록에서도 제거
@@ -119,9 +119,7 @@ function SearchContentInner() {
     }
 
     // 카테고리 ID (가장 하위 카테고리 우선)
-    const categoryId = filterValues.detailCategoryId
-      ?? filterValues.subCategoryId
-      ?? filterValues.mainCategoryId
+    const categoryId = filterValues.detailCategoryId ?? filterValues.subCategoryId ?? filterValues.mainCategoryId
     if (categoryId) {
       params.append('categoryIds', String(categoryId))
     }
@@ -221,18 +219,18 @@ function SearchContentInner() {
   const selectedCartItems = (cartItems ?? []).filter(item => selectedIds.includes(item.lectureId))
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center overflow-x-hidden">
+    <div className="flex min-h-screen w-full flex-col items-center overflow-x-hidden bg-white">
       {/* Hero Banner */}
       <div className="w-full">
         <HeroBanner
           title="강의 검색"
-          description={"원하는 분야의 강의를 검색해\nAI로 각 강의를 비교해보며, 최적의 강의를 선택해보세요."}
+          description={'원하는 분야의 강의를 검색해\nAI로 각 강의를 비교해보며, 최적의 강의를 선택해보세요.'}
           backgroundImageUrl="/images/bootcamp-hero.jpg"
         />
       </div>
 
       {/* ========== MOBILE LAYOUT ========== */}
-      <main className="w-full max-w-[360px] px-4 pb-[100px] flex flex-col items-center gap-6 lg:hidden bg-white">
+      <main className="flex w-full max-w-[360px] flex-col items-center gap-6 bg-white px-4 pb-[100px] lg:hidden">
         {/* Section Title */}
         <SectionTitle title="강의 검색" />
 
@@ -246,8 +244,8 @@ function SearchContentInner() {
           onToggleOpen={() => setIsInterestSectionOpen(prev => !prev)}
           isLoading={isCartLoading}
           closedMessage={
-            <p className="text-center text-base text-[#020202] leading-relaxed">
-              <span className="text-[#FEB706] font-semibold">AI 비교분석 기능</span>으로
+            <p className="text-center text-base leading-relaxed text-[#020202]">
+              <span className="font-semibold text-[#FEB706]">AI 비교분석 기능</span>으로
               <br />
               최적의 강의를 한 눈에 비교해보세요.
             </p>
@@ -256,7 +254,7 @@ function SearchContentInner() {
 
         {/* VS 비교 섹션 - 선택된 과정 2개 표시 (토글과 연동) */}
         {isInterestSectionOpen && selectedIds.length >= 2 && (
-          <div className="w-full flex flex-col gap-4">
+          <div className="flex w-full flex-col gap-4">
             <div className="relative flex items-center gap-4">
               <ComparisonCard
                 title={(cartItems ?? []).find(c => c.lectureId === selectedIds[0])?.title || ''}
@@ -264,7 +262,7 @@ function SearchContentInner() {
               />
 
               {/* VS Badge */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[45px] h-[45px] bg-[#020202] rounded-full flex items-center justify-center z-10">
+              <div className="absolute top-1/2 left-1/2 z-10 flex h-[45px] w-[45px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#020202]">
                 <span className="text-base font-bold text-[#FEB706]">VS</span>
               </div>
 
@@ -277,7 +275,7 @@ function SearchContentInner() {
             {/* AI 비교 분석 버튼 */}
             <button
               onClick={handleGoToCompare}
-              className="w-full h-10 bg-[#F9F9F9] rounded-xl shadow-[2px_2px_10px_rgba(161,161,170,0.25)] flex items-center justify-center"
+              className="flex h-10 w-full items-center justify-center rounded-xl bg-[#F9F9F9] shadow-[2px_2px_10px_rgba(161,161,170,0.25)]"
             >
               <span className="text-xs text-[#020202]">AI 비교 분석 자세히 보기</span>
             </button>
@@ -285,7 +283,7 @@ function SearchContentInner() {
         )}
 
         {/* Filter & Search */}
-        <div className="w-full flex flex-col gap-6">
+        <div className="flex w-full flex-col gap-6">
           <FilterSection
             searchValue={searchValue}
             onSearchChange={setSearchValue}
@@ -296,13 +294,13 @@ function SearchContentInner() {
           />
 
           {/* Lecture List */}
-          <div className="w-full flex flex-col gap-4">
+          <div className="flex w-full flex-col gap-4">
             {isLectureLoading ? (
               <div className="py-10 text-center text-sm text-gray-500">강의 목록을 불러오는 중...</div>
             ) : lectures.length === 0 ? (
               <div className="py-10 text-center text-sm text-gray-500">검색 결과가 없습니다.</div>
             ) : (
-              lectures.map((lecture) => (
+              lectures.map(lecture => (
                 <LectureCard
                   key={lecture.id}
                   lecture={lecture}
@@ -330,14 +328,14 @@ function SearchContentInner() {
       </main>
 
       {/* ========== DESKTOP LAYOUT ========== */}
-      <div className="hidden lg:block w-full">
+      <div className="hidden w-full lg:block">
         {/* Section Title */}
-        <div className="w-full max-w-[1448px] mx-auto px-6 pt-6">
+        <div className="mx-auto w-full max-w-[1448px] px-6 pt-6">
           <SectionTitle title="강의 검색" />
         </div>
 
         {/* Main Layout: Filter | Interest List + AI Banner + Card Grid */}
-        <div ref={mainContentRef} data-main-content className="w-full max-w-[1448px] mx-auto px-6 py-6 flex gap-6">
+        <div ref={mainContentRef} data-main-content className="mx-auto flex w-full max-w-[1448px] gap-6 px-6 py-6">
           {/* Left: Filter Sidebar */}
           <PCFilterSidebar
             isOpen={isPCFilterOpen}
@@ -349,24 +347,24 @@ function SearchContentInner() {
           />
 
           {/* Center: Main Content */}
-          <div className="flex-1 flex flex-col gap-6">
+          <div className="flex flex-1 flex-col gap-6">
             {/* AI 비교 섹션 - 접기/펼치기 */}
             {isPCCompareSectionOpen ? (
-              <div className="w-full rounded-xl overflow-hidden shadow-[4px_4px_20px_rgba(0,0,0,0.15)] border border-[#E5E5E5]">
+              <div className="w-full overflow-hidden rounded-xl border border-[#E5E5E5] shadow-[4px_4px_20px_rgba(0,0,0,0.15)]">
                 {/* 브라우저 타이틀바 */}
-                <div className="h-8 bg-[#F5F5F5] border-b border-[#E5E5E5] flex items-center justify-end px-3">
+                <div className="flex h-8 items-center justify-end border-b border-[#E5E5E5] bg-[#F5F5F5] px-3">
                   {/* 최소화 버튼 */}
                   <button
                     onClick={() => setIsPCCompareSectionOpen(false)}
-                    className="w-6 h-6 flex items-center justify-center hover:bg-[#E5E5E5] rounded transition-colors"
+                    className="flex h-6 w-6 items-center justify-center rounded transition-colors hover:bg-[#E5E5E5]"
                     title="최소화"
                   >
-                    <Minus className="w-4 h-4 text-[#666666]" />
+                    <Minus className="h-4 w-4 text-[#666666]" />
                   </button>
                 </div>
 
                 {/* 콘텐츠 영역 */}
-                <div className="p-4 bg-white flex gap-4 items-stretch">
+                <div className="flex items-stretch gap-4 bg-white p-4">
                   {/* Interest List */}
                   <PCInterestList
                     items={cartItems ?? []}
@@ -376,7 +374,7 @@ function SearchContentInner() {
                   />
 
                   {/* AI Recommendation Banner + VS */}
-                  <div className="flex-1 flex">
+                  <div className="flex flex-1">
                     <PCAIBanner selectedItems={selectedCartItems} isFilterOpen={isPCFilterOpen} />
                   </div>
                 </div>
@@ -384,40 +382,40 @@ function SearchContentInner() {
             ) : (
               <button
                 onClick={() => setIsPCCompareSectionOpen(true)}
-                className="w-full h-12 p-3 bg-[#F9F9F9] rounded-xl border border-[#D1D5DB] shadow-[4px_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-[#D1D5DB] bg-[#F9F9F9] p-3 shadow-[4px_4px_12px_rgba(0,0,0,0.15)]"
               >
-                <Maximize2 className="w-4 h-4 text-[#020202]" />
+                <Maximize2 className="h-4 w-4 text-[#020202]" />
                 <span className="text-base text-[#020202]">AI 비교 분석</span>
               </button>
             )}
 
             {/* Search Row */}
-            <div className="w-full flex items-center gap-2">
-              <div className="flex-1 h-10 px-6 py-2 bg-white rounded-lg border border-[#020202] flex items-center gap-1">
-                <Search className="w-4 h-4 text-[#888888]" />
+            <div className="flex w-full items-center gap-2">
+              <div className="flex h-10 flex-1 items-center gap-1 rounded-lg border border-[#020202] bg-white px-6 py-2">
+                <Search className="h-4 w-4 text-[#888888]" />
                 <input
                   type="text"
                   value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  onKeyDown={(e) => {
+                  onChange={e => setSearchValue(e.target.value)}
+                  onKeyDown={e => {
                     if (e.key === 'Enter') {
                       handleSearch()
                     }
                   }}
                   placeholder="검색어를 입력해주세요."
-                  className="flex-1 text-xs text-[#020202] placeholder:text-[#888888] outline-none bg-transparent"
+                  className="flex-1 bg-transparent text-xs text-[#020202] outline-none placeholder:text-[#888888]"
                 />
               </div>
               <button
                 onClick={handleSearch}
-                className="w-20 h-10 px-6 py-2 bg-[#262626] rounded-lg flex items-center justify-center"
+                className="flex h-10 w-20 items-center justify-center rounded-lg bg-[#262626] px-6 py-2"
               >
                 <span className="text-xs text-white">검색</span>
               </button>
               <div className="relative min-w-[213px]">
                 <select
                   value={sortValue}
-                  onChange={(e) => {
+                  onChange={e => {
                     setSortValue(e.target.value)
                     // 정렬 변경 시 바로 검색 실행
                     const params = new URLSearchParams(searchParams.toString())
@@ -425,31 +423,26 @@ function SearchContentInner() {
                     params.set('page', '1')
                     router.push(`/lectures/search?${params.toString()}`)
                   }}
-                  className="h-10 w-full px-4 py-2 bg-white rounded-lg border border-[#020202] text-xs text-[#020202] appearance-none cursor-pointer pr-8"
+                  className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-[#020202] bg-white px-4 py-2 pr-8 text-xs text-[#020202]"
                 >
-                  {SORT_OPTIONS.map((opt) => (
+                  {SORT_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-4 h-4 text-black absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-black" />
               </div>
             </div>
 
             {/* Lecture Grid - 필터 열림: 3열, 닫힘: 4열 */}
-            <div
-              className={`
-                w-full grid gap-6
-                ${isPCFilterOpen ? 'grid-cols-3' : 'grid-cols-4'}
-              `}
-            >
+            <div className={`grid w-full gap-6 ${isPCFilterOpen ? 'grid-cols-3' : 'grid-cols-4'} `}>
               {isLectureLoading ? (
                 <div className="col-span-full py-10 text-center text-sm text-gray-500">강의 목록을 불러오는 중...</div>
               ) : lectures.length === 0 ? (
                 <div className="col-span-full py-10 text-center text-sm text-gray-500">검색 결과가 없습니다.</div>
               ) : (
-                lectures.map((lecture) => (
+                lectures.map(lecture => (
                   <LectureCard
                     key={lecture.id}
                     lecture={lecture}
@@ -467,7 +460,7 @@ function SearchContentInner() {
 
             {/* Pagination */}
             {pageInfo.totalPages > 1 && (
-              <div className="w-full flex justify-center pt-4">
+              <div className="flex w-full justify-center pt-4">
                 <Pagination
                   currentPage={pageInfo.currentPage}
                   totalPages={pageInfo.totalPages}
@@ -476,16 +469,11 @@ function SearchContentInner() {
               </div>
             )}
           </div>
-
         </div>
       </div>
 
       {/* PC Cart Sidebar - 컴포넌트 자체에서 위치 계산 */}
-      <PCCartSidebar
-        items={cartItems ?? []}
-        onRemove={handleRemoveFromCart}
-        onCompare={handleGoToCompare}
-      />
+      <PCCartSidebar items={cartItems ?? []} onRemove={handleRemoveFromCart} onCompare={handleGoToCompare} />
 
       {/* Filter Modal - Mobile only */}
       <div className="lg:hidden">

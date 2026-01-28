@@ -44,13 +44,13 @@ export function ApprovalPagination({ currentPage, totalPages, onPageChange }: Ap
   const isLast = currentPage >= displayTotalPages - 1
 
   return (
-    <div className="flex flex-col items-center gap-3 sm:gap-4">
+    <div className="flex flex-col items-center gap-3 md:gap-4">
       {/* 페이지네이션 버튼 - 모바일에서 가로 스크롤 */}
-      <div className="-mx-4 w-full overflow-x-auto px-4 sm:mx-0 sm:w-auto sm:overflow-visible sm:px-0">
-        <div className="flex items-center justify-center gap-0.5 sm:gap-1">
+      <div className="-mx-4 w-full overflow-x-auto px-4 md:mx-0 md:w-auto md:overflow-visible md:px-0">
+        <div className="flex items-center justify-center gap-0.5 md:gap-1">
           {/* 처음 */}
-          <Button variant="outline" size="sm" onClick={() => onPageChange(0)} disabled={isFirst} className="h-8 w-8 shrink-0 sm:h-9 sm:w-9">
-            <LuChevronsLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          <Button variant="outline" size="sm" onClick={() => onPageChange(0)} disabled={isFirst} className="h-8 w-8 shrink-0 md:h-9 md:w-9">
+            <LuChevronsLeft className="h-3.5 w-3.5 md:h-4 md:w-4" />
           </Button>
           {/* 이전 */}
           <Button
@@ -58,15 +58,15 @@ export function ApprovalPagination({ currentPage, totalPages, onPageChange }: Ap
             size="sm"
             onClick={() => onPageChange(Math.max(0, currentPage - 1))}
             disabled={isFirst}
-            className="h-8 w-8 shrink-0 sm:h-9 sm:w-9"
+            className="h-8 w-8 shrink-0 md:h-9 md:w-9"
           >
-            <LuChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <LuChevronLeft className="h-3.5 w-3.5 md:h-4 md:w-4" />
           </Button>
 
           {/* 페이지 번호 */}
           {pages.map((page, idx) =>
             page === 'ellipsis' ? (
-              <span key={`ellipsis-${idx}`} className="text-muted-foreground px-1 sm:px-2">
+              <span key={`ellipsis-${idx}`} className="text-muted-foreground px-1 md:px-2">
                 ...
               </span>
             ) : (
@@ -75,7 +75,7 @@ export function ApprovalPagination({ currentPage, totalPages, onPageChange }: Ap
                 variant={currentPage === page ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onPageChange(page)}
-                className={`h-8 w-8 shrink-0 text-xs sm:h-9 sm:w-9 sm:text-sm ${
+                className={`h-8 w-8 shrink-0 text-xs md:h-9 md:w-9 md:text-sm ${
                   currentPage === page ? 'bg-gray-700 text-white hover:bg-gray-600' : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -90,9 +90,9 @@ export function ApprovalPagination({ currentPage, totalPages, onPageChange }: Ap
             size="sm"
             onClick={() => onPageChange(Math.min(displayTotalPages - 1, currentPage + 1))}
             disabled={isLast}
-            className="h-8 w-8 shrink-0 sm:h-9 sm:w-9"
+            className="h-8 w-8 shrink-0 md:h-9 md:w-9"
           >
-            <LuChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <LuChevronRight className="h-3.5 w-3.5 md:h-4 md:w-4" />
           </Button>
           {/* 마지막 */}
           <Button
@@ -100,16 +100,16 @@ export function ApprovalPagination({ currentPage, totalPages, onPageChange }: Ap
             size="sm"
             onClick={() => onPageChange(displayTotalPages - 1)}
             disabled={isLast}
-            className="h-8 w-8 shrink-0 sm:h-9 sm:w-9"
+            className="h-8 w-8 shrink-0 md:h-9 md:w-9"
           >
-            <LuChevronsRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <LuChevronsRight className="h-3.5 w-3.5 md:h-4 md:w-4" />
           </Button>
         </div>
       </div>
 
       {/* Go to page - 페이지가 많을 때만 표시, 모바일에서 숨김 */}
       {displayTotalPages > 5 && (
-        <div className="hidden items-center gap-2 sm:flex">
+        <div className="hidden items-center gap-2 md:flex">
           <span className="text-sm text-gray-500">Go to page:</span>
           <Select value={String(currentPage + 1)} onValueChange={value => onPageChange(Number(value) - 1)}>
             <SelectTrigger className="h-8 w-16">

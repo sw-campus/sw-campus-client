@@ -91,7 +91,7 @@ export function LectureSearchSidebar({
   }
 
   return (
-    <Card className="sticky top-4 flex h-fit w-full flex-col gap-3 border-white/20 bg-white/50 p-4 backdrop-blur-xl lg:w-[300px]">
+    <Card className="sticky top-4 flex h-fit w-full flex-col gap-3 border-white/20 bg-white/50 p-4 backdrop-blur-xl md:w-[300px]">
       <h3 className="text-base font-bold text-gray-800">검색 필터</h3>
 
       {/* 카테고리 섹션 */}

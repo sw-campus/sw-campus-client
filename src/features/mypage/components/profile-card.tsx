@@ -161,7 +161,7 @@ export function ProfileCard({ onEditClick }: ProfileCardProps) {
                 onClick={() => setChangePasswordOpen(true)}
               >
                 <LuKey className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">비밀번호</span>
+                <span className="hidden md:inline">비밀번호</span>
               </Button>
             )}
             <Button
@@ -171,7 +171,7 @@ export function ProfileCard({ onEditClick }: ProfileCardProps) {
               onClick={handleEditClick}
             >
               <LuPencil className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">프로필 수정</span>
+              <span className="hidden md:inline">프로필 수정</span>
             </Button>
           </div>
         </CardHeader>

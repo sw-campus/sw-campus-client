@@ -37,7 +37,7 @@ export function LectureCreateScheduleFields() {
               }
 
               return (
-                <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
+                <div className="grid grid-cols-4 gap-2 md:grid-cols-7">
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="day-mon"
@@ -151,7 +151,7 @@ export function LectureCreateScheduleFields() {
           강의 기간<span className="ml-1 text-xl font-bold text-red-600">*</span>
         </FieldLabel>
         <FieldContent>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <Controller
               control={control}
               name="startAtDate"
@@ -194,7 +194,7 @@ export function LectureCreateScheduleFields() {
           수업 시간<span className="ml-1 text-xl font-bold text-red-600">*</span>
         </FieldLabel>
         <FieldContent>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <Controller
               control={control}
               name="startTime"

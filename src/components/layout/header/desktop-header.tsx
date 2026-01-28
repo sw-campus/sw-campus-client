@@ -2,10 +2,9 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Bot, LogIn, LogOut, User } from 'lucide-react'
+import { LogIn, LogOut, User } from 'lucide-react'
 
 import { HeaderIconAction } from '@/components/layout/header/header-icon-action'
-import { NotificationDropdown } from '@/features/notification'
 import type { UserType } from '@/store/auth-store'
 
 import type { NavCategoryItem } from './header'
@@ -21,6 +20,7 @@ interface DesktopHeaderProps {
   onLogoutClick: () => void
   onCategoryEnter: (id: number) => void
   onOtherNavEnter: () => void
+  isHome?: boolean
 }
 
 export function DesktopHeader({
@@ -30,25 +30,31 @@ export function DesktopHeader({
   userType,
   hasHydrated,
   mypageHref,
-  isPending,
+  isPending: _isPending,
   onLogoutClick,
   onCategoryEnter,
   onOtherNavEnter,
+  isHome = false,
 }: DesktopHeaderProps) {
+  const headerBg = isHome ? 'bg-[#020f2b]' : 'bg-white'
+  const textColor = isHome ? 'text-header-text' : 'text-gray-900'
+  const logoFilter = isHome ? 'brightness-0 invert' : ''
+
   return (
-    <header className="sticky top-0 z-50 mx-auto mt-6 hidden w-full max-w-7xl items-center justify-between rounded-full border border-gray-200 bg-white/60 px-10 py-4 shadow-lg backdrop-blur-xl md:flex">
+    <header className={`hidden w-full md:flex ${headerBg}`}>
+      <div className="page-container flex items-center justify-between px-6 py-3">
       {/* 좌측: 로고 */}
-      <div className="flex flex-1 items-center gap-8">
+      <div className="flex items-center gap-3">
         <Link href={userType === 'ADMIN' ? '/admin' : '/'} className="flex items-center gap-3">
           <Image
             src="/images/logo.png"
             alt="SOFTWARE CAMPUS 로고"
-            width={48}
-            height={48}
-            className="size-12 shrink-0 object-contain"
+            width={52}
+            height={52}
+            className={`size-[52px] shrink-0 object-contain ${logoFilter}`}
             priority
           />
-          <div className="flex h-12 translate-y-px flex-col justify-center leading-none font-extrabold tracking-tight text-gray-800">
+          <div className={`flex flex-col justify-center text-base leading-none font-bold tracking-tight ${textColor}`}>
             <span>SOFTWARE</span>
             <span>CAMPUS</span>
           </div>
@@ -56,7 +62,7 @@ export function DesktopHeader({
       </div>
 
       {/* 중앙: 네비게이션 (lg 이상) */}
-      <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-8 font-semibold text-gray-800 lg:flex">
+      <nav className={`flex gap-8 text-base font-semibold tracking-tight ${textColor}`}>
         {categories
           .filter(c => !c.type || c.type === 'LECTURE')
           .map(category => {
@@ -69,6 +75,7 @@ export function DesktopHeader({
               <Link
                 key={uniqueKey}
                 href={href}
+                className="hover:text-brand-gold"
                 onMouseEnter={() => onCategoryEnter(category.categoryId)}
                 onFocus={() => onCategoryEnter(category.categoryId)}
                 onClick={() => onCategoryEnter(category.categoryId)}
@@ -78,8 +85,12 @@ export function DesktopHeader({
             )
           })}
 
-        <Link href="/organizations" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
+        <Link href="/organizations" className="hover:text-brand-gold" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
           훈련 기관
+        </Link>
+
+        <Link href="/cart/compare" className="hover:text-brand-gold" onMouseEnter={onOtherNavEnter} onFocus={onOtherNavEnter}>
+          부트캠프 비교
         </Link>
 
         {categories
@@ -92,6 +103,7 @@ export function DesktopHeader({
               <Link
                 key={uniqueKey}
                 href={href}
+                className="hover:text-brand-gold"
                 prefetch={false}
                 onMouseEnter={onOtherNavEnter}
                 onFocus={onOtherNavEnter}
@@ -102,41 +114,31 @@ export function DesktopHeader({
           })}
       </nav>
 
-      {/* 우측: 아이콘 */}
-      <div className="flex items-center gap-6 text-xl text-gray-800">
+      {/* 우측: 사용자 정보 */}
+      <div className={`flex items-center gap-5 ${textColor}`}>
         {!hasHydrated ? (
           <div className="h-6 w-24" />
         ) : isLoggedIn ? (
           <>
-            <span className="text-base font-medium">{nickname}님</span>
-
-            <HeaderIconAction
-              kind="button"
-              ariaLabel="로그아웃"
-              tooltip="로그아웃"
-              onClick={onLogoutClick}
-              disabled={isPending}
-            >
-              <LogOut />
-            </HeaderIconAction>
-
-            <NotificationDropdown />
+            <span className="text-base">
+              {nickname} <span className="font-bold">님</span>
+            </span>
 
             <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href={mypageHref}>
-              <User />
+              <User size={28} />
             </HeaderIconAction>
 
-            {userType !== 'ADMIN' && userType !== 'ORGANIZATION' && (
-              <HeaderIconAction kind="link" ariaLabel="AI 심층 비교" tooltip="AI 심층 비교" href="/cart/compare">
-                <Bot />
-              </HeaderIconAction>
-            )}
+            <HeaderIconAction kind="button" ariaLabel="로그아웃" tooltip="로그아웃" onClick={onLogoutClick}>
+              <LogOut size={24} />
+            </HeaderIconAction>
           </>
         ) : (
-          <HeaderIconAction kind="link" ariaLabel="로그인" tooltip="로그인" href="/login">
-            <LogIn />
-          </HeaderIconAction>
+          <Link href="/login" className="flex items-center gap-2 text-sm font-medium leading-none">
+            로그인을 해주세요.
+            <LogIn size={18} />
+          </Link>
         )}
+      </div>
       </div>
     </header>
   )

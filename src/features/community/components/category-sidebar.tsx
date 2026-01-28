@@ -190,7 +190,7 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
   return (
     <>
       {/* 모바일: 드릴다운 방식 탭 */}
-      <div className="relative lg:hidden">
+      <div className="relative md:hidden">
         {/* 오른쪽 스크롤 힌트 그라데이션 */}
         <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-8 bg-gradient-to-l from-white via-white/80 to-transparent" />
         <div className="scrollbar-hide -mx-4 overflow-x-auto px-4 pr-8">
@@ -250,7 +250,7 @@ export function CategorySidebar({ categories, selectedCategoryId, onSelect }: Ca
       </div>
 
       {/* 데스크탑: 사이드바 트리 */}
-      <aside className="hidden w-64 shrink-0 lg:block">
+      <aside className="hidden w-64 shrink-0 md:block">
         <nav className="sticky top-24 space-y-1 rounded-2xl border border-gray-200/60 bg-white/80 p-4 shadow-sm backdrop-blur-xl">
           <h3 className="mb-4 flex items-center gap-2 px-2 text-xs font-bold tracking-wider text-gray-400 uppercase">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />

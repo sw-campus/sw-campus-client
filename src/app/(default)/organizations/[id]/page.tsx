@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+
 import { notFound } from 'next/navigation'
 
 import { JsonLd, createOrganizationJsonLd } from '@/components/seo/json-ld'
