@@ -57,7 +57,7 @@ export default function KakaoChannelButton() {
         integrity="sha384-tJkjbtDbvoxO+diRuDtwRO9JXR7pjWnfjfRn5ePUpl7e7RJCxKCwwnfqUAdXh53p"
         crossOrigin="anonymous"
         onLoad={handleKakaoLoad}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
       <div
         id="kakao-chat-channel-button"

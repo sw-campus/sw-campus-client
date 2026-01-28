@@ -163,7 +163,7 @@ function CourseItem({ course, isSelected = false, onClick }: CourseItemProps) {
       {/* 썸네일 */}
       <div className="bg-muted relative size-[46px] shrink-0 overflow-hidden rounded-lg">
         {course.thumbnailUrl ? (
-          <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover" />
+          <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover" sizes="(max-width: 768px) 50vw, 200px" />
         ) : (
           <div className="flex size-full items-center justify-center">
             <Star className="text-muted-foreground size-5" />
@@ -190,7 +190,7 @@ function CompareCard({ course }: CompareCardProps) {
       {/* 썸네일 */}
       <div className="bg-muted relative h-[86px] w-full overflow-hidden rounded-lg">
         {course.thumbnailUrl ? (
-          <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover" />
+          <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover" sizes="(max-width: 768px) 50vw, 200px" />
         ) : (
           <div className="flex size-full items-center justify-center">
             <Star className="text-muted-foreground size-6" />

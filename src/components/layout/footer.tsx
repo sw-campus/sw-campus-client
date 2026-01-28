@@ -21,7 +21,7 @@ export default function Footer() {
             {/* 로고 및 회사명 */}
             <div className="flex items-center gap-2">
               <div className="relative size-6 md:size-8">
-                <Image src="/images/logo.png" alt="SOFTWARE CAMPUS" fill className="object-contain brightness-0 invert" />
+                <Image src="/images/logo.png" alt="SOFTWARE CAMPUS" fill sizes="32px" className="object-contain brightness-0 invert" />
               </div>
               <span className="text-sm font-semibold text-white md:text-2xl md:font-extrabold">SOFTWARE CAMPUS</span>
             </div>

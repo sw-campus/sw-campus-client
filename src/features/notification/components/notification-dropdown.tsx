@@ -145,7 +145,11 @@ function NotificationItem({
 
 const NOTIFICATIONS_PER_PAGE = 10
 
-export function NotificationDropdown() {
+interface NotificationDropdownProps {
+  isMobile?: boolean
+}
+
+export function NotificationDropdown({ isMobile = false }: NotificationDropdownProps) {
   useSSE()
 
   const [displayCount, setDisplayCount] = useState(NOTIFICATIONS_PER_PAGE)
@@ -165,29 +169,38 @@ export function NotificationDropdown() {
     }
   }
 
+  const triggerButton = (
+    <button
+      type="button"
+      className={cn(
+        'relative rounded-full p-1.5 transition-colors',
+        !isMobile && 'hover:bg-muted'
+      )}
+      aria-label="알림"
+    >
+      <FiBell className="size-5" />
+      {unreadCount > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white ring-2 ring-background">
+          {unreadCount > 9 ? '9+' : unreadCount}
+        </span>
+      )}
+    </button>
+  )
+
   return (
     <DropdownMenu onOpenChange={handleOpenChange}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="relative rounded-full p-1.5 transition-colors hover:bg-muted"
-              aria-label="알림"
-            >
-              <FiBell className="size-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white ring-2 ring-background">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </button>
-          </DropdownMenuTrigger>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p className="font-semibold">알림</p>
-        </TooltipContent>
-      </Tooltip>
+      {isMobile ? (
+        <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
+      ) : (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="font-semibold">알림</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
 
       <DropdownMenuContent align="end" className="w-80 p-0">
         <DropdownMenuLabel className="flex items-center justify-between border-b px-4 py-3">

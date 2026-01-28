@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Bot, Menu, User } from 'lucide-react'
+import { Menu, User } from 'lucide-react'
 
 import { HeaderIconAction } from '@/components/layout/header/header-icon-action'
 import { NotificationDropdown } from '@/features/notification'
@@ -10,7 +10,6 @@ import type { UserType } from '@/store/auth-store'
 
 interface MobileHeaderProps {
   isLoggedIn: boolean
-  nickname: string | null
   userType: UserType | null
   hasHydrated: boolean
   mypageHref: string
@@ -20,7 +19,6 @@ interface MobileHeaderProps {
 
 export function MobileHeader({
   isLoggedIn,
-  nickname,
   userType,
   hasHydrated,
   mypageHref,
@@ -37,48 +35,35 @@ export function MobileHeader({
       {/* 좌측: 햄버거 + 로고 */}
       <div className="flex items-center gap-3">
         <button type="button" className={textColor} onClick={onOpenNav} aria-label="메뉴 열기">
-          <Menu size={32} />
+          <Menu size={24} />
         </button>
         <Link href={userType === 'ADMIN' ? '/admin' : '/'}>
           <Image
             src="/images/logo.png"
             alt="SOFTWARE CAMPUS 로고"
-            width={40}
-            height={40}
-            className={`size-10 object-contain ${logoFilter}`}
-            priority
+            width={32}
+            height={32}
+            className={`size-8 object-contain ${logoFilter}`}
+            loading="eager"
           />
         </Link>
       </div>
 
-      {/* 우측: 사용자 정보 + 아이콘들 */}
-      <div className={`flex items-center gap-3 ${textColor}`}>
+      {/* 우측: 아이콘들 */}
+      <div className={`flex items-center gap-2 ${textColor}`}>
         {!hasHydrated ? (
-          <div className="h-5 w-20" />
+          <div className="h-5 w-16" />
         ) : isLoggedIn ? (
           <>
-            <span className="text-sm">
-              {nickname} <span className="font-bold">님</span>
-            </span>
-            <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href={mypageHref}>
-              <User size={28} />
+            <HeaderIconAction kind="link" ariaLabel="마이페이지" tooltip="마이페이지" href={mypageHref} showTooltip={false}>
+              <User size={24} />
             </HeaderIconAction>
-            <NotificationDropdown />
-            {userType !== 'ADMIN' && userType !== 'ORGANIZATION' && (
-              <HeaderIconAction kind="link" ariaLabel="AI 비교" tooltip="AI 비교" href="/cart/compare">
-                <Bot size={28} />
-              </HeaderIconAction>
-            )}
+            <NotificationDropdown isMobile />
           </>
         ) : (
-          <>
-            <Link href="/login" className="text-sm font-bold">
-              로그인을 해주세요.
-            </Link>
-            <HeaderIconAction kind="link" ariaLabel="AI 비교" tooltip="AI 비교" href="/cart/compare">
-              <Bot size={28} />
-            </HeaderIconAction>
-          </>
+          <Link href="/login" className="text-sm font-bold">
+            로그인을 해주세요.
+          </Link>
         )}
       </div>
     </header>
