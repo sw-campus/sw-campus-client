@@ -76,8 +76,8 @@ export default async function OrganizationDetailPage({ params }: OrganizationDet
   return (
     <>
       {orgJsonLd && <JsonLd data={orgJsonLd} />}
-      <div className="bg-background min-h-screen">
-        <div className="mx-auto max-w-3xl px-4 md:max-w-7xl md:px-6">
+      <div className="w-full min-h-screen bg-white flex flex-col items-center overflow-x-hidden">
+        <div className="w-full max-w-[1448px] mx-auto px-4 md:px-6 py-6">
           <OrganizationDetailPageClient organizationId={orgId} initialData={organization ?? undefined} />
         </div>
       </div>

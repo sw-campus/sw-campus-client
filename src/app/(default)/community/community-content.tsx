@@ -158,16 +158,6 @@ function CommunityContentInner() {
             </Button>
           </div>
 
-          {/* 모바일 프로필 버튼 - 44px 최소 터치 영역 */}
-          {currentMember && (
-            <button
-              onClick={() => router.push(`/community/user/${currentMember.userId}`)}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all active:scale-95 md:hidden"
-              aria-label="내 프로필"
-            >
-              <FiUser className="h-5 w-5" />
-            </button>
-          )}
         </div>
       </div>
 
@@ -185,48 +175,70 @@ function CommunityContentInner() {
           </div>
 
           {/* 필터 및 컨트롤 */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide md:gap-2.5">
-            {/* 강의 필터 */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsLectureModalOpen(true)}
-              className={`h-9 shrink-0 gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition-all duration-200 active:scale-95 md:h-10 md:gap-2 md:rounded-xl md:px-4 md:text-sm ${
-                selectedLecture
-                  ? 'border-primary/30 bg-primary/5 text-primary shadow-sm'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              <FiFilter className="h-3.5 w-3.5 md:h-4 md:w-4" />
-              <span className="hidden xs:inline">강의</span>
-              <span>필터</span>
-              {selectedLecture && (
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground md:h-5 md:w-5 md:text-[10px]">
-                  1
-                </span>
+          <div className="flex items-center justify-between gap-2 md:justify-start md:gap-2.5">
+            {/* 왼쪽: 필터 + 정렬 */}
+            <div className="flex items-center gap-2">
+              {/* 강의 필터 */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsLectureModalOpen(true)}
+                className={`h-9 shrink-0 gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition-all duration-200 active:scale-95 md:h-10 md:gap-2 md:rounded-xl md:px-4 md:text-sm ${
+                  selectedLecture
+                    ? 'border-primary/30 bg-primary/5 text-primary shadow-sm'
+                    : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                <FiFilter className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                <span className="hidden xs:inline">강의</span>
+                <span>필터</span>
+                {selectedLecture && (
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground md:h-5 md:w-5 md:text-[10px]">
+                    1
+                  </span>
+                )}
+              </Button>
+
+              {/* 정렬 선택 */}
+              <Select
+                value={sort}
+                onValueChange={value => {
+                  setSort(value)
+                  setPage(0)
+                }}
+              >
+                <SelectTrigger className="h-9 w-[88px] shrink-0 rounded-lg border-gray-200 bg-white text-[13px] font-medium md:h-10 md:w-[110px] md:rounded-xl md:text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {POST_SORT_OPTIONS.map(option => (
+                    <SelectItem key={option.value} value={option.value} className="text-sm">
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 오른쪽: 프로필 + 글쓰기 (모바일만) */}
+            <div className="flex items-center gap-2 md:hidden">
+              {currentMember && (
+                <button
+                  onClick={() => router.push(`/community/user/${currentMember.userId}`)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all active:scale-95"
+                  aria-label="내 프로필"
+                >
+                  <FiUser className="h-4 w-4" />
+                </button>
               )}
-            </Button>
-
-            {/* 정렬 선택 */}
-            <Select
-              value={sort}
-              onValueChange={value => {
-                setSort(value)
-                setPage(0)
-              }}
-            >
-              <SelectTrigger className="h-9 w-[100px] shrink-0 rounded-lg border-gray-200 bg-white text-[13px] font-medium md:h-10 md:w-[110px] md:rounded-xl md:text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                {POST_SORT_OPTIONS.map(option => (
-                  <SelectItem key={option.value} value={option.value} className="text-sm">
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
+              <button
+                onClick={handleWriteClick}
+                className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 text-[13px] font-semibold text-primary-foreground shadow-sm transition-all active:scale-95"
+              >
+                <FiEdit3 className="h-4 w-4" />
+                <span>글쓰기</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -381,16 +393,6 @@ function CommunityContentInner() {
           )}
         </main>
       </div>
-
-      {/* 모바일 플로팅 글쓰기 버튼 */}
-      <button
-        onClick={handleWriteClick}
-        className="group fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/30 ring-4 ring-primary/20 transition-all duration-200 active:scale-90 md:hidden"
-        aria-label="글쓰기"
-      >
-        <span className="absolute inset-0 rounded-2xl bg-linear-to-br from-white/20 to-transparent opacity-0 transition-opacity duration-200 group-active:opacity-100" />
-        <FiEdit3 className="h-6 w-6 transition-transform duration-200 group-active:rotate-12" />
-      </button>
 
       {/* 강의 검색 모달 */}
       <LectureSearchModal
