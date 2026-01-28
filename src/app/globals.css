@@ -291,36 +291,6 @@ html {
     background-size: 20px 20px;
   }
 
-  /* Pulse animation for live data */
-  @keyframes data-pulse {
-    0%, 100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.7;
-      transform: scale(1.05);
-    }
-  }
-
-  .animate-data-pulse {
-    animation: data-pulse 2s ease-in-out infinite;
-  }
-
-  /* Glow effect for accents */
-  @keyframes glow-pulse {
-    0%, 100% {
-      box-shadow: 0 0 5px var(--dash-glow), 0 0 10px var(--dash-glow);
-    }
-    50% {
-      box-shadow: 0 0 10px var(--dash-glow), 0 0 20px var(--dash-glow), 0 0 30px var(--dash-glow);
-    }
-  }
-
-  .animate-glow {
-    animation: glow-pulse 3s ease-in-out infinite;
-  }
-
   /* Trend indicator animations */
   @keyframes trend-up {
     0%, 100% { transform: translateY(0); }
@@ -338,11 +308,6 @@ html {
 
   .animate-trend-down {
     animation: trend-down 1.5s ease-in-out infinite;
-  }
-
-  /* Sparkline container */
-  .sparkline-container {
-    @apply absolute right-0 bottom-0 h-12 w-24 opacity-60;
   }
 
   /* Number counter animation */
@@ -367,30 +332,6 @@ html {
     font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-variant-numeric: tabular-nums;
     font-feature-settings: 'tnum' on, 'lnum' on;
-  }
-
-  /* Gradient text */
-  .gradient-text-lime {
-    @apply bg-gradient-to-r from-lime-500 to-emerald-500 bg-clip-text text-transparent;
-  }
-
-  .gradient-text-cyan {
-    @apply bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent;
-  }
-
-  .gradient-text-magenta {
-    @apply bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent;
-  }
-
-  /* Chart gradient definitions */
-  .chart-gradient-lime {
-    --chart-start: oklch(0.84 0.2 128);
-    --chart-end: oklch(0.84 0.2 128 / 0.1);
-  }
-
-  .chart-gradient-cyan {
-    --chart-start: oklch(0.78 0.15 195);
-    --chart-end: oklch(0.78 0.15 195 / 0.1);
   }
 
   /* 스켈레톤 shimmer 애니메이션 */
