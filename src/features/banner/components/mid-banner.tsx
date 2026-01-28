@@ -40,7 +40,7 @@ export default function MidBanner() {
           {[0, 1].map(i => (
             <div
               key={i}
-              className="bg-muted flex h-[90px] w-[calc(50%-4px)] shrink-0 animate-pulse items-center justify-between border border-gray-200 md:h-[180px]"
+              className="bg-muted flex h-[90px] w-[calc(50%-4px)] shrink-0 animate-pulse items-center justify-between border border-gray-200 md:h-[150px]"
             />
           ))}
         </div>
@@ -71,63 +71,68 @@ export default function MidBanner() {
       {/* 중형 배너 슬라이더 - 중배너가 있을 때만 표시 */}
       {hasMiddleBanners && (
         <div className="relative">
-            <Swiper
-              modules={[Autoplay, Navigation]}
-              rewind={true}
-              navigation={true}
-              autoplay={{
-                delay: 5000,
-                disableOnInteraction: false,
-              }}
-              spaceBetween={4}
-              slidesPerView={1}
-            >
-              {middleBanners.map(banner => {
-                const href = getBannerLink(banner)
-                const external = isExternalLink(href)
+          <Swiper
+            modules={[Autoplay, Navigation]}
+            rewind={true}
+            navigation={true}
+            autoplay={{
+              delay: 5000,
+              disableOnInteraction: false,
+            }}
+            spaceBetween={8}
+            slidesPerView={1}
+            breakpoints={{
+              768: {
+                slidesPerView: 2,
+              },
+            }}
+          >
+            {middleBanners.map(banner => {
+              const href = getBannerLink(banner)
+              const external = isExternalLink(href)
 
-                const content = (
-                  <div
-                    className="relative h-[90px] w-full overflow-hidden border border-gray-200 shadow-lg md:h-[180px]"
-                    style={{ backgroundColor: banner.backgroundColor || '#ffffff' }}
-                  >
-                    {banner.imageUrl ? (
-                      <Image
-                        src={banner.imageUrl}
-                        alt={banner.lectureName}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-contain object-center"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center">
-                        <span className="text-xl font-bold">{banner.lectureName}</span>
-                      </div>
-                    )}
-                  </div>
-                )
+              const content = (
+                <div
+                  className="relative h-[90px] w-full overflow-hidden border border-gray-200 shadow-lg md:h-[150px]"
+                  style={{ backgroundColor: banner.backgroundColor || '#ffffff' }}
+                >
+                  {banner.imageUrl ? (
+                    <Image
+                      src={banner.imageUrl}
+                      alt={banner.lectureName}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-contain object-center"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <span className="text-xl font-bold">{banner.lectureName}</span>
+                    </div>
+                  )}
+                </div>
+              )
 
-                return (
-                  <SwiperSlide key={banner.id}>
-                    {external ? (
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block"
-                        onClick={() => handleBannerClick(banner)}
-                      >
-                        {content}
-                      </a>
-                    ) : (
-                      <Link href={href} className="block" onClick={() => handleBannerClick(banner)}>
-                        {content}
-                      </Link>
-                    )}
-                  </SwiperSlide>
-                )
-              })}
-            </Swiper>
+              return (
+                <SwiperSlide key={banner.id}>
+                  {external ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                      onClick={() => handleBannerClick(banner)}
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <Link href={href} className="block" onClick={() => handleBannerClick(banner)}>
+                      {content}
+                    </Link>
+                  )}
+                </SwiperSlide>
+              )
+            })}
+          </Swiper>
         </div>
       )}
 

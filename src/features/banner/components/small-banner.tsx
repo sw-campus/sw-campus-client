@@ -66,8 +66,13 @@ export default function SmallBanner() {
           delay: 3000,
           disableOnInteraction: false,
         }}
-        spaceBetween={4}
+        spaceBetween={8}
         slidesPerView={2}
+        breakpoints={{
+          768: {
+            slidesPerView: 4,
+          },
+        }}
       >
         {banners.map(banner => {
           const href = getBannerLink(banner)
