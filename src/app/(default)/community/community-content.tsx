@@ -132,26 +132,10 @@ function CommunityContentInner() {
   const totalPages = pageInfo?.totalPages ?? 1
 
   return (
-    <div className="custom-container mx-auto w-full max-w-7xl">
-      {/* 1. 상단 헤더 영역 */}
+    <div className="w-full">
+      {/* 1. 상단 버튼 영역 */}
       <div className="mb-6 md:mb-8">
-        <div className="flex items-start justify-between gap-3 md:gap-4">
-          <div className="min-w-0 flex-1 space-y-2 md:space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-2.5 py-1 md:px-3">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-              <span className="text-[11px] font-semibold text-primary md:text-xs">커뮤니티</span>
-            </div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 md:text-3xl lg:text-4xl">
-              부트캠프{' '}
-              <span className="text-primary">
-                수강일기
-              </span>
-            </h1>
-            <p className="max-w-md text-sm text-gray-500 md:text-base">
-              매주 배운 내용과 성장 과정을 기록하고, 동료들과 함께 성장하세요
-            </p>
-          </div>
-
+        <div className="flex items-center justify-end gap-3 md:gap-4">
           {/* 데스크탑 버튼 영역 */}
           <div className="hidden shrink-0 items-center gap-2.5 md:flex">
             {currentMember && (

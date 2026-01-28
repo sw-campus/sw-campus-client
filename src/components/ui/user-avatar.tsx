@@ -38,9 +38,9 @@ type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 const sizeClasses: Record<AvatarSize, { avatar: string; text: string }> = {
   xs: { avatar: 'h-6 w-6', text: 'text-xs' },
-  md: { avatar: 'h-8 w-8', text: 'text-sm' },
+  sm: { avatar: 'h-8 w-8', text: 'text-sm' },
   md: { avatar: 'h-10 w-10', text: 'text-base' },
-  md: { avatar: 'h-16 w-16 md:h-20 md:w-20', text: 'text-xl md:text-2xl' },
+  lg: { avatar: 'h-16 w-16 md:h-20 md:w-20', text: 'text-xl md:text-2xl' },
   xl: { avatar: 'h-20 w-20 md:h-32 md:w-32', text: 'text-xl md:text-3xl' },
 }
 
