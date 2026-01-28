@@ -13,6 +13,9 @@ import { DEFAULT_PAGE_SIZE } from '@/features/lecture/types/filter.type'
 
 import { BootcampListItem } from './bootcamp-list-item'
 
+/** 카드 높이 (데스크탑 기준) - BootcampListItem computed height */
+const CARD_HEIGHT_DESKTOP = 352.5
+
 export function BootcampListSection() {
   // 카테고리 트리에서 첫 번째 대분류의 중분류(children)를 가져옴
   const { data: categoryTree } = useCategoryTree()
@@ -61,7 +64,10 @@ export function BootcampListSection() {
 
         {/* 부트캠프 리스트 */}
         {isLoading ? (
-          <div className="flex h-48 items-center justify-center">
+          <div
+            className="flex h-48 items-center justify-center"
+            style={{ minHeight: `${CARD_HEIGHT_DESKTOP}px` }}
+          >
             <div className="border-muted border-t-primary size-8 animate-spin rounded-full border-4" />
           </div>
         ) : lecturesData && lecturesData.length > 0 ? (
@@ -83,7 +89,10 @@ export function BootcampListSection() {
             ))}
           </motion.div>
         ) : (
-          <div className="text-muted-foreground flex h-48 flex-col items-center justify-center gap-3">
+          <div
+            className="text-muted-foreground flex h-48 flex-col items-center justify-center gap-3"
+            style={{ minHeight: `${CARD_HEIGHT_DESKTOP}px` }}
+          >
             <div className="bg-muted/50 rounded-full p-4">
               <span className="text-2xl">🔍</span>
             </div>
