@@ -5,20 +5,20 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import {
   HeroBanner,
   SectionTitle,
-  InterestCourseSection,
-  FloatingInterestBar,
+  InterestLectureSection,
+  FloatingCartPanel,
   ComparisonCard,
   FilterSection,
   FilterModal,
   LectureCard,
   Pagination,
   PCFilterSidebar,
-  PCCartSidebar,
-  PCInterestList,
-  PCAIBanner,
 } from '@/features/bootcamp-list'
+import { AiComparePreview } from '@/components/common/ai-compare-preview'
+import { InterestLectureList } from '@/components/common/interest-lecture-list'
 import type { FilterValues } from '@/features/bootcamp-list'
 import type { LectureSummary } from '@/features/lecture/types/lecture.type'
+import type { CartItem } from '@/features/cart/types/cart.type'
 import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedAddToCart } from '@/features/cart/hooks/use-unified-add-to-cart'
 import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
@@ -69,8 +69,9 @@ function BootcampListContent() {
   const { addToCart, isPending: isAddPending } = useUnifiedAddToCart()
   const { mutate: removeFromCart } = useUnifiedRemoveFromCart()
 
-  // 비교를 위해 선택된 항목 (카트 내에서 선택)
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  // 비교를 위해 선택된 항목 — 고정 슬롯: [왼쪽, 오른쪽]
+  const [selectedSlots, setSelectedSlots] = useState<[string | null, string | null]>([null, null])
+  const selectedIds = selectedSlots.filter((id): id is string => id !== null)
 
   // UI 상태
   const [searchValue, setSearchValue] = useState(searchParams.get('text') ?? '')
@@ -94,17 +95,26 @@ function BootcampListContent() {
     return cartItems.some(item => item.lectureId === lectureId)
   }
 
-  // 비교 선택 토글
+  // 비교 선택 토글 (고정 슬롯)
   const handleToggleSelect = (id: string) => {
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    )
+    setSelectedSlots(prev => {
+      if (prev[0] === id) return [null, prev[1]]
+      if (prev[1] === id) return [prev[0], null]
+      // 새로 선택 → 첫 번째 빈 슬롯에 채움
+      if (prev[0] === null) return [id, prev[1]]
+      if (prev[1] === null) return [prev[0], id]
+      // 둘 다 차있으면 왼쪽 교체
+      return [id, prev[1]]
+    })
   }
 
-  // 카트에서 제거 시 선택 목록에서도 제거
+  // 카트에서 제거 시 선택 슬롯에서도 제거
   const handleRemoveFromCart = (lectureId: string) => {
     removeFromCart(lectureId)
-    setSelectedIds(prev => prev.filter(id => id !== lectureId))
+    setSelectedSlots(prev => [
+      prev[0] === lectureId ? null : prev[0],
+      prev[1] === lectureId ? null : prev[1],
+    ])
   }
 
   // URL 파라미터 빌드 및 네비게이션
@@ -209,8 +219,14 @@ function BootcampListContent() {
     router.push('/cart/compare')
   }
 
-  // 선택된 카트 아이템
-  const selectedCartItems = cartItems.filter(item => selectedIds.includes(item.lectureId))
+  // 선택된 카트 아이템 (슬롯 순서 유지)
+  const selectedCartSlots: (CartItem | null)[] = selectedSlots.map(
+    id => (id !== null ? cartItems.find(item => item.lectureId === id) ?? null : null),
+  )
+
+  // 카테고리 잠금: 선택된 항목 중 첫 번째의 카테고리
+  const firstSelected = selectedCartSlots.find(item => item !== null)
+  const lockedCategory = firstSelected ? (firstSelected.categoryName ?? null) : null
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center overflow-x-hidden">
@@ -229,7 +245,7 @@ function BootcampListContent() {
         <SectionTitle title="부트캠프" />
 
         {/* Interest Courses (카트 목록) */}
-        <InterestCourseSection
+        <InterestLectureSection
           items={cartItems}
           selectedIds={selectedIds}
           onToggleSelect={handleToggleSelect}
@@ -357,19 +373,21 @@ function BootcampListContent() {
                   </button>
                 </div>
 
-                {/* 콘텐츠 영역 */}
-                <div className="p-4 bg-white flex gap-4 items-stretch">
-                  {/* Interest List */}
-                  <PCInterestList
+                {/* 콘텐츠 영역 — 1:3 비율 유지 */}
+                <div className="grid h-[clamp(300px,50vh,500px)] grid-cols-4 gap-4 bg-white p-4">
+                  {/* Interest List (1/4) */}
+                  <InterestLectureList
                     items={cartItems}
                     selectedIds={selectedIds}
                     onToggleSelect={handleToggleSelect}
-                    isFilterOpen={isPCFilterOpen}
+                    onRemove={handleRemoveFromCart}
+                    lockedCategory={lockedCategory}
+                    variant="sidebar"
                   />
 
-                  {/* AI Recommendation Banner + VS */}
-                  <div className="flex-1 flex">
-                    <PCAIBanner selectedItems={selectedCartItems} isFilterOpen={isPCFilterOpen} />
+                  {/* AI Recommendation Banner + VS (3/4) */}
+                  <div className="col-span-3 flex min-h-0">
+                    <AiComparePreview selectedItems={selectedCartSlots} compact={isPCFilterOpen} />
                   </div>
                 </div>
               </div>
@@ -472,13 +490,6 @@ function BootcampListContent() {
         </div>
       </div>
 
-      {/* PC Cart Sidebar - 컴포넌트 자체에서 위치 계산 */}
-      <PCCartSidebar
-        items={cartItems}
-        onRemove={handleRemoveFromCart}
-        onCompare={handleGoToCompare}
-      />
-
       {/* Filter Modal - Mobile only */}
       <div className="lg:hidden">
         <FilterModal
@@ -490,16 +501,14 @@ function BootcampListContent() {
         />
       </div>
 
-      {/* 하단 플로팅 관심 항목 바 - Mobile only */}
-      <div className="lg:hidden">
-        <FloatingInterestBar
-          items={cartItems}
-          onRemove={handleRemoveFromCart}
-          onCompare={handleGoToCompare}
-          isOpen={isFloatingBarOpen}
-          onToggleOpen={() => setIsFloatingBarOpen(prev => !prev)}
-        />
-      </div>
+      {/* 플로팅 관심 항목 바 (모바일: 하단, md+: 사이드) */}
+      <FloatingCartPanel
+        items={cartItems}
+        onRemove={handleRemoveFromCart}
+        onCompare={handleGoToCompare}
+        isOpen={isFloatingBarOpen}
+        onToggleOpen={() => setIsFloatingBarOpen(prev => !prev)}
+      />
     </div>
   )
 }

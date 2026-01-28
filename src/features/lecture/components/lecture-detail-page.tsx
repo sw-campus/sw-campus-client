@@ -25,8 +25,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 import {
-  FloatingInterestBar,
-  PCCartSidebar,
+  FloatingCartPanel,
   SectionHeader,
   CurriculumItem,
   ServiceGrid,
@@ -819,9 +818,6 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
         </div>
       </div>
 
-      {/* PC Cart Sidebar - 컴포넌트 자체에서 위치 계산 */}
-      <PCCartSidebar items={cartItems} onRemove={id => removeFromCart(id)} onCompare={handleGoToCompare} />
-
       {/* ==================== 모바일 레이아웃 (lg 미만) ==================== */}
       <div className="flex min-h-screen w-full flex-col bg-white lg:hidden">
         {/* Hero Image */}
@@ -1269,15 +1265,16 @@ export default function LectureDetailPage({ lectureId, initialData }: Props) {
           <div className="h-[100px]" />
         </div>
 
-        {/* 하단 플로팅 관심 항목 바 (모바일 전용) */}
-        <FloatingInterestBar
-          items={cartItems}
-          onRemove={id => removeFromCart(id)}
-          onCompare={handleGoToCompare}
-          isOpen={isFloatingBarOpen}
-          onToggleOpen={() => setIsFloatingBarOpen(prev => !prev)}
-        />
       </div>
+
+      {/* 플로팅 관심 항목 바 (모바일: 하단, md+: 사이드) */}
+      <FloatingCartPanel
+        items={cartItems}
+        onRemove={id => removeFromCart(id)}
+        onCompare={handleGoToCompare}
+        isOpen={isFloatingBarOpen}
+        onToggleOpen={() => setIsFloatingBarOpen(prev => !prev)}
+      />
     </>
   )
 }
