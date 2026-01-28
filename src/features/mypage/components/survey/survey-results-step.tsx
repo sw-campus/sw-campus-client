@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { Code2, Database, Layers, Palette, Pencil, RefreshCw, Sparkles, type LucideIcon } from 'lucide-react'
+import { Pencil, RefreshCw, Sparkles } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -30,17 +30,54 @@ interface SurveyResultsStepProps {
   onClose?: () => void
 }
 
-const RECOMMENDED_JOB_ICONS: Record<RecommendedJob, LucideIcon> = {
-  FRONTEND: Palette,
-  BACKEND: Code2,
-  DATA: Database,
-  FULLSTACK: Layers,
+// MBTI 스타일 직무 타입 정보
+export const JOB_TYPE_INFO: Record<RecommendedJob, {
+  imagePath: string
+  typeName: string
+  traits: string[]
+  color: string
+  bgColor: string
+  bgLight: string
+  borderColor: string
+}> = {
+  FRONTEND: {
+    imagePath: '/images/characters/frontend.png',
+    typeName: '창의적인 크리에이터',
+    traits: ['디자인 감각', '사용자 중심', '시각적 표현'],
+    color: 'text-pink-600',
+    bgColor: 'bg-pink-500',
+    bgLight: 'bg-pink-50',
+    borderColor: 'border-pink-200',
+  },
+  BACKEND: {
+    imagePath: '/images/characters/backend.png',
+    typeName: '논리적인 설계자',
+    traits: ['체계적 사고', '문제 해결', '안정성 추구'],
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-500',
+    bgLight: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+  },
+  DATA: {
+    imagePath: '/images/characters/data.png',
+    typeName: '분석적인 탐험가',
+    traits: ['데이터 분석', '패턴 발견', '인사이트 도출'],
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-500',
+    bgLight: 'bg-emerald-50',
+    borderColor: 'border-emerald-200',
+  },
+  FULLSTACK: {
+    imagePath: '/images/characters/fullstack.png',
+    typeName: '다재다능한 연결자',
+    traits: ['넓은 시야', '유연한 사고', '전체 이해'],
+    color: 'text-orange-600',
+    bgColor: 'bg-orange-500',
+    bgLight: 'bg-orange-50',
+    borderColor: 'border-orange-200',
+  },
 }
 
-function RecommendedJobIcon({ job, className }: { job: RecommendedJob | undefined; className?: string }) {
-  const Icon = job ? RECOMMENDED_JOB_ICONS[job] : Sparkles
-  return <Icon className={className} />
-}
 
 export function SurveyResultsStep({
   survey,
@@ -112,23 +149,45 @@ export function SurveyResultsStep({
         </div>
       </div>
 
-      {/* 추천 직무 카드 (성향 테스트 완료 시) */}
+      {/* 추천 직무 카드 - MBTI 스타일 (성향 테스트 완료 시) */}
       {results?.recommendedJob && (
-        <div className="rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 p-6 text-white shadow-lg">
-          <div className="flex items-start gap-4">
-            <div className="rounded-xl bg-white/20 p-3">
-              <RecommendedJobIcon job={results.recommendedJob} className="h-8 w-8" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-white/80">당신에게 추천하는 직무</p>
-              <h3 className="mt-1 text-2xl font-bold">
-                {RECOMMENDED_JOB_LABELS[results.recommendedJob]}
-              </h3>
-              <p className="mt-2 text-sm text-white/90">
-                {getRecommendedJobDescription(results.recommendedJob)}
-              </p>
+        <div className={`rounded-2xl border ${JOB_TYPE_INFO[results.recommendedJob].borderColor} ${JOB_TYPE_INFO[results.recommendedJob].bgLight} p-6`}>
+          {/* 캐릭터 영역 */}
+          <div className="mb-4 flex justify-center">
+            <div className={`relative flex h-[168px] w-[168px] items-center justify-center rounded-full ${JOB_TYPE_INFO[results.recommendedJob].bgColor}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={JOB_TYPE_INFO[results.recommendedJob].imagePath}
+                alt={RECOMMENDED_JOB_LABELS[results.recommendedJob]}
+                className="absolute h-[216px] w-[216px] object-contain"
+              />
             </div>
           </div>
+
+          {/* 직무명 */}
+          <div className="mb-3 text-center">
+            <p className="text-sm text-gray-500 mb-1">당신에게 추천하는 직무</p>
+            <h3 className={`text-2xl font-bold ${JOB_TYPE_INFO[results.recommendedJob].color}`}>
+              {RECOMMENDED_JOB_LABELS[results.recommendedJob]}
+            </h3>
+          </div>
+
+          {/* 특성 태그 */}
+          <div className="mb-4 flex flex-wrap justify-center gap-1.5">
+            {JOB_TYPE_INFO[results.recommendedJob].traits.map((trait) => (
+              <span
+                key={trait}
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${JOB_TYPE_INFO[results.recommendedJob].bgColor} text-white`}
+              >
+                {trait}
+              </span>
+            ))}
+          </div>
+
+          {/* 설명 */}
+          <p className="text-center text-sm text-gray-600 whitespace-pre-line">
+            {getRecommendedJobDescription(results.recommendedJob).replace(/\. /g, '.\n')}
+          </p>
         </div>
       )}
 

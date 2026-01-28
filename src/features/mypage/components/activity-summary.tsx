@@ -1,9 +1,8 @@
 'use client'
 
-import { LuActivity, LuAward, LuBadgeCheck, LuClipboardCheck, LuPencil } from 'react-icons/lu'
+import { Activity, Award, BadgeCheck, ClipboardCheck, Pencil } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { APPROVAL_STATUS } from '@/features/admin/types/approval.type'
 import { useCompletedLecturesQuery } from '@/features/mypage/hooks/use-completed-lectures-query'
 
@@ -27,112 +26,114 @@ export function ActivitySummary({ onEditSurvey }: ActivitySummaryProps) {
 
   const loading = lecturesLoading || surveyLoading
 
-  // 공통 헤더 렌더링
-  const renderHeader = () => (
-    <div className="flex items-center gap-2">
-      <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
-        <LuActivity className="h-4 w-4" />
-      </div>
-      <span className="text-foreground text-lg font-semibold">활동 요약</span>
-    </div>
-  )
-
-  // 공통 컨텐츠 렌더링
-  const renderContent = () => (
-    <>
-      {loading ? (
-        <div className="flex h-20 items-center justify-center">
-          <span className="text-muted-foreground text-sm">불러오는 중...</span>
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 gap-2 sm:gap-4">
-          {/* 수료 강의 */}
-          <div className="flex flex-col items-center gap-0.5 text-center sm:gap-1">
-            <div className="text-muted-foreground">
-              <LuAward className="h-4 w-4 sm:h-5 sm:w-5" />
-            </div>
-            <span className="text-foreground text-lg font-bold sm:text-xl">{lectures?.length ?? 0}개</span>
-            <span className="text-muted-foreground text-[10px] sm:text-xs">수료 강의</span>
-          </div>
-
-          {/* 승인된 후기 */}
-          <div className="flex flex-col items-center gap-0.5 text-center sm:gap-1">
-            <div className="text-muted-foreground">
-              <LuBadgeCheck className="h-4 w-4 sm:h-5 sm:w-5" />
-            </div>
-            <span className="text-foreground text-lg font-bold sm:text-xl">{approvedReviews}개</span>
-            <span className="text-muted-foreground text-[10px] sm:text-xs">승인 후기</span>
-          </div>
-
-          {/* 설문 - 프로그레스 바 + 수정 버튼 */}
-          <div className="flex flex-col items-center gap-0.5 text-center sm:gap-1">
-            <div className="text-muted-foreground">
-              <LuClipboardCheck className="h-4 w-4 sm:h-5 sm:w-5" />
-            </div>
-            {/* 프로그레스 바 + 상태 텍스트 (한 줄) */}
-            <div className="flex items-center gap-1 sm:gap-2">
-              <div className="flex gap-0.5 sm:gap-1">
-                <div
-                  className={`h-2.5 w-4 rounded sm:h-3 sm:w-5 ${
-                    hasBasicSurvey
-                      ? hasAptitudeTest
-                        ? 'bg-success'
-                        : 'bg-warning'
-                      : 'bg-gray-300 dark:bg-gray-600'
-                  }`}
-                />
-                <div
-                  className={`h-2.5 w-4 rounded sm:h-3 sm:w-5 ${hasAptitudeTest ? 'bg-success' : 'bg-gray-300 dark:bg-gray-600'}`}
-                />
-              </div>
-              <span
-                className={`text-lg font-bold sm:text-xl ${
-                  hasAptitudeTest
-                    ? 'text-success'
-                    : hasBasicSurvey
-                      ? 'text-warning'
-                      : 'text-muted-foreground'
-                }`}
-              >
-                {hasAptitudeTest ? '2단계' : hasBasicSurvey ? '1단계' : '미작성'}
-              </span>
-            </div>
-            <div className="flex items-center gap-0.5 sm:gap-1">
-              <span className="text-muted-foreground text-[10px] sm:text-xs">설문</span>
-              {onEditSurvey && (
-                <Button variant="ghost" size="icon" className="h-4 w-4 sm:h-5 sm:w-5" onClick={onEditSurvey}>
-                  <LuPencil className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  )
-
   return (
     <>
       {/* Mobile: 플랫 섹션 */}
-      <section className="border-border space-y-4 overflow-hidden border-b pb-6 sm:hidden">
-        {renderHeader()}
-        {renderContent()}
+      <section className="space-y-4 pb-6 border-b border-gray-200 sm:hidden">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <Activity className="w-5 h-5 text-[#FEB706]" />
+          <span className="text-base font-semibold text-[#020202]">활동 요약</span>
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <div className="flex h-20 items-center justify-center">
+            <span className="text-sm text-[#888888]">불러오는 중...</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-2">
+            {/* 수료 강의 */}
+            <div className="flex flex-col items-center gap-1 text-center p-3 bg-[#FFFCF4] rounded-xl">
+              <Award className="w-5 h-5 text-[#FEB706]" />
+              <span className="text-xl font-bold text-[#020202]">{lectures?.length ?? 0}개</span>
+              <span className="text-xs text-[#888888]">수료 강의</span>
+            </div>
+
+            {/* 승인된 후기 */}
+            <div className="flex flex-col items-center gap-1 text-center p-3 bg-[#FFFCF4] rounded-xl">
+              <BadgeCheck className="w-5 h-5 text-[#FEB706]" />
+              <span className="text-xl font-bold text-[#020202]">{approvedReviews}개</span>
+              <span className="text-xs text-[#888888]">승인 후기</span>
+            </div>
+
+            {/* 설문 */}
+            <div className="flex flex-col items-center gap-1 text-center p-3 bg-[#FFFCF4] rounded-xl">
+              <ClipboardCheck className="w-5 h-5 text-[#FEB706]" />
+              <div className="flex items-center gap-1">
+                <div className="flex gap-0.5">
+                  <div className={`h-2.5 w-4 rounded ${hasBasicSurvey ? (hasAptitudeTest ? 'bg-emerald-500' : 'bg-amber-500') : 'bg-gray-300'}`} />
+                  <div className={`h-2.5 w-4 rounded ${hasAptitudeTest ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                </div>
+              </div>
+              <div className="flex items-center gap-0.5">
+                <span className="text-xs text-[#888888]">
+                  {hasAptitudeTest ? '완료' : hasBasicSurvey ? '1단계' : '미작성'}
+                </span>
+                {onEditSurvey && (
+                  <Button variant="ghost" size="icon" className="h-4 w-4" onClick={onEditSurvey}>
+                    <Pencil className="h-2.5 w-2.5 text-[#888888]" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* Desktop: Card */}
-      <Card className="bg-card hidden sm:block">
-        <CardHeader className="pb-0">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
-              <LuActivity className="h-4 w-4" />
-            </div>
-            <CardTitle className="text-foreground text-lg">활동 요약</CardTitle>
+      {/* Desktop: 강의 상세 페이지 스타일 */}
+      <div className="hidden sm:block p-6">
+        {/* Header */}
+        <div className="flex items-center gap-3 pb-4 border-b border-gray-200 mb-6">
+          <Activity className="w-6 h-6 text-[#FEB706]" />
+          <span className="text-lg font-semibold text-[#020202]">활동 요약</span>
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <div className="flex h-20 items-center justify-center">
+            <span className="text-base text-[#888888]">불러오는 중...</span>
           </div>
-        </CardHeader>
-        <CardContent className="border-border border-t py-4">
-          {renderContent()}
-        </CardContent>
-      </Card>
+        ) : (
+          <div className="grid grid-cols-3 gap-6">
+            {/* 수료 강의 */}
+            <div className="flex flex-col items-center gap-2 text-center p-6 bg-[#FFFCF4] rounded-xl border border-[#FEB706]/20">
+              <Award className="w-8 h-8 text-[#FEB706]" />
+              <span className="text-3xl font-bold text-[#020202]">{lectures?.length ?? 0}개</span>
+              <span className="text-sm text-[#888888]">수료 강의</span>
+            </div>
+
+            {/* 승인된 후기 */}
+            <div className="flex flex-col items-center gap-2 text-center p-6 bg-[#FFFCF4] rounded-xl border border-[#FEB706]/20">
+              <BadgeCheck className="w-8 h-8 text-[#FEB706]" />
+              <span className="text-3xl font-bold text-[#020202]">{approvedReviews}개</span>
+              <span className="text-sm text-[#888888]">승인 후기</span>
+            </div>
+
+            {/* 설문 */}
+            <div className="flex flex-col items-center gap-2 text-center p-6 bg-[#FFFCF4] rounded-xl border border-[#FEB706]/20">
+              <ClipboardCheck className="w-8 h-8 text-[#FEB706]" />
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div className={`h-4 w-6 rounded ${hasBasicSurvey ? (hasAptitudeTest ? 'bg-emerald-500' : 'bg-amber-500') : 'bg-gray-300'}`} />
+                  <div className={`h-4 w-6 rounded ${hasAptitudeTest ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                </div>
+                <span className={`text-lg font-bold ${hasAptitudeTest ? 'text-emerald-500' : hasBasicSurvey ? 'text-amber-500' : 'text-[#888888]'}`}>
+                  {hasAptitudeTest ? '완료' : hasBasicSurvey ? '1단계' : '미작성'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-[#888888]">설문</span>
+                {onEditSurvey && (
+                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={onEditSurvey}>
+                    <Pencil className="h-3 w-3 text-[#888888]" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   )
 }

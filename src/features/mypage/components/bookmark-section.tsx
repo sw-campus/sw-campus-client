@@ -2,10 +2,8 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { LuBookmark, LuFileText, LuMessageCircle, LuHeart } from 'react-icons/lu'
+import { Bookmark, FileText, MessageCircle, Heart } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { formatRelativeTime } from '@/lib/format-relative-time'
 
 import { useBookmarksQuery } from '../hooks/use-bookmarks-query'
 
@@ -13,122 +11,84 @@ export function BookmarkSection() {
   const router = useRouter()
   const { data: bookmarks, isLoading } = useBookmarksQuery()
 
-  // 공통 헤더 렌더링
-  const renderHeader = () => (
-    <div className="flex items-center gap-2">
-      <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
-        <LuBookmark className="h-4 w-4" />
+  return (
+    <div className="p-4 sm:p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
+        <div className="flex items-center gap-2">
+          <Bookmark className="w-5 h-5 text-[#FEB706]" />
+          <span className="text-base font-semibold text-[#020202]">북마크한 글</span>
+        </div>
+        <span className="text-xs text-[#888888]">총 {bookmarks?.length ?? 0}건</span>
       </div>
-      <span className="text-foreground text-lg font-semibold">북마크한 글</span>
-    </div>
-  )
 
-  // 공통 컨텐츠 렌더링
-  const renderContent = () => (
-    <>
+      {/* Content */}
       {isLoading ? (
         <div className="flex h-32 items-center justify-center">
-          <span className="text-muted-foreground text-sm">불러오는 중...</span>
+          <span className="text-sm text-[#888888]">불러오는 중...</span>
         </div>
       ) : !bookmarks || bookmarks.length === 0 ? (
-        <div className="flex h-32 flex-col items-center justify-center gap-2">
-          <LuBookmark className="text-muted-foreground h-8 w-8" />
-          <span className="text-muted-foreground text-sm">북마크한 글이 없습니다.</span>
+        <div className="flex h-48 flex-col items-center justify-center gap-3">
+          <Bookmark className="w-12 h-12 text-gray-200" />
+          <span className="text-sm text-[#888888]">북마크한 글이 없습니다.</span>
+          <button
+            onClick={() => router.push('/community')}
+            className="text-sm text-[#FEB706] hover:underline"
+          >
+            커뮤니티 둘러보기
+          </button>
         </div>
       ) : (
-        <div className="space-y-3">
-          {bookmarks.slice(0, 5).map(bookmark => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {bookmarks.map(bookmark => (
             <div
               key={bookmark.bookmarkId}
               onClick={() => router.push(`/community/${bookmark.postId}`)}
-              className="group flex cursor-pointer gap-3 rounded-lg border border-transparent p-2 transition-all hover:border-gray-200 hover:bg-gray-50"
+              className="group cursor-pointer rounded-xl border border-gray-100 bg-white p-3 transition-all hover:border-[#FEB706]/30 hover:shadow-sm"
             >
               {/* 썸네일 */}
-              <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 sm:h-16 sm:w-16">
+              <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 mb-3">
                 {bookmark.thumbnailUrl ? (
                   <Image
                     src={bookmark.thumbnailUrl}
                     alt={bookmark.title}
                     fill
-                    sizes="(max-width: 640px) 56px, 64px"
-                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform group-hover:scale-105"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50">
-                    <LuFileText className="h-6 w-6 text-orange-300" />
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#FFFCF4] to-[#FFF8E7]">
+                    <FileText className="w-8 h-8 text-[#FEB706]/50" />
                   </div>
                 )}
+                {/* 카테고리 뱃지 */}
+                <span className="absolute top-2 left-2 rounded-full bg-white/90 px-2.5 py-1 text-xs text-[#555555] shadow-sm">
+                  {bookmark.categoryName}
+                </span>
               </div>
 
               {/* 컨텐츠 */}
-              <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
-                <div>
-                  <h4 className="text-foreground line-clamp-1 text-sm font-medium transition-colors group-hover:text-orange-600">
-                    {bookmark.title}
-                  </h4>
-                  <div className="mt-0.5 flex items-center gap-1.5 text-xs">
-                    <span className="text-muted-foreground truncate">
-                      {bookmark.authorNickname}
-                    </span>
-                    <span className="text-muted-foreground hidden sm:inline">·</span>
-                    <span className="hidden rounded bg-orange-100 px-1.5 py-0.5 text-orange-600 sm:inline">
-                      {bookmark.categoryName}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-muted-foreground flex items-center gap-2 text-xs sm:gap-3">
+              <h4 className="line-clamp-2 text-sm font-medium text-[#020202] transition-colors group-hover:text-[#FEB706] mb-2">
+                {bookmark.title}
+              </h4>
+
+              <div className="flex items-center justify-between text-xs text-[#888888]">
+                <span className="truncate max-w-[100px]">{bookmark.authorNickname}</span>
+                <div className="flex items-center gap-2">
                   <span className="flex items-center gap-0.5">
-                    <LuHeart className="h-3 w-3" />
+                    <Heart className="w-3 h-3" />
                     {bookmark.likeCount}
                   </span>
                   <span className="flex items-center gap-0.5">
-                    <LuMessageCircle className="h-3 w-3" />
+                    <MessageCircle className="w-3 h-3" />
                     {bookmark.commentCount}
-                  </span>
-                  <span>{formatRelativeTime(new Date(bookmark.postCreatedAt))}</span>
-                  <span className="max-w-[60px] truncate rounded bg-orange-100 px-1.5 py-0.5 text-orange-600 sm:hidden">
-                    {bookmark.categoryName}
                   </span>
                 </div>
               </div>
             </div>
           ))}
-
-          {/* 더보기 링크 */}
-          {bookmarks.length > 5 && (
-            <div className="pt-2 text-center">
-              <span className="text-muted-foreground text-xs">
-                외 {bookmarks.length - 5}개의 북마크
-              </span>
-            </div>
-          )}
         </div>
       )}
-    </>
-  )
-
-  return (
-    <>
-      {/* Mobile: 플랫 섹션 (마지막 섹션이므로 border-b 없음) */}
-      <section className="space-y-4 overflow-hidden sm:hidden">
-        {renderHeader()}
-        {renderContent()}
-      </section>
-
-      {/* Desktop: Card */}
-      <Card className="bg-card hidden sm:block">
-        <CardHeader className="pb-0">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
-              <LuBookmark className="h-4 w-4" />
-            </div>
-            <CardTitle className="text-foreground text-lg">북마크한 글</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="border-border border-t py-4">
-          {renderContent()}
-        </CardContent>
-      </Card>
-    </>
+    </div>
   )
 }
