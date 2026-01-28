@@ -3,9 +3,9 @@
 import type { ReactNode } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import type { CartItem } from '@/features/cart/types/cart.type'
-import { CourseItem } from './course-item'
+import { InterestLectureItem } from '@/components/common/interest-lecture-item'
 
-interface InterestCourseSectionProps {
+interface InterestLectureSectionProps {
   items: CartItem[]
   selectedIds: string[]
   onToggleSelect: (id: string) => void
@@ -17,7 +17,7 @@ interface InterestCourseSectionProps {
   closedMessage?: ReactNode
 }
 
-export function InterestCourseSection({
+export function InterestLectureSection({
   items,
   selectedIds,
   onToggleSelect,
@@ -27,7 +27,7 @@ export function InterestCourseSection({
   onToggleOpen,
   isLoading = false,
   closedMessage,
-}: InterestCourseSectionProps) {
+}: InterestLectureSectionProps) {
   return (
     <div className="w-full p-4 bg-white rounded-xl shadow-[4px_4px_20px_rgba(161,161,170,0.25)] flex flex-col gap-4">
       {/* 닫혀있을 때 안내 문구 */}
@@ -74,10 +74,11 @@ export function InterestCourseSection({
             </div>
           ) : (
             items.map((item) => (
-              <CourseItem
+              <InterestLectureItem
                 key={item.lectureId}
                 item={item}
                 isSelected={selectedIds.includes(item.lectureId)}
+                size="sm"
                 onClick={() => onToggleSelect(item.lectureId)}
                 onRemove={() => onRemove(item.lectureId)}
               />
