@@ -40,7 +40,7 @@ export default function MidBanner() {
           {[0, 1].map(i => (
             <div
               key={i}
-              className="bg-muted flex aspect-[630/180] w-[calc(50%-4px)] shrink-0 animate-pulse items-center justify-between rounded-lg border border-gray-200 md:rounded-2xl"
+              className="bg-muted flex h-[140px] w-[calc(50%-4px)] shrink-0 animate-pulse items-center justify-between border border-gray-200 md:h-[180px]"
             />
           ))}
         </div>
@@ -88,7 +88,7 @@ export default function MidBanner() {
 
                 const content = (
                   <div
-                    className="relative aspect-[630/180] w-full overflow-hidden rounded-lg border border-gray-200 shadow-lg md:rounded-2xl"
+                    className="relative h-[140px] w-full overflow-hidden border border-gray-200 shadow-lg md:h-[180px]"
                     style={{ backgroundColor: banner.backgroundColor || '#ffffff' }}
                   >
                     {banner.imageUrl ? (
