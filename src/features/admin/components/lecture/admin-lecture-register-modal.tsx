@@ -80,7 +80,7 @@ export function AdminLectureRegisterModal({ isOpen, onClose }: AdminLectureRegis
     }
     // 기존 스텝 인덱스는 1부터 시작하므로 -1 해줌
     const originalStepIndex = currentStep - 1
-    const fields = stepFields[originalStepIndex as keyof typeof stepFields] as FieldPath<LectureFormValues>[]
+    const fields = [...stepFields[originalStepIndex as keyof typeof stepFields]] as FieldPath<LectureFormValues>[]
     const isValid = await trigger(fields)
     return isValid
   }

@@ -146,7 +146,7 @@ export function EventStatsSection({ period = 7 }: EventStatsSectionProps) {
                   <LabelList
                     dataKey="value"
                     position="right"
-                    formatter={(value: number) => value.toLocaleString()}
+                    formatter={(value) => (typeof value === 'number' ? value.toLocaleString() : String(value))}
                     style={{
                       fill: 'hsl(var(--foreground))',
                       fontSize: 13,
