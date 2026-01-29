@@ -13,7 +13,7 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
   return (
     <Link href={`/organizations/${organization.id}`} className="group block">
       {/* Mobile: 세로 레이아웃 */}
-      <div className="flex flex-col gap-4 rounded-xl bg-card p-4 shadow-[4px_4px_15px_0px_rgba(161,161,170,0.25)] transition-all duration-200 hover:shadow-[4px_4px_20px_0px_rgba(161,161,170,0.35)] md:hidden">
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 md:hidden">
         {/* Top Section: Logo + Info */}
         <div className="flex items-center gap-2">
           {/* Logo - 원형 */}

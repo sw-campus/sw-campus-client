@@ -59,8 +59,8 @@ export function OrganizationList() {
               {filteredOrganizations.length}곳의 훈련기관을 찾았어요.
             </p>
 
-            {/* 체크박스 + 검색창 - 한 줄 유지 */}
-            <div className="flex items-center gap-2">
+            {/* 체크박스 + 검색창 - 모바일: 세로 / 데스크탑: 가로 */}
+            <div className="flex flex-col items-end gap-2 md:flex-row md:items-center">
               {/* Checkbox - 모집 중인 기관만 보기 */}
               <div className="flex shrink-0 items-center gap-2">
                 <Checkbox
@@ -74,7 +74,7 @@ export function OrganizationList() {
               </div>
 
               {/* Search Bar */}
-              <div className="flex min-w-0 flex-1 gap-2 md:flex-initial">
+              <div className="flex w-full gap-2 md:w-auto">
                 <div className="relative min-w-0 flex-1 md:flex-initial">
                   <Search className="text-muted-foreground absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2" />
                   <input
@@ -106,9 +106,11 @@ export function OrganizationList() {
         {/* Organization List */}
         {!isLoading &&
           (filteredOrganizations.length > 0 ? (
-            <div className="space-y-3">
+            <div className="divide-y divide-border">
               {filteredOrganizations.map(org => (
-                <OrganizationCard key={org.id} organization={org} />
+                <div key={org.id} className="py-3 first:pt-0 last:pb-0">
+                  <OrganizationCard organization={org} />
+                </div>
               ))}
             </div>
           ) : (

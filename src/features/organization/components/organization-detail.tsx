@@ -89,10 +89,10 @@ export function OrganizationDetail({ organization, totalReviews = 0, totalLectur
         <div className="pt-6 pb-20">
           {/* 기관 소개 */}
           <TabsContent value="intro" className="mt-0">
-            <div className="space-y-6 px-4 md:px-6">
+            <div className="divide-y divide-border px-4 md:px-6">
               {/* 기관 설명 */}
               {organization.description && (
-                <section>
+                <section className="py-6 first:pt-0">
                   <h2 className="text-foreground mb-2 text-base font-bold">이런 철학으로 운영해요</h2>
                   <p className="text-muted-foreground text-sm leading-relaxed">{organization.description}</p>
                 </section>
@@ -100,7 +100,7 @@ export function OrganizationDetail({ organization, totalReviews = 0, totalLectur
 
               {/* 시설 이미지 - 슬라이드 */}
               {facilityImages.length > 0 && (
-                <section>
+                <section className="py-6">
                   <h2 className="text-foreground mb-3 text-base font-bold">교육 현장</h2>
                   <PhotoSlider photos={facilityImages} />
                 </section>
