@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
-import { User, Award, ClipboardCheck, Key, UserX, Pencil, FileText, MessageSquare, Bookmark, Settings, Heart, LogOut, Trash2, Check } from 'lucide-react'
+import { User, ClipboardCheck, Key, UserX, Pencil, FileText, MessageSquare, Bookmark, Settings, Heart, LogOut, Trash2, Check } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
