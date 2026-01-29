@@ -13,7 +13,7 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
   return (
     <Link href={`/organizations/${organization.id}`} className="group block">
       {/* Mobile: 세로 레이아웃 */}
-      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 md:hidden">
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:shadow-[4px_4px_20px_0px_rgba(161,161,170,0.35)] md:hidden">
         {/* Top Section: Logo + Info */}
         <div className="flex items-center gap-2">
           {/* Logo - 원형 */}
@@ -57,7 +57,7 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
       </div>
 
       {/* Desktop: 가로 레이아웃 (피그마 디자인) */}
-      <div className="hidden h-[90px] items-center rounded-xl bg-card px-5 shadow-[4px_4px_15px_0px_rgba(161,161,170,0.25)] transition-all duration-200 hover:shadow-[4px_4px_20px_0px_rgba(161,161,170,0.35)] md:flex">
+      <div className="hidden h-[90px] items-center rounded-xl border border-border bg-card px-5 transition-all duration-200 hover:shadow-[4px_4px_20px_0px_rgba(161,161,170,0.35)] md:flex">
         {/* Logo */}
         <div className="relative flex h-[50px] w-[50px] flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[2px_2px_10px_0px_rgba(161,161,170,0.25)]">
           {organization.logoUrl ? (
