@@ -54,7 +54,7 @@ export function AiComparePreview({ selectedItems, compact = false }: AiComparePr
       {/* AI 비교 분석 서비스로 이동하기 */}
       <button
         onClick={handleGoToCompare}
-        className={`w-full shrink-0 rounded-xl border border-[#D1D5DB] bg-[#F9F9F9] shadow-[4px_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center ${compact ? 'h-9' : 'h-11'} ${(!item1 || !item2) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#FEB706] hover:border-[#FEB706] transition-colors'}`}
+        className={`w-full shrink-0 rounded-xl shadow-[4px_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center transition-colors ${compact ? 'h-9' : 'h-11'} ${(!item1 || !item2) ? 'border border-[#D1D5DB] bg-[#F9F9F9] opacity-50 cursor-not-allowed' : 'bg-[#FEB706] border border-[#FEB706] hover:bg-[#E5A505]'}`}
         disabled={!item1 || !item2}
       >
         <span className={`text-[#020202] ${compact ? 'text-sm' : 'text-base'}`}>비교 결과 확인하기</span>
@@ -65,9 +65,9 @@ export function AiComparePreview({ selectedItems, compact = false }: AiComparePr
 
 function CompareCard({ item, compact }: { item?: CartItem; compact: boolean }) {
   return (
-    <div className={`flex flex-1 flex-col gap-2 rounded-xl bg-white shadow-[4px_4px_20px_rgba(161,161,170,0.25)] ${compact ? 'p-3' : 'p-4'}`}>
+    <div className={`flex flex-1 flex-col gap-2 rounded-xl bg-white shadow-[4px_4px_20px_rgba(161,161,170,0.25)] ${compact ? 'p-3 px-5' : 'p-4 px-6'}`}>
       {/* 썸네일 */}
-      <div className={`w-full shrink-0 overflow-hidden rounded-lg bg-[#E5E5E5] ${compact ? 'h-[80px]' : 'h-[120px]'}`}>
+      <div className={`w-full shrink-0 overflow-hidden rounded-lg bg-[#E5E5E5] ${compact ? 'h-[120px]' : 'h-[160px]'}`}>
         {item ? (
           item.thumbnailUrl ? (
             <div
@@ -86,9 +86,9 @@ function CompareCard({ item, compact }: { item?: CartItem; compact: boolean }) {
         )}
       </div>
 
-      {/* 타이틀 */}
-      <div className="flex flex-1 items-center justify-center">
-        <h4 className={`font-bold text-[#020202] text-center ${compact ? 'text-sm line-clamp-1' : 'text-base line-clamp-2'}`}>
+      {/* 타이틀 - 두 줄 높이 고정, 첫 줄부터 시작 */}
+      <div className={`flex flex-1 items-start justify-center ${compact ? 'min-h-[40px]' : 'min-h-[48px]'}`}>
+        <h4 className={`font-bold text-[#020202] text-center line-clamp-2 ${compact ? 'text-sm' : 'text-base'}`}>
           {item ? item.title : <span className={`font-normal text-[#888888] ${compact ? 'text-xs' : 'text-sm'}`}>강의를 선택해주세요</span>}
         </h4>
       </div>

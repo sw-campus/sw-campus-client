@@ -71,10 +71,10 @@ export function InterestLectureItem({
       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
         <span
           className={cn(
-            'font-semibold text-foreground leading-tight',
+            'font-semibold text-foreground leading-tight line-clamp-1',
             responsive
-              ? 'text-xs line-clamp-2 @[280px]:text-sm @[280px]:line-clamp-none @[280px]:truncate'
-              : size === 'sm' ? 'text-xs line-clamp-2' : 'text-sm truncate',
+              ? 'text-xs @[280px]:text-sm'
+              : size === 'sm' ? 'text-xs' : 'text-sm',
           )}
         >
           {item.title}

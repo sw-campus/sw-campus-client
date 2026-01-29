@@ -247,7 +247,7 @@ function SearchContentInner() {
       </div>
 
       {/* ========== MOBILE LAYOUT ========== */}
-      <main className="flex w-full flex-col items-center gap-6 bg-white px-4 pb-[100px] md:hidden">
+      <main className="flex w-full flex-col items-center gap-6 bg-white px-4 pb-[100px] lg:hidden">
         {/* Section Title */}
         <SectionTitle title="강의 검색" />
 
@@ -345,14 +345,14 @@ function SearchContentInner() {
       </main>
 
       {/* ========== DESKTOP LAYOUT ========== */}
-      <div className="hidden w-full md:block">
+      <div className="hidden w-full lg:block">
         {/* Section Title */}
         <div className="mx-auto w-full max-w-[1448px] px-6 pt-6">
           <SectionTitle title="강의 검색" />
         </div>
 
         {/* Main Layout: Filter | Interest List + AI Banner + Card Grid */}
-        <div ref={mainContentRef} data-main-content className="relative mx-auto flex w-full max-w-[1448px] gap-6 px-6 py-6">
+        <div ref={mainContentRef} data-main-content className="mx-auto flex w-full max-w-[1448px] gap-6 px-6 py-6">
           {/* Left: Filter Sidebar */}
           <PCFilterSidebar
             isOpen={isPCFilterOpen}
@@ -380,20 +380,23 @@ function SearchContentInner() {
                   </button>
                 </div>
 
-                {/* 콘텐츠 영역 — 1:3 비율 유지 */}
-                <div className="grid h-[clamp(300px,50vh,500px)] grid-cols-4 gap-4 bg-white p-4">
-                  {/* Interest List (1/4) */}
-                  <InterestLectureList
-                    items={cartItems ?? []}
-                    selectedIds={selectedIds}
-                    onToggleSelect={handleToggleSelect}
-                    onRemove={handleRemoveFromCart}
-                    lockedCategory={lockedCategory}
-                    variant="sidebar"
-                  />
+                {/* 콘텐츠 영역 */}
+                <div className="flex items-stretch gap-4 bg-white p-4">
+                  {/* Interest List - 필터 열림: 작은 사이즈, 닫힘: 큰 사이즈 */}
+                  <div className={`shrink-0 ${isPCFilterOpen ? 'w-[280px] h-[380px]' : 'w-[360px] h-[480px]'}`}>
+                    <InterestLectureList
+                      items={cartItems ?? []}
+                      selectedIds={selectedIds}
+                      onToggleSelect={handleToggleSelect}
+                      onRemove={handleRemoveFromCart}
+                      lockedCategory={lockedCategory}
+                      variant="sidebar"
+                      className="h-full"
+                    />
+                  </div>
 
-                  {/* AI Recommendation Banner + VS (3/4) */}
-                  <div className="col-span-3 flex min-h-0">
+                  {/* AI Recommendation Banner + VS */}
+                  <div className="flex flex-1">
                     <AiComparePreview selectedItems={selectedCartSlots} compact={isPCFilterOpen && isFilterInline} />
                   </div>
                 </div>
@@ -458,7 +461,7 @@ function SearchContentInner() {
             </div>
 
             {/* Lecture Grid - 필터 열림: 3열, 닫힘: 4열 */}
-            <div className="grid w-full gap-6 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
+            <div className={`grid w-full gap-6 ${isPCFilterOpen ? 'grid-cols-3' : 'grid-cols-4'}`}>
               {isLectureLoading ? (
                 <div className="col-span-full py-10 text-center text-sm text-gray-500">강의 목록을 불러오는 중...</div>
               ) : lectures.length === 0 ? (
@@ -488,7 +491,7 @@ function SearchContentInner() {
       </div>
 
       {/* Filter Modal - Mobile only */}
-      <div className="md:hidden">
+      <div className="lg:hidden">
         <FilterModal
           isOpen={isFilterModalOpen}
           onClose={() => setIsFilterModalOpen(false)}
