@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { FloatingCartPanel } from '@/features/bootcamp-list'
+import { FloatingCartPanel } from '@/features/lecture'
 import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 import type { LectureDetail } from '@/features/lecture/api/lecture-api.types'

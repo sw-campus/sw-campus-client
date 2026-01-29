@@ -80,7 +80,7 @@ export function BannerDetailModal({
             >
               <Image
                 src={banner.imageUrl}
-                alt={banner.lectureName}
+                alt={banner.lectureName || '배너 이미지'}
                 width={800}
                 height={400}
                 className="h-auto w-full object-contain"
@@ -94,7 +94,13 @@ export function BannerDetailModal({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className="text-muted-foreground text-sm">강의명</div>
-                <div className="text-foreground font-medium">{banner.lectureName}</div>
+                <div className="font-medium">
+                  {banner.lectureName ? (
+                    <span className="text-foreground">{banner.lectureName}</span>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </div>
               </div>
               <div>
                 <div className="text-muted-foreground text-sm">배너 타입</div>

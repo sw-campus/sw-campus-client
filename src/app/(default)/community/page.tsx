@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { HeroBanner } from '@/features/bootcamp-list'
+import { HeroBanner } from '@/features/lecture'
 
 import CommunityContent from './community-content'
 

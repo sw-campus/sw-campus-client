@@ -1,7 +1,7 @@
 /**
  * 배너 타입
  */
-export type BannerType = 'BIG' | 'MIDDLE' | 'SMALL'
+export type BannerType = 'BIG' | 'MIDDLE' | 'SMALL' | 'EVENT'
 
 /**
  * 배너 타입 필터 (ALL 포함)
@@ -13,8 +13,8 @@ export type BannerTypeFilter = 'ALL' | BannerType
  */
 export interface Banner {
   id: number
-  lectureId: number
-  lectureName: string
+  lectureId: number | null
+  lectureName: string | null
   type: BannerType
   url: string | null
   imageUrl: string
@@ -31,6 +31,7 @@ export const BANNER_TYPE_LABEL: Record<BannerType, string> = {
   BIG: '대형',
   MIDDLE: '중형',
   SMALL: '소형',
+  EVENT: '이벤트',
 }
 
 /**
@@ -41,13 +42,14 @@ export const BANNER_TYPE_FILTER_LABEL: Record<BannerTypeFilter, string> = {
   BIG: '대형',
   MIDDLE: '중형',
   SMALL: '소형',
+  EVENT: '이벤트',
 }
 
 /**
  * 배너 생성 요청
  */
 export interface CreateBannerRequest {
-  lectureId: number
+  lectureId?: number | null
   type: BannerType
   url?: string
   imageUrl?: string

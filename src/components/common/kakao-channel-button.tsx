@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react'
 
 import Script from 'next/script'
 import { usePathname } from 'next/navigation'
+import { createPortal } from 'react-dom'
 
 import { useFloatingBarStore } from '@/store/floating-bar.store'
-import { useMediaQuery } from '@/hooks/use-media-query'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 
 declare global {
   interface Window {
@@ -23,10 +24,37 @@ declare global {
 const KAKAO_JAVASCRIPT_KEY = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY
 const KAKAO_CHANNEL_ID = process.env.NEXT_PUBLIC_KAKAO_CHANNEL_ID
 
+function KakaoButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
+      style={{ backgroundColor: '#FEE500' }}
+      aria-label="카카오톡 상담"
+      title="카카오톡 상담"
+    >
+      {/* 카카오톡 말풍선 아이콘 */}
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M12 3C6.48 3 2 6.58 2 11C2 13.77 3.8 16.19 6.5 17.59L5.5 21L9.5 18.5C10.3 18.67 11.14 18.76 12 18.76C17.52 18.76 22 15.18 22 10.76C22 6.34 17.52 3 12 3Z"
+          fill="#3C1E1E"
+        />
+      </svg>
+    </button>
+  )
+}
+
 export default function KakaoChannelButton() {
   const pathname = usePathname()
+  const isMounted = useIsMounted()
   const isFloatingBarOpen = useFloatingBarStore((state) => state.isOpen)
-  const isDesktop = useMediaQuery('(min-width: 1280px)')
   const [pcLeftPosition, setPcLeftPosition] = useState<number | null>(null)
   const [isReady, setIsReady] = useState(false)
 
@@ -70,23 +98,14 @@ export default function KakaoChannelButton() {
     }
   }, [])
 
-  if (isHiddenPage) {
+  if (isHiddenPage || !isMounted) {
     return null
   }
 
-  // 위치 스타일 계산
-  const getPositionStyle = (): React.CSSProperties => {
-    if (isDesktop) {
-      // PC: 동적 위치 또는 오른쪽 고정
-      return pcLeftPosition
-        ? { left: pcLeftPosition, bottom: 40 }
-        : { right: 40, bottom: 40 }
-    }
-    // 모바일: 오른쪽 고정
-    return { right: 16, bottom: isFloatingBarOpen ? 195 : 60 }
-  }
+  // 모바일 위치 계산 (ScrollToTopButton과 동일한 방식)
+  const mobileBottom = isFloatingBarOpen ? 195 : 60
 
-  return (
+  return createPortal(
     <>
       <Script
         src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.7/kakao.min.js"
@@ -96,29 +115,27 @@ export default function KakaoChannelButton() {
         strategy="lazyOnload"
       />
       {isReady && (
-        <button
-          type="button"
-          onClick={handleClick}
-          className="fixed z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
-          style={{ ...getPositionStyle(), backgroundColor: '#FEE500' }}
-          aria-label="카카오톡 상담"
-          title="카카오톡 상담"
-        >
-          {/* 카카오톡 말풍선 아이콘 */}
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+        <>
+          {/* 모바일 버전 - ScrollToTopButton과 동일한 구조 */}
+          <div
+            className="pointer-events-none fixed inset-x-0 z-50 mx-auto w-full max-w-[360px] px-4 transition-all duration-300 xl:hidden"
+            style={{ bottom: mobileBottom }}
           >
-            <path
-              d="M12 3C6.48 3 2 6.58 2 11C2 13.77 3.8 16.19 6.5 17.59L5.5 21L9.5 18.5C10.3 18.67 11.14 18.76 12 18.76C17.52 18.76 22 15.18 22 10.76C22 6.34 17.52 3 12 3Z"
-              fill="#3C1E1E"
-            />
-          </svg>
-        </button>
+            <div className="ml-auto w-fit">
+              <KakaoButton onClick={handleClick} />
+            </div>
+          </div>
+
+          {/* PC 버전 - ScrollToTopButton과 동일한 구조 */}
+          <div
+            className="pointer-events-none fixed z-50 hidden xl:block"
+            style={pcLeftPosition ? { left: pcLeftPosition, bottom: 40 } : { right: 40, bottom: 40 }}
+          >
+            <KakaoButton onClick={handleClick} />
+          </div>
+        </>
       )}
-    </>
+    </>,
+    document.body,
   )
 }

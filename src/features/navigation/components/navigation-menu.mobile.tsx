@@ -48,13 +48,19 @@ function SubAccordionItem({
 
   return (
     <div>
-      <button
+      <div
         className={`flex w-full items-center justify-between rounded py-1.5 ${isOpen || isActive ? 'bg-gray-100 text-gray-700' : 'text-gray-600'}`}
-        onClick={() => setIsOpen(!isOpen)}
       >
-        <span>{item.title}</span>
-        <FiChevronRight className={`transition-transform ${isOpen ? 'rotate-90' : ''}`} size={16} />
-      </button>
+        <Link href={item.href} className="flex-1" onClick={onClose}>
+          {item.title}
+        </Link>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex h-6 w-6 items-center justify-center rounded hover:bg-gray-200"
+        >
+          <FiChevronRight className={`transition-transform ${isOpen ? 'rotate-90' : ''}`} size={16} />
+        </button>
+      </div>
       {isOpen && (
         <div className="ml-2 flex flex-col gap-1 border-l border-gray-200 pb-1 pl-3">
           {item.items.map(subItem => (
@@ -105,13 +111,19 @@ function AccordionMenu({
 
   return (
     <div>
-      <button
+      <div
         className={`flex w-full items-center justify-between py-3 font-semibold ${isOpen || hasActiveChild ? 'text-brand-gold' : 'text-gray-900'}`}
-        onClick={onToggle}
       >
-        <span>{group.title}</span>
-        <FiChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} size={20} />
-      </button>
+        <Link href={group.href || '#'} className="flex-1" onClick={onClose}>
+          {group.title}
+        </Link>
+        <button
+          onClick={onToggle}
+          className="flex h-8 w-8 items-center justify-center rounded hover:bg-gray-100"
+        >
+          <FiChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} size={20} />
+        </button>
+      </div>
       {isOpen && (
         <div className="ml-2 flex flex-col gap-1 border-l border-gray-200 pb-2 pl-4">
           {group.items.map(child => (
@@ -133,7 +145,7 @@ export function NavigationMenuMobileOverlay({
   onLogout,
   isLoggingOut,
 }: Props) {
-  const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(0)
+  const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null)
 
   if (!open) return null
 

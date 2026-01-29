@@ -17,8 +17,8 @@ export default function FloatingCartContainer() {
   const isOpen = useFloatingBarStore((state) => state.isOpen)
   const setIsOpen = useFloatingBarStore((state) => state.setIsOpen)
 
-  // bootcamp-list, lecture 상세/검색 페이지에서는 자체 FloatingCartPanel 사용
-  if (pathname === '/bootcamp-list' || pathname.startsWith('/lectures/')) return null
+  // lecture 상세/검색 페이지에서는 자체 FloatingCartPanel 사용
+  if (pathname.startsWith('/lectures/')) return null
 
   // hydration 완료 전에는 렌더링하지 않음 (flash 방지)
   if (!hasHydrated) return null

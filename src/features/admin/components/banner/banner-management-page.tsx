@@ -50,7 +50,17 @@ export function BannerManagementPage() {
   const totalPages = pageData?.page?.totalPages ?? 0
 
   const handleToggle = (id: number, isActive: boolean) => {
-    toggleMutation.mutate({ id, isActive })
+    toggleMutation.mutate(
+      { id, isActive },
+      {
+        onSuccess: () => {
+          // 모달에서 토글 시 selectedBanner 상태도 업데이트
+          if (selectedBanner && selectedBanner.id === id) {
+            setSelectedBanner({ ...selectedBanner, isActive })
+          }
+        },
+      },
+    )
   }
 
   const handleViewDetail = (banner: Banner) => {

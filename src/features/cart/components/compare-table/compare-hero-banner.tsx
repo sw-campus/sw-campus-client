@@ -1,11 +1,15 @@
+import Image from 'next/image'
+
 export function CompareHeroBanner() {
   return (
     <div className="relative flex h-[250px] w-full flex-col items-center justify-center gap-2.5 overflow-hidden p-2.5">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <img
+        <Image
           alt=""
           className="absolute size-full object-cover"
           src="/images/compare-hero-bg.jpg"
+          fill
+          priority
         />
         <div className="absolute inset-0 bg-black/60" />
       </div>
