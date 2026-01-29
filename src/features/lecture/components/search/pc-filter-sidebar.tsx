@@ -346,7 +346,7 @@ export function PCFilterSidebar({
                       <button
                         key={option}
                         onClick={() => handleCheckboxChange('selectionProcess', option)}
-                        className={`w-full h-9 px-3 rounded-lg text-sm text-left transition-colors ${
+                        className={`w-full h-9 px-3 rounded-lg text-sm text-center transition-colors ${
                           filterValues.selectionProcess.includes(option)
                             ? 'bg-[#FEB706] text-[#020202] font-medium'
                             : 'bg-[#F9F9F9] text-black'

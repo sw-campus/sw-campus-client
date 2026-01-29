@@ -28,7 +28,7 @@ import {
   ServiceGrid,
   QualificationsSection,
   InfoCard,
-} from '@/features/bootcamp-list'
+} from '@/features/lecture'
 
 import LectureReviews from './lecture-reviews'
 import { formatCurrency, tabs, type LectureUIData, type TabType } from './map-lecture-ui-data'

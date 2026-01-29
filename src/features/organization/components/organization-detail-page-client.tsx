@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 
 import { useQuery } from '@tanstack/react-query'
 
-import { PCCartSidebar } from '@/features/bootcamp-list'
+import { PCCartSidebar } from '@/features/lecture'
 import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 import { getOrganizationReviews } from '@/features/lecture/api/review-api.client'

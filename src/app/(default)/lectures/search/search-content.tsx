@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, Suspense } from 'react'
+import { useState, useRef, Suspense, useSyncExternalStore } from 'react'
 
 import { Search, Minus, Maximize2 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -13,15 +13,14 @@ import {
   ComparisonCard,
   FilterSection,
   FilterModal,
-  LectureCard,
   Pagination,
   PCFilterSidebar,
-} from '@/features/bootcamp-list'
+} from '@/features/lecture'
+import { BootcampListItem } from '@/features/home/components/bootcamp-list-item'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup } from '@/components/ui/select'
 import { AiComparePreview } from '@/components/common/ai-compare-preview'
 import { InterestLectureList } from '@/components/common/interest-lecture-list'
-import type { FilterValues } from '@/features/bootcamp-list'
-import { useUnifiedAddToCart } from '@/features/cart/hooks/use-unified-add-to-cart'
+import type { FilterValues } from '@/features/lecture'
 import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 import type { CartItem } from '@/features/cart/types/cart.type'
@@ -35,8 +34,7 @@ import {
   DEFAULT_SORT,
   DEFAULT_PAGE_SIZE,
 } from '@/features/lecture/types/filter.type'
-import type { LectureSummary } from '@/features/lecture/types/lecture.type'
-import { mapLectureResponseToSummary } from '@/features/lecture/utils/map-lecture-response-to-summary'
+import type { LectureResponseDto } from '@/features/lecture/types/lecture-response.type'
 import { trackSearch } from '@/lib/analytics'
 
 const initialFilterValues: FilterValues = {
@@ -60,8 +58,8 @@ function SearchContentInner() {
   const queryString = searchParams.toString()
   const { data, isLoading: isLectureLoading } = useSearchLectureQuery(queryString)
 
-  // API 응답 변환
-  const lectures: LectureSummary[] = (data?.content ?? []).map(mapLectureResponseToSummary)
+  // API 응답 (변환 없이 원본 사용)
+  const lectures: LectureResponseDto[] = data?.content ?? []
   const pageInfo = {
     currentPage: (data?.page?.number ?? 0) + 1, // 0-indexed → 1-indexed
     totalPages: data?.page?.totalPages ?? 1,
@@ -70,7 +68,6 @@ function SearchContentInner() {
 
   // 통합 카트 훅 사용
   const { items: cartItems, isLoading: isCartLoading } = useUnifiedCart()
-  const { addToCart, isPending: isAddPending } = useUnifiedAddToCart()
   const { mutate: removeFromCart } = useUnifiedRemoveFromCart()
 
   // 비교를 위해 선택된 항목 — 고정 슬롯: [왼쪽, 오른쪽]
@@ -89,25 +86,21 @@ function SearchContentInner() {
   const [isPCFilterOpen, setIsPCFilterOpen] = useState(true)
 
   // 필터 사이드바 인라인/플로팅 판별 (기준: --breakpoint-filter-inline in globals.css)
-  const [isFilterInline, setIsFilterInline] = useState(true)
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1400px)')
-    setIsFilterInline(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setIsFilterInline(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
+  const isFilterInline = useSyncExternalStore(
+    (callback) => {
+      const mq = window.matchMedia('(min-width: 1400px)')
+      mq.addEventListener('change', callback)
+      return () => mq.removeEventListener('change', callback)
+    },
+    () => window.matchMedia('(min-width: 1400px)').matches,
+    () => true, // 서버 스냅샷
+  )
 
   // PC AI 비교 섹션 상태 (기본: 펼쳐짐)
   const [isPCCompareSectionOpen, setIsPCCompareSectionOpen] = useState(true)
 
   // 메인 콘텐츠 영역 참조 (장바구니 위치 계산용)
   const mainContentRef = useRef<HTMLDivElement>(null)
-
-  // 카트에 있는 항목인지 확인
-  const isInCart = (lectureId: string) => {
-    return (cartItems ?? []).some(item => item.lectureId === lectureId)
-  }
 
   // 비교 선택 토글 (고정 슬롯)
   const handleToggleSelect = (id: string) => {
@@ -228,19 +221,6 @@ function SearchContentInner() {
     router.push(`/lectures/search?${params.toString()}`)
   }
 
-  const handleAddToCart = (lecture: LectureSummary) => {
-    addToCart({ lectureId: lecture.id })
-  }
-
-  const handleCompare = (lectureId: string) => {
-    // 해당 강의가 카트에 없으면 추가
-    if (!isInCart(lectureId)) {
-      addToCart({ lectureId })
-    }
-    // 비교 페이지로 이동
-    router.push('/cart/compare')
-  }
-
   const handleGoToCompare = () => {
     router.push('/cart/compare')
   }
@@ -345,16 +325,9 @@ function SearchContentInner() {
               <div className="py-10 text-center text-sm text-gray-500">검색 결과가 없습니다.</div>
             ) : (
               lectures.map(lecture => (
-                <LectureCard
-                  key={lecture.id}
+                <BootcampListItem
+                  key={lecture.lectureId}
                   lecture={lecture}
-                  isHighlighted={false}
-                  isInCart={isInCart(String(lecture.id))}
-                  onAddToCart={() => handleAddToCart(lecture)}
-                  onRemoveFromCart={() => handleRemoveFromCart(String(lecture.id))}
-                  onCompare={() => handleCompare(String(lecture.id))}
-                  isPending={isAddPending}
-                  variant="mobile"
                 />
               ))
             )}
@@ -492,16 +465,9 @@ function SearchContentInner() {
                 <div className="col-span-full py-10 text-center text-sm text-gray-500">검색 결과가 없습니다.</div>
               ) : (
                 lectures.map(lecture => (
-                  <LectureCard
-                    key={lecture.id}
+                  <BootcampListItem
+                    key={lecture.lectureId}
                     lecture={lecture}
-                    isHighlighted={false}
-                    isInCart={isInCart(String(lecture.id))}
-                    onAddToCart={() => handleAddToCart(lecture)}
-                    onRemoveFromCart={() => handleRemoveFromCart(String(lecture.id))}
-                    onCompare={() => handleCompare(String(lecture.id))}
-                    isPending={isAddPending}
-                    variant="desktop"
                   />
                 ))
               )}

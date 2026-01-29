@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { HeroBanner } from '@/features/bootcamp-list'
+import { HeroBanner } from '@/features/lecture'
 import { OrganizationList } from '@/features/organization/components/organization-list'
 
 export const metadata: Metadata = {

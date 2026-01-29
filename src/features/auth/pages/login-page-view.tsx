@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -68,7 +69,7 @@ export default function LoginPageView() {
         {/* 브랜드 콘텐츠 */}
         <div className="relative z-10 flex flex-col items-center gap-6 px-12">
           <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-background/90 shadow-xl ring-1 ring-brand-gold/10 backdrop-blur-sm">
-            <img src="/images/logo.png" alt="SOFTWARE CAMPUS" className="h-16 w-16 object-contain" />
+            <Image src="/images/logo.png" alt="SOFTWARE CAMPUS" width={64} height={64} className="object-contain" />
           </div>
           <div className="text-center">
             <h1 className="text-3xl font-bold tracking-tight text-foreground">SOFTWARE CAMPUS</h1>

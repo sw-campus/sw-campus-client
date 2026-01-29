@@ -7,7 +7,7 @@ import { Search } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { PCCartSidebar } from '@/features/bootcamp-list'
+import { PCCartSidebar } from '@/features/lecture'
 import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
 import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 
