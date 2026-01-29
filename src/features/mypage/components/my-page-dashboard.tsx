@@ -430,7 +430,7 @@ export function MyPageDashboard() {
                   </div>
                 ) : (
                   // 성향검사 미완료 - 안내 문구
-                  <div>
+                  <div className="text-center">
                     {hasBasicSurvey ? (
                       // 기초설문 완료, 성향 테스트 미완료
                       <>

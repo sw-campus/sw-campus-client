@@ -212,7 +212,7 @@ export function SurveyResultsStep({
       )}
 
       {/* AI 추천 상태 */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <div
           className={`rounded-xl border p-4 ${
             status?.canUseBasicRecommendation
@@ -251,6 +251,27 @@ export function SurveyResultsStep({
           </div>
           <p className="mt-1 text-sm text-gray-600">
             {status?.canUsePreciseRecommendation
+              ? '사용 가능'
+              : '성향 테스트 완료 필요'}
+          </p>
+        </div>
+        <div
+          className={`rounded-xl border p-4 ${
+            status?.hasAptitudeTest
+              ? 'border-success/30 bg-success/10'
+              : 'border-gray-200 bg-gray-50'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <div
+              className={`h-3 w-3 rounded-full ${
+                status?.hasAptitudeTest ? 'bg-success' : 'bg-gray-300'
+              }`}
+            />
+            <span className="font-medium text-gray-900">후기 조회</span>
+          </div>
+          <p className="mt-1 text-sm text-gray-600">
+            {status?.hasAptitudeTest
               ? '사용 가능'
               : '성향 테스트 완료 필요'}
           </p>

@@ -10,7 +10,7 @@ variables:
 # Lint Check (MR 시)
 lint:
   stage: lint
-  image: node:20-alpine
+  image: node:24-alpine
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   before_script:
