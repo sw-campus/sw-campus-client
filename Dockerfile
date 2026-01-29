@@ -1,5 +1,5 @@
 # Next.js 프로덕션 이미지
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 
 # 의존성 설치 단계 
 FROM base AS deps
