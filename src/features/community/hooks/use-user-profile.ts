@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 
-import { PagedPosts } from '../api/post-api.types'
+import { PagedPosts, PagedCommentedPosts } from '../api/post-api.types'
 import { getUserProfile, getUserPosts, getUserCommentedPosts } from '../api/user-profile-api.client'
 import { UserProfile } from '../api/user-profile-api.types'
 
@@ -49,7 +49,7 @@ export function useUserCommentedPosts(
   userId: number,
   params: { page?: number; size?: number; sort?: string } = {}
 ) {
-  return useQuery<PagedPosts, Error>({
+  return useQuery<PagedCommentedPosts, Error>({
     queryKey: userProfileKeys.commentedPosts(userId, params),
     queryFn: () => getUserCommentedPosts(userId, params),
     staleTime: 1000 * 60, // 1분간 캐시

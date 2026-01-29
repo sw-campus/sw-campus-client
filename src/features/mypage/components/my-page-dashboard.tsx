@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
-import { User, Award, ClipboardCheck, Key, UserX, Pencil, FileText, MessageSquare, Bookmark, Settings, Heart } from 'lucide-react'
+import { User, ClipboardCheck, Key, UserX, Pencil, FileText, MessageSquare, Bookmark, Settings, Heart, LogOut, Trash2, Check } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -19,7 +20,9 @@ import { type WithdrawResponse } from '@/features/mypage/api/member.api'
 
 import { useUserPosts, useUserCommentedPosts } from '@/features/community/hooks/use-user-profile'
 
+import { useLogout } from '@/features/auth/hooks/use-logout'
 import { useCartLecturesQuery } from '@/features/cart/hooks/use-cart-lectures-query'
+import { useRemoveFromCart } from '@/features/cart/hooks/use-remove-from-cart'
 import type { CartItem } from '@/features/cart/types/cart.type'
 import { useBookmarksQuery } from '../hooks/use-bookmarks-query'
 import { useCurrentMemberQuery } from '../hooks/use-current-member-query'
@@ -51,6 +54,7 @@ type MobileSectionTab = 'lecture' | 'community'
 
 export function MyPageDashboard() {
   const router = useRouter()
+  const { logout } = useLogout()
   const [profileModalOpen, setProfileModalOpen] = useState(false)
   const [lectureTab, setLectureTab] = useState<LectureTabType>('all')
   const [communityTab, setCommunityTab] = useState<CommunityTabType>('posts')
@@ -60,6 +64,43 @@ export function MyPageDashboard() {
   const [postsPage, setPostsPage] = useState(0)
   const [commentedPage, setCommentedPage] = useState(0)
   const [bookmarksPage, setBookmarksPage] = useState(0)
+
+  // 커뮤니티 선택 상태
+  const [communitySelectedIds, setCommunitySelectedIds] = useState<Set<number>>(new Set())
+
+  // 탭 변경 시 선택 초기화
+  useEffect(() => {
+    setCommunitySelectedIds(new Set())
+  }, [communityTab])
+
+  // 개별 선택/해제
+  const handleCommunitySelect = (id: number) => {
+    setCommunitySelectedIds(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) {
+        newSet.delete(id)
+      } else {
+        newSet.add(id)
+      }
+      return newSet
+    })
+  }
+
+  // 전체 선택/해제 (데이터 필요)
+  const handleCommunitySelectAll = (allIds: number[]) => {
+    if (communitySelectedIds.size === allIds.length) {
+      setCommunitySelectedIds(new Set())
+    } else {
+      setCommunitySelectedIds(new Set(allIds))
+    }
+  }
+
+  // 삭제 핸들러
+  const handleCommunityDelete = () => {
+    if (communitySelectedIds.size === 0) return
+    // TODO: 삭제 확인 모달 및 API 호출
+    alert(`${communitySelectedIds.size}개 항목을 삭제합니다.`)
+  }
 
   // Modal states for password change and withdrawal
   const [verifyModalOpen, setVerifyModalOpen] = useState(false)
@@ -137,9 +178,18 @@ export function MyPageDashboard() {
               <h1 className="text-xl font-bold text-[#FEB706]">
                 {profile?.nickname || profile?.name || '사용자'}
               </h1>
-              <p className="text-[#FEB706]/80 text-xs mt-1.5">
-                {profile?.email || ''}
-              </p>
+              <div className="flex items-center gap-2 mt-1.5">
+                <p className="text-[#FEB706]/80 text-xs">
+                  {profile?.email || ''}
+                </p>
+                <button
+                  onClick={() => logout().then(() => router.push('/'))}
+                  className="flex items-center gap-1 text-xs text-white/60 hover:text-white transition-colors"
+                >
+                  <LogOut className="w-3 h-3" />
+                  로그아웃
+                </button>
+              </div>
             </div>
 
             {/* 캐릭터 + 설정 버튼 (헤더 위로 넘어가도록) */}
@@ -242,38 +292,38 @@ export function MyPageDashboard() {
             /* 나의 강의 */
             <div className="bg-gray-50 rounded-xl overflow-hidden">
               <div className="p-4 pb-3">
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                   <button
                     onClick={() => setLectureTab('all')}
-                    className={`flex-1 rounded-lg p-3 border transition-colors text-center ${
+                    className={`flex-1 rounded-lg px-2 py-3 border transition-colors text-center ${
                       lectureTab === 'all'
                         ? 'bg-[#FEB706]/10 border-[#FEB706]'
                         : 'bg-white border-gray-100'
                     }`}
                   >
-                    <div className={`text-xs mb-1 ${lectureTab === 'all' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>수료한 강의</div>
+                    <div className={`text-xs mb-1 whitespace-nowrap ${lectureTab === 'all' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>수료한 강의</div>
                     <div className="text-lg font-bold text-[#020202]">{completedLectureCount}</div>
                   </button>
                   <button
                     onClick={() => setLectureTab('reviews')}
-                    className={`flex-1 rounded-lg p-3 border transition-colors text-center ${
+                    className={`flex-1 rounded-lg px-2 py-3 border transition-colors text-center ${
                       lectureTab === 'reviews'
                         ? 'bg-[#FEB706]/10 border-[#FEB706]'
                         : 'bg-white border-gray-100'
                     }`}
                   >
-                    <div className={`text-xs mb-1 ${lectureTab === 'reviews' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>작성한 후기</div>
+                    <div className={`text-xs mb-1 whitespace-nowrap ${lectureTab === 'reviews' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>작성한 후기</div>
                     <div className="text-lg font-bold text-[#020202]">{writtenReviewCount}</div>
                   </button>
                   <button
                     onClick={() => setLectureTab('interest')}
-                    className={`flex-1 rounded-lg p-3 border transition-colors text-center ${
+                    className={`flex-1 rounded-lg px-2 py-3 border transition-colors text-center ${
                       lectureTab === 'interest'
                         ? 'bg-[#FEB706]/10 border-[#FEB706]'
                         : 'bg-white border-gray-100'
                     }`}
                   >
-                    <div className={`text-xs mb-1 ${lectureTab === 'interest' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>관심 등록 강의</div>
+                    <div className={`text-xs mb-1 whitespace-nowrap ${lectureTab === 'interest' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>관심 등록 강의</div>
                     <div className="text-lg font-bold text-[#020202]">{interestLectureCount}</div>
                   </button>
                 </div>
@@ -290,43 +340,67 @@ export function MyPageDashboard() {
             /* 커뮤니티 활동 */
             <div className="bg-gray-50 rounded-xl overflow-hidden">
               <div className="p-4 pb-3">
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                   <button
                     onClick={() => setCommunityTab('posts')}
-                    className={`flex-1 rounded-lg p-3 border transition-colors text-center ${
+                    className={`flex-1 rounded-lg px-2 py-3 border transition-colors text-center ${
                       communityTab === 'posts'
                         ? 'bg-[#FEB706]/10 border-[#FEB706]'
                         : 'bg-white border-gray-100'
                     }`}
                   >
-                    <div className={`text-xs mb-1 ${communityTab === 'posts' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>작성글</div>
+                    <div className={`text-xs mb-1 whitespace-nowrap ${communityTab === 'posts' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>작성글</div>
                     <div className="text-lg font-bold text-[#020202]">{profile?.postCount ?? 0}</div>
                   </button>
                   <button
                     onClick={() => setCommunityTab('commented')}
-                    className={`flex-1 rounded-lg p-3 border transition-colors text-center ${
+                    className={`flex-1 rounded-lg px-2 py-3 border transition-colors text-center ${
                       communityTab === 'commented'
                         ? 'bg-[#FEB706]/10 border-[#FEB706]'
                         : 'bg-white border-gray-100'
                     }`}
                   >
-                    <div className={`text-xs mb-1 ${communityTab === 'commented' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>댓글 활동</div>
+                    <div className={`text-xs mb-1 whitespace-nowrap ${communityTab === 'commented' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>댓글 활동</div>
                     <div className="text-lg font-bold text-[#020202]">{profile?.commentedPostCount ?? 0}</div>
                   </button>
                   <button
                     onClick={() => setCommunityTab('bookmarks')}
-                    className={`flex-1 rounded-lg p-3 border transition-colors text-center ${
+                    className={`flex-1 rounded-lg px-2 py-3 border transition-colors text-center ${
                       communityTab === 'bookmarks'
                         ? 'bg-[#FEB706]/10 border-[#FEB706]'
                         : 'bg-white border-gray-100'
                     }`}
                   >
-                    <div className={`text-xs mb-1 ${communityTab === 'bookmarks' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>북마크</div>
+                    <div className={`text-xs mb-1 whitespace-nowrap ${communityTab === 'bookmarks' ? 'text-[#FF9500]' : 'text-[#888888]'}`}>북마크</div>
                     <div className="text-lg font-bold text-[#020202]">{bookmarkCount}</div>
                   </button>
                 </div>
               </div>
               <div className="border-t border-gray-200 bg-white">
+                {/* 모바일 전체 선택/삭제 버튼 - 리스트 바로 위 */}
+                <div className="flex items-center justify-end gap-3 px-3 pt-3 pb-2">
+                  <button
+                    onClick={() => {
+                      const allIds = communityTab === 'posts'
+                        ? (userPostsData?.posts ?? []).map(p => p.id)
+                        : communityTab === 'commented'
+                          ? (commentedPostsData?.posts ?? []).map(p => p.id)
+                          : (bookmarks ?? []).map(b => b.postId)
+                      handleCommunitySelectAll(allIds)
+                    }}
+                    className="text-xs text-[#888888] hover:text-[#555555] transition-colors"
+                  >
+                    전체 선택
+                  </button>
+                  <button
+                    onClick={handleCommunityDelete}
+                    disabled={communitySelectedIds.size === 0}
+                    className="text-xs text-red-500 hover:text-red-600 transition-colors flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    삭제
+                  </button>
+                </div>
                 <CommunityContentSection
                   tab={communityTab}
                   userPosts={userPostsData?.posts ?? []}
@@ -337,6 +411,8 @@ export function MyPageDashboard() {
                   onPostsPageChange={setPostsPage}
                   onCommentedPageChange={setCommentedPage}
                   onBookmarksPageChange={setBookmarksPage}
+                  selectedIds={communitySelectedIds}
+                  onSelect={handleCommunitySelect}
                 />
               </div>
             </div>
@@ -491,7 +567,7 @@ export function MyPageDashboard() {
           {/* ==================== 오른쪽: 섹션들 (하나의 카드) ==================== */}
           <div className="flex-1 min-w-0 bg-white border border-gray-200 rounded-2xl p-6 flex flex-col gap-8">
             {/* ==================== 섹션 1: 나의 강의 ==================== */}
-            <div className="h-[380px] overflow-hidden">
+            <div className="min-h-[520px]">
             {/* 섹션 헤더 */}
             <h3 className="text-lg font-bold text-[#020202] pb-3 border-b border-[#020202]">나의 강의</h3>
 
@@ -553,47 +629,73 @@ export function MyPageDashboard() {
             {/* 섹션 헤더 */}
             <h3 className="text-lg font-bold text-[#020202] pb-3 border-b border-[#020202]">커뮤니티 활동</h3>
 
-            {/* 탭 버튼 */}
-            <div className="flex gap-6 border-b border-gray-200 mt-2">
-              <button
-                onClick={() => setCommunityTab('posts')}
-                className={`py-3 text-base font-medium transition-colors relative ${
-                  communityTab === 'posts'
-                    ? 'text-[#FF9500]'
-                    : 'text-[#888888] hover:text-[#555555]'
-                }`}
-              >
-                작성한 게시글 ({profile?.postCount ?? 0})
-                {communityTab === 'posts' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF9500]" />
-                )}
-              </button>
-              <button
-                onClick={() => setCommunityTab('commented')}
-                className={`py-3 text-base font-medium transition-colors relative ${
-                  communityTab === 'commented'
-                    ? 'text-[#FF9500]'
-                    : 'text-[#888888] hover:text-[#555555]'
-                }`}
-              >
-                댓글 단 게시글 ({profile?.commentedPostCount ?? 0})
-                {communityTab === 'commented' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF9500]" />
-                )}
-              </button>
-              <button
-                onClick={() => setCommunityTab('bookmarks')}
-                className={`py-3 text-base font-medium transition-colors relative ${
-                  communityTab === 'bookmarks'
-                    ? 'text-[#FF9500]'
-                    : 'text-[#888888] hover:text-[#555555]'
-                }`}
-              >
-                북마크 ({bookmarkCount})
-                {communityTab === 'bookmarks' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF9500]" />
-                )}
-              </button>
+            {/* 탭 버튼 + 전체 선택/삭제 */}
+            <div className="flex items-end justify-between border-b border-gray-200 mt-2">
+              <div className="flex gap-6">
+                <button
+                  onClick={() => setCommunityTab('posts')}
+                  className={`py-3 text-base font-medium transition-colors relative ${
+                    communityTab === 'posts'
+                      ? 'text-[#FF9500]'
+                      : 'text-[#888888] hover:text-[#555555]'
+                  }`}
+                >
+                  작성한 게시글 ({profile?.postCount ?? 0})
+                  {communityTab === 'posts' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF9500]" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setCommunityTab('commented')}
+                  className={`py-3 text-base font-medium transition-colors relative ${
+                    communityTab === 'commented'
+                      ? 'text-[#FF9500]'
+                      : 'text-[#888888] hover:text-[#555555]'
+                  }`}
+                >
+                  작성한 댓글 ({profile?.commentedPostCount ?? 0})
+                  {communityTab === 'commented' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF9500]" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setCommunityTab('bookmarks')}
+                  className={`py-3 text-base font-medium transition-colors relative ${
+                    communityTab === 'bookmarks'
+                      ? 'text-[#FF9500]'
+                      : 'text-[#888888] hover:text-[#555555]'
+                  }`}
+                >
+                  북마크한 게시글 ({bookmarkCount})
+                  {communityTab === 'bookmarks' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF9500]" />
+                  )}
+                </button>
+              </div>
+              {/* 전체 선택 / 삭제 버튼 */}
+              <div className="flex items-center gap-3 pb-3">
+                <button
+                  onClick={() => {
+                    const allIds = communityTab === 'posts'
+                      ? (userPostsData?.posts ?? []).map(p => p.id)
+                      : communityTab === 'commented'
+                        ? (commentedPostsData?.posts ?? []).map(p => p.id)
+                        : (bookmarks ?? []).map(b => b.postId)
+                    handleCommunitySelectAll(allIds)
+                  }}
+                  className="text-xs text-[#888888] hover:text-[#555555] transition-colors"
+                >
+                  전체 선택
+                </button>
+                <button
+                  onClick={handleCommunityDelete}
+                  disabled={communitySelectedIds.size === 0}
+                  className="text-xs text-red-500 hover:text-red-600 transition-colors flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  삭제
+                </button>
+              </div>
             </div>
 
             {/* 콘텐츠 영역 */}
@@ -608,6 +710,8 @@ export function MyPageDashboard() {
                   onPostsPageChange={setPostsPage}
                   onCommentedPageChange={setCommentedPage}
                   onBookmarksPageChange={setBookmarksPage}
+                  selectedIds={communitySelectedIds}
+                  onSelect={handleCommunitySelect}
                 />
             </div>
             </div>
@@ -753,6 +857,10 @@ interface CommunityContentSectionProps {
     commentCount: number
     createdAt: Date
     thumbnailUrl: string | null
+    myComment: string | null
+    myCommentCreatedAt: Date | null
+    myCommentLikeCount: number
+    myCommentReplyCount: number
   }>
   // 페이지네이션
   postsPage: { current: number; total: number }
@@ -761,6 +869,9 @@ interface CommunityContentSectionProps {
   onPostsPageChange: (page: number) => void
   onCommentedPageChange: (page: number) => void
   onBookmarksPageChange: (page: number) => void
+  // 선택 관련
+  selectedIds: Set<number>
+  onSelect: (id: number) => void
 }
 
 function CommunityContentSection({
@@ -773,6 +884,8 @@ function CommunityContentSection({
   onPostsPageChange,
   onCommentedPageChange,
   onBookmarksPageChange,
+  selectedIds,
+  onSelect,
 }: CommunityContentSectionProps) {
   const router = useRouter()
   const { data: bookmarks, isLoading: bookmarksLoading } = useBookmarksQuery()
@@ -813,6 +926,9 @@ function CommunityContentSection({
           likeCount: p.likeCount,
           commentCount: p.commentCount,
           thumbnailUrl: p.thumbnailUrl,
+          myComment: p.myComment,
+          myCommentLikeCount: p.myCommentLikeCount,
+          myCommentReplyCount: p.myCommentReplyCount,
         }))
       case 'bookmarks':
         const allBookmarks = (bookmarks ?? []).map(b => ({
@@ -847,107 +963,217 @@ function CommunityContentSection({
   }
   const pageInfo = getCurrentPageInfo()
 
+  // 개별 선택/해제
+  const handleSelect = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation()
+    onSelect(id)
+  }
+
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <div className="flex h-32 items-center justify-center">
+        <span className="text-sm text-[#888888]">불러오는 중...</span>
+      </div>
+    )
+  }
+
+  // 빈 상태
+  if (data.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-16">
+        <Icon className="w-12 h-12 text-gray-200" />
+        <span className="text-sm text-[#888888]">{emptyText}</span>
+        <button
+          onClick={() => router.push('/community')}
+          className="text-sm text-[#FEB706] hover:underline"
+        >
+          커뮤니티 둘러보기
+        </button>
+      </div>
+    )
+  }
+
   return (
-    <div className="h-full flex flex-col">
-      {/* Content */}
-      {isLoading ? (
-        <div className="flex h-full min-h-[200px] items-center justify-center">
-          <span className="text-sm text-[#888888]">불러오는 중...</span>
-        </div>
-      ) : data.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 py-16">
-          <Icon className="w-12 h-12 text-gray-200" />
-          <span className="text-sm text-[#888888]">{emptyText}</span>
-          <button
-            onClick={() => router.push('/community')}
-            className="text-sm text-[#FEB706] hover:underline"
+    <div>
+      {/* 모바일: 리스트 스타일 */}
+      <div className="sm:hidden space-y-2">
+        {data.map(item => (
+          <div
+            key={item.id}
+            className={`rounded-xl border bg-white p-3 transition-all ${
+              selectedIds.has(item.id) ? 'border-[#FEB706] bg-[#FEB706]/5' : 'border-gray-200'
+            }`}
           >
-            커뮤니티 둘러보기
-          </button>
-        </div>
-      ) : (
-        <div className="flex-1">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.map(item => (
-            <div
-              key={item.id}
-              onClick={() => router.push(`/community/${item.id}`)}
-              className="group cursor-pointer rounded-xl border border-gray-100 bg-white p-3 transition-all hover:border-[#FEB706]/30 hover:shadow-sm"
-            >
-              {/* 썸네일 */}
-              <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 mb-3">
-                {item.thumbnailUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={item.thumbnailUrl}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#FFFCF4] to-[#FFF8E7]">
-                    <FileText className="w-8 h-8 text-[#FEB706]/50" />
-                  </div>
-                )}
-                {/* 카테고리 뱃지 */}
-                <span className="absolute top-2 left-2 rounded-full bg-white/90 px-2.5 py-1 text-xs text-[#555555] shadow-sm">
-                  {item.categoryName}
-                </span>
-              </div>
-
-              {/* 컨텐츠 */}
-              <h4 className="line-clamp-2 text-sm font-medium text-[#020202] transition-colors group-hover:text-[#FEB706] mb-2">
-                {item.title}
-              </h4>
-
-              <div className="flex items-center justify-between text-xs text-[#888888]">
-                <span className="truncate max-w-[100px]">{item.authorNickname}</span>
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-0.5">
-                    <Award className="w-3 h-3" />
-                    {item.likeCount}
-                  </span>
-                  <span className="flex items-center gap-0.5">
-                    <MessageSquare className="w-3 h-3" />
-                    {item.commentCount}
-                  </span>
+            <div className="flex items-start gap-3">
+              {/* 체크박스 */}
+              <button
+                onClick={(e) => handleSelect(item.id, e)}
+                className="mt-0.5 shrink-0"
+              >
+                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                  selectedIds.has(item.id)
+                    ? 'bg-[#FEB706] border-[#FEB706]'
+                    : 'border-gray-300 hover:border-[#FEB706]'
+                }`}>
+                  {selectedIds.has(item.id) && (
+                    <Check className="w-3 h-3 text-white" />
+                  )}
                 </div>
+              </button>
+              {/* 콘텐츠 */}
+              <div
+                className="flex-1 min-w-0 cursor-pointer"
+                onClick={() => router.push(`/community/${item.id}`)}
+              >
+                {/* 댓글 단 게시글: 댓글 메인 + 제목 태그 + 내 댓글 좋아요/대댓글 오른쪽 정렬 */}
+                {tab === 'commented' && 'myComment' in item ? (
+                  <>
+                    <p className="text-sm text-[#020202]">{item.myComment || '-'}</p>
+                    <div className="mt-1.5 flex items-center justify-between">
+                      <span className="text-[9px] text-gray-400 bg-gray-100 px-1 py-0.5 rounded truncate max-w-[60%]">
+                        {item.title}
+                      </span>
+                      <div className="flex items-center gap-2 text-xs text-[#888888]">
+                        <span className="flex items-center gap-0.5">
+                          <Heart className="w-3 h-3" />
+                          {'myCommentLikeCount' in item ? item.myCommentLikeCount : 0}
+                        </span>
+                        <span className="flex items-center gap-0.5">
+                          <MessageSquare className="w-3 h-3" />
+                          {'myCommentReplyCount' in item ? item.myCommentReplyCount : 0}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm font-medium text-[#020202] truncate">
+                      {item.title}
+                    </p>
+                    <div className="mt-1 flex items-center gap-3 text-xs text-[#888888]">
+                      <span className="truncate max-w-[80px]">{item.authorNickname}</span>
+                      <span className="flex items-center gap-0.5">
+                        <Heart className="w-3 h-3" />
+                        {item.likeCount}
+                      </span>
+                      <span className="flex items-center gap-0.5">
+                        <MessageSquare className="w-3 h-3" />
+                        {item.commentCount}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
-          ))}
           </div>
+        ))}
+      </div>
 
-          {/* 페이지네이션 */}
-          {pageInfo && pageInfo.page.total > 1 && (
-            <div className="flex justify-center items-center gap-1 mt-4 pt-4 border-t border-gray-100">
-              <button
-                onClick={() => pageInfo.onPageChange(Math.max(0, pageInfo.page.current - 1))}
-                disabled={pageInfo.page.current === 0}
-                className="px-2 py-1 text-sm text-[#888888] hover:text-[#020202] disabled:opacity-30 disabled:cursor-not-allowed"
+      {/* PC: 테이블 스타일 */}
+      <div className="hidden sm:block overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-100 bg-gray-50">
+              <th className="w-10 py-3"></th>
+              <th className="py-3 text-left text-[#888888] text-xs font-medium">
+                {tab === 'commented' ? '내 댓글' : '제목'}
+              </th>
+              {tab !== 'commented' && (
+                <th className="w-28 py-3 text-left text-[#888888] text-xs font-medium">작성자</th>
+              )}
+              <th className="w-20 py-3 text-center text-[#888888] text-xs font-medium">좋아요</th>
+              <th className="w-20 py-3 text-center text-[#888888] text-xs font-medium">댓글</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item) => (
+              <tr
+                key={item.id}
+                className={`border-b border-gray-50 transition-colors ${
+                  selectedIds.has(item.id)
+                    ? 'bg-[#FEB706]/10'
+                    : 'hover:bg-[#FEB706]/5'
+                }`}
               >
-                이전
-              </button>
-              {Array.from({ length: pageInfo.page.total }, (_, i) => (
-                <button
-                  key={i}
-                  onClick={() => pageInfo.onPageChange(i)}
-                  className={`w-8 h-8 text-sm rounded-full transition-colors ${
-                    pageInfo.page.current === i
-                      ? 'bg-[#FF9500] text-white'
-                      : 'text-[#888888] hover:bg-gray-100'
-                  }`}
+                <td className="py-3 text-center">
+                  <button onClick={(e) => handleSelect(item.id, e)}>
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors mx-auto ${
+                      selectedIds.has(item.id)
+                        ? 'bg-[#FEB706] border-[#FEB706]'
+                        : 'border-gray-300 hover:border-[#FEB706]'
+                    }`}>
+                      {selectedIds.has(item.id) && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                  </button>
+                </td>
+                <td
+                  className="py-3 text-sm text-[#020202] cursor-pointer"
+                  onClick={() => router.push(`/community/${item.id}`)}
                 >
-                  {i + 1}
-                </button>
-              ))}
-              <button
-                onClick={() => pageInfo.onPageChange(Math.min(pageInfo.page.total - 1, pageInfo.page.current + 1))}
-                disabled={pageInfo.page.current >= pageInfo.page.total - 1}
-                className="px-2 py-1 text-sm text-[#888888] hover:text-[#020202] disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                다음
-              </button>
-            </div>
-          )}
+                  {/* 댓글 단 게시글: 댓글 메인 + 제목 태그 */}
+                  {tab === 'commented' && 'myComment' in item ? (
+                    <div>
+                      <p className="text-sm text-[#020202]">{item.myComment || '-'}</p>
+                      <span className="text-[9px] text-gray-400 bg-gray-100 px-1 py-0.5 rounded inline-block mt-1">
+                        {item.title}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="truncate block max-w-[300px]" title={item.title}>
+                      {item.title}
+                    </span>
+                  )}
+                </td>
+                {tab !== 'commented' && (
+                  <td className="py-3 text-sm text-[#888888] truncate max-w-[100px]">{item.authorNickname}</td>
+                )}
+                <td className="py-3 text-center text-sm text-[#888888]">
+                  {tab === 'commented' && 'myCommentLikeCount' in item
+                    ? item.myCommentLikeCount
+                    : item.likeCount}
+                </td>
+                <td className="py-3 text-center text-sm text-[#888888]">
+                  {tab === 'commented' && 'myCommentReplyCount' in item
+                    ? item.myCommentReplyCount
+                    : item.commentCount}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 페이지네이션 */}
+      {pageInfo && pageInfo.page.total > 1 && (
+        <div className="flex justify-center items-center gap-1 mt-4 pt-4 border-t border-gray-100">
+          <button
+            onClick={() => pageInfo.onPageChange(Math.max(0, pageInfo.page.current - 1))}
+            disabled={pageInfo.page.current === 0}
+            className="px-2 py-1 text-sm text-[#888888] hover:text-[#020202] disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            이전
+          </button>
+          {Array.from({ length: pageInfo.page.total }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => pageInfo.onPageChange(i)}
+              className={`w-8 h-8 text-sm rounded-full transition-colors ${
+                pageInfo.page.current === i
+                  ? 'bg-[#FF9500] text-white'
+                  : 'text-[#888888] hover:bg-gray-100'
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => pageInfo.onPageChange(Math.min(pageInfo.page.total - 1, pageInfo.page.current + 1))}
+            disabled={pageInfo.page.current >= pageInfo.page.total - 1}
+            className="px-2 py-1 text-sm text-[#888888] hover:text-[#020202] disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            다음
+          </button>
         </div>
       )}
     </div>
@@ -955,12 +1181,81 @@ function CommunityContentSection({
 }
 
 // 관심등록 강의 섹션
+interface InterestLectureCardProps {
+  lecture: CartItem
+  onClick: () => void
+  onDelete?: () => void
+}
+
+function InterestLectureCard({ lecture, onClick, onDelete }: InterestLectureCardProps) {
+  const [imgError, setImgError] = useState(false)
+
+  const handleImageError = useCallback(() => {
+    setImgError(true)
+  }, [])
+
+  const handleDelete = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    onDelete?.()
+  }, [onDelete])
+
+  const showFallback = !lecture.thumbnailUrl || imgError
+
+  return (
+    <div
+      onClick={onClick}
+      className="group flex cursor-pointer gap-3 rounded-xl border border-gray-200 bg-white p-3 transition-all hover:border-[#FEB706]/30 hover:shadow-sm"
+    >
+      {/* 썸네일 (왼쪽) */}
+      <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded bg-gray-100">
+        {showFallback ? (
+          <div className="flex h-full w-full items-center justify-center bg-gray-100">
+            <span className="text-[8px] text-gray-400">NO IMAGE</span>
+          </div>
+        ) : (
+          <Image
+            src={lecture.thumbnailUrl!}
+            alt={lecture.title}
+            fill
+            sizes="64px"
+            className="object-cover"
+            unoptimized
+            onError={handleImageError}
+          />
+        )}
+      </div>
+
+      {/* 컨텐츠 (가운데) */}
+      <div className="flex min-w-0 flex-1 flex-col justify-center">
+        {lecture.categoryName && (
+          <span className="text-[10px] text-gray-400 mb-0.5">{lecture.categoryName}</span>
+        )}
+        <h4 className="line-clamp-1 text-sm font-medium text-[#020202] transition-colors group-hover:text-[#FEB706]">
+          {lecture.title}
+        </h4>
+        {lecture.orgName && (
+          <span className="text-xs text-[#888888] truncate">{lecture.orgName}</span>
+        )}
+      </div>
+
+      {/* 삭제 버튼 (오른쪽) */}
+      <button
+        onClick={handleDelete}
+        className="shrink-0 self-center px-2 py-1 text-xs text-gray-400 hover:text-red-500 transition-colors"
+      >
+        삭제
+      </button>
+    </div>
+  )
+}
+
 interface InterestLectureSectionProps {
   lectures: CartItem[]
 }
 
 function InterestLectureSection({ lectures }: InterestLectureSectionProps) {
   const router = useRouter()
+  const { mutate: removeFromCart } = useRemoveFromCart()
 
   if (lectures.length === 0) {
     return (
@@ -977,46 +1272,24 @@ function InterestLectureSection({ lectures }: InterestLectureSectionProps) {
     )
   }
 
+  const displayedLectures = lectures.slice(0, 10) // 최대 10개
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {lectures.map(lecture => (
-        <div
+    <div className="pt-4 pb-6 md:pt-0 md:pb-0">
+      <p className="text-xs text-gray-500 mb-3 flex items-center gap-1">
+        <span>⏰</span>
+        <span>관심 등록하신 강의는 일주일간 보관됩니다.</span>
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+      {displayedLectures.map(lecture => (
+        <InterestLectureCard
           key={lecture.lectureId}
+          lecture={lecture}
           onClick={() => router.push(`/lectures/${lecture.lectureId}`)}
-          className="group cursor-pointer rounded-xl border border-gray-100 bg-white p-3 transition-all hover:border-[#FEB706]/30 hover:shadow-sm"
-        >
-          {/* 썸네일 */}
-          <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 mb-3">
-            {lecture.thumbnailUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={lecture.thumbnailUrl}
-                alt={lecture.title}
-                className="w-full h-full object-cover transition-transform group-hover:scale-105"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#FFFCF4] to-[#FFF8E7]">
-                <Heart className="w-8 h-8 text-[#FEB706]/50" />
-              </div>
-            )}
-            {/* 카테고리 뱃지 */}
-            {lecture.categoryName && (
-              <span className="absolute top-2 left-2 rounded-full bg-white/90 px-2.5 py-1 text-xs text-[#555555] shadow-sm">
-                {lecture.categoryName}
-              </span>
-            )}
-          </div>
-
-          {/* 컨텐츠 */}
-          <h4 className="line-clamp-2 text-sm font-medium text-[#020202] transition-colors group-hover:text-[#FEB706] mb-2">
-            {lecture.title}
-          </h4>
-
-          {lecture.orgName && (
-            <span className="text-xs text-[#888888] truncate block">{lecture.orgName}</span>
-          )}
-        </div>
+          onDelete={() => removeFromCart(lecture.lectureId)}
+        />
       ))}
+      </div>
     </div>
   )
 }

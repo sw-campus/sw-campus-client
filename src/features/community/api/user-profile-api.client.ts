@@ -4,8 +4,11 @@ import { ApiUserProfileResponse, UserProfile } from './user-profile-api.types'
 import {
   ApiPageResponse,
   ApiPostResponse,
+  ApiCommentedPostResponse,
   PagedPosts,
+  PagedCommentedPosts,
   mapApiPostToPost,
+  mapApiCommentedPostToCommentedPost,
 } from './post-api.types'
 
 // Mapper function
@@ -73,7 +76,7 @@ export async function getUserPosts(
 export async function getUserCommentedPosts(
   userId: number,
   params: { page?: number; size?: number; sort?: string } = {}
-): Promise<PagedPosts> {
+): Promise<PagedCommentedPosts> {
   const searchParams = new URLSearchParams()
 
   if (params.page !== undefined) {
@@ -89,10 +92,10 @@ export async function getUserCommentedPosts(
   const queryString = searchParams.toString()
   const url = queryString ? `/users/${userId}/commented-posts?${queryString}` : `/users/${userId}/commented-posts`
 
-  const { data } = await api.get<ApiPageResponse<ApiPostResponse>>(url)
+  const { data } = await api.get<ApiPageResponse<ApiCommentedPostResponse>>(url)
 
   return {
-    posts: data.content.map(mapApiPostToPost),
+    posts: data.content.map(mapApiCommentedPostToCommentedPost),
     page: {
       size: data.pageable?.pageSize ?? data.page?.size ?? 10,
       number: data.pageable?.pageNumber ?? data.page?.number ?? 0,
