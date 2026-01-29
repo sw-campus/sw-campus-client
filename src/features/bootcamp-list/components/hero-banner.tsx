@@ -26,7 +26,14 @@ export function HeroBanner({
         {/* 콘텐츠 */}
         <div className="relative h-full px-4 py-2.5 flex flex-col items-center justify-center gap-2.5">
           <h1 className="text-white text-xl md:text-4xl font-bold">{title}</h1>
-          <p className="text-white text-xs md:text-lg text-center max-w-[300px] md:max-w-[600px] whitespace-pre-line">{description}</p>
+          <p className="text-white text-xs md:text-lg text-center max-w-full px-4 md:max-w-[600px]">
+            {description.split('\n').map((part, index, array) => (
+              <span key={index}>
+                {part}
+                {index < array.length - 1 && <br className="md:hidden" />}
+              </span>
+            ))}
+          </p>
         </div>
       </div>
     </div>
