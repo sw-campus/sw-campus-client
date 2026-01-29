@@ -117,8 +117,14 @@ export function BannerForm({
   // 초기 배너 데이터로 폼 초기화 (수정 모드)
   useEffect(() => {
     if (initialBanner) {
-      setSelectedLecture({ id: initialBanner.lectureId, name: initialBanner.lectureName })
-      setSearchKeyword(initialBanner.lectureName)
+      // EVENT 타입이거나 lectureId가 있는 경우에만 강의 정보 설정
+      if (initialBanner.lectureId && initialBanner.lectureName) {
+        setSelectedLecture({ id: initialBanner.lectureId, name: initialBanner.lectureName })
+        setSearchKeyword(initialBanner.lectureName)
+      } else {
+        setSelectedLecture(null)
+        setSearchKeyword('')
+      }
       setFormData({
         type: initialBanner.type,
         url: initialBanner.url || '',
@@ -142,16 +148,22 @@ export function BannerForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!selectedLecture || !formData.startDate || !formData.endDate) {
+    // EVENT 타입은 강의 선택이 선택적
+    const isEventType = formData.type === 'EVENT'
+    if (!isEventType && !selectedLecture) {
+      return
+    }
+    if (!formData.startDate || !formData.endDate) {
       return
     }
 
     onSubmit(
       {
         ...formData,
-        lectureId: selectedLecture.id,
-        lectureName: selectedLecture.name,
-        backgroundColor: selectedColor || undefined,
+        lectureId: selectedLecture?.id ?? null,
+        lectureName: selectedLecture?.name ?? '',
+        // BIG 타입일 때만 배경색 전달
+        backgroundColor: formData.type === 'BIG' ? selectedColor || undefined : undefined,
       },
       imageFile,
     )
@@ -164,7 +176,10 @@ export function BannerForm({
       // 이미지 미리보기 URL 생성
       const previewUrl = URL.createObjectURL(file)
       setImagePreviewUrl(previewUrl)
-      extractColors(previewUrl)
+      // BIG 타입일 때만 색상 추출
+      if (formData.type === 'BIG') {
+        extractColors(previewUrl)
+      }
     }
   }
 
@@ -184,19 +199,36 @@ export function BannerForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* 강의 검색 */}
+      {/* 배너 타입 */}
       <div className="space-y-2">
-        <Label htmlFor="lecture">강의 *</Label>
+        <Label htmlFor="type">배너 타입 *</Label>
+        <Select value={formData.type} onValueChange={(value: BannerType) => setFormData({ ...formData, type: value })}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.keys(BANNER_TYPE_LABEL) as BannerType[]).map(type => (
+              <SelectItem key={type} value={type}>
+                {BANNER_TYPE_LABEL[type]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* 강의 검색 - EVENT 타입은 선택적 */}
+      <div className="space-y-2">
+        <Label htmlFor="lecture">강의 {formData.type !== 'EVENT' && '*'}</Label>
         <div className="relative">
           <Input
             ref={inputRef}
             id="lecture"
             type="text"
-            placeholder="강의명을 검색하세요..."
+            placeholder={formData.type === 'EVENT' ? '강의명을 검색하세요 (선택사항)' : '강의명을 검색하세요...'}
             value={searchKeyword}
             onChange={handleSearchChange}
             onFocus={() => setShowDropdown(true)}
-            required={!selectedLecture}
+            required={formData.type !== 'EVENT' && !selectedLecture}
           />
           {showDropdown && debouncedKeyword.length >= 2 && (
             <div className="bg-popover border-border absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-md border shadow-lg">
@@ -224,23 +256,6 @@ export function BannerForm({
         </div>
       </div>
 
-      {/* 배너 타입 */}
-      <div className="space-y-2">
-        <Label htmlFor="type">배너 타입 *</Label>
-        <Select value={formData.type} onValueChange={(value: BannerType) => setFormData({ ...formData, type: value })}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {(Object.keys(BANNER_TYPE_LABEL) as BannerType[]).map(type => (
-              <SelectItem key={type} value={type}>
-                {BANNER_TYPE_LABEL[type]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
       {/* 이미지 */}
       <div className="space-y-2">
         <Label htmlFor="image">{isEditMode ? '이미지 (변경 시에만 선택)' : '이미지 *'}</Label>
@@ -261,7 +276,7 @@ export function BannerForm({
             {imagePreviewUrl && (
               <div
                 className="relative h-40 w-full overflow-hidden rounded-lg border"
-                style={{ backgroundColor: selectedColor || '#f3f4f6' }}
+                style={{ backgroundColor: formData.type === 'BIG' ? selectedColor || '#f3f4f6' : '#f3f4f6' }}
               >
                 <img src={imagePreviewUrl} alt="미리보기" className="h-full w-full object-contain" />
               </div>
@@ -273,7 +288,7 @@ export function BannerForm({
             {/* 기존 이미지 미리보기 */}
             <div
               className="relative h-40 w-full overflow-hidden rounded-lg border"
-              style={{ backgroundColor: initialBanner.backgroundColor || '#f3f4f6' }}
+              style={{ backgroundColor: formData.type === 'BIG' ? initialBanner.backgroundColor || '#f3f4f6' : '#f3f4f6' }}
             >
               <img src={initialBanner.imageUrl} alt="현재 이미지" className="h-full w-full object-contain" />
             </div>
@@ -281,47 +296,49 @@ export function BannerForm({
         ) : null}
       </div>
 
-      {/* 배경색 선택 */}
-      <div className="space-y-2">
-        <Label>배경색 (이미지 여백 채우기)</Label>
-        {isExtractingColors ? (
-          <div className="text-muted-foreground text-sm">색상 추출 중...</div>
-        ) : extractedColors.length > 0 ? (
-          <div className="space-y-2">
-            <div className="text-muted-foreground text-xs">추출된 색상에서 선택하세요:</div>
-            <div className="flex flex-wrap gap-2">
-              {extractedColors.map((color, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => setSelectedColor(color)}
-                  className={`h-10 w-10 rounded-md border-2 transition-all ${
-                    selectedColor === color
-                      ? 'scale-110 border-blue-500 ring-2 ring-blue-300'
-                      : 'border-gray-300 hover:scale-105'
-                  }`}
-                  style={{ backgroundColor: color }}
-                  title={color}
-                />
-              ))}
+      {/* 배경색 선택 - BIG 타입에서만 표시 */}
+      {formData.type === 'BIG' && (
+        <div className="space-y-2">
+          <Label>배경색 (이미지 여백 채우기)</Label>
+          {isExtractingColors ? (
+            <div className="text-muted-foreground text-sm">색상 추출 중...</div>
+          ) : extractedColors.length > 0 ? (
+            <div className="space-y-2">
+              <div className="text-muted-foreground text-xs">추출된 색상에서 선택하세요:</div>
+              <div className="flex flex-wrap gap-2">
+                {extractedColors.map((color, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setSelectedColor(color)}
+                    className={`h-10 w-10 rounded-md border-2 transition-all ${
+                      selectedColor === color
+                        ? 'scale-110 border-blue-500 ring-2 ring-blue-300'
+                        : 'border-gray-300 hover:scale-105'
+                    }`}
+                    style={{ backgroundColor: color }}
+                    title={color}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ) : selectedColor || (isEditMode && initialBanner?.backgroundColor) ? null : (
-          <div className="text-muted-foreground text-sm">이미지를 선택하면 주요 색상이 자동 추출됩니다.</div>
-        )}
-        <div className="flex items-center gap-2">
-          <Input
-            type="text"
-            placeholder="#FFFFFF"
-            value={selectedColor}
-            onChange={e => setSelectedColor(e.target.value)}
-            className="w-32"
-          />
-          {selectedColor && (
-            <div className="h-8 w-8 rounded border border-gray-300" style={{ backgroundColor: selectedColor }} />
+          ) : selectedColor || (isEditMode && initialBanner?.backgroundColor) ? null : (
+            <div className="text-muted-foreground text-sm">이미지를 선택하면 주요 색상이 자동 추출됩니다.</div>
           )}
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              placeholder="#FFFFFF"
+              value={selectedColor}
+              onChange={e => setSelectedColor(e.target.value)}
+              className="w-32"
+            />
+            {selectedColor && (
+              <div className="h-8 w-8 rounded border border-gray-300" style={{ backgroundColor: selectedColor }} />
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 링크 URL */}
       <div className="space-y-2">
@@ -363,7 +380,7 @@ export function BannerForm({
         <Button type="button" variant="outline" onClick={onCancel}>
           취소
         </Button>
-        <Button type="submit" disabled={isSubmitting || !selectedLecture}>
+        <Button type="submit" disabled={isSubmitting || (formData.type !== 'EVENT' && !selectedLecture)}>
           {isSubmitting ? submittingText : submitText}
         </Button>
       </DialogFooter>
@@ -379,7 +396,7 @@ export function toApiRequest(formData: BannerFormData): CreateBannerRequest {
   return {
     type: formData.type,
     url: formData.url,
-    lectureId: formData.lectureId!,
+    lectureId: formData.lectureId ?? undefined,
     backgroundColor: formData.backgroundColor,
     startDate: toStartOfDayISO(formData.startDate),
     endDate: toEndOfDayISO(formData.endDate),

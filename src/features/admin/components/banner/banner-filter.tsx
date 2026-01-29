@@ -34,6 +34,7 @@ const typeOptions: { label: string; value: BannerTypeFilter }[] = [
   { label: BANNER_TYPE_FILTER_LABEL.BIG, value: 'BIG' },
   { label: BANNER_TYPE_FILTER_LABEL.MIDDLE, value: 'MIDDLE' },
   { label: BANNER_TYPE_FILTER_LABEL.SMALL, value: 'SMALL' },
+  { label: BANNER_TYPE_FILTER_LABEL.EVENT, value: 'EVENT' },
 ]
 
 export function BannerFilter({

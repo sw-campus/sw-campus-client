@@ -99,7 +99,7 @@ export default function LargeBanner() {
               {banner.imageUrl ? (
                 <Image
                   src={banner.imageUrl}
-                  alt={banner.lectureName}
+                  alt={banner.lectureName || '배너 이미지'}
                   fill
                   sizes="(max-width: 1280px) 100vw, 1280px"
                   className="object-contain object-center"
@@ -107,7 +107,7 @@ export default function LargeBanner() {
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-gray-100">
-                  <span className="text-xl font-bold">{banner.lectureName}</span>
+                  <span className="text-xl font-bold">{banner.lectureName || '이벤트 배너'}</span>
                 </div>
               )}
             </div>

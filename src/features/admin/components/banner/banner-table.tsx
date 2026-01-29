@@ -28,6 +28,7 @@ function TypeBadge({ type }: { type: BannerType }) {
     BIG: 'bg-primary/10 text-primary',
     MIDDLE: 'bg-secondary text-secondary-foreground',
     SMALL: 'bg-muted text-muted-foreground',
+    EVENT: 'bg-orange-100 text-orange-700',
   }
 
   return (
@@ -99,8 +100,15 @@ export function BannerTable({ banners, isLoading, isToggling, onViewDetail, onTo
                     <TableCell>
                       <TypeBadge type={banner.type} />
                     </TableCell>
-                    <TableCell className="text-foreground max-w-[100px] truncate text-xs font-medium md:max-w-none md:text-sm" title={banner.lectureName}>
-                      {banner.lectureName}
+                    <TableCell
+                      className="max-w-[100px] truncate text-xs font-medium md:max-w-none md:text-sm"
+                      title={banner.lectureName || undefined}
+                    >
+                      {banner.lectureName ? (
+                        <span className="text-foreground">{banner.lectureName}</span>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-muted-foreground truncate text-xs md:text-sm">
                       {formatDate(banner.startDate)} ~ {formatDate(banner.endDate)}

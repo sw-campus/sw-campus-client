@@ -99,14 +99,14 @@ export default function MidBanner() {
                   {banner.imageUrl ? (
                     <Image
                       src={banner.imageUrl}
-                      alt={banner.lectureName}
+                      alt={banner.lectureName || '배너 이미지'}
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-contain object-center"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center">
-                      <span className="text-xl font-bold">{banner.lectureName}</span>
+                      <span className="text-xl font-bold">{banner.lectureName || '이벤트 배너'}</span>
                     </div>
                   )}
                 </div>

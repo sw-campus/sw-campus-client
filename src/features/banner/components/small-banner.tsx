@@ -86,14 +86,14 @@ export default function SmallBanner() {
               {banner.imageUrl ? (
                 <Image
                   src={banner.imageUrl}
-                  alt={banner.lectureName}
+                  alt={banner.lectureName || '배너 이미지'}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-contain"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-gray-100">
-                  <span className="text-lg font-bold text-gray-600">{banner.lectureName}</span>
+                  <span className="text-lg font-bold text-gray-600">{banner.lectureName || '이벤트 배너'}</span>
                 </div>
               )}
             </div>
