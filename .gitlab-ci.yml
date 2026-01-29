@@ -26,11 +26,12 @@ lint:
       - .pnpm-store/
 
 
-# Build Dev (develop 브랜치 전용)
+# Build Dev (develop 브랜치 전용) - Kaniko 사용 (Docker daemon 불필요)
 build-dev:
   stage: build
-  image: docker:27
-  # Self-hosted Runner uses Docker socket binding (no DinD needed)
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "develop" && $CI_PIPELINE_SOURCE == "web"
@@ -39,26 +40,30 @@ build-dev:
     TAG: "RHSA-$CI_COMMIT_SHA"
   script:
     - |
-      echo "Building DEV image with tag $TAG"
+      echo "Building DEV image with tag $TAG using Kaniko"
 
-      docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+      # GitLab Container Registry 인증 설정
+      mkdir -p /kaniko/.docker
+      echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_JOB_TOKEN} | base64)\"}}}" > /kaniko/.docker/config.json
 
-      docker build \
-        --build-arg NEXT_PUBLIC_API_URL="${DEV_NEXT_PUBLIC_API_URL}" \
-        --build-arg NEXT_PUBLIC_BASE_URL="${DEV_NEXT_PUBLIC_BASE_URL}" \
-        --build-arg NEXT_PUBLIC_GA_ID="${NEXT_PUBLIC_GA_ID}" \
-        --build-arg NEXT_PUBLIC_S3_HOSTNAME="${NEXT_PUBLIC_S3_HOSTNAME}" \
-        --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID="${DEV_NEXT_PUBLIC_GOOGLE_CLIENT_ID}" \
-        --build-arg NEXT_PUBLIC_GITHUB_CLIENT_ID="${DEV_NEXT_PUBLIC_GITHUB_CLIENT_ID}" \
-        --build-arg NEXT_PUBLIC_KAKAO_CLIENT_ID="${DEV_NEXT_PUBLIC_KAKAO_CLIENT_ID}" \
-        --build-arg NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY="${DEV_NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY}" \
-        --build-arg NEXT_PUBLIC_KAKAO_CHANNEL_ID="${DEV_NEXT_PUBLIC_KAKAO_CHANNEL_ID}" \
-        --build-arg NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION="${NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION}" \
-        --build-arg NEXT_PUBLIC_NAVER_SITE_VERIFICATION="${NEXT_PUBLIC_NAVER_SITE_VERIFICATION}" \
-        --build-arg GEMINI_API_KEY="${GEMINI_API_KEY}" \
-        -t $IMAGE_NAME:$TAG .
+      # Kaniko로 빌드 및 푸시
+      /kaniko/executor \
+        --context "${CI_PROJECT_DIR}" \
+        --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
+        --destination "$IMAGE_NAME:$TAG" \
+        --build-arg "NEXT_PUBLIC_API_URL=${DEV_NEXT_PUBLIC_API_URL}" \
+        --build-arg "NEXT_PUBLIC_BASE_URL=${DEV_NEXT_PUBLIC_BASE_URL}" \
+        --build-arg "NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}" \
+        --build-arg "NEXT_PUBLIC_S3_HOSTNAME=${NEXT_PUBLIC_S3_HOSTNAME}" \
+        --build-arg "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${DEV_NEXT_PUBLIC_GOOGLE_CLIENT_ID}" \
+        --build-arg "NEXT_PUBLIC_GITHUB_CLIENT_ID=${DEV_NEXT_PUBLIC_GITHUB_CLIENT_ID}" \
+        --build-arg "NEXT_PUBLIC_KAKAO_CLIENT_ID=${DEV_NEXT_PUBLIC_KAKAO_CLIENT_ID}" \
+        --build-arg "NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY=${DEV_NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY}" \
+        --build-arg "NEXT_PUBLIC_KAKAO_CHANNEL_ID=${DEV_NEXT_PUBLIC_KAKAO_CHANNEL_ID}" \
+        --build-arg "NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=${NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION}" \
+        --build-arg "NEXT_PUBLIC_NAVER_SITE_VERIFICATION=${NEXT_PUBLIC_NAVER_SITE_VERIFICATION}" \
+        --build-arg "GEMINI_API_KEY=${GEMINI_API_KEY}"
 
-      docker push $IMAGE_NAME:$TAG
       echo "IMAGE_TAG=$TAG" >> build.env
   artifacts:
     reports:
@@ -97,20 +102,25 @@ update-manifest-dev:
       fi
 
 
-# Build Release (main 브랜치 전용)
+# Build Release (main 브랜치 전용) - Kaniko 사용 (Docker daemon 불필요)
 build-release:
   stage: build
-  image: docker:27
-  # Self-hosted Runner uses Docker socket binding (no DinD needed)
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /\[skip ci\]/
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "web"
       when: manual
   before_script:
-    - apk add --no-cache nodejs npm jq
+    - |
+      # Kaniko debug 이미지에는 busybox shell 포함
+      # jq 대신 sed 사용
+      echo "Preparing build environment"
   script:
     - |
-      CURRENT_VERSION=$(node -p "require('./package.json').version")
+      # package.json에서 버전 추출 (jq 없이)
+      CURRENT_VERSION=$(cat package.json | grep '"version"' | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/')
       echo "Current version: $CURRENT_VERSION"
 
       MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
@@ -124,27 +134,30 @@ build-release:
       echo "VERSION_TAG=$VERSION_TAG" >> build.env
       echo "NEW_VERSION=$NEW_VERSION" >> build.env
 
-      jq ".version = \"$NEW_VERSION\"" package.json > package.json.tmp
-      mv package.json.tmp package.json
+      # package.json 버전 업데이트 (jq 없이 sed 사용)
+      sed -i "s/\"version\": *\"[^\"]*\"/\"version\": \"$NEW_VERSION\"/" package.json
 
-      docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+      # GitLab Container Registry 인증 설정
+      mkdir -p /kaniko/.docker
+      echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_JOB_TOKEN} | base64)\"}}}" > /kaniko/.docker/config.json
 
-      docker build \
-        --build-arg NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL \
-        --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
-        --build-arg NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID \
-        --build-arg NEXT_PUBLIC_S3_HOSTNAME=$NEXT_PUBLIC_S3_HOSTNAME \
-        --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID \
-        --build-arg NEXT_PUBLIC_GITHUB_CLIENT_ID=$NEXT_PUBLIC_GITHUB_CLIENT_ID \
-        --build-arg NEXT_PUBLIC_KAKAO_CLIENT_ID=$NEXT_PUBLIC_KAKAO_CLIENT_ID \
-        --build-arg NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY=$NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY \
-        --build-arg NEXT_PUBLIC_KAKAO_CHANNEL_ID=$NEXT_PUBLIC_KAKAO_CHANNEL_ID \
-        --build-arg NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=$NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION \
-        --build-arg NEXT_PUBLIC_NAVER_SITE_VERIFICATION=$NEXT_PUBLIC_NAVER_SITE_VERIFICATION \
-        --build-arg GEMINI_API_KEY=$GEMINI_API_KEY \
-        -t $IMAGE_NAME:$VERSION_TAG .
-
-      docker push $IMAGE_NAME:$VERSION_TAG
+      # Kaniko로 빌드 및 푸시
+      /kaniko/executor \
+        --context "${CI_PROJECT_DIR}" \
+        --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
+        --destination "$IMAGE_NAME:$VERSION_TAG" \
+        --build-arg "NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}" \
+        --build-arg "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" \
+        --build-arg "NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}" \
+        --build-arg "NEXT_PUBLIC_S3_HOSTNAME=${NEXT_PUBLIC_S3_HOSTNAME}" \
+        --build-arg "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}" \
+        --build-arg "NEXT_PUBLIC_GITHUB_CLIENT_ID=${NEXT_PUBLIC_GITHUB_CLIENT_ID}" \
+        --build-arg "NEXT_PUBLIC_KAKAO_CLIENT_ID=${NEXT_PUBLIC_KAKAO_CLIENT_ID}" \
+        --build-arg "NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY=${NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY}" \
+        --build-arg "NEXT_PUBLIC_KAKAO_CHANNEL_ID=${NEXT_PUBLIC_KAKAO_CHANNEL_ID}" \
+        --build-arg "NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=${NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION}" \
+        --build-arg "NEXT_PUBLIC_NAVER_SITE_VERIFICATION=${NEXT_PUBLIC_NAVER_SITE_VERIFICATION}" \
+        --build-arg "GEMINI_API_KEY=${GEMINI_API_KEY}"
   artifacts:
     reports:
       dotenv: build.env
