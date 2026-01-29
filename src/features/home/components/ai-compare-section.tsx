@@ -2,13 +2,10 @@
 
 import { useState } from 'react'
 
-import { Star } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { AiComparePreview } from '@/components/common/ai-compare-preview'
 import { InterestLectureList } from '@/components/common/interest-lecture-list'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { InterestLectureSection, ComparisonCard } from '@/features/lecture'
 import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
@@ -26,7 +23,7 @@ export function AiCompareSection() {
   const [selectedSlots, setSelectedSlots] = useState<[string | null, string | null]>([null, null])
 
   // 모바일 관심 과정 섹션 토글
-  const [isInterestSectionOpen, setIsInterestSectionOpen] = useState(false)
+  const [isInterestSectionOpen, setIsInterestSectionOpen] = useState(true)
 
   // InterestLectureList용 selectedIds (null 제외)
   const selectedIds = selectedSlots.filter((id): id is string => id !== null)
@@ -80,30 +77,10 @@ export function AiCompareSection() {
     )
   }
 
-  if (items.length === 0) {
-    return (
-      <section className="container-responsive flex flex-col items-center gap-4 pt-[30px] pb-4 md:gap-6 md:pt-[100px] md:pb-[50px]">
-        <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
-          <span className="text-brand-gold">AI 비교분석</span> 기능으로
-          <br className="md:hidden" /> 최적의 강의를 한눈에 비교해보세요.
-        </h2>
-        <Card className="w-full shadow-lg">
-          <CardContent className="flex flex-col items-center gap-4 p-8">
-            <Star className="text-muted-foreground/50 size-12" />
-            <p className="text-muted-foreground text-center text-sm">관심 과정을 등록하면 AI가 비교 분석해드려요.</p>
-            <Button asChild>
-              <Link href="/lectures/search?categoryIds=1&size=12">강의 둘러보기</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </section>
-    )
-  }
-
   return (
     <section className="container-responsive flex flex-col items-center gap-4 pt-[30px] pb-4 md:gap-6 md:pt-[100px] md:pb-[50px]">
-      {/* 섹션 타이틀 — 데스크톱에서만 표시 (모바일은 InterestLectureSection의 closedMessage 사용) */}
-      <h2 className="text-foreground hidden text-center text-xl font-bold md:block md:text-[32px]">
+      {/* 섹션 타이틀 */}
+      <h2 className="text-foreground text-center text-xl font-bold md:text-[32px]">
         <span className="text-brand-gold">AI 비교분석</span> 기능으로
         <br className="md:hidden" /> 최적의 강의를 한눈에 비교해보세요.
       </h2>
@@ -172,6 +149,7 @@ export function AiCompareSection() {
               lockedCategory={lockedCategory}
               variant="card"
               className="min-h-0 flex-1"
+              emptyMessage="관심 과정을 추가하면 AI가 비교해드려요"
             />
           </CardContent>
         </Card>

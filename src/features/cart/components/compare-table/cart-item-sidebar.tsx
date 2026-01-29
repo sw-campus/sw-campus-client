@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
-import { FiChevronDown } from 'react-icons/fi'
+import { FiChevronDown, FiX } from 'react-icons/fi'
 import { PiRobotDuotone } from 'react-icons/pi'
 
 import { Card } from '@/components/ui/card'
@@ -19,9 +19,10 @@ type Props = {
   canUseItem: (itemCategory: string | undefined) => boolean
   isAlreadySelected: (lectureId: string) => boolean
   onPick: (lectureId: string) => void
+  onRemove?: (lectureId: string) => void
 }
 
-export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlreadySelected, onPick }: Props) {
+export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlreadySelected, onPick, onRemove }: Props) {
   const reduceMotion = useReducedMotion()
   const [isExpanded, setIsExpanded] = useState(true)
 
@@ -110,6 +111,22 @@ export function CartItemSidebar({ items, isLoading, isError, canUseItem, isAlrea
                     {item.categoryName ?? '-'}
                   </div>
                 </div>
+                {onRemove && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onRemove(item.lectureId)
+                    }}
+                    className={cn(
+                      'shrink-0 rounded-full p-1 transition-colors hover:bg-gray-200',
+                      isMobile ? 'size-6' : 'size-7',
+                    )}
+                    aria-label="삭제"
+                  >
+                    <FiX className={cn(isMobile ? 'size-4' : 'size-5', 'text-gray-400')} />
+                  </button>
+                )}
               </button>
             </motion.div>
           )

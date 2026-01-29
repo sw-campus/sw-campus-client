@@ -13,6 +13,7 @@ import { StickyCompareHeader } from '@/features/cart/components/compare-table/st
 import { VsBadge } from '@/features/cart/components/compare-table/vs-badge'
 import { useAiCompare } from '@/features/cart/hooks/use-ai-compare'
 import { useCartComparePageModel } from '@/features/cart/hooks/use-cart-compare-page-model'
+import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 import { getDragLectureId } from '@/features/cart/utils/cart-compare-dnd'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth-store'
@@ -25,6 +26,7 @@ export default function CartCompareSection() {
   const stickyTriggerRef = useRef<HTMLDivElement>(null)
 
   const isLoggedIn = useAuthStore(state => state.isLoggedIn)
+  const { mutate: removeFromCart } = useUnifiedRemoveFromCart()
 
   const {
     items,
@@ -102,6 +104,19 @@ export default function CartCompareSection() {
     handleClearAi()
   }
 
+  // 카트에서 제거 시 선택 슬롯에서도 제거
+  const handleRemoveFromCart = (lectureId: string) => {
+    removeFromCart(lectureId)
+    if (leftId === lectureId) {
+      setLeftId(null)
+      handleClearAi()
+    }
+    if (rightId === lectureId) {
+      setRightId(null)
+      handleClearAi()
+    }
+  }
+
   return (
     <div className="flex w-full flex-col overflow-x-hidden pb-32 md:overflow-x-visible">
       {/* 히어로 배너 */}
@@ -125,6 +140,7 @@ export default function CartCompareSection() {
             canUseItem={canUseItem}
             isAlreadySelected={isAlreadySelected}
             onPick={pickFromList}
+            onRemove={handleRemoveFromCart}
           />
 
           {/* 메인 비교 영역 */}

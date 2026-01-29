@@ -26,7 +26,7 @@ export function InterestLectureList({
   maxSelections = 2,
   variant = 'sidebar',
   title = '관심 과정',
-  emptyMessage = '관심 과정이 없습니다',
+  emptyMessage = '강의 상세 페이지에서 관심 등록을 해보세요',
   className,
 }: InterestLectureListProps) {
   const maxReached = selectedIds.length >= maxSelections
