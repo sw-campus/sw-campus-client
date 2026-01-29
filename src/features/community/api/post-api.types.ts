@@ -177,3 +177,38 @@ export interface AdjacentPosts {
   previous: AdjacentPostItem | null
   next: AdjacentPostItem | null
 }
+
+// 댓글 단 게시글 (내 댓글 포함)
+export interface ApiCommentedPostResponse extends ApiPostResponse {
+  myComment: string | null
+  myCommentCreatedAt: string | null
+  myCommentLikeCount: number
+  myCommentReplyCount: number
+}
+
+export interface CommentedPost extends Post {
+  myComment: string | null
+  myCommentCreatedAt: Date | null
+  myCommentLikeCount: number
+  myCommentReplyCount: number
+}
+
+export interface PagedCommentedPosts {
+  posts: CommentedPost[]
+  page: {
+    size: number
+    number: number
+    totalElements: number
+    totalPages: number
+  }
+}
+
+export function mapApiCommentedPostToCommentedPost(apiPost: ApiCommentedPostResponse): CommentedPost {
+  return {
+    ...mapApiPostToPost(apiPost),
+    myComment: apiPost.myComment,
+    myCommentCreatedAt: apiPost.myCommentCreatedAt ? new Date(apiPost.myCommentCreatedAt) : null,
+    myCommentLikeCount: apiPost.myCommentLikeCount ?? 0,
+    myCommentReplyCount: apiPost.myCommentReplyCount ?? 0,
+  }
+}

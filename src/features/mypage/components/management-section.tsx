@@ -149,7 +149,7 @@ export function ReviewManagementSection({ filterStatus = 'all' }: ReviewManageme
     }
 
     return (
-      <div className="space-y-2">
+      <div className="space-y-2 pt-3">
         {lectures!.map(l => {
           const isExpanded = expandedCardId === l.certificateId
           return (
@@ -277,7 +277,7 @@ export function ReviewManagementSection({ filterStatus = 'all' }: ReviewManageme
                   </TableHeader>
                   <TableBody>
                     {lectures!.map((l, idx) => (
-                      <TableRow key={l.certificateId} className="hover:bg-gray-50 transition-colors border-b border-gray-50">
+                      <TableRow key={l.certificateId} className="hover:bg-[#FEB706]/5 transition-colors border-b border-gray-50">
                         <TableCell className="text-center text-[#888888] text-sm">{idx + 1}</TableCell>
                         <TableCell className="max-w-[200px] truncate text-sm text-[#020202]" title={l.lectureName}>
                           {l.lectureName}
@@ -299,7 +299,7 @@ export function ReviewManagementSection({ filterStatus = 'all' }: ReviewManageme
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-7 w-7 hover:bg-gray-100"
+                                  className="h-7 w-7 hover:bg-[#FEB706]/10"
                                   onClick={() => {
                                     setSelectedCertificate(l)
                                     setCertImageError(null)
@@ -337,7 +337,7 @@ export function ReviewManagementSection({ filterStatus = 'all' }: ReviewManageme
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-7 w-7 hover:bg-gray-100"
+                                    className="h-7 w-7 hover:bg-[#FEB706]/10"
                                     onClick={() => {
                                       setSelectedReviewId(l.reviewId ?? null)
                                       setSelectedLectureId(l.lectureId)
