@@ -22,7 +22,7 @@ export default function CommunityPage() {
       <div className="w-full">
         <HeroBanner
           title="부트캠프 수강일기"
-          description="매주 배운 내용과 성장 과정을 기록하고, 동료들과 함께 성장하세요"
+          description={"매주 배운 내용과 성장 과정을 기록하고, \n동료들과 함께 성장하세요"}
           backgroundImageUrl="/images/bootcamp-hero.jpg"
         />
       </div>

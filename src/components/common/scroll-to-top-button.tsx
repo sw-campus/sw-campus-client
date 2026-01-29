@@ -85,11 +85,10 @@ export function ScrollToTopButton() {
       </div>
 
       {/* PC 버전 - 장바구니 사이드바와 같은 가로 위치, 톡상담 버튼 위 */}
-      {pcLeftPosition && (
-        <div
-          className="pointer-events-none fixed z-40 hidden xl:block"
-          style={{ left: pcLeftPosition, bottom: 100 }}
-        >
+      <div
+        className="pointer-events-none fixed z-40 hidden xl:block"
+        style={pcLeftPosition ? { left: pcLeftPosition, bottom: 100 } : { right: 40, bottom: 100 }}
+      >
           <AnimatePresence>
             {isVisible && (
               <motion.button
@@ -109,7 +108,6 @@ export function ScrollToTopButton() {
             )}
           </AnimatePresence>
         </div>
-      )}
     </>,
     document.body,
   )

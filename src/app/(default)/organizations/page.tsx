@@ -21,7 +21,7 @@ export default function OrganizationsPage() {
       <div className="w-full">
         <HeroBanner
           title="훈련기관"
-          description="훈련기관을 살펴보고 훈련기관 별 교육과정도 확인해보세요."
+          description={"훈련기관을 살펴보고 \n훈련기관 별 교육과정도 확인해보세요."}
           backgroundImageUrl="/images/org/organization_banner.jpg"
         />
       </div>

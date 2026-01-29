@@ -1,7 +1,12 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+
 import { useQuery } from '@tanstack/react-query'
 
+import { PCCartSidebar } from '@/features/bootcamp-list'
+import { useUnifiedCart } from '@/features/cart/hooks/use-unified-cart'
+import { useUnifiedRemoveFromCart } from '@/features/cart/hooks/use-unified-remove-from-cart'
 import { getOrganizationReviews } from '@/features/lecture/api/review-api.client'
 
 import { fetchOrganizationLectures } from '../api/organization-api'
@@ -19,8 +24,22 @@ interface OrganizationDetailPageClientProps {
  * API 연동을 통해 실제 데이터 표시
  */
 export function OrganizationDetailPageClient({ organizationId, initialData }: OrganizationDetailPageClientProps) {
+  const router = useRouter()
+
   // 기관 상세 정보 조회
   const { data: organization, isLoading: isOrgLoading } = useOrganizationDetailQuery(organizationId, initialData)
+
+  // 장바구니 (관심 항목)
+  const { items: cartItems } = useUnifiedCart()
+  const { mutate: removeFromCart } = useUnifiedRemoveFromCart()
+
+  const handleRemoveFromCart = (lectureId: string) => {
+    removeFromCart(lectureId)
+  }
+
+  const handleGoToCompare = () => {
+    router.push('/cart/compare')
+  }
 
   // 기관별 후기 총 개수 조회 (탭 표시용 - 별도 queryKey 사용)
   const { data: reviewData } = useQuery({
@@ -57,5 +76,16 @@ export function OrganizationDetailPageClient({ organizationId, initialData }: Or
     )
   }
 
-  return <OrganizationDetail organization={organization} totalReviews={totalReviews} totalLectures={totalLectures} />
+  return (
+    <>
+      <OrganizationDetail organization={organization} totalReviews={totalReviews} totalLectures={totalLectures} />
+
+      {/* PC Cart Sidebar - 데스크탑에서 오른쪽에 표시 */}
+      <PCCartSidebar
+        items={cartItems}
+        onRemove={handleRemoveFromCart}
+        onCompare={handleGoToCompare}
+      />
+    </>
+  )
 }
