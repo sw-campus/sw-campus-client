@@ -21,7 +21,6 @@ export { ComparisonCard } from './components/search/comparison-card'
 export { FilterSection } from './components/search/filter-section'
 export { FilterModal } from './components/search/filter-modal'
 export type { FilterValues } from './components/search/filter-modal'
-export { LectureCard as SearchLectureCard } from './components/search/lecture-card'
 export { Pagination } from './components/search/pagination'
 export { PCFilterSidebar } from './components/search/pc-filter-sidebar'
 // Shared components
